@@ -1,0 +1,37 @@
+# .gitignore — slep_idps (RAMA A: proyecto publico, datos versionados)
+# Los datos son agregados publicos de la Agencia de Calidad y se versionan
+# dentro del repo. Por eso NO se incluye el bloque de exclusion de datos.
+
+# Credenciales
+.env
+.Renviron
+*credentials*
+*secret*
+*token*
+*password*
+
+# Sistema
+.Rproj.user/
+.Rhistory
+.RData
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+# Nota: *.Rproj SI se versiona (ancla del proyecto; sin el, here::here() no
+# resuelve en otra maquina). Solo .Rproj.user/ se ignora.
+
+# Snapshots y backups locales
+_archivo/
+*.bak
+
+# Outputs accidentales en raiz y scripts de diagnostico
+/*.docx
+/*.pdf
+/diagnostico_*.md
+/verificar_*.R
+/listar_*.R
+
+# Outputs temporales
+*_freeze/
+.quarto/

@@ -1,0 +1,90 @@
+ESCANEO DE ESTRUCTURA — slep_idps
+Raiz   : /Users/tomgc/Projects/slep_idps
+Fecha  : 2026-06-11 19:54:53
+Totales: 13 carpetas, 61 archivos
+Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
+
+slep_idps/
+├── 10_utils/
+│   ├── 10_configuracion.R  (2.38K)
+│   └── 10_utils.R  (1.68K)
+├── 20_insumos/
+│   ├── auxiliares/
+│   │   ├── idps4b2025_GLOSAS_web_preliminar.xlsx  (34.4K)
+│   │   ├── Metodología+de+Cálculo+IDPS.pdf  (3.58M)
+│   │   ├── REX N° 1440 (Nueva Politica General Seguridad).pdf  (995K)
+│   │   ├── REX N° 1459 (Deja sin ef REX 695, 701, 241 y 333).pdf  (3.16M)
+│   │   └── Taller+Conozcamos+los+IDPS+para+docentes+y+estudiantes.pdf  (1.68M)
+│   ├── .DS_Store  (6K)
+│   ├── .gitkeep  (0)
+│   ├── idps2m_niveles_final.xlsx  (3.44M)
+│   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
+│   ├── idps2m2022_rbd_final.xlsx  (659K)
+│   ├── idps2m2022_rbd_glosa_pública_final.xlsx  (33K)
+│   ├── idps2m2023_GLOSAS_rbd_público_final.xlsx  (38.2K)
+│   ├── idps2m2023_rbd_dim_final.xlsx  (1.99M)
+│   ├── idps2m2023_rbd_final.xlsx  (735K)
+│   ├── idps2m2024_GLOSAS_web_final.xlsx  (34K)
+│   ├── idps2M2024_rbd_dim_final.xlsx  (2.01M)
+│   ├── idps2M2024_rbd_final.xlsx  (1.06M)
+│   ├── idps2M2024_rbd_niveles_final.xlsx  (3.35M)
+│   ├── idps2m2025_GLOSAS_web_preliminar.xlsx  (34.4K)
+│   ├── idps2M2025_rbd_dim_preliminar.xlsx  (2.2M)
+│   ├── idps2M2025_rbd_preliminar.xlsx  (976K)
+│   ├── idps2m2025_rbd_subdim_niveles_preliminar.xlsx  (3.2M)
+│   ├── idps4b_niveles_final.xlsx  (7.59M)
+│   ├── idps4b2022_rbd_dim_final.xlsx  (4.78M)
+│   ├── idps4b2022_rbd_final.xlsx  (1.53M)
+│   ├── idps4b2022_rbd_glosa_pública_final.xlsx  (33K)
+│   ├── idps4b2023_GLOSAS_rbd_público_final.xlsx  (37.5K)
+│   ├── idps4b2023_rbd_dim_final.xlsx  (4.69M)
+│   ├── idps4b2023_rbd_final.xlsx  (1.68M)
+│   ├── idps4B2025_rbd_dim_preliminar.xlsx  (5.08M)
+│   ├── idps4B2025_rbd_preliminar.xlsx  (2.09M)
+│   ├── idps4b2025_rbd_subdim_niveles_preliminar.xlsx  (7.01M)
+│   ├── idps6b2024_GLOSAS_web_final.xlsx  (34K)
+│   ├── idps6B2024_rbd_dim_preliminar.xlsx  (4.7M)
+│   ├── idps6B2024_rbd_niveles_preliminar.xlsx  (7.42M)
+│   ├── idps6B2024_rbd_preliminar.xlsx  (2.41M)
+│   ├── idps8b2025_GLOSAS_web_preliminar.xlsx  (34.3K)
+│   ├── idps8B2025_rbd_dim_preliminar.xlsx  (4.38M)
+│   ├── idps8B2025_rbd_preliminar.xlsx  (1.88M)
+│   └── idps8b2025_rbd_subdim_niveles_preliminar.xlsx  (6.18M)
+├── 30_procesamiento/
+│   ├── .gitkeep  (0)
+│   └── idps_radar_prototipo.jsx  (12.9K)
+├── 40_salidas/
+│   └── intermedios/
+│       └── .gitkeep  (0)
+├── 50_documentacion/
+│   ├── activa/
+│   │   ├── decisiones/
+│   │   │   └── .gitkeep  (0)
+│   │   ├── POLITICA_PROYECTO.md  (29.7K)
+│   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
+│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (24.7K)
+│   ├── andamios/
+│   │   └── .gitkeep  (0)
+│   ├── estructura/
+│   │   └── .gitkeep  (0)
+│   ├── traspasos/
+│   │   └── .gitkeep  (0)
+│   └── .DS_Store  (8K)
+├── tests/
+│   └── .gitkeep  (0)
+├── .DS_Store  (10K)
+├── .gitignore  (711)
+├── 00_build.R  (1.24K)
+├── 00_escanear_proyecto.R  (8.99K)
+├── CLAUDE.md  (1.67K)
+├── README.md  (1.74K)
+└── slep_idps.Rproj  (195)
+
+Conteo por extension:
+  xlsx               34
+  (sin extension)    12
+  md                 5
+  pdf                4
+  r                  4
+  jsx                1
+  rproj              1

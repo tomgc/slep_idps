@@ -1,0 +1,540 @@
+# SETTINGS_Y_PROMPTS_OPERACIONALES.md
+
+> **Versión 1 (consolidada).** Vive permanentemente en la knowledge base
+> del Project (y se copia a `50_documentacion/activa/` de cada proyecto).
+> Absorbe y reemplaza a: `prompt-apertura-sesion.md` (v3),
+> `prompt-cierre-sesion.md` (v4), `prompt_orquestador.md`,
+> `prompt_migrar_estructura.md` (v2), `prompt_migracion_github_v2.md` y
+> `prompt_portabilidad_cross_os.md`. La arquitectura que esos prompts
+> implementaban vive ahora en `POLITICA_PROYECTO.md` v5; aquí viven los
+> PROTOCOLOS de sesión y de operación.
+>
+> **Regla crítica de automatización:** este documento y la política viven
+> en la knowledge base. El asistente los procesa proactivamente al inicio
+> de cada sesión. JAMÁS pide al usuario que los adjunte. Solo en un chat
+> suelto fuera de un Project, y solo si la tarea los requiere, los
+> solicita una vez. Si la knowledge base contiene una versión más
+> reciente de un documento que la citada en el traspaso, usar la más
+> reciente y declararlo en el acuse de recibo.
+>
+> **Nomenclatura de principios:** las referencias B.N / C.N apuntan a
+> los principios de interacción (B) y técnicos (C) de la política,
+> sección 5 (B.1 pensar antes de codificar, B.2 simplicidad, B.3 cambios
+> quirúrgicos, B.4 ejecución dirigida por objetivos; C.N = numeración de
+> la sección 5.2-5.3).
+
+---
+
+## 1. Protocolo de sesiones
+
+### 1.1 Clasificación (primer paso de toda sesión)
+
+Cuatro tipos:
+
+- **CONTINUATION:** retomar un proyecto en curso. Señales: "continuemos
+  con", "retomar", "donde quedamos", traspaso adjunto.
+- **NEW PROJECT:** proyecto de desarrollo desde cero. Señales:
+  descripción de algo a construir, requerimientos, pedido de andamiaje.
+- **ONE-OFF:** consulta aislada sin ciclo de vida (1-5 turnos). Una
+  pregunta, una revisión, una explicación.
+- **BIBLIOTECA:** sesión generativa que produce artefactos para
+  `herramientas_dev/` (políticas, prompts, plantillas). Taller, no
+  consulta: si el primer mensaje pide diseñar o mejorar instrumental,
+  es BIBLIOTECA aunque parezca simple.
+
+Si tras el primer mensaje el tipo es ambiguo, UNA pregunta para
+clasificar y proceder.
+
+### 1.2 CONTINUATION
+
+El objetivo de la apertura es **analizar, comprender, planificar y
+proponer antes de tocar una sola línea de código**. Sin atajos.
+
+#### 1.2.1 Insumos
+
+(a) Esta knowledge base (política + este documento), leída sin pedirla.
+(b) El traspaso `traspaso_cierre_vNN.md` de la sesión anterior.
+(c) El escáner reciente (`estructura_actual.md`).
+Si (b) o (c) faltan y no están en la knowledge base, pedirlos en un
+solo mensaje y detenerse. Insumo opcional: `CLAUDE.md` del proyecto si
+la sesión correrá en Claude Code.
+
+#### 1.2.2 Fase A — Lectura y verificación
+
+1. Leer la política completa (estructura, naming, gobernanza,
+   principios de la sección 5) y el traspaso completo de principio a
+   fin, **incluido todo el backlog acumulativo**. No escanear, no
+   resumir prematuramente, no saltar secciones.
+2. Comparar el árbol del escáner con la estructura canónica de la
+   política. Toda desviación (carpetas con nombres antiguos, archivos
+   fuera de lugar, huecos de numeración) se marca como **deuda
+   heredada**, no se "ajusta" en silencio.
+3. Ejecutar la auditoría de apertura (política, sección 5.6, preguntas
+   marcadas "Apertura") y anotar hallazgos.
+
+#### 1.2.3 Fase B — Acuse de recibo estructurado
+
+```markdown
+## Acuse de recibo — Traspaso vNN
+
+### Estado comprendido
+[Resumen en palabras propias: qué funciona, qué no, qué cambió en la última sesión]
+
+### Bugs y resoluciones asimilados
+- **Bug N:** [síntoma] → **Causa raíz:** [comprensión] → **Regla aprendida:** [regla a respetar]
+
+### Restricciones técnicas vigentes
+[Todas las restricciones, convenciones y trampas que deben respetarse]
+
+### Instrucciones específicas heredadas
+[Reproducción literal de la sección 12 del traspaso]
+
+### Estado del backlog
+[Total de cambios acumulados, sesiones completadas, 3-4 categorías dominantes con porcentaje]
+
+### Principios activados para esta sesión
+- **B.2 (Simplicidad primero):** aplica porque [razón concreta].
+- **C.6 vs B.2:** tensión a monitorear porque [razón].
+
+### Auditoría de apertura (política 5.6)
+- [pregunta] → [Sí / No — acción requerida]
+```
+
+Cerrar con confirmación explícita de haber procesado política,
+traspaso (con N bugs, N restricciones, N pendientes, backlog de NNN
+cambios) y escáner. Declarar aquí si se usó una versión de documento
+más reciente que la citada en el traspaso.
+
+#### 1.2.4 Fase C — Ruta de desarrollo propuesta
+
+No esperar a que el usuario diga qué hacer: con el traspaso completo,
+el asistente propone.
+
+```markdown
+## Ruta de desarrollo propuesta para esta sesión
+
+### Diagnóstico de situación
+[1-2 párrafos: dónde está el proyecto, urgencias, patrón del backlog
+(¿deuda acumulándose? ¿bugs bloqueantes? ¿deuda heredada detectada?)]
+
+### Prioridad N: [Título]
+- **Qué:** descripción concreta.
+- **Por qué en este orden:** justificación relativa.
+- **Complejidad estimada:** Baja / Media / Alta.
+- **Principios relevantes:** B.N / C.N.
+- **Criterio de éxito (B.4):** condición verificable de término.
+
+### Tareas que sugiero NO abordar en esta sesión
+[Pendientes a diferir y por qué]
+
+### Ruta alternativa (opcional)
+[Camino distinto igualmente válido, con recomendación explícita]
+```
+
+Tantas prioridades como quepan razonablemente en una sesión; no inflar.
+
+**Criterios de priorización, en este orden:** (1) bugs activos siempre
+primero; (2) bloqueantes; (3) instrucciones explícitas del traspaso
+(⚠️ / ✅ / 🔒); (4) deuda heredada de la auditoría de apertura; (5)
+deuda técnica acumulada (patrón de bugfixes recurrentes en la misma
+zona → proponer refactor antes de construir encima); (6) pendientes de
+alta complejidad al inicio, cuando hay más contexto; (7) funcionalidad
+nueva; (8) cosmética y documentación al final o en sesión dedicada.
+
+**Esta es la única compuerta de aprobación de la sesión.** El usuario
+aprueba, reordena o propone alternativa; cualquiera es válido.
+
+#### 1.2.5 Fase D — Ejecución por tarea
+
+Con la ruta aprobada, se ejecuta con autonomía (política 0.3): solo se
+interrumpe por decisión estratégica vital, archivo crítico faltante o
+compuerta de gobernanza. Por cada tarea, antes de codificar, plan
+compacto (presentado y ejecutado en el mismo turno salvo que active
+una de esas tres excepciones):
+
+```markdown
+## Plan — [Tarea]
+- **Objetivo:** [una oración]
+- **Criterio de éxito (B.4):** [definido ANTES de codificar]
+- **Archivos involucrados:** [rutas relativas y rol]
+- **Impacto:** [funciones afectadas directa/indirectamente, insumos requeridos, salidas que cambian]
+- **Riesgos:** [riesgo + mitigación]
+- **Verificación contra traspaso y principios:** [restricciones o bugs previos que aplican; tensiones declaradas]
+```
+
+Construcción incremental en bloques verificables (flujo: comprender →
+planificar → construir → verificar → documentar). Tras cada bloque:
+¿reintroduce un bug documentado?, ¿respeta restricciones del traspaso,
+principios, política y convenciones?, ¿tocó solo lo necesario (B.3)?
+
+Si el usuario pide algo que contradice un principio, una restricción
+del traspaso, una regla aprendida o la política, señalarlo ANTES de
+proceder, citando la fuente: "Antes de avanzar: [regla/principio]
+indica [X]; lo que propones [riesgo]. ¿Procedemos o ajustamos?"
+
+#### 1.2.6 Reglas permanentes de la sesión
+
+- **NUNCA modificar código sin haberlo leído primero.** La fuente
+  principal de errores entre sesiones es operar sobre un estado
+  supuesto. No asumir el contenido de un archivo ni su ubicación: leer
+  el archivo, consultar el escáner (y pedir re-correrlo si está
+  desactualizado).
+- **NUNCA aplicar cambios no solicitados ni aprobados** (B.3). Las
+  mejoras detectadas se mencionan, no se implementan.
+- **Un cambio conceptual por intervención:** un cambio, una
+  explicación, una verificación. No agrupar cambios distintos.
+- **Bugs: causa raíz antes de corregir.** Diagnosticar, documentar,
+  verificar si es un caso conocido del traspaso, y solo entonces
+  corregir, verificando no romper otra cosa.
+- **La política es contrato, no sugerencia.** Desviaciones se
+  documentan como deuda heredada y se proponen como pendiente.
+
+#### 1.2.7 Registro continuo para el cierre
+
+Durante toda la sesión, registrar mentalmente por cada cambio: qué y
+por qué, categoría temática del backlog, causa raíz si hubo bug,
+alternativas si hubo decisión de diseño, tensiones entre principios y
+cómo se resolvieron. Es el insumo del traspaso (sección 2).
+
+### 1.3 NEW PROJECT
+
+Sin traspaso. Primera acción obligatoria: la pregunta de bifurcación
+por sensibilidad de datos (política, sección 8.1). Luego el plan:
+
+```markdown
+Comprensión del proyecto
+[2-4 bullets en palabras propias]
+
+Supuestos que estoy haciendo
+[supuestos e inferencias declarados]
+
+Ruta de trabajo propuesta
+[3-6 pasos numerados; el paso 1 es siempre la inicialización según la
+rama A o B de la política, sección 8]
+
+Decisiones que necesito de ti antes de empezar
+[solo bloqueantes; la sensibilidad de datos ya debe estar resuelta]
+
+¿Avanzamos con el paso 1 o ajustamos la ruta?
+```
+
+Desde la aprobación de la ruta aplican las fases D y siguientes de
+1.2, y el primer cierre genera el traspaso v01 con el backlog inicial
+(objetivo del proyecto, nota metodológica y taxonomía inicial; ver
+2.2.5).
+
+### 1.4 ONE-OFF
+
+Sin protocolo. Responder directo. Sin ritual de cierre.
+
+### 1.5 BIBLIOTECA
+
+Sin apertura formal. Responder directo. Si la sesión produce 3 o más
+artefactos persistentes, ofrecer proactivamente un **cierre liviano**:
+
+```markdown
+Artefactos producidos
+[lista de archivos con destino]
+
+Decisiones clave
+[2-4 decisiones de diseño que conviene recordar]
+
+Próximos artefactos posibles
+[ideas no materializadas]
+```
+
+Guardar como `herramientas_dev/logs/YYYYMMDD_sesion_<tema>.md` previa
+confirmación del usuario.
+
+### 1.6 Prohibido en cualquier tipo
+
+Aperturas vagas ("¿en qué trabajamos hoy?"); acuses genéricos antes del
+plan; empezar trabajo tangible antes de entregar el plan (cuando
+aplica); planes no anclados en insumos reales.
+
+---
+
+## 2. Protocolo de cierre de sesión de proyecto
+
+### 2.1 Generación
+
+Al cerrar una sesión CONTINUATION o NEW PROJECT, generar
+`traspaso_cierre_vNN.md` (correlativo global, dos dígitos; snake_case
+según la política, sección 2; unifica la grafía antigua con guiones)
+en `50_documentacion/traspasos/`. El traspaso es el **único puente**
+entre sesiones: todo lo que no quede ahí, se pierde. Antes de cerrar:
+ejecutar el escáner y referenciarlo.
+
+Incluir TODAS las secciones de 2.2; si una no aplica, incluirla con
+"No aplica en esta sesión" y justificación breve.
+
+### 2.2 Estructura del traspaso
+
+1. **Identificación:** proyecto, versión vNN, fecha, sesión N con foco
+   en 1-2 oraciones, entorno, archivos principales modificados.
+2. **Resumen ejecutivo:** un párrafo de 5-8 oraciones (qué se propuso,
+   qué se logró, qué quedó pendiente, estado general). Suficiente por
+   sí solo para entender la situación.
+3. **Estado al cierre:** qué funciona (con última ejecución exitosa),
+   qué no funciona (síntoma observable), delta respecto a vNN-1.
+4. **Registro detallado de cambios:** un bloque por cambio
+   conceptualmente independiente (no agrupar aunque compartan archivo):
+   archivo(s), categoría temática, qué se hizo, por qué (C.11), cómo se
+   verificó (B.4), líneas o secciones clave, dependencias afectadas,
+   tensiones entre principios si las hubo.
+5. **Backlog acumulativo** (ver 2.2.5).
+6. **Bugs de la sesión:** síntoma observable, causa raíz, solución
+   exacta (archivo/línea), criterio de verificación, **patrón general
+   aprendido** como regla aplicable, principios violados o aplicados,
+   estado (resuelto / parcial / pendiente).
+7. **Aprendizajes y restricciones descubiertas:** cada uno como regla
+   concreta con principio relacionado, contexto (qué pasa si se viola)
+   y ejemplo de la sesión.
+8. **Decisiones de diseño:** decisión, alternativas consideradas,
+   justificación, tensiones resueltas, implicancia. Las de peso
+   arquitectónico se replican como archivo en
+   `50_documentacion/activa/decisiones/YYYYMMDD_decision_<tema>.md`.
+9. **Constantes y parámetros vigentes:** tabla constante / valor /
+   archivo / nota (marcando cambios de valor).
+10. **Arquitectura de archivos:** referencia al escáner al cierre; si
+    la estructura cambió, resumen del cambio y verificación contra la
+    política.
+11. **Pendientes y ruta sugerida:**
+    - Inventario: por pendiente, descripción, contexto, tipo (bug
+      activo / bloqueante / funcionalidad / deuda técnica / mejora
+      visual / documentación), impacto, dependencias, complejidad,
+      principios relevantes, precauciones, sugerencia de enfoque y
+      criterio de éxito sugerido. Campos obligatorios: son el insumo
+      de la Fase C de la próxima apertura.
+    - Evaluación de deuda técnica: zonas frágiles (qué principio se
+      viola) y oportunidades de mejora.
+    - Auditoría de cierre (política 5.6, preguntas "Cierre"); toda
+      respuesta "no" se agrega como pendiente.
+    - Ruta sugerida para la próxima sesión aplicando los criterios de
+      priorización de 1.2.4, con justificación y criterio de éxito por
+      ítem, más lo que conviene diferir.
+12. **Instrucciones específicas para la próxima sesión:** formato
+    ⚠️ NO [acción] sin [condición] / ✅ ANTES de [acción], verificar
+    [precondición] / 🔒 [invariante intocable].
+13. **Fragmentos de código de referencia:** patrones que son "la forma
+    correcta" en este proyecto, ejecutables tal cual, comentados.
+14. **Reapertura** (ver 2.2.14).
+
+#### 2.2.5 Backlog acumulativo (memoria de largo plazo)
+
+Registro histórico vivo. En cada cierre se **copia íntegro** el backlog
+del traspaso anterior y se agregan los cambios nuevos al final. Jamás
+se reescriben, resumen ni renumeran entradas anteriores; un error se
+corrige con una entrada nueva.
+
+- **Objetivo del proyecto:** párrafo permanente (qué es, qué produce,
+  con qué herramientas, para quién, desde cuándo). Se redacta en la
+  sesión 1.
+- **Nota metodológica:** párrafo permanente que define qué cuenta como
+  "cambio" (una solicitud distinguible del usuario, no las acciones
+  técnicas que la implementan), qué no (errores del asistente
+  corregidos de inmediato; sí cuentan los bugfixes reportados por el
+  usuario), que la clasificación es por intención primaria, y cuáles
+  son las fuentes del conteo.
+- **Clasificación temática:** tabla categoría / N° / % / descripción
+  con ejemplos concretos del proyecto. Taxonomía orgánica: se propone
+  en la sesión 1 y se refina después. Categorías mutuamente
+  excluyentes por intención primaria; entre 8 y 15; subdividir si una
+  supera el 25%; absorber si una queda bajo el 2% tras varias sesiones.
+- **Resumen estadístico por sesión:** tabla sesión / traspasos
+  generados / N° de cambios / modelo / foco (3-6 palabras), con fila
+  final separada para refinamientos menores no atribuibles, y total.
+- **Detalle cronológico:** todos los cambios por sesión, con
+  **numeración correlativa global y permanente** (nunca se reinicia ni
+  renumera), descripciones autocontenidas, referencia cuando un cambio
+  resuelve un pendiente anterior, y subtítulos temáticos en sesiones
+  largas.
+- **Delta del backlog:** cambios respecto a la versión anterior (N
+  entradas nuevas, refinamientos de taxonomía, reclasificaciones).
+
+#### 2.2.14 Reapertura (al final del traspaso Y replicada en el chat)
+
+Toda esta sección aparece dentro del traspaso y se replica
+**textualmente** al final del mensaje con el que el asistente cierra la
+sesión, para copiar todo sin abrir el archivo. Con **valores reales,
+jamás placeholders**.
+
+- **Nombre del chat:** `<Proyecto>, sesión <N+1> (<Modelo>)`.
+- **Mensaje de apertura pre-armado:** declara tipo CONTINUATION, indica
+  que el protocolo (política + este documento) vive en la knowledge
+  base y se lee desde ahí, y lista qué se adjunta. Variante para chat
+  suelto: "Adjunto los documentos de protocolo y los específicos de la
+  sesión."
+- **Documentos para la próxima sesión, en tres bloques:**
+  1. *Protocolo en knowledge base* (NO se adjuntan; se listan con
+     nombre exacto solo para verificar que la knowledge base esté al
+     día): `POLITICA_PROYECTO.md`,
+     `SETTINGS_Y_PROMPTS_OPERACIONALES.md`.
+  2. *Opcionales según el foco real de la próxima sesión* (solo los
+     que apliquen, no todos): `CLAUDE.md` si correrá en Claude Code;
+     protocolos 4.1-4.5 de este documento según la tarea;
+     `auditoria_codigo_proyecto_md_v1.md` si habrá auditoría de cifras.
+  3. *Específicos de la sesión* (SÍ se adjuntan): el traspaso
+     `traspaso_cierre_vNN.md`; el escáner `estructura_actual.md`; los
+     archivos críticos para retomar (solo los que la próxima sesión
+     necesita, priorizando los del pendiente foco; los voluminosos
+     pero críticos se mantienen anotados como tales); datos o
+     referencias externas si aplica, con su porqué.
+- **Nota final obligatoria:** si algún archivo listado cambió entre
+  sesiones, adjuntar la versión más actualizada al abrir y avisarlo en
+  el mensaje de apertura.
+
+### 2.3 Reglas de redacción del traspaso
+
+1. Exhaustividad sobre brevedad: ante la duda, incluir (la información
+   faltante cuesta una sesión repitiendo errores).
+2. Especificidad sobre generalidad: causa raíz exacta con archivo y
+   línea, no "tenía un bug".
+3. Causa raíz, no solo síntoma (C.11).
+4. Cada aprendizaje como regla concreta vinculada a su principio.
+5. Sin supuestos implícitos: la próxima instancia no "lo sabrá" (B.1).
+6. Todo fragmento de código incluido debe ser copiable y ejecutable.
+7. El backlog es la única fuente de verdad del conteo histórico.
+8. Los pendientes son el mapa de la próxima ruta: sus campos son
+   obligatorios.
+9. La auditoría de cierre es obligatoria: la sesión no deja deuda sin
+   documentar.
+10. Valores reales en la reapertura, sin placeholders.
+
+---
+
+## 3. Higiene de sesión
+
+Recomendar cierre proactivo ante: muchas vueltas con fatiga de
+contexto; múltiples archivos largos cargados con confusión de
+versiones; síntomas de degradación (mezclar versiones, repetir código
+ya entregado, respuestas vagas, perder acuerdos); pivote a otro
+dominio. Formato:
+
+> Sugiero cerrar esta sesión. Razón: [síntoma concreto]. ¿Cerramos con
+> el protocolo de cierre (proyecto) o con cierre liviano (BIBLIOTECA)?
+
+Cerrar temprano es más barato que un traspaso corrupto.
+
+---
+
+## 4. Protocolos bajo demanda
+
+Se activan cuando la tarea de la sesión lo requiere. El asistente los
+consulta solo; no espera que el usuario los invoque por nombre.
+
+### 4.1 Generar orquestador `00_run_all.R`
+
+Especificación completa: política, sección 4. Protocolo:
+
+1. Obtener el inventario real de ejecutables (escáner o
+   `estructura_actual.md`). No deducir nombres ni rutas.
+2. Generar el archivo completo cumpliendo la sección 4 de la política
+   (raíz vía `rprojroot`, `PASOS`, `run_all(from/to/only/skip)`,
+   validación de rutas al inicio, logging, `.qmd` vía
+   `quarto::quarto_render()`).
+3. Incluir al final ejemplos de uso comentados (`run_all()`,
+   `run_all(skip = c(1, 2))`, `run_all(from = 5)`, `run_all(only = 8)`).
+4. Prohibido: modificar scripts de estación, asumir scripts no
+   inventariados, caché automático por timestamp, lógica de negocio.
+
+### 4.2 Migrar estructura a la convención canónica
+
+Motor: `herramientas_dev/plantillas/99_reorganizar_estructura_PLANTILLA.R`
+copiado al proyecto. Reglas no negociables: política, sección 9.
+Secuencia exacta:
+
+1. **Escaneo** del proyecto (pedirlo si no está).
+2. **Diagnóstico de referencias:** buscar TODAS las referencias
+   literales a las carpetas actuales en `.R`/`.qmd` (entrecomilladas,
+   en `file.path()`, `test_path()`, comentarios, tests), excluyendo
+   `.Rproj.user`, `renv/`, `.bak`. Sin este diagnóstico los regex de
+   reescritura fallan en silencio.
+3. **Mapeo justificado:** carpetas vieja → nueva contra los principios
+   de la política sección 1; renombres de archivos; reorganización de
+   documentación; patrones de reemplazo derivados del diagnóstico;
+   exclusiones explícitas (`andamios/`). Confirmación del usuario antes
+   de generar el script (decisión estratégica: excepción válida a la
+   regla de autonomía).
+4. **Adaptar la plantilla** con `DRY_RUN <- TRUE` y registro en
+   `_archivo/log_reorganizacion.csv`.
+5. **Ciclo DRY_RUN → real:** verificar que los conteos del DRY_RUN
+   cuadren con el diagnóstico (Fase 3 con 0 reemplazos = regex malos);
+   commit limpio; `DRY_RUN <- FALSE`; verificar integridad de copias.
+6. **Validación:** reiniciar R, tests, orquestador end-to-end,
+   verificación visual. Solo entonces borrar `.bak`.
+
+No ceder a presión por saltar el DRY_RUN, aunque el usuario lo pida.
+
+### 4.3 Migrar proyecto local a GitHub privado (dos raíces)
+
+Arquitectura objetivo: política, sección 6.2. Contexto a confirmar al
+inicio: `nombre_proyecto`, `nombre_repo_github`, ruta local actual,
+ruta de código destino (`~/Projects/...`), ruta de datos destino
+(OneDrive). Visibilidad: privado, no negociable sin justificación.
+
+- **Fase 0 — Escaneo estructural.** Si la estructura está fuera de
+  norma, primero migrar estructura (4.2). No se sube a GitHub un
+  proyecto desordenado.
+- **Fase 1 — Auditoría de seguridad pre-migración.** Script
+  `diagnostico_migracion_github.R` que reporte: datos personales
+  hardcodeados (regex RUT `\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]`, correos,
+  nombres); credenciales; rutas absolutas con información personal
+  (OneDrive, `Users/<nombre>/`); archivos de datos en carpetas
+  versionables; nombres con tildes/ñ/espacios; historial Git sucio si
+  ya es repo. Output: `diagnostico_migracion_github.md` con hallazgo,
+  severidad, norma aplicable y recomendación. **Esperar revisión del
+  usuario** (compuerta de gobernanza, no interrupción trivial).
+- **Fase 2 — Separación código / datos.** Mover código a la raíz de
+  código, datos a la raíz de datos; configurar variable de entorno,
+  `10_configuracion.R`, `.Renviron.example` y `.gitignore` blindado
+  según política 6.2-6.3 y 8.3. Regla de movimiento físico: **copiar,
+  no mover**; verificar que OneDrive terminó de sincronizar antes de
+  borrar las carpetas de datos del origen (o moverlas a `_archivo/`
+  como respaldo local). Generar `gobernanza_datos.md` y `LICENSE`
+  (política, sección 10). Validar con el bloque 8.3.7 en sesión R
+  limpia ANTES del primer push; si falla, diagnosticar, no continuar.
+- **Fase 3 — Repo remoto.** Verificar con el usuario que es PRIVADO;
+  branch protection en `main` (PR obligatorio, sin force push, sin
+  borrado). **Matiz de plan:** en GitHub Free los repos privados NO
+  tienen branch protection; sustituir con el workflow de validación
+  del punto siguiente más autodisciplina de PR documentada en el
+  README. Secret Scanning (detección básica activa por defecto en
+  privados) y Dependabot; workflow de Actions que valide en cada push
+  ausencia de extensiones de datos, de patrones RUT y de tokens.
+- **Fase 4 — Primer push.** `git status` completo mostrado al usuario;
+  confirmación de cualquier archivo sospechoso; recién entonces push.
+- **Fase 5 — Despliegue (si aplica).** Secretos como variables de
+  entorno del servidor; autenticación (SSO institucional preferido);
+  logs sin datos personales; recordar que shinyapps.io aloja en AWS US
+  (si los datos no pueden salir de Chile, Posit Connect on-premise o
+  servidor institucional). Infraestructura SLEP: preguntar qué existe,
+  no asumir.
+- **Cierre.** Mover `diagnostico_migracion_github.md` a
+  `50_documentacion/activa/decisiones/` como evidencia histórica;
+  copiar `CLAUDE.md` a la raíz si las próximas sesiones serán en
+  Claude Code; documentar en el traspaso la configuración pendiente
+  para otras máquinas (protocolo 4.4).
+
+### 4.4 Setup de máquina nueva (proyecto ya migrado a dos raíces)
+
+1. Clonar el repo en `~/Projects/`.
+2. Verificar que OneDrive institucional esté sincronizado y localizar
+   la raíz de datos del proyecto.
+3. Copiar el contenido de `.Renviron.example` a `~/.Renviron` ajustando
+   la ruta al sistema operativo de la máquina.
+4. Reiniciar R y validar (política 8.3.7).
+5. Correr `run_all()` o el subconjunto mínimo para confirmar pipeline
+   operativo.
+
+No es un refactor: no se toca código del proyecto.
+
+### 4.5 Auditoría de cifras publicadas
+
+Patrón de tres scripts (helpers + orquestador de familias + spot-check)
+documentado en `herramientas_dev/prompts/auditoria_codigo_proyecto_md_v1.md`
+(vigente como documento independiente). Núcleo: cada cifra publicada se
+calcula por dos caminos independientes (caché vs. recálculo desde el
+objeto crudo) y se comparan con tolerancias definidas como constantes
+nombradas. Llaves siempre `character`; patrón índice-primero en Excel
+(jamás `worksheetOrder()`); una familia que falla no aborta las demás.
