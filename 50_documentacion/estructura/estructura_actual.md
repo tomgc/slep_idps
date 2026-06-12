@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-11 19:55:23
-- **Totales:** 13 carpetas, 65 archivos
+- **Fecha:** 2026-06-11 20:14:13
+- **Totales:** 13 carpetas, 68 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -63,7 +63,8 @@ slep_idps/
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
-│   │   │   └── .gitkeep  (0)
+│   │   │   ├── .gitkeep  (0)
+│   │   │   └── 20260611_decision_gobernanza_insumos_publicos.md  (3.23K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
 │   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (24.7K)
@@ -73,11 +74,13 @@ slep_idps/
 │   │   ├── .gitkeep  (0)
 │   │   ├── 20260611_195453_estructura.md  (3.86K)
 │   │   ├── 20260611_195453_estructura.txt  (3.85K)
-│   │   ├── estructura_actual.md  (3.86K)
-│   │   └── estructura_actual.txt  (3.85K)
+│   │   ├── 20260611_195523_estructura.md  (4.09K)
+│   │   ├── 20260611_195523_estructura.txt  (4.1K)
+│   │   ├── estructura_actual.md  (4.09K)
+│   │   └── estructura_actual.txt  (4.1K)
 │   ├── traspasos/
 │   │   └── .gitkeep  (0)
-│   └── .DS_Store  (8K)
+│   └── .DS_Store  (14K)
 ├── tests/
 │   └── .gitkeep  (0)
 ├── .DS_Store  (10K)
@@ -95,9 +98,9 @@ slep_idps/
 |---|---|
 | xlsx | 34 |
 | (sin extension) | 12 |
-| md | 7 |
+| md | 9 |
 | pdf | 4 |
 | r | 4 |
-| txt | 2 |
+| txt | 3 |
 | jsx | 1 |
 | rproj | 1 |
