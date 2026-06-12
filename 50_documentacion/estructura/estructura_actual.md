@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-11 20:14:13
-- **Totales:** 13 carpetas, 68 archivos
+- **Fecha:** 2026-06-11 20:26:18
+- **Totales:** 13 carpetas, 74 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -14,6 +14,11 @@ slep_idps/
 │   └── 10_utils.R  (1.68K)
 ├── 20_insumos/
 │   ├── auxiliares/
+│   │   ├── 202602_Listado_SLEP_2026_vf.xlsx  (55.5K)
+│   │   ├── caracterizacion_establecimientos.xlsx  (16.5K)
+│   │   ├── diccionario_territorios.xlsx  (16.8K)
+│   │   ├── directorio_oficial_ee.csv  (3.6M)
+│   │   ├── glosas_directorio_oficial_ee.pdf  (457K)
 │   │   ├── idps4b2025_GLOSAS_web_preliminar.xlsx  (34.4K)
 │   │   ├── Metodología+de+Cálculo+IDPS.pdf  (3.58M)
 │   │   ├── REX N° 1440 (Nueva Politica General Seguridad).pdf  (995K)
@@ -72,14 +77,15 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260611_195453_estructura.md  (3.86K)
-│   │   ├── 20260611_195453_estructura.txt  (3.85K)
 │   │   ├── 20260611_195523_estructura.md  (4.09K)
 │   │   ├── 20260611_195523_estructura.txt  (4.1K)
-│   │   ├── estructura_actual.md  (4.09K)
-│   │   └── estructura_actual.txt  (4.1K)
+│   │   ├── 20260611_201413_estructura.md  (4.3K)
+│   │   ├── 20260611_201413_estructura.txt  (4.3K)
+│   │   ├── estructura_actual.md  (4.3K)
+│   │   └── estructura_actual.txt  (4.3K)
 │   ├── traspasos/
-│   │   └── .gitkeep  (0)
+│   │   ├── .gitkeep  (0)
+│   │   └── traspaso_cierre_v01.md  (16.4K)
 │   └── .DS_Store  (14K)
 ├── tests/
 │   └── .gitkeep  (0)
@@ -96,11 +102,12 @@ slep_idps/
 
 | Extension | Archivos |
 |---|---|
-| xlsx | 34 |
+| xlsx | 37 |
 | (sin extension) | 12 |
-| md | 9 |
-| pdf | 4 |
+| md | 10 |
+| pdf | 5 |
 | r | 4 |
 | txt | 3 |
+| csv | 1 |
 | jsx | 1 |
 | rproj | 1 |
