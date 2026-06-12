@@ -1,13 +1,9 @@
-# Estructura actual — slep_idps
+ESCANEO DE ESTRUCTURA — slep_idps
+Raiz   : /Users/tomgc/Projects/slep_idps
+Fecha  : 2026-06-11 22:53:37
+Totales: 15 carpetas, 93 archivos
+Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
-- **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-11 22:15:48
-- **Totales:** 15 carpetas, 90 archivos
-- **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
-
-## Arbol
-
-```
 slep_idps/
 ├── 10_utils/
 │   ├── 10_configuracion.R  (2.38K)
@@ -15,21 +11,23 @@ slep_idps/
 ├── 20_insumos/
 │   ├── auxiliares/
 │   │   ├── referencias_idps/
-│   │   │   ├── afiche_idps_2025-2.pdf  (743K)
-│   │   │   ├── afiche_idps_2025.pdf  (743K)
+│   │   │   ├── .DS_Store  (6K)
 │   │   │   ├── articles-239257_recurso.pdf  (2.24M)
+│   │   │   ├── articles-90116_recurso_2.pdf  (131K)
 │   │   │   ├── articles-90146_recurso_2.pdf  (87.8K)
 │   │   │   ├── articles-90152_recurso_2.pdf  (88.7K)
 │   │   │   ├── articles-90157_recurso_2.pdf  (91.8K)
-│   │   │   ├── directorio_oficial_ee_publico.csv  (3.44M)
+│   │   │   ├── idps_corpus_conceptual.json  (73.7K)
+│   │   │   ├── idps_corpus_conceptual.md  (63.8K)
 │   │   │   ├── marco_evaluacion_idps_2025.pdf  (519K)
 │   │   │   ├── metodologia_calculo_idps.pdf  (3.58M)
 │   │   │   ├── otros_indicadores_calidad_2014.pdf  (909K)
 │   │   │   ├── otros_indicadores_calidad_2019.pdf  (357K)
-│   │   │   └── taller_idps.pdf  (1.68M)
-│   │   ├── .DS_Store  (6K)
+│   │   │   └── subdimensiones_idps.pdf  (2.8M)
+│   │   ├── .DS_Store  (10K)
 │   │   ├── caracterizacion_establecimientos.xlsx  (16.5K)
 │   │   ├── diccionario_territorios.xlsx  (16.8K)
+│   │   ├── directorio_oficial_ee_publico.csv  (3.44M)
 │   │   ├── directorio_oficial_ee.csv  (3.6M)
 │   │   ├── glosas_directorio_oficial_ee.pdf  (457K)
 │   │   ├── idps2m2023_GLOSAS_rbd_público_final.xlsx  (38.2K)
@@ -94,16 +92,17 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260611_215040_estructura.md  (4.88K)
-│   │   ├── 20260611_215040_estructura.txt  (4.89K)
-│   │   ├── 20260611_221058_estructura.md  (5.56K)
-│   │   ├── 20260611_221058_estructura.txt  (5.58K)
-│   │   ├── estructura_actual.md  (5.56K)
-│   │   └── estructura_actual.txt  (5.58K)
+│   │   ├── 20260611_221548_estructura.md  (5.61K)
+│   │   ├── 20260611_221548_estructura.txt  (5.63K)
+│   │   ├── 20260611_221618_estructura.md  (5.61K)
+│   │   ├── 20260611_221618_estructura.txt  (5.63K)
+│   │   ├── estructura_actual.md  (5.61K)
+│   │   └── estructura_actual.txt  (5.63K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
-│   │   └── traspaso_cierre_v02.md  (22.8K)
+│   │   ├── traspaso_cierre_v02.md  (22.8K)
+│   │   └── traspaso_cierre_v03.md  (23.9K)
 │   └── .DS_Store  (14K)
 ├── tests/
 │   └── .gitkeep  (0)
@@ -114,19 +113,16 @@ slep_idps/
 ├── CLAUDE.md  (1.67K)
 ├── README.md  (1.74K)
 └── slep_idps.Rproj  (195)
-```
 
-## Conteo por extension
-
-| Extension | Archivos |
-|---|---|
-| xlsx | 37 |
-| pdf | 14 |
-| (sin extension) | 13 |
-| md | 12 |
-| r | 6 |
-| txt | 3 |
-| csv | 2 |
-| jsx | 1 |
-| parquet | 1 |
-| rproj | 1 |
+Conteo por extension:
+  xlsx               37
+  (sin extension)    14
+  md                 14
+  pdf                13
+  r                  6
+  txt                3
+  csv                2
+  json               1
+  jsx                1
+  parquet            1
+  rproj              1
