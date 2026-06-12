@@ -35,3 +35,4 @@ _archivo/
 # Outputs temporales
 *_freeze/
 .quarto/
+20_insumos/auxiliares/directorio_oficial_ee.csv
