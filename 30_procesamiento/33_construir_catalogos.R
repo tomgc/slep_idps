@@ -244,8 +244,10 @@ for (ind in corpus$indicadores) {
       filas[[length(filas) + 1]] <- tibble::tibble(
         id_indicador     = as.integer(id_ind),
         indicador_nombre = ind$nombre,
+        indicador_definicion = if (is.null(ind$definicion)) NA_character_ else as.character(ind$definicion),
         id_dimension     = as.integer(id_dim),
         dimension_nombre = dim$nombre,
+        dimension_definicion = if (is.null(dim$definicion)) NA_character_ else as.character(dim$definicion),
         id_subdimension  = if (is.na(id_sub)) NA_integer_ else as.integer(id_sub),
         subdimension_nombre = sub$nombre,
         definicion       = if (is.null(sub$definicion)) NA_character_ else as.character(sub$definicion),
