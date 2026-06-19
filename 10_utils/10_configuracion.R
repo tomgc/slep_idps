@@ -73,6 +73,9 @@ INDICADOR_DIMENSIONES <- list(
 # Vigentes en documentacion 2024/2025: 4b, 6b, II medio (2m). El 8b solo
 # figura en la metodologia de calculo 2016, pero hay datos reales 8b 2025:
 # se incluye en radares y distribucion numerica (decision sesion 6).
+# Estas etiquetas llevan ° y á (no-ASCII). El archivo es UTF-8, pero en locale C
+# R puede marcarlas con Encoding "unknown"; 35_generar_motor_html.R las fuerza a
+# UTF-8 antes de serializar a JSON para evitar mojibake en el motor.
 GRADO_LABELS <- c(
   "4b" = "4° básico",
   "6b" = "6° básico",

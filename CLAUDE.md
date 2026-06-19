@@ -60,18 +60,26 @@ source("00_escanear_proyecto.R")  # snapshot de estructura (al abrir y cerrar se
 - `34_leer_normalizar_idps.R` — 3 familias -> homologa esquema por anio -> atributos
   canonicos por RBD (depe2/geo del registro mas reciente; GSE por anio) ->
   `idps_largo.parquet` por establecimiento-grado, SIN agregacion.
-- `35_generar_motor_html.R` — motor HTML (P9, pendiente).
+- `35_generar_motor_html.R` — motor HTML autocontenido. Embebe SOLO la Region de
+  Valparaiso (cod_reg=5) como universo de comparacion (filtro, no agregacion);
+  JSON gzip+base64+pako, D3/pako inline, React por CDN con SRI. Salida:
+  `40_salidas/motor_idps.html`. `regenerar_motor()` = `run_all(only = 35)`.
 
 ## Ultimos cambios
 
-1. **P6 — pipeline de lectura/normalizacion** (`34_leer_normalizar_idps.R`):
+1. **Motor HTML base** (`35_generar_motor_html.R` + `35_motor_template.html`):
+   grilla de radares por establecimiento agrupada por GSE (sin agregacion),
+   detalle con radar indicador/dimension, distribucion de niveles por subdimension
+   EST con texto por ciclo, marca de desvio vs GSE (`difgru`/`sigdifgru`),
+   evolucion donde hay serie, supresion explicita. Abre local; render verificado;
+   motor<->parquet 1:1. Alcance base: Region de Valparaiso. NO desplegado.
+2. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1; catalogos
+   territoriales quedan en UTF-8 limpio.
+3. **Textos de nivel por ciclo** anexados a `catalogo_idps.parquet` (solo EST).
+4. **P6 — pipeline de lectura/normalizacion** (`34_leer_normalizar_idps.R`):
    lee las 3 familias, homologa texto<->id por anio, resuelve la inconsistencia
    de `cod_depe2` entre familias, trae GSE a niveles, emite `idps_largo.parquet`
    (1.485.103 filas). Spot-check contra xlsx crudo en 2022 y 2025: OK.
-2. **Catalogos** (`33_construir_catalogos.R`): comunas/sleps/establecimientos
-   desde el directorio publico + catalogo jerarquico IDPS (30 subdim, 22 EST con id).
-3. **Orquestador** `00_build.R` reescrito al patron `run_all(only=/from=/skip=)`;
-   carga `10_configuracion.R`; sin etapa de agregacion.
-4. **`10_configuracion.R`**: crosswalk texto<->id (CW_*), grados/ciclos, regiones.
-5. **Gobernanza sesion 5**: versionada la decision de ponderacion y los andamios
-   (`motor_idps/`); archivado el residuo duplicado de `andamios/diseno/`.
+5. **Catalogos + orquestador**: `33_construir_catalogos.R` (comunas/sleps/
+   establecimientos + jerarquia IDPS); `00_build.R` con `run_all()` y carga de
+   `10_configuracion.R` (crosswalk CW_*); gobernanza sesion 5 versionada.
