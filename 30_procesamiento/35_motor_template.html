@@ -447,7 +447,7 @@ __FONTS_CSS__
   function App(){
     const grados=Object.keys(DATA.meta.grados);
     const [region,setRegion]=useState(DATA.meta.region_foco||DATA.regiones[0].cod);
-    const [slep,setSlep]=useState(DATA.meta.slep_foco||"");
+    const [sostenedor,setSostenedor]=useState("");   // tipo de dependencia (cod_depe2), reemplaza SLEP
     const [comuna,setComuna]=useState("");
     const [grado,setGrado]=useState(grados.includes("4b")?"4b":grados[0]);
     const anios=DATA.meta.grado_anios[grado]||[];
@@ -456,41 +456,45 @@ __FONTS_CSS__
     const [rbdSel,setRbdSel]=useState(null);
 
     useEffect(()=>{const a=DATA.meta.grado_anios[grado]||[];if(!a.includes(agno))setAgno(a[a.length-1]);setRbdSel(null);},[grado]);
-    useEffect(()=>{setRbdSel(null);},[region,slep,comuna,agno,gse]);
+    useEffect(()=>{setRbdSel(null);},[region,sostenedor,comuna,agno,gse]);
 
-    const slepsReg=useMemo(()=>DATA.sleps.filter(s=>s.cod_reg===region).sort((a,b)=>a.nombre_slep.localeCompare(b.nombre_slep)),[region]);
     const comunasReg=useMemo(()=>DATA.comunas.filter(c=>c.cod_reg===region).sort((a,b)=>a.nom.localeCompare(b.nom)),[region]);
+    // Sostenedores = tipos de dependencia (cod_depe2, esquema IDPS 4-cat); conteo
+    // de establecimientos por categoria (nacional, informativo). Acota, no agrega.
+    const sostenedorOpts=useMemo(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null)m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
+      return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c]||("Dependencia "+c),n:m[c]}));},[]);
 
     // roster del territorio seleccionado, para (grado, agno)
     const unidades=useMemo(()=>{const b=DATA.roster,out=[];
       for(let i=0;i<b.rows;i++){if(b.grado[i]!==grado||b.agno[i]!==agno)continue;
         const e=est[b.rbd[i]]; if(!e||e.cod_reg!==region)continue;
-        if(slep && e.cod_slep!==slep)continue;
+        if(sostenedor && e.cod_depe2!==sostenedor)continue;
         if(comuna && e.cod_com!==comuna)continue;
         if(gse!=="TODOS" && b.gse[i]!==gse)continue;
         out.push({rbd:b.rbd[i],gse:b.gse[i]});}
-      return out;},[region,slep,comuna,grado,agno,gse]);
+      return out;},[region,sostenedor,comuna,grado,agno,gse]);
 
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
 
-    const territorioTxt = comuna?("comuna de "+comNom(comuna)):(slep?("SLEP "+(slepsReg.find(s=>s.cod_slep===slep)?.nombre_slep||slep)):("Región de "+regNom(region)));
+    const sostNom = sostenedor ? (DEPE[sostenedor]||sostenedor) : null;
+    const territorioTxt = (comuna?("comuna de "+comNom(comuna)):("Región de "+regNom(region))) + (sostNom?(" · sostenedor: "+sostNom):"");
 
     return (
       <div className="wrap">
         <div className="nav">
           <div className="nav-row">
             <div className="ctl"><label>Región</label>
-              <select value={region} onChange={e=>{setRegion(e.target.value);setSlep("");setComuna("");}}>
+              <select value={region} onChange={e=>{setRegion(e.target.value);setComuna("");}}>
                 {DATA.regiones.map(r=><option key={r.cod} value={r.cod}>{r.nom}</option>)}</select></div>
-            <div className="ctl"><label>SLEP (servicio local)</label>
-              <select value={slep} onChange={e=>{setSlep(e.target.value);setComuna("");}}>
-                <option value="">— todos —</option>
-                {slepsReg.map(s=><option key={s.cod_slep} value={s.cod_slep}>{s.nombre_slep}</option>)}</select></div>
             <div className="ctl"><label>Comuna</label>
-              <select value={comuna} onChange={e=>{setComuna(e.target.value);setSlep("");}}>
+              <select value={comuna} onChange={e=>setComuna(e.target.value)}>
                 <option value="">— todas —</option>
-                {comunasReg.map(c=><option key={c.cod} value={c.cod}>{c.nom}{FOCO.has(c.cod)?" ★":""}</option>)}</select></div>
+                {comunasReg.map(c=><option key={c.cod} value={c.cod}>{tc(c.nom)}{FOCO.has(c.cod)?" ★":""}</option>)}</select></div>
+            <div className="ctl"><label>Sostenedor</label>
+              <select value={sostenedor} onChange={e=>setSostenedor(e.target.value)}>
+                <option value="">— todos —</option>
+                {sostenedorOpts.map(s=><option key={s.cod} value={s.cod}>{s.nom} ({s.n} establecimientos)</option>)}</select></div>
             <div className="ctl"><label>Grado</label>
               <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
             <div className="ctl"><label>Año</label>
