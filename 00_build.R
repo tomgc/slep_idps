@@ -56,7 +56,7 @@ PASOS <- list(
        ruta = file.path("30_procesamiento", "33_construir_catalogos.R")),
   list(id = 34L, etiqueta = "Leer y normalizar IDPS (3 familias -> parquet largo)",
        ruta = file.path("30_procesamiento", "34_leer_normalizar_idps.R")),
-  list(id = 35L, etiqueta = "Generar motor HTML autocontenido (pendiente)",
+  list(id = 35L, etiqueta = "Generar motor HTML autocontenido (region Valparaiso)",
        ruta = file.path("30_procesamiento", "35_generar_motor_html.R"))
 )
 
