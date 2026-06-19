@@ -5,8 +5,10 @@
 #             eliminando columnas con datos personales identificables antes de
 #             versionar el insumo. El CSV original NO se versiona (queda cubierto
 #             por .gitignore); este script produce la version publica.
-# Insumos   : 20_insumos/auxiliares/directorio_oficial_ee.csv (original, latin1,
-#             delim ";", con columnas MRUN y RUT_SOSTENEDOR).
+# Insumos   : 20_insumos/auxiliares/directorio_oficial_ee.csv (original, UTF-8,
+#             delim ";", con columnas MRUN y RUT_SOSTENEDOR). El crudo viene en
+#             UTF-8 (las comunas con tilde/enie traen los bytes C3xx); leerlo
+#             como latin1 produciria doble codificacion al reescribir.
 # Salidas   : 20_insumos/auxiliares/directorio_oficial_ee_publico.csv
 #             (UTF-8, sin columnas personales; este SI se versiona).
 # Gobernanza: Ley 21.719 (datos personales) y Condiciones de Uso Agencia de
@@ -39,11 +41,12 @@ COLUMNAS_SENSIBLES <- c("MRUN", "RUT_SOSTENEDOR")
 
 # ---- Flujo principal ----
 
-# Lectura: origen en latin1, separador ";" (locale Mineduc).
+# Lectura: origen en UTF-8 (verificado por bytes: las tildes vienen como C3xx),
+# separador ";" (locale Mineduc).
 directorio_crudo <- readr::read_delim(
   ruta_origen,
   delim = ";",
-  locale = readr::locale(encoding = "latin1"),
+  locale = readr::locale(encoding = "UTF-8"),
   show_col_types = FALSE
 )
 
