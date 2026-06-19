@@ -159,7 +159,7 @@ __FONTS_CSS__
   const GSE=DATA.meta.gse_labels, DEPE=DATA.meta.depe2_labels;
   const FOCO=new Set(DATA.meta.comunas_foco);
   const CICLO={"4b":"basica","6b":"basica","2m":"media"};      // 8b -> sin texto
-  const PRELIM=String(DATA.meta.anios_preliminar);
+  const PRELIM=new Set((DATA.meta.anios_preliminar||[]).map(String));  // anios preliminares (del dato)
   const fmt=v=>(v==null||isNaN(v))?"—":Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
   const fmtSigned=v=>v==null?"—":(v>0?"+":"")+Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
   // Title Case en capa de presentacion para nombres ALLCAPS del dato (comuna, EE),
@@ -302,7 +302,7 @@ __FONTS_CSS__
       const y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);   // FIJO 0-100
       [0,25,50,75,100].forEach(t=>{svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke","var(--linea)");
         svg.append("text").attr("x",5).attr("y",y(t)+3).attr("class","axis-lab").text(t);});
-      anios.forEach(a=>svg.append("text").attr("x",x(String(a))).attr("y",H-5).attr("text-anchor","middle").attr("class","axis-lab b").text(a+(String(a)===PRELIM?"*":"")));
+      anios.forEach(a=>svg.append("text").attr("x",x(String(a))).attr("y",H-5).attr("text-anchor","middle").attr("class","axis-lab b").text(a+(PRELIM.has(String(a))?"*":"")));
       series.forEach(s=>{const pts=s.pts.map(p=>({a:String(p.a),v:p.v}));
         const line=d3.line().defined(d=>d.v!=null).x(d=>x(d.a)).y(d=>y(d.v));
         svg.append("path").datum(pts).attr("d",line).attr("fill","none").attr("stroke",s.color).attr("stroke-width",2);
@@ -337,7 +337,7 @@ __FONTS_CSS__
       <div className="detail">
         <button className="back" onClick={onBack}>‹ Volver a la grilla</button>
         <h2>{e?tc(e.nom):rbd}</h2>
-        <div className="dmeta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{String(agno)===PRELIM?" (preliminar)":""}</div>
+        <div className="dmeta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
         <div className="help">La escala <b>0–100 es relativa</b>: por sí sola no dice si el establecimiento va bien o mal. Las anclas de lectura son el <b>desvío vs su GSE</b> (mismo grupo socioeconómico) y la <b>variación vs la evaluación anterior</b>, ambas con su significancia. <span style={{color:"var(--alerta)"}}>▼ rojo = significativamente bajo (alerta)</span>; <span style={{color:"var(--destaca)"}}>▲ verde = significativamente sobre (destacado)</span>.</div>
 
         <div className="dcrumb">
@@ -374,7 +374,7 @@ __FONTS_CSS__
                   <Tendencia anios={anios}
                     series={(nivel===1?(dimsByInd[drillInd]||[]).map(d=>({nombre:d.nombre,color:indById[drillInd].color,pts:serieDim(rbd,grado,d.id,anios)}))
                                       :DATA.indicadores.map(ind=>({nombre:ind.nombre,color:ind.color,pts:serieInd(rbd,grado,ind.id,anios)})))}/></div>
-                  <div className="nota">Eje fijo 0–100 (escala común y comparable). Años sin punto = sin aplicación (no se interpola). {anios.includes(2025)?"2025 es preliminar.":""}</div>
+                  <div className="nota">Eje fijo 0–100 (escala común y comparable). Años sin punto = sin aplicación (no se interpola). {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
                 </div>
               : <div className="nota">Vista temporal no disponible: {DATA.meta.grados[grado]} tiene un solo año de aplicación ({anios.join(", ")}).</div>}
           </div>}
@@ -457,7 +457,7 @@ __FONTS_CSS__
             <div className="ctl"><label>Grado</label>
               <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
             <div className="ctl"><label>Año</label>
-              <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{String(a)===PRELIM?"*":""}</button>)}</div></div>
+              <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{PRELIM.has(String(a))?"*":""}</button>)}</div></div>
             <div className="ctl"><label>Grupo socioeconómico</label>
               <div className="gse-pills">
                 <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
@@ -468,7 +468,7 @@ __FONTS_CSS__
         {rbdSel
           ? <Detalle rbd={rbdSel} grado={grado} agno={agno} onBack={()=>setRbdSel(null)}/>
           : <div>
-              <div className="crumb">Mostrando establecimientos educacionales de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{String(agno)===PRELIM?" (preliminar)":""} · {unidades.length} establecimientos</div>
+              <div className="crumb">Mostrando establecimientos educacionales de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""} · {unidades.length} establecimientos</div>
               <div className="help">Cada tarjeta es un <b>establecimiento individual</b> (su dato crudo, nunca un promedio). El color de alerta resume cuántos indicadores están <span style={{color:"var(--alerta)"}}>significativamente bajo su GSE (▼)</span> o <span style={{color:"var(--destaca)"}}>sobre él (▲)</span>. El territorio solo acota la lista; no produce cifras agregadas. Haz clic en un establecimiento para ver el detalle y bajar a dimensiones y subdimensiones.</div>
               <div className="leyenda">{DATA.indicadores.map(i=>(<span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>))}<span>· ★ Costa Central</span></div>
               {unidades.length===0
