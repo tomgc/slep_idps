@@ -54,8 +54,14 @@ P   <- arrow::read_parquet(here::here("40_salidas", "intermedios", "idps_largo.p
 CAT <- arrow::read_parquet(here::here("40_salidas", "intermedios", "catalogo_idps.parquet"))
 COM <- arrow::read_parquet(here::here("40_salidas", "intermedios", "comunas_chile.parquet"))
 SLE <- arrow::read_parquet(here::here("40_salidas", "intermedios", "sleps_chile.parquet"))
-message(sprintf("    %d filas, %d establecimientos (nacional).",
-                nrow(P), dplyr::n_distinct(P$rbd)))
+
+# Filtro de PRESENTACION (decision de alcance): el motor expone solo GRADOS_MOTOR
+# (4b/2m). El dato completo de los 4 grados permanece intacto en idps_largo.parquet;
+# se acota AQUI el universo final que alimenta el motor (no a media tuberia).
+P <- dplyr::filter(P, .data$grado %in% GRADOS_MOTOR)
+stopifnot("Sin filas tras filtrar a GRADOS_MOTOR" = nrow(P) > 0)
+message(sprintf("    %d filas, %d establecimientos (grados del motor: %s).",
+                nrow(P), dplyr::n_distinct(P$rbd), paste(GRADOS_MOTOR, collapse = ", ")))
 
 
 # ============================================================================
