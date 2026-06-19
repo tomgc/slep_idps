@@ -246,7 +246,7 @@ __FONTS_CSS__
     const lbl = significativo ? "significativo" : "no significativo";
     return <div className={"ancla "+cls} title={tipo+": "+fmtSigned(dif)+" · "+lbl}>
       <span className="k">{tipo}</span><span className="arr">{arr}</span>{fmtSigned(dif)}
-      <span style={{fontSize:"9px",opacity:.8}}>{significativo?"·sig":""}</span></div>;
+      <span style={{fontSize:"9px",opacity:.8}}>{significativo?"· sig.":"· n.s."}</span></div>;
   }
 
   // ===== Fila de indicador/dimension con doble ancla (GSE protagonista) =====
