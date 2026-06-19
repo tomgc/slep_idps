@@ -190,11 +190,16 @@ names(grado_anios) <- names(GRADO_LABELS); grado_anios <- grado_anios[!vapply(gr
 
 grados_lbl <- GRADO_LABELS[names(grado_anios)]; Encoding(grados_lbl) <- "UTF-8"
 
+# Anios preliminares DERIVADOS del dato (columna preliminar), no hardcodeados:
+# robusto a anios futuros (la marca preliminar/final viene del nombre de archivo
+# en 34). I() fuerza array aunque sea un solo anio.
+anios_prelim <- sort(unique(as.integer(P$agno[P$preliminar %in% TRUE])))
+
 meta <- list(
   fecha_generacion = format(Sys.Date()),
   cobertura = "Todo Chile",
   region_foco = REGION_FOCO, slep_foco = if (length(slep_foco)) slep_foco else NULL,
-  grados = as.list(grados_lbl), grado_anios = grado_anios, anios_preliminar = I(2025L),
+  grados = as.list(grados_lbl), grado_anios = grado_anios, anios_preliminar = I(anios_prelim),
   gse = names(GSE_LABELS), gse_labels = as.list(GSE_LABELS),
   depe2 = names(DEPENDENCIAS), depe2_labels = as.list(DEPENDENCIAS),
   comunas_foco = comunas_foco,
