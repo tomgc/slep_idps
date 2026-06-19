@@ -19,13 +19,13 @@ __FONTS_CSS__
     font-family:"Museo Sans","Helvetica Neue",system-ui,Arial,sans-serif;font-size:14px;line-height:1.45;}
   h1,h2,h3,.gob{font-family:"gobCL","Museo Sans",system-ui,sans-serif;}
   header.app{background:var(--azul);color:#fff;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
-  header.app h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.4px;text-transform:uppercase;}
+  header.app h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.4px;}
   header.app .sub{font-size:12px;opacity:.85;max-width:760px;}
   .wrap{max-width:1320px;margin:0 auto;padding:16px 24px 70px;}
 
   .nav{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--sombra);}
   .nav-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;}
-  .ctl label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--gris);margin-bottom:5px;}
+  .ctl label{display:block;font-size:10.5px;letter-spacing:.5px;color:var(--gris);margin-bottom:5px;}
   select{padding:7px 9px;border:1px solid var(--linea);border-radius:7px;background:#fff;font-size:13px;min-width:150px;font-family:inherit;}
   .seg{display:inline-flex;border:1px solid var(--linea);border-radius:7px;overflow:hidden;}
   .seg button{border:0;background:#fff;padding:6px 12px;cursor:pointer;font-size:13px;color:var(--tinta);border-right:1px solid var(--linea);font-family:inherit;}
@@ -72,7 +72,7 @@ __FONTS_CSS__
   .dcrumb b{color:var(--tinta);}
   .row2{display:grid;grid-template-columns:340px 1fr;gap:26px;}
   @media(max-width:860px){.row2{grid-template-columns:1fr;}}
-  .blk h3{font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--azul);margin:0 0 10px;border-bottom:1px solid var(--linea);padding-bottom:5px;}
+  .blk h3{font-size:13px;letter-spacing:.4px;color:var(--azul);margin:0 0 10px;border-bottom:1px solid var(--linea);padding-bottom:5px;}
 
   /* GSE protagonista: fila de indicador/dimension con doble ancla */
   .anchor-row{padding:9px 0;border-bottom:1px solid var(--linea);cursor:pointer;}
@@ -86,7 +86,7 @@ __FONTS_CSS__
   .ar-prom .u{font-size:10px;color:var(--gris);font-weight:400;}
   .anclas{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
   .ancla{font-size:11px;padding:3px 9px;border-radius:7px;border:1px solid var(--linea);background:#fff;display:flex;gap:5px;align-items:center;}
-  .ancla .k{color:var(--gris);text-transform:uppercase;font-size:9.5px;letter-spacing:.3px;}
+  .ancla .k{color:var(--gris);font-size:9.5px;letter-spacing:.3px;}
   .ancla.al{background:var(--alerta-bg);border-color:#f3c9c2;color:var(--alerta);}
   .ancla.de{background:var(--destaca-bg);border-color:#c5e4cd;color:var(--destaca);}
   .arr{font-weight:800;}
@@ -162,6 +162,18 @@ __FONTS_CSS__
   const PRELIM=String(DATA.meta.anios_preliminar);
   const fmt=v=>(v==null||isNaN(v))?"—":Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
   const fmtSigned=v=>v==null?"—":(v>0?"+":"")+Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
+  // Title Case en capa de presentacion para nombres ALLCAPS del dato (comuna, EE),
+  // conservando siglas y bajando conectores. NO altera el parquet. JS toLowerCase/
+  // toUpperCase son Unicode-aware (Ñ/tildes correctas) sin depender del locale.
+  const SIGLAS=new Set(["SLEP","GSE","RBD","IDPS","EST","DOC","PAD","SIMCE"]);
+  const CONECT=new Set(["de","la","del","los","las","y","e","en","a","o","da","do"]);
+  const tc=s=>{ if(!s) return s;
+    return String(s).split(/\s+/).map((w,i)=>{
+      const wu=w.toUpperCase(); if(SIGLAS.has(wu)) return wu;
+      const wl=w.toLowerCase(); if(i>0 && CONECT.has(wl)) return wl;
+      return wl.charAt(0).toUpperCase()+wl.slice(1);
+    }).join(" ");
+  };
 
   // lectura de medidas para (rbd, grado, agno)
   function indOf(rbd,grado,agno){const b=DATA.ind,r=RIX.ind[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.ind[i]]={prom:b.prom[i],dif:b.dif[i],sigdif:b.sigdif[i],difgru:b.difgru[i],sigdifgru:b.sigdifgru[i]};return o;}
@@ -257,7 +269,7 @@ __FONTS_CSS__
     const foco=FOCO.has(e?.cod_com); const al=alertSummary(im);
     return (
       <div className={"card"+(foco?" foco":"")} onClick={()=>onSel(rbd)}>
-        <div className="nom">{e?e.nom:rbd}</div>
+        <div className="nom">{e?tc(e.nom):rbd}</div>
         <div className="meta">{est[rbd]?comNom(est[rbd].cod_com):""} · {DEPE[e?.cod_depe2]||"—"}</div>
         <Radar axes={axes} size={168} showLabels={false}/>
         <div className="alerts">
@@ -270,7 +282,7 @@ __FONTS_CSS__
       </div>);
   }
 
-  const comNom=cod=>{const c=DATA.comunas.find(x=>x.cod===cod);return c?c.nom:cod;};
+  const comNom=cod=>{const c=DATA.comunas.find(x=>x.cod===cod);return c?tc(c.nom):cod;};
   const regNom=cod=>{const r=DATA.regiones.find(x=>x.cod===cod);return r?r.nom:cod;};
 
   // ===== Distribucion de niveles de una subdimension =====
@@ -324,7 +336,7 @@ __FONTS_CSS__
     return (
       <div className="detail">
         <button className="back" onClick={onBack}>‹ Volver a la grilla</button>
-        <h2>{e?e.nom:rbd}</h2>
+        <h2>{e?tc(e.nom):rbd}</h2>
         <div className="dmeta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{String(agno)===PRELIM?" (preliminar)":""}</div>
         <div className="help">La escala <b>0–100 es relativa</b>: por sí sola no dice si el establecimiento va bien o mal. Las anclas de lectura son el <b>desvío vs su GSE</b> (mismo grupo socioeconómico) y la <b>variación vs la evaluación anterior</b>, ambas con su significancia. <span style={{color:"var(--alerta)"}}>▼ rojo = significativamente bajo (alerta)</span>; <span style={{color:"var(--destaca)"}}>▲ verde = significativamente sobre (destacado)</span>.</div>
 

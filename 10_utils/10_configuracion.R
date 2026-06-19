@@ -80,7 +80,7 @@ GRADO_LABELS <- c(
   "4b" = "4° básico",
   "6b" = "6° básico",
   "8b" = "8° básico",
-  "2m" = "II medio"
+  "2m" = "2° medio"
 )
 
 # Ciclo para SELECCIONAR el texto cualitativo de nivel (corpus): solo basica
@@ -92,6 +92,14 @@ GRADO_CICLO_TEXTO <- c(
   "6b" = "basica",
   "2m" = "media"
 )
+
+# --- Alcance del motor: grados expuestos en la UI ---------------------------
+# El motor expone SOLO 4° básico y 2° medio (decision de alcance). El dato
+# completo de los 4 grados permanece intacto en idps_largo.parquet; este es un
+# filtro de PRESENTACION (35_generar_motor_html.R lo aplica antes de serializar).
+# Reversible: editar esta constante reincorpora 6b/8b sin tocar el pipeline.
+# El valor debe coincidir EXACTO con la columna 'grado' del parquet (2m/4b/6b/8b).
+GRADOS_MOTOR <- c("4b", "2m")
 
 # --- Crosswalk de esquema por anio: texto (2022-2024) -> id numerico (2025) --
 # La Agencia migro el identificador de indicador/dimension/subdimension de
