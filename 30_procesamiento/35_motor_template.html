@@ -107,6 +107,19 @@ __FONTS_CSS__
   .defn-ctx{background:#f4f1e8;border-radius:7px;padding:9px 12px;margin:0 0 14px;}
   .defn-ctx .defn-text{color:#4a4536;}
   .nota{font-size:11px;color:var(--gris);background:#f4f1e8;border-radius:6px;padding:9px 11px;margin-top:10px;}
+  /* Evolucion: small-multiples 2x2 (un panel por indicador/dimension) */
+  .evol-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:680px){.evol-grid{grid-template-columns:1fr;}}
+  .evol-panel{border:1px solid var(--linea);border-radius:8px;padding:10px 12px;background:#fff;}
+  .evol-h{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:2px;}
+  .evol-sw{width:11px;height:11px;border-radius:3px;flex:none;}
+  .evol-marks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .evol-mark{font-size:11px;padding:2px 8px;border-radius:11px;background:#eee5cf;color:#6a5a2f;display:inline-flex;gap:4px;align-items:center;}
+  .evol-mark.al{background:var(--alerta-bg);color:var(--alerta);}
+  .evol-mark.de{background:var(--destaca-bg);color:var(--destaca);}
+  .evol-mark.nt{background:#eef0ee;color:var(--gris);}
+  .evol-mark .arr{font-weight:800;}
+  .evol-sig{font-size:9.5px;opacity:.8;}
   .axis-lab{font-size:9px;fill:var(--gris);} .axis-lab.b{font-size:10px;}
   .ring{fill:none;stroke:var(--linea);}
   .tt{position:fixed;background:#23303a;color:#fff;font-size:11px;padding:5px 8px;border-radius:5px;pointer-events:none;display:none;z-index:80;max-width:260px;}
@@ -292,24 +305,46 @@ __FONTS_CSS__
       return <span key={k} style={{width:val+"%",background:c}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val):""}</span>;})}</div>;
   }
 
-  // ===== Tendencia: eje FIJO 0-100, sin autoescala, sin interpolar huecos =====
-  function Tendencia({series,anios,titulo}){
+  // serie completa de una metrica (indicador o dimension) por anio: prom + dif +
+  // sigdif (vs evaluacion anterior, LEIDOS de la Agencia, no calculados).
+  function serieFull(ofFn,rbd,grado,id,anios){return anios.map(a=>{const d=ofFn(rbd,grado,a)[id]||{};
+    return {a, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null)};});}
+
+  // ===== Panel de evolucion de UNA metrica: linea eje FIJO 0-100 (sin autoescala,
+  //       sin interpolar huecos) + marcas inter-anuales (dif absoluto + sigdif). =====
+  function PanelEvolucion({nombre,color,pts}){
     const ref=useRef(null);
     useEffect(()=>{const el=ref.current;el.innerHTML="";
-      const W=Math.min(560,Math.max(320,anios.length*120)),H=150,m={l:30,r:12,t:10,b:20};
-      const svg=d3.select(el).append("svg").attr("width",W).attr("height",H);
-      const x=d3.scalePoint().domain(anios.map(String)).range([m.l,W-m.r]).padding(.5);
-      const y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);   // FIJO 0-100
-      [0,25,50,75,100].forEach(t=>{svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke","var(--linea)");
-        svg.append("text").attr("x",5).attr("y",y(t)+3).attr("class","axis-lab").text(t);});
-      anios.forEach(a=>svg.append("text").attr("x",x(String(a))).attr("y",H-5).attr("text-anchor","middle").attr("class","axis-lab b").text(a+(PRELIM.has(String(a))?"*":"")));
-      series.forEach(s=>{const pts=s.pts.map(p=>({a:String(p.a),v:p.v}));
-        const line=d3.line().defined(d=>d.v!=null).x(d=>x(d.a)).y(d=>y(d.v));
-        svg.append("path").datum(pts).attr("d",line).attr("fill","none").attr("stroke",s.color).attr("stroke-width",2);
-        pts.forEach(p=>{if(p.v==null)return;svg.append("circle").attr("cx",x(p.a)).attr("cy",y(p.v)).attr("r",3.2).attr("fill",s.color)
-          .on("mousemove",e=>showTT("<b>"+s.nombre+"</b><br>"+p.a+": "+fmt(p.v)+" (0–100)",e)).on("mouseleave",hideTT);});});
-    },[series,anios]);
-    return <div ref={ref}></div>;
+      const anios=pts.map(p=>String(p.a));
+      const W=Math.max(220,anios.length*64),H=118,m={l:24,r:10,t:8,b:18};
+      const svg=d3.select(el).append("svg").attr("width","100%").attr("viewBox","0 0 "+W+" "+H).attr("preserveAspectRatio","xMidYMid meet");
+      const x=d3.scalePoint().domain(anios).range([m.l,W-m.r]).padding(.5);
+      const y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);   // FIJO 0-100, nunca autoescala
+      [0,50,100].forEach(t=>{svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke","var(--linea)");
+        svg.append("text").attr("x",2).attr("y",y(t)+3).attr("class","axis-lab").text(t);});
+      anios.forEach(a=>svg.append("text").attr("x",x(a)).attr("y",H-4).attr("text-anchor","middle").attr("class","axis-lab b").text(a+(PRELIM.has(a)?"*":"")));
+      const dd=pts.map(p=>({a:String(p.a),v:p.v}));
+      const line=d3.line().defined(d=>d.v!=null).x(d=>x(d.a)).y(d=>y(d.v));
+      svg.append("path").datum(dd).attr("d",line).attr("fill","none").attr("stroke",color).attr("stroke-width",2.2);
+      dd.forEach(p=>{if(p.v==null)return;svg.append("circle").attr("cx",x(p.a)).attr("cy",y(p.v)).attr("r",3.4).attr("fill",color)
+        .on("mousemove",e=>showTT("<b>"+nombre+"</b><br>"+p.a+": "+fmt(p.v)+" (0–100)",e)).on("mouseleave",hideTT);});
+    },[pts,color,nombre]);
+    const marcas=pts.filter(p=>p.dif!=null);   // anios con cambio vs evaluacion anterior
+    return (
+      <div className="evol-panel">
+        <div className="evol-h"><span className="evol-sw" style={{background:color}}></span>{nombre}</div>
+        <div ref={ref}></div>
+        <div className="evol-marks">
+          {marcas.length===0
+            ? <span className="evol-mark nt">sin cambios medibles entre años</span>
+            : marcas.map(p=>{const cls=p.sig===1?"de":(p.sig===-1?"al":"nt");
+                const g=p.sig===1?"▲":(p.sig===-1?"▼":"=");
+                const txt=p.sig===0?"sin dif. significativa":"significativo";
+                return <span className={"evol-mark "+cls} key={p.a}
+                  title={p.a+": "+fmtSigned(p.dif)+" pts vs evaluación anterior · "+txt}>
+                  <b>{p.a}</b> <span className="arr">{g}</span> {fmtSigned(p.dif)} <span className="evol-sig">{txt}</span></span>;})}
+        </div>
+      </div>);
   }
 
   // ===== Detalle de establecimiento con drill-down indicador->dimension->subdim =====
@@ -367,16 +402,18 @@ __FONTS_CSS__
 
         {drillDim==null &&
           <div className="blk" style={{marginTop:20}}>
-            <h3>Evolución {nivel===1?"de las dimensiones":"de los indicadores"} <span style={{fontWeight:400,textTransform:"none",color:"var(--gris)"}}>· eje fijo 0–100</span></h3>
+            <h3>Evolución {nivel===1?"por dimensión":"por indicador"} <span style={{fontWeight:400,color:"var(--gris)"}}>· eje fijo 0–100, un panel por {nivel===1?"dimensión":"indicador"}</span></h3>
             {serie
               ? <div>
-                  <div style={{display:"flex",justifyContent:"center"}}>
-                  <Tendencia anios={anios}
-                    series={(nivel===1?(dimsByInd[drillInd]||[]).map(d=>({nombre:d.nombre,color:indById[drillInd].color,pts:serieDim(rbd,grado,d.id,anios)}))
-                                      :DATA.indicadores.map(ind=>({nombre:ind.nombre,color:ind.color,pts:serieInd(rbd,grado,ind.id,anios)})))}/></div>
-                  <div className="nota">Eje fijo 0–100 (escala común y comparable). Años sin punto = sin aplicación (no se interpola). {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
+                  <div className="evol-grid">
+                    {(nivel===1
+                       ? (dimsByInd[drillInd]||[]).map(d=>({key:d.id,nombre:d.nombre,color:indById[drillInd].color,pts:serieFull(dimOf,rbd,grado,d.id,anios)}))
+                       : DATA.indicadores.map(ind=>({key:ind.id,nombre:ind.nombre,color:ind.color,pts:serieFull(indOf,rbd,grado,ind.id,anios)}))
+                     ).map(p=><PanelEvolucion key={p.key} nombre={p.nombre} color={p.color} pts={p.pts}/>)}
+                  </div>
+                  <div className="nota">Cada panel es una {nivel===1?"dimensión":"indicador"} con su propio eje fijo 0–100 (escala común, comparable). La marca de cada año muestra la diferencia absoluta (dif) vs la evaluación anterior y su significancia (▲/▼/= + texto), <b>leídas de la Agencia</b> (no calculadas). Años sin punto = sin aplicación (no se interpola). {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
                 </div>
-              : <div className="nota">Vista temporal no disponible: {DATA.meta.grados[grado]} tiene un solo año de aplicación ({anios.join(", ")}).</div>}
+              : <div className="nota">Sin serie suficiente para evolución: {DATA.meta.grados[grado]} tiene un solo año de aplicación ({anios.join(", ")}).</div>}
           </div>}
       </div>);
   }
