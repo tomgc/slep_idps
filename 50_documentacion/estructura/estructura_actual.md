@@ -1,21 +1,22 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-12 07:52:49
-- **Totales:** 19 carpetas, 114 archivos
+- **Fecha:** 2026-06-19 12:44:23
+- **Totales:** 20 carpetas, 116 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
 
 ```
 slep_idps/
+├── .claude/
+│   └── settings.local.json  (88)
 ├── 10_utils/
-│   ├── 10_configuracion.R  (2.38K)
+│   ├── 10_configuracion.R  (5.94K)
 │   └── 10_utils.R  (1.68K)
 ├── 20_insumos/
 │   ├── auxiliares/
 │   │   ├── referencias_idps/
-│   │   │   ├── .DS_Store  (6K)
 │   │   │   ├── articles-239257_recurso.pdf  (2.24M)
 │   │   │   ├── articles-90116_recurso_2.pdf  (131K)
 │   │   │   ├── articles-90146_recurso_2.pdf  (87.8K)
@@ -28,27 +29,25 @@ slep_idps/
 │   │   │   ├── otros_indicadores_calidad_2014.pdf  (909K)
 │   │   │   ├── otros_indicadores_calidad_2019.pdf  (357K)
 │   │   │   └── subdimensiones_idps.pdf  (2.8M)
-│   │   ├── .DS_Store  (10K)
 │   │   ├── caracterizacion_establecimientos.xlsx  (16.5K)
 │   │   ├── diccionario_territorios.xlsx  (16.8K)
-│   │   ├── directorio_oficial_ee_publico.csv  (3.44M)
 │   │   ├── directorio_oficial_ee.csv  (3.6M)
+│   │   ├── directorio_oficial_ee_publico.csv  (3.44M)
 │   │   ├── glosas_directorio_oficial_ee.pdf  (457K)
-│   │   ├── idps2m2023_GLOSAS_rbd_público_final.xlsx  (38.2K)
+│   │   ├── idps2m2023_GLOSAS_rbd_pu<cc><81>blico_final.xlsx  (NA)
 │   │   ├── idps2m2024_GLOSAS_web_final.xlsx  (34K)
 │   │   ├── idps2m2025_GLOSAS_web_preliminar.xlsx  (34.4K)
-│   │   ├── idps4b2023_GLOSAS_rbd_público_final.xlsx  (37.5K)
+│   │   ├── idps4b2023_GLOSAS_rbd_pu<cc><81>blico_final.xlsx  (NA)
 │   │   ├── idps4b2025_GLOSAS_web_preliminar.xlsx  (34.4K)
 │   │   ├── idps6b2024_GLOSAS_web_final.xlsx  (34K)
 │   │   ├── idps8b2025_GLOSAS_web_preliminar.xlsx  (34.3K)
 │   │   ├── listado_slep_2026.xlsx  (55.5K)
 │   │   ├── rex_1440.pdf  (995K)
 │   │   └── rex_1459.pdf  (3.16M)
-│   ├── .DS_Store  (10K)
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
-│   ├── idps2m2022_rbd_glosa_pública_final.xlsx  (33K)
+│   ├── idps2m2022_rbd_glosa_pu<cc><81>blica_final.xlsx  (NA)
 │   ├── idps2m2023_niveles_final.xlsx  (3.44M)
 │   ├── idps2m2023_rbd_dim_final.xlsx  (1.99M)
 │   ├── idps2m2023_rbd_final.xlsx  (735K)
@@ -60,7 +59,7 @@ slep_idps/
 │   ├── idps2m2025_rbd_subdim_niveles_preliminar.xlsx  (3.2M)
 │   ├── idps4b2022_rbd_dim_final.xlsx  (4.78M)
 │   ├── idps4b2022_rbd_final.xlsx  (1.53M)
-│   ├── idps4b2022_rbd_glosa_pública_final.xlsx  (33K)
+│   ├── idps4b2022_rbd_glosa_pu<cc><81>blica_final.xlsx  (NA)
 │   ├── idps4b2023_niveles_final.xlsx  (7.59M)
 │   ├── idps4b2023_rbd_dim_final.xlsx  (4.69M)
 │   ├── idps4b2023_rbd_final.xlsx  (1.68M)
@@ -76,70 +75,74 @@ slep_idps/
 ├── 30_procesamiento/
 │   ├── .gitkeep  (0)
 │   ├── 31_depurar_directorio_oficial.R  (3.34K)
-│   └── 32_censo_insumos.R  (9.37K)
+│   ├── 32_censo_insumos.R  (9.37K)
+│   ├── 33_construir_catalogos.R  (13.7K)
+│   └── 34_leer_normalizar_idps.R  (17.5K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
+│   │   ├── catalogo_idps.parquet  (6.06K)
 │   │   ├── censo_insumos.md  (3.58K)
-│   │   └── censo_insumos.parquet  (7.23K)
+│   │   ├── censo_insumos.parquet  (7.23K)
+│   │   ├── comunas_chile.parquet  (7.26K)
+│   │   ├── establecimientos_chile.parquet  (261K)
+│   │   ├── idps_largo.parquet  (5.61M)
+│   │   └── sleps_chile.parquet  (59K)
 │   └── .DS_Store  (6K)
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
 │   │   │   ├── .gitkeep  (0)
-│   │   │   └── 20260611_decision_gobernanza_insumos_publicos.md  (3.23K)
+│   │   │   ├── 20260611_decision_gobernanza_insumos_publicos.md  (3.23K)
+│   │   │   └── 20260612_decision_ponderacion_idps.md  (7.21K)
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
 │   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (24.7K)
 │   ├── andamios/
+│   │   ├── diseno/
+│   │   │   └── motor_idps/
+│   │   │       ├── fonts/
+│   │   │       │   ├── gobCL_Heavy.otf  (43.7K)
+│   │   │       │   ├── gobCL_Light.otf  (37.1K)
+│   │   │       │   ├── gobCL_Regular.otf  (35.7K)
+│   │   │       │   ├── MuseoSans-100.otf  (61K)
+│   │   │       │   ├── MuseoSans-300.otf  (61.5K)
+│   │   │       │   ├── MuseoSans_500.otf  (61K)
+│   │   │       │   └── MuseoSans_700.otf  (62.1K)
+│   │   │       ├── screenshots/
+│   │   │       │   └── dual-default.png  (39.2K)
+│   │   │       ├── idps-app.jsx  (18K)
+│   │   │       ├── idps-charts.jsx  (19.9K)
+│   │   │       ├── idps-controls.jsx  (16.3K)
+│   │   │       ├── idps-data.js  (16.6K)
+│   │   │       ├── Motor IDPS.html  (28.6K)
+│   │   │       ├── PROMPT.md  (9.01K)
+│   │   │       └── slep_idps_fuente_completa.md  (100K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260611_221618_estructura.md  (5.61K)
-│   │   ├── 20260611_221618_estructura.txt  (5.63K)
-│   │   ├── 20260611_225337_estructura.md  (5.8K)
-│   │   ├── 20260611_225337_estructura.txt  (5.83K)
-│   │   ├── estructura_actual.md  (5.8K)
-│   │   └── estructura_actual.txt  (5.83K)
+│   │   ├── 20260612_075249_estructura.md  (6.94K)
+│   │   ├── 20260612_075249_estructura.txt  (7.02K)
+│   │   ├── 20260619_120614_estructura.md  (7.16K)
+│   │   ├── 20260619_120614_estructura.txt  (7.24K)
+│   │   ├── estructura_actual.md  (7.16K)
+│   │   └── estructura_actual.txt  (7.24K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
 │   │   ├── traspaso_cierre_v02.md  (22.8K)
-│   │   └── traspaso_cierre_v03.md  (23.9K)
-│   └── .DS_Store  (14K)
-├── diseno/
-│   ├── motor_idps/
-│   │   ├── fonts/
-│   │   │   ├── gobCL_Heavy.otf  (43.7K)
-│   │   │   ├── gobCL_Light.otf  (37.1K)
-│   │   │   ├── gobCL_Regular.otf  (35.7K)
-│   │   │   ├── MuseoSans_500.otf  (61K)
-│   │   │   ├── MuseoSans_700.otf  (62.1K)
-│   │   │   ├── MuseoSans-100.otf  (61K)
-│   │   │   └── MuseoSans-300.otf  (61.5K)
-│   │   ├── screenshots/
-│   │   │   └── dual-default.png  (39.2K)
-│   │   ├── .DS_Store  (6K)
-│   │   ├── idps-app.jsx  (18K)
-│   │   ├── idps-charts.jsx  (19.9K)
-│   │   ├── idps-controls.jsx  (16.3K)
-│   │   ├── idps-data.js  (16.6K)
-│   │   ├── Motor IDPS.html  (28.6K)
-│   │   ├── PROMPT.md  (9.01K)
-│   │   └── slep_idps_fuente_completa.md  (100K)
-│   ├── .DS_Store  (6K)
-│   ├── PROMPT.md  (9.01K)
-│   ├── Simce IDPS.zip  (301K)
-│   └── slep_idps_fuente_completa.md  (100K)
+│   │   ├── traspaso_cierre_v03.md  (23.9K)
+│   │   └── traspaso_cierre_v04.md  (26.2K)
+│   └── .DS_Store  (6K)
 ├── tests/
 │   └── .gitkeep  (0)
-├── .DS_Store  (14K)
+├── .DS_Store  (8K)
 ├── .gitignore  (759)
-├── 00_build.R  (1.24K)
+├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
-├── CLAUDE.md  (1.67K)
+├── CLAUDE.md  (4K)
 ├── README.md  (1.74K)
 └── slep_idps.Rproj  (195)
 ```
@@ -150,17 +153,16 @@ slep_idps/
 |---|---|
 | xlsx | 37 |
 | md | 18 |
-| (sin extension) | 17 |
 | pdf | 13 |
+| (sin extension) | 12 |
+| r | 8 |
 | otf | 7 |
-| r | 6 |
+| parquet | 6 |
 | jsx | 4 |
 | txt | 3 |
 | csv | 2 |
+| json | 2 |
 | html | 1 |
 | js | 1 |
-| json | 1 |
-| parquet | 1 |
 | png | 1 |
 | rproj | 1 |
-| zip | 1 |
