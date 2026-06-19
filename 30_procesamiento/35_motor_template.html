@@ -3,80 +3,113 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Motor IDPS — SLEP Costa Central</title>
+<title>Motor IDPS — Agencia de Calidad · establecimientos de Chile</title>
 <style>
+__FONTS_CSS__
   :root{
     --azul:#0A3A5C; --cream:#FFF6E0; --tinta:#23303a; --gris:#6b7780;
-    --linea:#e4dcc6; --panel:#fffdf7;
+    --linea:#e4dcc6; --panel:#fffdf7; --foco:#0062A0;
     --ind1:#EE2D49; --ind2:#FFC92E; --ind3:#9BC93E; --ind4:#2A8FD9;
     --bajo:#E88663; --medio:#FFC92E; --alto:#75924E;
-    --foco:#0062A0;
+    --alerta:#c0392b; --alerta-bg:#fbe9e7; --destaca:#3a8f4a; --destaca-bg:#eaf5ec;
+    --sombra:0 2px 8px rgba(74,39,70,.10);
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--tinta);
-    font-family:"Helvetica Neue",Arial,system-ui,sans-serif;font-size:14px;line-height:1.4;}
-  header.app{background:var(--azul);color:#fff;padding:14px 22px;display:flex;align-items:baseline;gap:14px;}
-  header.app h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
-  header.app .sub{font-size:12px;opacity:.85;}
-  .wrap{max-width:1280px;margin:0 auto;padding:16px 22px 60px;}
-  .controls{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;
-    background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:14px 16px;margin-bottom:18px;}
-  .ctl label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--gris);margin-bottom:5px;}
-  .seg{display:inline-flex;border:1px solid var(--linea);border-radius:6px;overflow:hidden;}
-  .seg button{border:0;background:#fff;padding:6px 12px;cursor:pointer;font-size:13px;color:var(--tinta);border-right:1px solid var(--linea);}
+    font-family:"Museo Sans","Helvetica Neue",system-ui,Arial,sans-serif;font-size:14px;line-height:1.45;}
+  h1,h2,h3,.gob{font-family:"gobCL","Museo Sans",system-ui,sans-serif;}
+  header.app{background:var(--azul);color:#fff;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+  header.app h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.4px;text-transform:uppercase;}
+  header.app .sub{font-size:12px;opacity:.85;max-width:760px;}
+  .wrap{max-width:1320px;margin:0 auto;padding:16px 24px 70px;}
+
+  .nav{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--sombra);}
+  .nav-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;}
+  .ctl label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--gris);margin-bottom:5px;}
+  select{padding:7px 9px;border:1px solid var(--linea);border-radius:7px;background:#fff;font-size:13px;min-width:150px;font-family:inherit;}
+  .seg{display:inline-flex;border:1px solid var(--linea);border-radius:7px;overflow:hidden;}
+  .seg button{border:0;background:#fff;padding:6px 12px;cursor:pointer;font-size:13px;color:var(--tinta);border-right:1px solid var(--linea);font-family:inherit;}
   .seg button:last-child{border-right:0;}
   .seg button.on{background:var(--azul);color:#fff;font-weight:600;}
-  .seg button:disabled{color:#c3c3c3;cursor:not-allowed;background:#f4f1e8;}
-  select{padding:6px 8px;border:1px solid var(--linea);border-radius:6px;background:#fff;font-size:13px;}
-  .gse-lock{display:flex;align-items:center;gap:6px;}
-  .gse-lock .lock{font-size:11px;color:var(--foco);}
-  .gse-pills{display:inline-flex;gap:4px;flex-wrap:wrap;}
-  .gse-pills button{border:1px solid var(--linea);background:#fff;border-radius:14px;padding:4px 11px;cursor:pointer;font-size:12px;}
+  .gse-pills{display:inline-flex;gap:5px;flex-wrap:wrap;}
+  .gse-pills button{border:1px solid var(--linea);background:#fff;border-radius:15px;padding:4px 11px;cursor:pointer;font-size:12px;font-family:inherit;}
   .gse-pills button.on{background:var(--foco);color:#fff;border-color:var(--foco);}
-  .gse-group{margin-bottom:26px;}
-  .gse-head{display:flex;align-items:center;gap:10px;margin:8px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--linea);}
-  .gse-head .tag{background:var(--azul);color:#fff;border-radius:5px;padding:3px 10px;font-size:12px;font-weight:600;}
+  .crumb{font-size:12.5px;color:var(--gris);margin:2px 0 10px;}
+  .crumb b{color:var(--azul);}
+
+  .help{background:#eef3f7;border:1px solid #d4e2ec;border-radius:8px;padding:10px 13px;font-size:12.5px;color:#3d5566;margin-bottom:14px;}
+  .help b{color:var(--azul);}
+
+  .gse-group{margin-bottom:24px;}
+  .gse-head{display:flex;align-items:center;gap:10px;margin:6px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--linea);}
+  .gse-head .tag{background:var(--azul);color:#fff;border-radius:6px;padding:3px 11px;font-size:12px;font-weight:600;}
   .gse-head .cnt{font-size:12px;color:var(--gris);}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;}
-  .card{background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:10px;cursor:pointer;transition:box-shadow .12s;}
-  .card:hover{box-shadow:0 3px 10px rgba(74,39,70,.14);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--linea);border-radius:9px;padding:11px;cursor:pointer;transition:box-shadow .12s,transform .12s;}
+  .card:hover{box-shadow:var(--sombra);transform:translateY(-1px);}
   .card.foco{border-color:var(--foco);box-shadow:0 0 0 1px var(--foco) inset;}
-  .card .nom{font-size:12px;font-weight:600;line-height:1.25;height:2.5em;overflow:hidden;}
+  .card .nom{font-size:12px;font-weight:700;line-height:1.25;height:2.5em;overflow:hidden;}
   .card .meta{font-size:10.5px;color:var(--gris);margin-top:2px;}
-  .badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;background:#eee5cf;color:#6a5a2f;margin-top:4px;}
+  .alerts{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;min-height:20px;}
+  .chip{font-size:10.5px;padding:2px 7px;border-radius:11px;font-weight:600;display:inline-flex;gap:3px;align-items:center;}
+  .chip.al{background:var(--alerta-bg);color:var(--alerta);}
+  .chip.de{background:var(--destaca-bg);color:var(--destaca);}
+  .chip.nt{background:#eee5cf;color:#6a5a2f;}
+  .badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:10px;background:#eee5cf;color:#6a5a2f;margin-top:5px;}
   .badge.foco{background:var(--foco);color:#fff;}
-  .empty{padding:40px;text-align:center;color:var(--gris);}
+  .empty{padding:46px;text-align:center;color:var(--gris);}
   .sup{color:#b06a4f;font-style:italic;}
-  .detail{background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:18px;}
-  .detail .back{border:0;background:none;color:var(--foco);cursor:pointer;font-size:13px;padding:0;margin-bottom:8px;}
-  .detail h2{margin:.1em 0;font-size:18px;}
-  .detail .dmeta{font-size:12.5px;color:var(--gris);margin-bottom:14px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-  @media(max-width:820px){.row2{grid-template-columns:1fr;}}
-  .blk h3{font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--azul);margin:0 0 8px;border-bottom:1px solid var(--linea);padding-bottom:4px;}
-  .marca{display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--linea);}
-  .marca .sw{width:11px;height:11px;border-radius:3px;flex:none;}
-  .marca .val{font-weight:700;margin-left:auto;}
-  .arr-up{color:#3a8f4a;font-weight:700;} .arr-dn{color:#c0392b;font-weight:700;} .arr-eq{color:var(--gris);}
-  .sig{font-size:10.5px;color:var(--gris);}
-  .distrow{margin:10px 0;}
-  .distrow .lbl{font-size:12px;font-weight:600;}
-  .distrow .actores{font-size:10px;color:var(--gris);font-weight:400;}
-  .bar{display:flex;height:18px;border-radius:4px;overflow:hidden;border:1px solid var(--linea);background:#f4f1e8;}
-  .bar span{display:flex;align-items:center;justify-content:center;font-size:10px;color:#3a2e10;}
-  .leyenda{display:flex;gap:14px;font-size:11px;color:var(--gris);margin:6px 0 14px;flex-wrap:wrap;}
+  .leyenda{display:flex;gap:14px;font-size:11px;color:var(--gris);margin:4px 0 12px;flex-wrap:wrap;align-items:center;}
   .leyenda i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px;}
+
+  .detail{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:20px;box-shadow:var(--sombra);}
+  .back{border:0;background:none;color:var(--foco);cursor:pointer;font-size:13px;padding:0;font-family:inherit;}
+  .detail h2{margin:.15em 0;font-size:20px;}
+  .dmeta{font-size:12.5px;color:var(--gris);margin-bottom:8px;}
+  .dcrumb{font-size:13px;margin:10px 0 14px;}
+  .dcrumb button{border:0;background:none;color:var(--foco);cursor:pointer;font-size:13px;padding:0;font-family:inherit;}
+  .dcrumb span{color:var(--gris);}
+  .dcrumb b{color:var(--tinta);}
+  .row2{display:grid;grid-template-columns:340px 1fr;gap:26px;}
+  @media(max-width:860px){.row2{grid-template-columns:1fr;}}
+  .blk h3{font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--azul);margin:0 0 10px;border-bottom:1px solid var(--linea);padding-bottom:5px;}
+
+  /* GSE protagonista: fila de indicador/dimension con doble ancla */
+  .anchor-row{padding:9px 0;border-bottom:1px solid var(--linea);cursor:pointer;}
+  .anchor-row:hover{background:#fbf7ea;}
+  .anchor-row.flat{cursor:default;}
+  .anchor-row.flat:hover{background:none;}
+  .ar-top{display:flex;align-items:center;gap:9px;}
+  .ar-sw{width:12px;height:12px;border-radius:3px;flex:none;}
+  .ar-nom{font-weight:600;font-size:13px;}
+  .ar-prom{margin-left:auto;font-weight:800;font-size:17px;}
+  .ar-prom .u{font-size:10px;color:var(--gris);font-weight:400;}
+  .anclas{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+  .ancla{font-size:11px;padding:3px 9px;border-radius:7px;border:1px solid var(--linea);background:#fff;display:flex;gap:5px;align-items:center;}
+  .ancla .k{color:var(--gris);text-transform:uppercase;font-size:9.5px;letter-spacing:.3px;}
+  .ancla.al{background:var(--alerta-bg);border-color:#f3c9c2;color:var(--alerta);}
+  .ancla.de{background:var(--destaca-bg);border-color:#c5e4cd;color:var(--destaca);}
+  .arr{font-weight:800;}
+  .go{margin-left:6px;color:var(--foco);font-size:11px;}
+
+  .distrow{margin:11px 0;}
+  .distrow .lbl{font-size:12.5px;font-weight:600;}
+  .distrow .actores{font-size:10px;color:var(--gris);font-weight:400;}
+  .bar{display:flex;height:19px;border-radius:5px;overflow:hidden;border:1px solid var(--linea);background:#f4f1e8;}
+  .bar span{display:flex;align-items:center;justify-content:center;font-size:10px;color:#2e2710;font-weight:600;}
   .nivel-txt{font-size:11px;color:#5a5142;margin-top:3px;}
-  .nota{font-size:11px;color:var(--gris);background:#f4f1e8;border-radius:5px;padding:8px 10px;margin-top:10px;}
-  .axis-lab{font-size:9px;fill:var(--gris);}
+  .defn{font-size:11px;color:#6a6253;font-style:italic;margin:2px 0 6px;}
+  .nota{font-size:11px;color:var(--gris);background:#f4f1e8;border-radius:6px;padding:9px 11px;margin-top:10px;}
+  .axis-lab{font-size:9px;fill:var(--gris);} .axis-lab.b{font-size:10px;}
   .ring{fill:none;stroke:var(--linea);}
-  .tt{position:fixed;background:#23303a;color:#fff;font-size:11px;padding:5px 8px;border-radius:5px;pointer-events:none;display:none;z-index:50;max-width:240px;}
+  .tt{position:fixed;background:#23303a;color:#fff;font-size:11px;padding:5px 8px;border-radius:5px;pointer-events:none;display:none;z-index:80;max-width:260px;}
+  code{background:#eee5cf;padding:0 4px;border-radius:3px;font-size:11px;}
 </style>
 </head>
 <body>
   <header class="app">
     <h1>Motor IDPS</h1>
-    <span class="sub">Indicadores de Desarrollo Personal y Social — SLEP Costa Central · datos por establecimiento educacional, segmentados por GSE</span>
+    <span class="sub">Indicadores de Desarrollo Personal y Social — Agencia de Calidad de la Educación · dato por establecimiento educacional de todo Chile, leído vs su grupo socioeconómico (GSE). Sin agregación territorial.</span>
   </header>
   <div id="root"></div>
   <div class="tt" id="tt"></div>
@@ -93,270 +126,325 @@
   <script>__D3_INLINE__</script>
   <script>__PAKO_INLINE__</script>
   <script>
+    window.__t0 = performance.now();
     const DATA = JSON.parse(pako.inflate(
-      Uint8Array.from(atob("__JSON_DATA__"), c => c.charCodeAt(0)),
-      { to: "string" }
-    ));
+      Uint8Array.from(atob("__JSON_DATA__"), c => c.charCodeAt(0)), { to: "string" }));
+    window.__tDecode = performance.now() - window.__t0;
   </script>
 
   <script type="text/babel" data-presets="env,react">
   "use strict";
   const {useState, useMemo, useRef, useEffect} = React;
 
-  // ===== Indices a partir de los bloques columnares =====
-  function colToRows(b){const o=[];for(let i=0;i<b.rows;i++){const r={};for(const k in b){if(k!=="rows")r[k]=b[k][i];}o.push(r);}return o;}
-  const KEY = (rbd,grado,agno)=>rbd+"|"+grado+"|"+agno;
+  // ===== Indice de rangos por rbd (columnas ORDENADAS por rbd; sin materializar
+  //       1,5M de objetos: solo [inicio,fin) por establecimiento) =====
+  const tIdx0 = performance.now();
+  function rangeIdx(arr){const m=Object.create(null);for(let i=0;i<arr.length;i++){const r=arr[i];const e=m[r];if(e===undefined)m[r]=[i,i+1];else e[1]=i+1;}return m;}
+  const RIX={ind:rangeIdx(DATA.ind.rbd), dim:rangeIdx(DATA.dim.rbd), niv:rangeIdx(DATA.niv.rbd), roster:rangeIdx(DATA.roster.rbd)};
+  window.__tIndex = performance.now() - tIdx0;
 
-  const M = (()=>{
-    const indById={}; DATA.indicadores.forEach(d=>indById[d.id]=d);
-    const dimById={}; DATA.dimensiones.forEach(d=>dimById[d.id]=d);
-    const subById={}; DATA.subdimensiones.forEach(d=>{if(d.id!=null)subById[d.id]=d;});
-    const estab={}; DATA.establecimientos.forEach(e=>estab[e.rbd]=e);
-    // medidas
-    const ind={}, dim={}, niv={};
-    colToRows(DATA.ind).forEach(r=>{const k=KEY(r.rbd,r.grado,r.agno);(ind[k]=ind[k]||{})[r.ind]={prom:r.prom,dif:r.dif,sigdif:r.sigdif,difgru:r.difgru,sigdifgru:r.sigdifgru};});
-    colToRows(DATA.dim).forEach(r=>{const k=KEY(r.rbd,r.grado,r.agno);(dim[k]=dim[k]||{})[r.dim]={prom:r.prom,dif:r.dif,sigdif:r.sigdif};});
-    colToRows(DATA.niv).forEach(r=>{const k=KEY(r.rbd,r.grado,r.agno);(niv[k]=niv[k]||{})[r.sub]={bajo:r.bajo,medio:r.medio,alto:r.alto};});
-    return {indById,dimById,subById,estab,ind,dim,niv,roster:colToRows(DATA.roster)};
-  })();
+  const indById={}; DATA.indicadores.forEach(d=>indById[d.id]=d);
+  const dimById={}; DATA.dimensiones.forEach(d=>dimById[d.id]=d);
+  const subById={}; DATA.subdimensiones.forEach(d=>{if(d.id!=null)subById[d.id]=d;});
+  const subByDim={}; DATA.subdimensiones.forEach(d=>{if(d.tiene_niveles){(subByDim[d.id_dim]=subByDim[d.id_dim]||[]).push(d);}});
+  const dimsByInd={}; DATA.dimensiones.forEach(d=>{(dimsByInd[d.id_ind]=dimsByInd[d.id_ind]||[]).push(d);});
+  const est={}; DATA.establecimientos.forEach(e=>est[e.rbd]=e);
+  const GSE=DATA.meta.gse_labels, DEPE=DATA.meta.depe2_labels;
+  const FOCO=new Set(DATA.meta.comunas_foco);
+  const CICLO={"4b":"basica","6b":"basica","2m":"media"};      // 8b -> sin texto
+  const PRELIM=String(DATA.meta.anios_preliminar);
+  const fmt=v=>(v==null||isNaN(v))?"—":Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
+  const fmtSigned=v=>v==null?"—":(v>0?"+":"")+Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
 
-  const CICLO = {"4b":"basica","6b":"basica","2m":"media"};   // 8b -> sin texto (decision sesion 6)
-  const fmt = v => (v==null||isNaN(v)) ? "—" : Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
-  const DEPE = DATA.meta.depe2_labels, GSE = DATA.meta.gse_labels;
-  const FOCO = new Set(DATA.meta.comunas_foco);
+  // lectura de medidas para (rbd, grado, agno)
+  function indOf(rbd,grado,agno){const b=DATA.ind,r=RIX.ind[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.ind[i]]={prom:b.prom[i],dif:b.dif[i],sigdif:b.sigdif[i],difgru:b.difgru[i],sigdifgru:b.sigdifgru[i]};return o;}
+  function dimOf(rbd,grado,agno){const b=DATA.dim,r=RIX.dim[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.dim[i]]={prom:b.prom[i],dif:b.dif[i],sigdif:b.sigdif[i]};return o;}
+  function nivOf(rbd,grado,agno){const b=DATA.niv,r=RIX.niv[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.sub[i]]={bajo:b.bajo[i],medio:b.medio[i],alto:b.alto[i]};return o;}
+  // serie de un indicador/dimension a lo largo de los anios
+  function serieInd(rbd,grado,indId,anios){return anios.map(a=>{const d=indOf(rbd,grado,a)[indId];return{a,v:d?d.prom:null};});}
+  function serieDim(rbd,grado,dimId,anios){return anios.map(a=>{const d=dimOf(rbd,grado,a)[dimId];return{a,v:d?d.prom:null};});}
 
-  // ===== Tooltip global =====
-  const tt = ()=>document.getElementById("tt");
-  function showTT(html,e){const t=tt();t.innerHTML=html;t.style.display="block";t.style.left=(e.clientX+12)+"px";t.style.top=(e.clientY+12)+"px";}
-  function hideTT(){tt().style.display="none";}
+  const tt=()=>document.getElementById("tt");
+  const showTT=(h,e)=>{const t=tt();t.innerHTML=h;t.style.display="block";t.style.left=(e.clientX+12)+"px";t.style.top=(e.clientY+12)+"px";};
+  const hideTT=()=>{tt().style.display="none";};
 
-  // ===== RadarChart (D3) =====
-  function Radar({axes, size, showLabels}){
-    // axes: [{label, value(0-100|null), color}]
+  // ===== Radar D3 (rompe en NA: honesto con la supresion) =====
+  function Radar({axes,size,showLabels}){
     const ref=useRef(null);
-    useEffect(()=>{
-      const el=ref.current; el.innerHTML="";
-      const R=size/2, cx=R, cy=R, rad=R-(showLabels?34:10), n=axes.length;
+    useEffect(()=>{const el=ref.current;el.innerHTML="";
+      const R=size/2,cx=R,cy=R,rad=R-(showLabels?34:12),n=axes.length;
       const svg=d3.select(el).append("svg").attr("width",size).attr("height",size);
-      const ang=i=>(Math.PI*2*i/n)-Math.PI/2;
-      const rsc=d3.scaleLinear().domain([0,100]).range([0,rad]);
-      // anillos
+      const ang=i=>(Math.PI*2*i/n)-Math.PI/2, rsc=d3.scaleLinear().domain([0,100]).range([0,rad]);
       [20,40,60,80,100].forEach(t=>svg.append("circle").attr("cx",cx).attr("cy",cy).attr("r",rsc(t)).attr("class","ring"));
-      // ejes + etiquetas
-      axes.forEach((a,i)=>{
-        const x=cx+Math.cos(ang(i))*rad, y=cy+Math.sin(ang(i))*rad;
+      axes.forEach((a,i)=>{const x=cx+Math.cos(ang(i))*rad,y=cy+Math.sin(ang(i))*rad;
         svg.append("line").attr("x1",cx).attr("y1",cy).attr("x2",x).attr("y2",y).attr("stroke","var(--linea)");
-        if(showLabels){
-          const lx=cx+Math.cos(ang(i))*(rad+12), ly=cy+Math.sin(ang(i))*(rad+12);
-          svg.append("text").attr("x",lx).attr("y",ly).attr("class","axis-lab")
+        if(showLabels){const lx=cx+Math.cos(ang(i))*(rad+13),ly=cy+Math.sin(ang(i))*(rad+13);
+          svg.append("text").attr("x",lx).attr("y",ly).attr("class","axis-lab b")
             .attr("text-anchor",Math.abs(Math.cos(ang(i)))<.3?"middle":(Math.cos(ang(i))>0?"start":"end"))
-            .attr("dominant-baseline","middle").text(a.label);
-        }
-      });
-      // poligono (rompe en nulos -> honesto con la supresion)
-      const pts=axes.map((a,i)=>({a,i,x:cx+Math.cos(ang(i))*rsc(a.value||0),y:cy+Math.sin(ang(i))*rsc(a.value||0)}));
+            .attr("dominant-baseline","middle").text(a.label);}});
+      const pts=axes.map((a,i)=>({a,x:cx+Math.cos(ang(i))*rsc(a.value||0),y:cy+Math.sin(ang(i))*rsc(a.value||0)}));
       const line=d3.line().defined(d=>d.a.value!=null).x(d=>d.x).y(d=>d.y).curve(d3.curveLinearClosed);
-      svg.append("path").datum(pts).attr("d",line).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.5);
-      pts.forEach(p=>{
-        if(p.a.value==null) return;
-        svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",showLabels?4:3).attr("fill",p.a.color||"var(--azul)")
-          .on("mousemove",e=>showTT("<b>"+p.a.label+"</b><br>"+fmt(p.a.value)+" pts",e)).on("mouseleave",hideTT);
-      });
+      svg.append("path").datum(pts).attr("d",line).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.6);
+      pts.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",showLabels?4:2.6).attr("fill",p.a.color||"var(--azul)")
+        .on("mousemove",e=>showTT("<b>"+p.a.label+"</b><br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});
     },[axes,size,showLabels]);
     return <div ref={ref}></div>;
   }
 
-  // ===== Marca de desvio vs GSE (difgru/sigdifgru) — NO linea absoluta =====
-  function MarcaDesvio({d}){
-    if(!d||d.prom==null) return <span className="sup">sin dato</span>;
-    const g=d.difgru;
-    let arr=<span className="arr-eq">=</span>, txt="igual a su GSE";
-    if(g!=null && g>0){arr=<span className="arr-up">▲</span>;txt="sobre su GSE (+"+fmt(g)+")";}
-    else if(g!=null && g<0){arr=<span className="arr-dn">▼</span>;txt="bajo su GSE ("+fmt(g)+")";}
-    // sigdifgru de la Agencia: -1 = significativamente bajo, 0 = no significativo,
-    // +1 = significativamente alto (verificado: el signo coincide 100% con difgru).
-    const significativo = d.sigdifgru!=null && d.sigdifgru!==0;
-    const sig = (g!=null) ? (significativo ? " · significativo" : " · no significativo") : "";
-    return <span title={txt+sig}>{arr} <span className="sig">{txt}{sig}</span></span>;
+  // ===== Ancla (vs GSE / vs año anterior): numero + significancia + color =====
+  function Ancla({tipo,dif,sig}){
+    if(dif==null) return <div className="ancla"><span className="k">{tipo}</span><span className="sup">sin dato</span></div>;
+    const significativo = sig!=null && sig!==0;
+    let cls="", arr="=";
+    if(dif>0){arr="▲"; cls=significativo?"de":"";}
+    else if(dif<0){arr="▼"; cls=significativo?"al":"";}
+    const lbl = significativo ? "significativo" : "no significativo";
+    return <div className={"ancla "+cls} title={tipo+": "+fmtSigned(dif)+" · "+lbl}>
+      <span className="k">{tipo}</span><span className="arr">{arr}</span>{fmtSigned(dif)}
+      <span style={{fontSize:"9px",opacity:.8}}>{significativo?"·sig":""}</span></div>;
   }
 
-  // ===== Card de establecimiento (radar mini de indicadores) =====
+  // ===== Fila de indicador/dimension con doble ancla (GSE protagonista) =====
+  function AnchorRow({color,nombre,d,onClick}){
+    return (
+      <div className={"anchor-row"+(onClick?"":" flat")} onClick={onClick}>
+        <div className="ar-top">
+          <span className="ar-sw" style={{background:color}}></span>
+          <span className="ar-nom">{nombre}</span>
+          {onClick && <span className="go">ver ›</span>}
+          <span className="ar-prom">{d&&d.prom!=null?fmt(d.prom):<span className="sup" style={{fontSize:13}}>sin dato</span>}{d&&d.prom!=null&&<span className="u"> /100</span>}</span>
+        </div>
+        {d&&d.prom!=null &&
+          <div className="anclas">
+            <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>
+            <Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/>
+          </div>}
+      </div>);
+  }
+
+  // ===== Resumen de alertas de un establecimiento (para la tarjeta) =====
+  function alertSummary(im){
+    let bajo=0,sobre=0,dato=0;
+    DATA.indicadores.forEach(ind=>{const d=im[ind.id];if(d&&d.prom!=null){dato++;if(d.sigdifgru===-1)bajo++;else if(d.sigdifgru===1)sobre++;}});
+    return {bajo,sobre,dato};
+  }
+
+  // ===== Tarjeta de establecimiento =====
   function Card({rbd,grado,agno,onSel}){
-    const e=M.estab[rbd]; const im=M.ind[KEY(rbd,grado,agno)]||{};
-    const axes=DATA.indicadores.map(ind=>({label:ind.corto||("I"+ind.id),value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
-    const foco=FOCO.has(e?.cod_com);
-    const nSup=axes.filter(a=>a.value==null).length;
+    const e=est[rbd]; const im=indOf(rbd,grado,agno);
+    const axes=DATA.indicadores.map(ind=>({label:ind.corto,value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
+    const foco=FOCO.has(e?.cod_com); const al=alertSummary(im);
     return (
       <div className={"card"+(foco?" foco":"")} onClick={()=>onSel(rbd)}>
         <div className="nom">{e?e.nom:rbd}</div>
-        <div className="meta">{e?e.nom_com:""} · {DEPE[e?.cod_depe2]||"—"}</div>
-        <Radar axes={axes} size={150} showLabels={false}/>
+        <div className="meta">{est[rbd]?comNom(est[rbd].cod_com):""} · {DEPE[e?.cod_depe2]||"—"}</div>
+        <Radar axes={axes} size={168} showLabels={false}/>
+        <div className="alerts">
+          {al.bajo>0 && <span className="chip al" title="indicadores significativamente bajo su GSE">▼ {al.bajo} bajo GSE</span>}
+          {al.sobre>0 && <span className="chip de" title="indicadores significativamente sobre su GSE">▲ {al.sobre} sobre GSE</span>}
+          {al.dato>0 && al.bajo===0 && al.sobre===0 && <span className="chip nt">≈ en su GSE</span>}
+          {al.dato===0 && <span className="chip nt sup">sin dato</span>}
+        </div>
         {foco && <span className="badge foco">Costa Central</span>}
-        {nSup>0 && <div className="meta sup">{nSup} indicador(es) sin dato</div>}
-      </div>
-    );
+      </div>);
   }
 
-  // ===== Detalle de un establecimiento =====
+  const comNom=cod=>{const c=DATA.comunas.find(x=>x.cod===cod);return c?c.nom:cod;};
+  const regNom=cod=>{const r=DATA.regiones.find(x=>x.cod===cod);return r?r.nom:cod;};
+
+  // ===== Distribucion de niveles de una subdimension =====
+  function DistBar({v}){
+    const segs=[["bajo","var(--bajo)"],["medio","var(--medio)"],["alto","var(--alto)"]];
+    return <div className="bar">{segs.map(([k,c])=>{const val=v[k];if(val==null||val===0)return null;
+      return <span key={k} style={{width:val+"%",background:c}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val):""}</span>;})}</div>;
+  }
+
+  // ===== Tendencia: eje FIJO 0-100, sin autoescala, sin interpolar huecos =====
+  function Tendencia({series,anios,titulo}){
+    const ref=useRef(null);
+    useEffect(()=>{const el=ref.current;el.innerHTML="";
+      const W=Math.min(560,Math.max(320,anios.length*120)),H=150,m={l:30,r:12,t:10,b:20};
+      const svg=d3.select(el).append("svg").attr("width",W).attr("height",H);
+      const x=d3.scalePoint().domain(anios.map(String)).range([m.l,W-m.r]).padding(.5);
+      const y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);   // FIJO 0-100
+      [0,25,50,75,100].forEach(t=>{svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke","var(--linea)");
+        svg.append("text").attr("x",5).attr("y",y(t)+3).attr("class","axis-lab").text(t);});
+      anios.forEach(a=>svg.append("text").attr("x",x(String(a))).attr("y",H-5).attr("text-anchor","middle").attr("class","axis-lab b").text(a+(String(a)===PRELIM?"*":"")));
+      series.forEach(s=>{const pts=s.pts.map(p=>({a:String(p.a),v:p.v}));
+        const line=d3.line().defined(d=>d.v!=null).x(d=>x(d.a)).y(d=>y(d.v));
+        svg.append("path").datum(pts).attr("d",line).attr("fill","none").attr("stroke",s.color).attr("stroke-width",2);
+        pts.forEach(p=>{if(p.v==null)return;svg.append("circle").attr("cx",x(p.a)).attr("cy",y(p.v)).attr("r",3.2).attr("fill",s.color)
+          .on("mousemove",e=>showTT("<b>"+s.nombre+"</b><br>"+p.a+": "+fmt(p.v)+" (0–100)",e)).on("mouseleave",hideTT);});});
+    },[series,anios]);
+    return <div ref={ref}></div>;
+  }
+
+  // ===== Detalle de establecimiento con drill-down indicador->dimension->subdim =====
   function Detalle({rbd,grado,agno,onBack}){
-    const e=M.estab[rbd]; const k=KEY(rbd,grado,agno);
-    const im=M.ind[k]||{}, dm=M.dim[k]||{}, nm=M.niv[k]||{};
-    const ciclo=CICLO[grado];
-    const axInd=DATA.indicadores.map(ind=>({label:ind.corto||ind.nombre,value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
-    const axDim=DATA.dimensiones.map(d=>({label:String(d.id),value:dm[d.id]?dm[d.id].prom:null,color:DATA.indicadores.find(x=>x.id===d.id_ind)?.color}));
-    const anios=DATA.meta.grado_anios[grado]||[];
-    const serie = anios.length>1;
+    const [drillInd,setDrillInd]=useState(null);
+    const [drillDim,setDrillDim]=useState(null);
+    useEffect(()=>{setDrillInd(null);setDrillDim(null);},[rbd,grado,agno]);
+    const e=est[rbd]; const im=indOf(rbd,grado,agno),dm=dimOf(rbd,grado,agno),nm=nivOf(rbd,grado,agno);
+    const ciclo=CICLO[grado]; const anios=DATA.meta.grado_anios[grado]||[]; const serie=anios.length>1;
+    const axInd=DATA.indicadores.map(ind=>({label:ind.corto,value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
+
+    let nivel=0,tituloNivel="Indicadores",radarAxes=axInd,radarTitle="Mirada integral — 4 indicadores";
+    let filas=DATA.indicadores.map(ind=>({id:ind.id,color:ind.color,nombre:ind.nombre,d:im[ind.id],
+      onClick:()=>{setDrillInd(ind.id);setDrillDim(null);}}));
+    if(drillInd!=null){nivel=1;const ind=indById[drillInd];tituloNivel="Dimensiones de "+ind.nombre;
+      const dims=dimsByInd[drillInd]||[];
+      radarAxes=dims.map(d=>({label:String(d.id),value:dm[d.id]?dm[d.id].prom:null,color:ind.color}));
+      radarTitle="Dimensiones del indicador";
+      filas=dims.map(d=>({id:d.id,color:ind.color,nombre:d.nombre,d:dm[d.id],
+        onClick:(subByDim[d.id]&&subByDim[d.id].length)?()=>setDrillDim(d.id):null}));}
+
     return (
       <div className="detail">
         <button className="back" onClick={onBack}>‹ Volver a la grilla</button>
         <h2>{e?e.nom:rbd}</h2>
-        <div className="dmeta">{e?e.nom_com:""} · {DEPE[e?.cod_depe2]||"—"} · GSE {agnoGseLabel(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{String(DATA.meta.anios_preliminar)===String(agno)?" (preliminar)":""}</div>
+        <div className="dmeta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{String(agno)===PRELIM?" (preliminar)":""}</div>
+        <div className="help">La escala <b>0–100 es relativa</b>: por sí sola no dice si el establecimiento va bien o mal. Las anclas de lectura son el <b>desvío vs su GSE</b> (mismo grupo socioeconómico) y la <b>variación vs la evaluación anterior</b>, ambas con su significancia. <span style={{color:"var(--alerta)"}}>▼ rojo = significativamente bajo (alerta)</span>; <span style={{color:"var(--destaca)"}}>▲ verde = significativamente sobre (destacado)</span>.</div>
 
-        <div className="row2">
-          <div className="blk">
-            <h3>Indicadores</h3>
-            <div style={{display:"flex",justifyContent:"center"}}><Radar axes={axInd} size={260} showLabels={true}/></div>
-            {DATA.indicadores.map(ind=>{const d=im[ind.id];return (
-              <div className="marca" key={ind.id}>
-                <span className="sw" style={{background:ind.color}}></span>{ind.nombre}
-                <span className="val">{d&&d.prom!=null?fmt(d.prom):<span className="sup">sin dato</span>}</span>
-                <span style={{marginLeft:10,minWidth:160,textAlign:"right"}}><MarcaDesvio d={d}/></span>
-              </div>);})}
-            <div className="nota">El desvío compara cada establecimiento contra <b>su mismo GSE</b> (columna <code>difgru</code> de la Agencia). No es un puntaje del GSE: el motor no agrega.</div>
-          </div>
-          <div className="blk">
-            <h3>Dimensiones (11)</h3>
-            <div style={{display:"flex",justifyContent:"center"}}><Radar axes={axDim} size={260} showLabels={true}/></div>
-            <div className="leyenda">{DATA.indicadores.map(ind=>(<span key={ind.id}><i style={{background:ind.color}}></i>{ind.id}. {ind.nombre}</span>))}</div>
-          </div>
+        <div className="dcrumb">
+          <button onClick={()=>{setDrillInd(null);setDrillDim(null);}}>Indicadores</button>
+          {drillInd!=null && <span> ▸ <b>{indById[drillInd].nombre}</b></span>}
+          {drillDim!=null && <span> ▸ <b>{dimById[drillDim].nombre}</b></span>}
         </div>
 
-        <div className="blk" style={{marginTop:18}}>
-          <h3>Distribución de niveles por subdimensión (estudiantes)</h3>
-          <div className="leyenda"><span><i style={{background:"var(--bajo)"}}></i>Bajo</span><span><i style={{background:"var(--medio)"}}></i>Medio</span><span><i style={{background:"var(--alto)"}}></i>Alto</span></div>
-          {DATA.subdimensiones.filter(s=>s.tiene_niveles).map(s=>{
-            const v=nm[s.id]; const txt=(s.texto&&ciclo&&s.texto[ciclo])?s.texto[ciclo]:null;
-            return (
-              <div className="distrow" key={s.id}>
-                <div className="lbl">{s.nombre} <span className="actores">[{s.actores}]</span></div>
-                {(!v||v.bajo==null)
-                  ? <div className="sup">sin dato (resguardo estadístico)</div>
-                  : <DistBar v={v}/>}
-                {v&&v.bajo!=null&&txt&&<div className="nivel-txt"><b>Alto:</b> {txt.alto}</div>}
-                {v&&v.bajo!=null&&!ciclo&&<div className="nivel-txt sup">Texto de nivel no disponible para este grado.</div>}
-              </div>);
-          })}
-        </div>
+        {drillDim!=null
+          ? <SubdimView rbd={rbd} grado={grado} agno={agno} dimId={drillDim} nm={nm} ciclo={ciclo}/>
+          : (
+          <div className="row2">
+            <div className="blk">
+              <h3>{radarTitle}</h3>
+              <div style={{display:"flex",justifyContent:"center"}}><Radar axes={radarAxes} size={nivel===0?280:250} showLabels={true}/></div>
+              {nivel===1 && <div className="leyenda">{(dimsByInd[drillInd]||[]).map(d=>(<span key={d.id}>{d.id}. {d.nombre}</span>))}</div>}
+            </div>
+            <div className="blk">
+              <h3>{tituloNivel} — lectura vs GSE y vs año anterior</h3>
+              {filas.map(f=><AnchorRow key={f.id} color={f.color} nombre={f.nombre} d={f.d} onClick={f.onClick}/>)}
+              <div className="nota">Cada cifra se interpreta por su <b>desvío</b>, no por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); no reconstruye el puntaje del GSE.</div>
+            </div>
+          </div>)}
 
-        <div className="blk" style={{marginTop:18}}>
-          <h3>Evolución</h3>
-          {serie ? <Temporal rbd={rbd} grado={grado} anios={anios}/> :
-            <div className="nota">Vista temporal no disponible: el grado {DATA.meta.grados[grado]} tiene un solo año de aplicación ({anios.join(", ")}). No se interpola.</div>}
-        </div>
-      </div>
-    );
+        {drillDim==null &&
+          <div className="blk" style={{marginTop:20}}>
+            <h3>Evolución {nivel===1?"de las dimensiones":"de los indicadores"} <span style={{fontWeight:400,textTransform:"none",color:"var(--gris)"}}>· eje fijo 0–100</span></h3>
+            {serie
+              ? <div>
+                  <div style={{display:"flex",justifyContent:"center"}}>
+                  <Tendencia anios={anios}
+                    series={(nivel===1?(dimsByInd[drillInd]||[]).map(d=>({nombre:d.nombre,color:indById[drillInd].color,pts:serieDim(rbd,grado,d.id,anios)}))
+                                      :DATA.indicadores.map(ind=>({nombre:ind.nombre,color:ind.color,pts:serieInd(rbd,grado,ind.id,anios)})))}/></div>
+                  <div className="nota">Eje fijo 0–100 (escala común y comparable). Años sin punto = sin aplicación (no se interpola). {anios.includes(2025)?"2025 es preliminar.":""}</div>
+                </div>
+              : <div className="nota">Vista temporal no disponible: {DATA.meta.grados[grado]} tiene un solo año de aplicación ({anios.join(", ")}).</div>}
+          </div>}
+      </div>);
   }
 
-  function agnoGseLabel(rbd,grado,agno){
-    const r=M.roster.find(x=>x.rbd===rbd&&x.grado===grado&&x.agno===agno);
-    return r&&r.gse?(r.gse+" "+(GSE[r.gse]||"")):"—";
+  function gseLbl(rbd,grado,agno){const b=DATA.roster,r=RIX.roster[rbd];if(!r)return "—";
+    for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno){const g=b.gse[i];return g?g+" "+(GSE[g]||""):"—";}return "—";}
+
+  // ===== Vista de subdimensiones (distribucion de niveles, solo EST) =====
+  function SubdimView({rbd,grado,agno,dimId,nm,ciclo}){
+    const subs=subByDim[dimId]||[];
+    return (
+      <div className="blk">
+        <h3>Distribución de niveles por subdimensión — {dimById[dimId].nombre}</h3>
+        <div className="leyenda"><span><i style={{background:"var(--bajo)"}}></i>Bajo</span><span><i style={{background:"var(--medio)"}}></i>Medio</span><span><i style={{background:"var(--alto)"}}></i>Alto</span><span>· solo respuestas de estudiantes (EST)</span></div>
+        {subs.map(s=>{const v=nm[s.id]; const txt=(s.texto&&ciclo&&s.texto[ciclo])?s.texto[ciclo]:null;
+          return (
+            <div className="distrow" key={s.id}>
+              <div className="lbl">{s.nombre} <span className="actores">[{s.actores}]</span></div>
+              {s.definicion && <div className="defn">{s.definicion}</div>}
+              {(!v||v.bajo==null)
+                ? <div className="sup">sin dato (resguardo estadístico)</div>
+                : <DistBar v={v}/>}
+              {v&&v.bajo!=null&&txt&&<div className="nivel-txt"><b>Nivel Alto:</b> {txt.alto}</div>}
+              {v&&v.bajo!=null&&!ciclo&&<div className="nivel-txt sup">Texto de nivel no disponible para este grado (8° básico).</div>}
+            </div>);})}
+      </div>);
   }
 
-  function DistBar({v}){
-    const segs=[["bajo","var(--bajo)"],["medio","var(--medio)"],["alto","var(--alto)"]];
-    return <div className="bar">{segs.map(([k,c])=>{const val=v[k];if(val==null||val===0)return null;
-      return <span key={k} style={{width:val+"%",background:c}}>{val>=8?fmt(val):""}</span>;})}</div>;
-  }
-
-  // ===== Evolucion (sparkline por indicador con huecos) =====
-  function Temporal({rbd,grado,anios}){
-    const ref=useRef(null);
-    useEffect(()=>{
-      const el=ref.current; el.innerHTML="";
-      const W=520,H=120,m={l:30,r:10,t:10,b:18};
-      const svg=d3.select(el).append("svg").attr("width",W).attr("height",H);
-      const x=d3.scalePoint().domain(anios.map(String)).range([m.l,W-m.r]);
-      const y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);
-      [0,50,100].forEach(t=>{svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke","var(--linea)");
-        svg.append("text").attr("x",4).attr("y",y(t)+3).attr("class","axis-lab").text(t);});
-      anios.forEach(a=>svg.append("text").attr("x",x(String(a))).attr("y",H-4).attr("text-anchor","middle").attr("class","axis-lab").text(a));
-      DATA.indicadores.forEach(ind=>{
-        const pts=anios.map(a=>{const d=(M.ind[KEY(rbd,grado,a)]||{})[ind.id];return {a:String(a),v:d?d.prom:null};});
-        const line=d3.line().defined(d=>d.v!=null).x(d=>x(d.a)).y(d=>y(d.v));
-        svg.append("path").datum(pts).attr("d",line).attr("fill","none").attr("stroke",ind.color).attr("stroke-width",2);
-        pts.forEach(p=>{if(p.v==null)return;svg.append("circle").attr("cx",x(p.a)).attr("cy",y(p.v)).attr("r",3).attr("fill",ind.color)
-          .on("mousemove",e=>showTT("<b>"+ind.nombre+"</b><br>"+p.a+": "+fmt(p.v),e)).on("mouseleave",hideTT);});
-      });
-    },[rbd,grado,anios]);
-    return <div><div ref={ref}></div><div className="leyenda">{DATA.indicadores.map(i=>(<span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>))}</div>
-      <div className="nota">Una línea por indicador. Los tramos sin punto son años sin aplicación (no se interpolan). 2025 es preliminar.</div></div>;
-  }
-
-  // ===== App =====
+  // ===== Navegacion territorial: region -> SLEP/comuna -> grilla =====
   function App(){
     const grados=Object.keys(DATA.meta.grados);
+    const [region,setRegion]=useState(DATA.meta.region_foco||DATA.regiones[0].cod);
+    const [slep,setSlep]=useState(DATA.meta.slep_foco||"");
+    const [comuna,setComuna]=useState("");
     const [grado,setGrado]=useState(grados.includes("4b")?"4b":grados[0]);
     const anios=DATA.meta.grado_anios[grado]||[];
     const [agno,setAgno]=useState(anios[anios.length-1]);
     const [gse,setGse]=useState("TODOS");
-    const [comuna,setComuna]=useState("TODAS");
-    const [slep,setSlep]=useState("TODOS");
     const [rbdSel,setRbdSel]=useState(null);
 
     useEffect(()=>{const a=DATA.meta.grado_anios[grado]||[];if(!a.includes(agno))setAgno(a[a.length-1]);setRbdSel(null);},[grado]);
+    useEffect(()=>{setRbdSel(null);},[region,slep,comuna,agno,gse]);
 
-    const unidades=useMemo(()=>{
-      return M.roster.filter(r=>r.grado===grado && r.agno===agno
-        && (gse==="TODOS"||r.gse===gse)
-        && (comuna==="TODAS"||M.estab[r.rbd]?.cod_com===comuna)
-        && (slep==="TODOS"||M.estab[r.rbd]?.cod_slep===slep));
-    },[grado,agno,gse,comuna,slep]);
+    const slepsReg=useMemo(()=>DATA.sleps.filter(s=>s.cod_reg===region).sort((a,b)=>a.nombre_slep.localeCompare(b.nombre_slep)),[region]);
+    const comunasReg=useMemo(()=>DATA.comunas.filter(c=>c.cod_reg===region).sort((a,b)=>a.nom.localeCompare(b.nom)),[region]);
 
-    // agrupar por GSE
-    const grupos=useMemo(()=>{
-      const g={}; unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
-      return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(M.estab[a.rbd]?.nom||"").localeCompare(M.estab[b.rbd]?.nom||""))}));
-    },[unidades]);
+    // roster del territorio seleccionado, para (grado, agno)
+    const unidades=useMemo(()=>{const b=DATA.roster,out=[];
+      for(let i=0;i<b.rows;i++){if(b.grado[i]!==grado||b.agno[i]!==agno)continue;
+        const e=est[b.rbd[i]]; if(!e||e.cod_reg!==region)continue;
+        if(slep && e.cod_slep!==slep)continue;
+        if(comuna && e.cod_com!==comuna)continue;
+        if(gse!=="TODOS" && b.gse[i]!==gse)continue;
+        out.push({rbd:b.rbd[i],gse:b.gse[i]});}
+      return out;},[region,slep,comuna,grado,agno,gse]);
+
+    const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
+      return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
+
+    const territorioTxt = comuna?("comuna de "+comNom(comuna)):(slep?("SLEP "+(slepsReg.find(s=>s.cod_slep===slep)?.nombre_slep||slep)):("Región de "+regNom(region)));
 
     return (
       <div className="wrap">
-        <div className="controls">
-          <div className="ctl"><label>Grado</label>
-            <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
-          <div className="ctl"><label>Año</label>
-            <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{String(DATA.meta.anios_preliminar)===String(a)?"*":""}</button>)}</div></div>
-          <div className="ctl"><label>Grupo socioeconómico (segmentador)</label>
-            <div className="gse-lock"><div className="gse-pills">
-              <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
-              {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{g} {GSE[g]}</button>)}
-            </div><span className="lock">🔒 siempre presente</span></div></div>
-          <div className="ctl"><label>Comuna</label>
-            <select value={comuna} onChange={e=>setComuna(e.target.value)}>
-              <option value="TODAS">Todas</option>
-              {DATA.comunas.map(c=><option key={c.cod} value={c.cod}>{c.nom}{FOCO.has(c.cod)?" ★":""}</option>)}</select></div>
-          <div className="ctl"><label>SLEP</label>
-            <select value={slep} onChange={e=>setSlep(e.target.value)}>
-              <option value="TODOS">Todos</option>
-              {DATA.sleps.map(s=><option key={s.cod_slep} value={s.cod_slep}>{s.nombre_slep}</option>)}</select></div>
+        <div className="nav">
+          <div className="nav-row">
+            <div className="ctl"><label>Región</label>
+              <select value={region} onChange={e=>{setRegion(e.target.value);setSlep("");setComuna("");}}>
+                {DATA.regiones.map(r=><option key={r.cod} value={r.cod}>{r.nom}</option>)}</select></div>
+            <div className="ctl"><label>SLEP (servicio local)</label>
+              <select value={slep} onChange={e=>{setSlep(e.target.value);setComuna("");}}>
+                <option value="">— todos —</option>
+                {slepsReg.map(s=><option key={s.cod_slep} value={s.cod_slep}>{s.nombre_slep}</option>)}</select></div>
+            <div className="ctl"><label>Comuna</label>
+              <select value={comuna} onChange={e=>{setComuna(e.target.value);setSlep("");}}>
+                <option value="">— todas —</option>
+                {comunasReg.map(c=><option key={c.cod} value={c.cod}>{c.nom}{FOCO.has(c.cod)?" ★":""}</option>)}</select></div>
+            <div className="ctl"><label>Grado</label>
+              <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
+            <div className="ctl"><label>Año</label>
+              <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{String(a)===PRELIM?"*":""}</button>)}</div></div>
+            <div className="ctl"><label>Grupo socioeconómico</label>
+              <div className="gse-pills">
+                <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
+                {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{g} {GSE[g]}</button>)}</div></div>
+          </div>
         </div>
 
         {rbdSel
           ? <Detalle rbd={rbdSel} grado={grado} agno={agno} onBack={()=>setRbdSel(null)}/>
-          : (unidades.length===0
-              ? <div className="empty">No hay establecimientos educacionales para esta combinación.</div>
-              : <div>
-                  <div className="leyenda" style={{marginBottom:14}}>{DATA.indicadores.map(i=>(<span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>))}<span>· {unidades.length} establecimientos · ★ Costa Central</span></div>
-                  {grupos.map(grp=>(
+          : <div>
+              <div className="crumb">Mostrando establecimientos educacionales de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{String(agno)===PRELIM?" (preliminar)":""} · {unidades.length} establecimientos</div>
+              <div className="help">Cada tarjeta es un <b>establecimiento individual</b> (su dato crudo, nunca un promedio). El color de alerta resume cuántos indicadores están <span style={{color:"var(--alerta)"}}>significativamente bajo su GSE (▼)</span> o <span style={{color:"var(--destaca)"}}>sobre él (▲)</span>. El territorio solo acota la lista; no produce cifras agregadas. Haz clic en un establecimiento para ver el detalle y bajar a dimensiones y subdimensiones.</div>
+              <div className="leyenda">{DATA.indicadores.map(i=>(<span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>))}<span>· ★ Costa Central</span></div>
+              {unidades.length===0
+                ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, grado, año y GSE.</div>
+                : grupos.map(grp=>(
                     <div className="gse-group" key={grp.gse}>
-                      <div className="gse-head"><span className="tag">GSE {grp.gse} · {GSE[grp.gse]||"—"}</span><span className="cnt">{grp.items.length} establecimientos educacionales</span></div>
+                      <div className="gse-head"><span className="tag">GSE {grp.gse} · {GSE[grp.gse]||"sin clasificar"}</span><span className="cnt">{grp.items.length} establecimientos educacionales</span></div>
                       <div className="grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={grado} agno={agno} onSel={setRbdSel}/>)}</div>
                     </div>))}
-                </div>)
-        }
-      </div>
-    );
+            </div>}
+      </div>);
   }
+  const tRender0=performance.now();
   ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  window.__tRender = performance.now()-tRender0;
   </script>
 </body>
 </html>

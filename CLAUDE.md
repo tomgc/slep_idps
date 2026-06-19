@@ -60,26 +60,27 @@ source("00_escanear_proyecto.R")  # snapshot de estructura (al abrir y cerrar se
 - `34_leer_normalizar_idps.R` — 3 familias -> homologa esquema por anio -> atributos
   canonicos por RBD (depe2/geo del registro mas reciente; GSE por anio) ->
   `idps_largo.parquet` por establecimiento-grado, SIN agregacion.
-- `35_generar_motor_html.R` — motor HTML autocontenido. Embebe SOLO la Region de
-  Valparaiso (cod_reg=5) como universo de comparacion (filtro, no agregacion);
-  JSON gzip+base64+pako, D3/pako inline, React por CDN con SRI. Salida:
-  `40_salidas/motor_idps.html`. `regenerar_motor()` = `run_all(only = 35)`.
+- `35_generar_motor_html.R` — motor HTML autocontenido, TODO CHILE (filtro
+  territorial en la navegacion, no agregacion). Navegacion region->SLEP/comuna->
+  establecimiento; GSE de referencia protagonista (doble ancla difgru/sigdifgru y
+  dif/sigdif con alerta); drill-down indicador->dimension->subdimension; tendencia
+  eje fijo 0-100; fuentes gobCL/Museo Sans embebidas (base64). JSON columnar
+  ordenado por rbd (el cliente arma indice de rangos; decode ~340ms). Salida:
+  `40_salidas/motor_idps.html` (= `docs/index.html` para GitHub Pages).
+  `regenerar_motor()` = `run_all(only = 35)`.
 
 ## Ultimos cambios
 
-1. **Motor HTML base** (`35_generar_motor_html.R` + `35_motor_template.html`):
-   grilla de radares por establecimiento agrupada por GSE (sin agregacion),
-   detalle con radar indicador/dimension, distribucion de niveles por subdimension
-   EST con texto por ciclo, marca de desvio vs GSE (`difgru`/`sigdifgru`),
-   evolucion donde hay serie, supresion explicita. Abre local; render verificado;
-   motor<->parquet 1:1. Alcance base: Region de Valparaiso. NO desplegado.
-2. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1; catalogos
-   territoriales quedan en UTF-8 limpio.
-3. **Textos de nivel por ciclo** anexados a `catalogo_idps.parquet` (solo EST).
-4. **P6 — pipeline de lectura/normalizacion** (`34_leer_normalizar_idps.R`):
-   lee las 3 familias, homologa texto<->id por anio, resuelve la inconsistencia
-   de `cod_depe2` entre familias, trae GSE a niveles, emite `idps_largo.parquet`
-   (1.485.103 filas). Spot-check contra xlsx crudo en 2022 y 2025: OK.
-5. **Catalogos + orquestador**: `33_construir_catalogos.R` (comunas/sleps/
-   establecimientos + jerarquia IDPS); `00_build.R` con `run_all()` y carga de
-   `10_configuracion.R` (crosswalk CW_*); gobernanza sesion 5 versionada.
+1. **Producto completo + deploy** (encargo 2): motor ampliado a TODO CHILE (8353
+   establecimientos, 16 regiones); navegacion territorial region->SLEP/comuna->
+   establecimiento; GSE de referencia protagonista (doble ancla + alerta);
+   drill-down indicador->dimension->subdimension; tendencia eje fijo 0-100;
+   fuentes de marca embebidas. Copiado a `docs/index.html` para GitHub Pages.
+   Decode ~340ms, indice de rangos 7ms. Spot-check fuera de Valparaiso 1:1.
+2. **Motor HTML base**: grilla de radares por establecimiento agrupada por GSE
+   (sin agregacion), detalle, distribucion de niveles, marca de desvio, evolucion.
+3. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1.
+4. **Textos de nivel por ciclo** anexados a `catalogo_idps.parquet` (solo EST).
+5. **P6 — pipeline** (`34_leer_normalizar_idps.R`): 3 familias, homologa
+   texto<->id por anio, resuelve `cod_depe2`, GSE a niveles -> `idps_largo.parquet`
+   (1.485.103 filas). Catalogos (`33`) + orquestador `run_all()` (`00_build.R`).
