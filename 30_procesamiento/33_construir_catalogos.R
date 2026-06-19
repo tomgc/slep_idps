@@ -233,6 +233,14 @@ for (ind in corpus$indicadores) {
       es_est  <- "EST" %in% unlist(sub$actores)
       nb <- if (!is.null(sub$n_niveles$basica)) as.integer(sub$n_niveles$basica) else NA_integer_
       nm <- if (!is.null(sub$n_niveles$media))  as.integer(sub$n_niveles$media)  else NA_integer_
+      # Texto cualitativo por ciclo y nivel (corpus). NULL -> NA: subdimensiones
+      # no-EST no tienen texto; en esquemas de 2 niveles el "Medio" no existe.
+      # El 8b no selecciona ciclo (ciclo_texto=NA), asi que no recibe texto.
+      dn <- sub$descripcion_niveles_subdimension
+      txt <- function(ciclo, nivel) {
+        v <- if (is.null(dn)) NULL else dn[[ciclo]][[nivel]]
+        if (is.null(v)) NA_character_ else as.character(v)
+      }
       filas[[length(filas) + 1]] <- tibble::tibble(
         id_indicador     = as.integer(id_ind),
         indicador_nombre = ind$nombre,
@@ -240,10 +248,17 @@ for (ind in corpus$indicadores) {
         dimension_nombre = dim$nombre,
         id_subdimension  = if (is.na(id_sub)) NA_integer_ else as.integer(id_sub),
         subdimension_nombre = sub$nombre,
+        definicion       = if (is.null(sub$definicion)) NA_character_ else as.character(sub$definicion),
         actores          = actores,
         tiene_niveles    = es_est,
         n_niveles_basica = nb,
-        n_niveles_media  = nm
+        n_niveles_media  = nm,
+        nivel_basica_bajo  = txt("basica", "Bajo"),
+        nivel_basica_medio = txt("basica", "Medio"),
+        nivel_basica_alto  = txt("basica", "Alto"),
+        nivel_media_bajo   = txt("media", "Bajo"),
+        nivel_media_medio  = txt("media", "Medio"),
+        nivel_media_alto   = txt("media", "Alto")
       )
     }
   }
@@ -272,9 +287,19 @@ stopifnot(
 # (decision sesion 6). Se documenta como atributo del catalogo.
 attr(catalogo, "nota_8b") <- "8b: distribucion numerica disponible; sin texto de nivel por ciclo (decision sesion 6)."
 
+# Toda subdimension EST debe traer texto de nivel (Alto) en basica y media.
+est_rows <- catalogo[catalogo$tiene_niveles, ]
+stopifnot(
+  "Hay subdimensiones EST sin texto de nivel (basica o media)" =
+    all(!is.na(est_rows$nivel_basica_alto) & !is.na(est_rows$nivel_media_alto))
+)
+n_2niv <- sum(est_rows$n_niveles_basica == 2L, na.rm = TRUE)
+
 escribir_parquet_atomico(catalogo, "catalogo_idps.parquet")
 message(sprintf("    OK: %d subdimensiones (%d EST con niveles e id, %d sin niveles).",
                 nrow(catalogo), n_est, nrow(catalogo) - n_est))
+message(sprintf("    Textos de nivel por ciclo: %d EST con texto basica+media; %d de 2 niveles (sin 'Medio').",
+                nrow(est_rows), n_2niv))
 
 
 # ============================================================================
