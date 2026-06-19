@@ -63,16 +63,26 @@ message(sprintf("    %d filas, %d establecimientos (nacional).",
 # ============================================================================
 message("[2] Catalogos conceptuales y territoriales...")
 
+# Las definiciones (corpus -> catalogo) son ASCII, pero se fuerza UTF-8 de forma
+# defensiva antes de serializar (regla del Bug 2: literales no-ASCII en locale C).
+for (col in c("definicion", "indicador_definicion", "dimension_definicion")) {
+  if (col %in% names(CAT)) Encoding(CAT[[col]]) <- "UTF-8"
+}
+
+# Definicion canonica del indicador (1 por id_indicador, desde el catalogo).
+ind_def <- CAT |> dplyr::distinct(id_indicador, indicador_definicion)
 indicadores_lst <- lapply(as.character(1:4), function(id) {
+  d <- ind_def$indicador_definicion[ind_def$id_indicador == as.integer(id)][1]
   list(id = as.integer(id), nombre = unname(INDICADOR_LABELS[id]),
-       corto = unname(INDICADOR_CORTO[id]), color = unname(INDICADOR_COLORS[id]))
+       corto = unname(INDICADOR_CORTO[id]), color = unname(INDICADOR_COLORS[id]),
+       definicion = if (length(d) == 0 || is.na(d)) NULL else d)
 })
 
 dimensiones_lst <- CAT |>
-  dplyr::distinct(id_dimension, id_indicador, dimension_nombre) |>
+  dplyr::distinct(id_dimension, id_indicador, dimension_nombre, dimension_definicion) |>
   dplyr::arrange(id_dimension) |>
   dplyr::transmute(id = as.integer(id_dimension), id_ind = as.integer(id_indicador),
-                   nombre = dimension_nombre)
+                   nombre = dimension_nombre, definicion = dimension_definicion)
 
 subdim_lst <- lapply(seq_len(nrow(CAT)), function(i) {
   r <- CAT[i, ]

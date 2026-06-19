@@ -99,6 +99,13 @@ __FONTS_CSS__
   .bar span{display:flex;align-items:center;justify-content:center;font-size:10px;color:#2e2710;font-weight:600;}
   .nivel-txt{font-size:11px;color:#5a5142;margin-top:3px;}
   .defn{font-size:11px;color:#6a6253;font-style:italic;margin:2px 0 6px;}
+  /* P-meta: definicion metodologica contextual (colapsable, discreta) */
+  .defn-box{margin-top:6px;}
+  .defn-toggle{border:0;background:none;color:var(--foco);cursor:pointer;font-size:11px;padding:0;font-family:inherit;display:inline-flex;align-items:center;gap:3px;}
+  .defn-toggle:hover{text-decoration:underline;}
+  .defn-text{font-size:11.5px;color:#5a5142;line-height:1.45;margin-top:5px;max-width:70ch;}
+  .defn-ctx{background:#f4f1e8;border-radius:7px;padding:9px 12px;margin:0 0 14px;}
+  .defn-ctx .defn-text{color:#4a4536;}
   .nota{font-size:11px;color:var(--gris);background:#f4f1e8;border-radius:6px;padding:9px 11px;margin-top:10px;}
   .axis-lab{font-size:9px;fill:var(--gris);} .axis-lab.b{font-size:10px;}
   .ring{fill:none;stroke:var(--linea);}
@@ -168,6 +175,19 @@ __FONTS_CSS__
   const showTT=(h,e)=>{const t=tt();t.innerHTML=h;t.style.display="block";t.style.left=(e.clientX+12)+"px";t.style.top=(e.clientY+12)+"px";};
   const hideTT=()=>{tt().style.display="none";};
 
+  // ===== Definicion metodologica contextual (colapsable; del catalogo embebido) =====
+  // Degrada con elegancia: sin texto -> no renderiza bloque (no "undefined"/vacio).
+  function Definicion({texto, etiqueta, contexto}){
+    const [open,setOpen]=useState(false);
+    if(!texto) return null;
+    return (
+      <div className={contexto?"defn-box defn-ctx":"defn-box"}>
+        <button className="defn-toggle" onClick={(e)=>{e.stopPropagation();setOpen(o=>!o);}}>
+          {open?"▾":"ⓘ"} {etiqueta||"¿Qué mide?"}</button>
+        {open && <div className="defn-text">{texto}</div>}
+      </div>);
+  }
+
   // ===== Radar D3 (rompe en NA: honesto con la supresion) =====
   function Radar({axes,size,showLabels}){
     const ref=useRef(null);
@@ -205,7 +225,7 @@ __FONTS_CSS__
   }
 
   // ===== Fila de indicador/dimension con doble ancla (GSE protagonista) =====
-  function AnchorRow({color,nombre,d,onClick}){
+  function AnchorRow({color,nombre,d,definicion,onClick}){
     return (
       <div className={"anchor-row"+(onClick?"":" flat")} onClick={onClick}>
         <div className="ar-top">
@@ -219,6 +239,7 @@ __FONTS_CSS__
             <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>
             <Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/>
           </div>}
+        <Definicion texto={definicion}/>
       </div>);
   }
 
@@ -290,12 +311,14 @@ __FONTS_CSS__
 
     let nivel=0,tituloNivel="Indicadores",radarAxes=axInd,radarTitle="Mirada integral — 4 indicadores";
     let filas=DATA.indicadores.map(ind=>({id:ind.id,color:ind.color,nombre:ind.nombre,d:im[ind.id],
+      definicion:ind.definicion,
       onClick:()=>{setDrillInd(ind.id);setDrillDim(null);}}));
     if(drillInd!=null){nivel=1;const ind=indById[drillInd];tituloNivel="Dimensiones de "+ind.nombre;
       const dims=dimsByInd[drillInd]||[];
       radarAxes=dims.map(d=>({label:String(d.id),value:dm[d.id]?dm[d.id].prom:null,color:ind.color}));
       radarTitle="Dimensiones del indicador";
       filas=dims.map(d=>({id:d.id,color:ind.color,nombre:d.nombre,d:dm[d.id],
+        definicion:d.definicion,
         onClick:(subByDim[d.id]&&subByDim[d.id].length)?()=>setDrillDim(d.id):null}));}
 
     return (
@@ -311,6 +334,9 @@ __FONTS_CSS__
           {drillDim!=null && <span> ▸ <b>{dimById[drillDim].nombre}</b></span>}
         </div>
 
+        {drillInd!=null && drillDim==null &&
+          <Definicion texto={indById[drillInd].definicion} etiqueta="Sobre este indicador" contexto={true}/>}
+
         {drillDim!=null
           ? <SubdimView rbd={rbd} grado={grado} agno={agno} dimId={drillDim} nm={nm} ciclo={ciclo}/>
           : (
@@ -322,7 +348,7 @@ __FONTS_CSS__
             </div>
             <div className="blk">
               <h3>{tituloNivel} — lectura vs GSE y vs año anterior</h3>
-              {filas.map(f=><AnchorRow key={f.id} color={f.color} nombre={f.nombre} d={f.d} onClick={f.onClick}/>)}
+              {filas.map(f=><AnchorRow key={f.id} color={f.color} nombre={f.nombre} d={f.d} definicion={f.definicion} onClick={f.onClick}/>)}
               <div className="nota">Cada cifra se interpreta por su <b>desvío</b>, no por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); no reconstruye el puntaje del GSE.</div>
             </div>
           </div>)}
@@ -352,6 +378,7 @@ __FONTS_CSS__
     return (
       <div className="blk">
         <h3>Distribución de niveles por subdimensión — {dimById[dimId].nombre}</h3>
+        <Definicion texto={dimById[dimId].definicion} etiqueta="Sobre esta dimensión" contexto={true}/>
         <div className="leyenda"><span><i style={{background:"var(--bajo)"}}></i>Bajo</span><span><i style={{background:"var(--medio)"}}></i>Medio</span><span><i style={{background:"var(--alto)"}}></i>Alto</span><span>· solo respuestas de estudiantes (EST)</span></div>
         {subs.map(s=>{const v=nm[s.id]; const txt=(s.texto&&ciclo&&s.texto[ciclo])?s.texto[ciclo]:null;
           return (
