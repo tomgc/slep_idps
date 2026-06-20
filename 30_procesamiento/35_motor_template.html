@@ -64,6 +64,11 @@ __FONTS_CSS__
   .sup{color:#b06a4f;font-style:italic;}
   .leyenda{display:flex;gap:14px;font-size:11px;color:var(--gris);margin:4px 0 12px;flex-wrap:wrap;align-items:center;}
   .leyenda i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px;}
+  /* II.6 — control de comparacion de dos anios en el radar */
+  .radar-cmp{display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:8px;}
+  .radar-cmp .leyenda{margin:0;justify-content:center;}
+  .radar-cmp .cmp-label{font-size:11.5px;color:var(--gris);}
+  .radar-cmp select{padding:3px 7px;font-size:12px;min-width:auto;border:1px solid var(--linea);border-radius:6px;background:#fff;font-family:inherit;}
 
   .detail{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:20px;box-shadow:var(--sombra);}
   .back{border:0;background:none;color:var(--foco);cursor:pointer;font-size:13px;padding:0;font-family:inherit;}
@@ -411,10 +416,23 @@ __FONTS_CSS__
   function Detalle({rbd,grado,agno,onBack}){
     const [drillInd,setDrillInd]=useState(null);
     const [drillDim,setDrillDim]=useState(null);
-    useEffect(()=>{setDrillInd(null);setDrillDim(null);},[rbd,grado,agno]);
+    const [cmpA,setCmpA]=useState(null);              // II.6 — anio de comparacion en el radar (-1 = ninguno)
+    useEffect(()=>{setDrillInd(null);setDrillDim(null);setCmpA(null);},[rbd,grado,agno]);
     const e=est[rbd]; const im=indOf(rbd,grado,agno),dm=dimOf(rbd,grado,agno),nm=nivOf(rbd,grado,agno);
     const ciclo=CICLO[grado]; const anios=DATA.meta.grado_anios[grado]||[]; const serie=anios.length>1;
     const axInd=DATA.indicadores.map(ind=>({label:ind.corto,value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
+
+    // II.6 — comparacion de DOS anios del MISMO rbd/grado en el radar (solo nivel 0).
+    // Default: anio actual vs el inmediatamente anterior CON serie; el usuario lo
+    // cambia o lo apaga. Cada anio se LEE (prom por indicador); NA no se grafica.
+    const aniosCD=anios.filter(a=>{const o=indOf(rbd,grado,a);return DATA.indicadores.some(ind=>o[ind.id]&&o[ind.id].prom!=null);});
+    const cmpPrev=aniosCD.filter(a=>a<agno);
+    const cmpDef=cmpPrev.length?Math.max.apply(null,cmpPrev):null;
+    const cmpAgno = cmpA===-1 ? null
+                  : (cmpA!=null && aniosCD.indexOf(cmpA)>=0 && cmpA!==agno) ? cmpA : cmpDef;
+    const imB = cmpAgno!=null?indOf(rbd,grado,cmpAgno):{};
+    const axIndB = DATA.indicadores.map(ind=>({label:ind.corto,value:imB[ind.id]?imB[ind.id].prom:null}));
+    const cmpOpts = aniosCD.filter(a=>a!==agno);
 
     let nivel=0,tituloNivel="Indicadores",radarAxes=axInd,radarTitle="Mirada integral — 4 indicadores";
     let filas=DATA.indicadores.map(ind=>({id:ind.id,color:ind.color,nombre:ind.nombre,d:im[ind.id],
@@ -450,7 +468,23 @@ __FONTS_CSS__
           <div className="row2">
             <div className="blk">
               <h3>{radarTitle}</h3>
-              <div style={{display:"flex",justifyContent:"center"}}><Radar axes={radarAxes} size={nivel===0?280:250} showLabels={true} showValues={true}/></div>
+              <div style={{display:"flex",justifyContent:"center"}}><Radar axes={radarAxes}
+                axesB={nivel===0&&cmpAgno!=null?axIndB:undefined} colB="#C77D3A"
+                labelB={cmpAgno!=null?String(cmpAgno):null}
+                size={nivel===0?280:250} showLabels={true} showValues={true}/></div>
+              {nivel===0 && cmpOpts.length>0 &&
+                <div className="radar-cmp">
+                  <div className="leyenda">
+                    <span><i style={{background:"var(--azul)"}}></i>{agno}{PRELIM.has(String(agno))?"*":""} · actual</span>
+                    {cmpAgno!=null && <span><i style={{background:"#C77D3A"}}></i>{cmpAgno}{PRELIM.has(String(cmpAgno))?"*":""} · comparación</span>}
+                  </div>
+                  <label className="cmp-label">Comparar con:{" "}
+                    <select value={cmpAgno!=null?cmpAgno:""} onChange={ev=>setCmpA(ev.target.value===""?-1:Number(ev.target.value))}>
+                      {cmpOpts.map(a=><option key={a} value={a}>{a}{PRELIM.has(String(a))?"*":""}</option>)}
+                      <option value="">— sin comparación</option>
+                    </select>
+                  </label>
+                </div>}
               {nivel===1 && <div className="leyenda">{(dimsByInd[drillInd]||[]).map(d=>(<span key={d.id}>{d.id}. {d.nombre}</span>))}</div>}
             </div>
             <div className="blk">
