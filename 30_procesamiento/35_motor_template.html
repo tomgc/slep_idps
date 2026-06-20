@@ -13,13 +13,23 @@ __FONTS_CSS__
     --bajo:#E88663; --medio:#FFC92E; --alto:#75924E;
     --alerta:#c0392b; --alerta-bg:#fbe9e7; --destaca:#3a8f4a; --destaca-bg:#eaf5ec;
     --sombra:0 2px 8px rgba(74,39,70,.10);
-    /* Tokens que consume EntityModal (mapeados a la identidad del motor) */
-    --border-2:var(--linea); --radius-2:8px; --ink:var(--tinta); --fs-base:14px;
+    --shadow-1:0 1px 0 rgba(28,18,18,.05);
+    /* --- Escala de presentacion alineada a la referencia (slep_categoria_desempeno):
+       tipografia densa, radios ajustados, "overline". La identidad IDPS (azul gobCL +
+       cream) y la PALETA de 4 indicadores quedan INTACTAS (FASE 4 = piel). --- */
+    --paper:#ffffff; --cream-200:#f4e9cc;
+    --fs-display:30px; --fs-h1:22px; --fs-h2:17px; --fs-base:13px; --fs-sm:12px; --fs-xs:11px;
+    --fw-regular:400; --fw-medium:500; --fw-bold:700; --fw-heavy:800;
+    --radius-1:3px; --radius-2:5px; --radius-3:9px;
+    --tracking-overline:.12em;
+    --font-display:"gobCL","Museo Sans",system-ui,sans-serif;
     --font-body:"Museo Sans","Helvetica Neue",system-ui,Arial,sans-serif;
+    /* Tokens heredados que consume EntityModal */
+    --border-2:var(--linea); --ink:var(--tinta);
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--tinta);
-    font-family:"Museo Sans","Helvetica Neue",system-ui,Arial,sans-serif;font-size:14px;line-height:1.45;}
+    font-family:var(--font-body);font-size:var(--fs-base);line-height:1.5;}
   h1,h2,h3,.gob{font-family:"gobCL","Museo Sans",system-ui,sans-serif;}
   header.app{background:var(--azul);color:#fff;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
   header.app h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.4px;}
