@@ -46,9 +46,10 @@ REGION_FOCO <- "5"  # Valparaiso (default de navegacion; foco Costa Central)
 
 # Encoding UTF-8 defensivo sobre las etiquetas con tildes antes de serializar
 # (regla Bug 2: literales no-ASCII pueden quedar "unknown" en locale C -> mojibake).
-Encoding(INDICADOR_LABELS) <- "UTF-8"
-Encoding(INDICADOR_CORTO)  <- "UTF-8"
-Encoding(DIMENSION_LABELS) <- "UTF-8"
+Encoding(INDICADOR_LABELS)    <- "UTF-8"
+Encoding(INDICADOR_CORTO)     <- "UTF-8"
+Encoding(DIMENSION_LABELS)    <- "UTF-8"
+Encoding(SUBDIMENSION_LABELS) <- "UTF-8"
 
 
 # ============================================================================
@@ -119,9 +120,16 @@ subdim_lst <- lapply(seq_len(nrow(CAT)), function(i) {
   txt_ciclo <- function(b, m, a) {
     out <- list(bajo = r[[b]], medio = r[[m]], alto = r[[a]]); out[!is.na(out)]
   }
+  # Nombre acentuado de presentacion (SUBDIMENSION_LABELS por id; solo las 22 EST),
+  # con fallback al nombre ASCII del catalogo. La definicion (P-meta) se conserva
+  # 1:1 (sigue ASCII: sin fuente acentuada verificable, queda pendiente del titular).
+  nom_sub <- if (!is.na(r$id_subdimension))
+    unname(SUBDIMENSION_LABELS[as.character(r$id_subdimension)]) else NA_character_
+  if (is.na(nom_sub)) nom_sub <- r$subdimension_nombre
+  Encoding(nom_sub) <- "UTF-8"
   base <- list(
     id_ind = as.integer(r$id_indicador), id_dim = as.integer(r$id_dimension),
-    nombre = r$subdimension_nombre, actores = r$actores,
+    nombre = nom_sub, actores = r$actores,
     tiene_niveles = isTRUE(r$tiene_niveles),
     definicion = if (is.na(r$definicion)) NULL else r$definicion
   )
