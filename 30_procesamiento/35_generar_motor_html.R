@@ -35,7 +35,7 @@ library(here)
 library(fs)
 
 source(here::here("10_utils", "10_utils.R"))
-instalar_si_falta(c("dplyr", "arrow", "jsonlite", "readr"))
+instalar_si_falta(c("dplyr", "arrow", "jsonlite", "readr", "readxl"))
 source(here::here("10_utils", "10_configuracion.R"))
 
 # Paleta canonica de los 4 indicadores (madre / prototipo) y etiquetas cortas.
@@ -167,14 +167,65 @@ dir_attr <- DIR |>
                    cod_depe2_dir = unname(CW_DEPE_DIRECTORIO_A_IDPS[as.character(COD_DEPE2)])) |>
   dplyr::distinct(rbd, .keep_all = TRUE)
 
+# ----------------------------------------------------------------------------
+# SANEAMIENTO DE NOMBRES (decision titular, Fase 3) — jerarquia de 3 capas:
+#  1) EE del SLEP Costa Central -> caracterizacion_establecimientos.xlsx (autoridad
+#     curada: tildes y mayusculas correctas). Se muestra VERBATIM (sin tc() en el
+#     cliente; flag `cur`), porque tc() bajaria "La Greda" -> "la Greda".
+#  2) Resto del pais -> nombre del directorio con apostrofo/comilla SANEADOS.
+#  3) Fallback al nombre (truncado) de idps_largo solo si el directorio no cubre el
+#     RBD; tambien saneado.
+# Las CIFRAS NO cambian: es 100% reparacion de etiqueta de presentacion.
+# ----------------------------------------------------------------------------
+# Mapa curado rbd -> nombre (solo los 73 RBD del SLEP CC presentes en el xlsx).
+carac_map <- readxl::read_excel(
+    here::here("20_insumos", "auxiliares", "caracterizacion_establecimientos.xlsx"),
+    sheet = 1, .name_repair = "minimal") |>
+  dplyr::transmute(rbd = as.character(.data[["RBD"]]),
+                   nom_carac = .data[["Nombre del establecimiento"]]) |>
+  dplyr::filter(!is.na(rbd), !is.na(nom_carac)) |>
+  dplyr::distinct(rbd, .keep_all = TRUE)
+Encoding(carac_map$nom_carac) <- "UTF-8"
+
+# REPARACION DE CODIFICACION del apostrofo/comilla del directorio (NO edicion
+# ortografica). Diagnostico por bytes (Fase 3): el directorio usa codepoints
+# erroneos donde va un apostrofo/comilla:
+#   U+00B4 (acento agudo) y U+005E (circunflejo) -> SIEMPRE apostrofo U+0027 (').
+#   U+0060 (backtick): comillas envolventes en PARES -> U+0022 ("); conteo IMPAR
+#     (backtick suelto, mas probable apostrofo) -> U+0027 (') y se registra como
+#     anomalia (regla titular: no adivinar). U+0027 ya correcto no se toca.
+sanea_nombre_dir <- function(s) {
+  if (is.na(s) || !nzchar(s)) return(s)
+  Encoding(s) <- "UTF-8"; cps <- utf8ToInt(s)
+  cps[cps == 0x00B4 | cps == 0x005E] <- 0x27L
+  nbt <- sum(cps == 0x60)
+  if (nbt > 0) cps[cps == 0x60] <- if (nbt %% 2 == 0) 0x22L else 0x27L
+  out <- intToUtf8(cps); Encoding(out) <- "UTF-8"; out
+}
+
+# Anomalia de backtick IMPAR en EE fuera del SLEP (se registra; el saneo ya lo
+# trata como apostrofo, fallback seguro).
+bt_odd <- DIR |>
+  dplyr::transmute(rbd = as.character(RBD), nom = NOM_RBD) |>
+  dplyr::filter(!rbd %in% carac_map$rbd, !is.na(nom)) |>
+  dplyr::mutate(nbt = vapply(nom, function(s){ Encoding(s) <- "UTF-8"; sum(utf8ToInt(s) == 0x60) }, integer(1))) |>
+  dplyr::filter(nbt %% 2 == 1)
+if (nrow(bt_odd)) {
+  message(sprintf("[NOMBRES] %d nombre(s) con backtick IMPAR (tratados como apostrofo; revisar):", nrow(bt_odd)))
+  for (i in seq_len(nrow(bt_odd))) message(sprintf("   RBD %s: %s", bt_odd$rbd[i], bt_odd$nom[i]))
+} else message("[NOMBRES] sin backticks impares en EE fuera del SLEP.")
+
 est_attr <- P |>
   dplyr::distinct(rbd, nom_rbd, cod_com_rbd, cod_reg_rbd, cod_pro_rbd, cod_depe2) |>
   dplyr::rename(cod_depe2_idps = cod_depe2) |>
   dplyr::left_join(dir_attr, by = "rbd") |>
+  dplyr::left_join(carac_map, by = "rbd") |>
   dplyr::transmute(
     rbd,
-    # Directorio = autoridad; fallback al dato IDPS solo si faltara (no deberia).
-    nom     = dplyr::coalesce(nom_dir, nom_rbd),
+    cur = !is.na(nom_carac),   # TRUE = nombre curado (SLEP CC) -> verbatim en cliente
+    # Capa 1 caracterizacion (verbatim) | Capa 2/3 directorio|idps con apostrofo saneado.
+    nom = dplyr::if_else(cur, nom_carac,
+                         vapply(dplyr::coalesce(nom_dir, nom_rbd), sanea_nombre_dir, character(1))),
     cod_com = dplyr::coalesce(cod_com_dir, cod_com_rbd),
     cod_reg = dplyr::coalesce(cod_reg_dir, cod_reg_rbd),
     cod_pro = dplyr::coalesce(cod_pro_dir, cod_pro_rbd),
@@ -182,6 +233,16 @@ est_attr <- P |>
     # de idps_largo solo si el directorio no cubre el RBD.
     cod_depe2 = dplyr::coalesce(cod_depe2_dir, cod_depe2_idps)) |>
   dplyr::left_join(estab_slep, by = "rbd")
+Encoding(est_attr$nom) <- "UTF-8"
+
+# Verificacion POR BYTES del saneo (no visual; regla Bug 2 / locale C): ningun
+# nombre de presentacion conserva U+00B4 / U+005E / U+0060.
+nom_corrupto <- vapply(est_attr$nom, function(s){
+  if (is.na(s)) return(FALSE); Encoding(s) <- "UTF-8"
+  any(utf8ToInt(s) %in% c(0x00B4, 0x005E, 0x0060)) }, logical(1))
+stopifnot("[NOMBRES] quedaron codepoints corruptos (U+00B4/U+005E/U+0060) tras el saneo" = sum(nom_corrupto) == 0)
+message(sprintf("[NOMBRES] saneo OK: 0 nombres con U+00B4/U+005E/U+0060; %d EE con nombre curado (caracterizacion SLEP CC).",
+                sum(est_attr$cur)))
 
 # Validacion H6: reporta el delta de dependencia (vigente vs por-evaluacion) y
 # asegura que ningun RBD del motor pierde dependencia (coalesce cubre los faltantes).
@@ -198,7 +259,7 @@ message(sprintf("     antes (idps): %s", fmt_tab(chk_h6$depe2_idps)))
 message(sprintf("     ahora (dir):  %s", fmt_tab(chk_h6$cod_depe2)))
 
 establecimientos_lst <- est_attr |>
-  dplyr::transmute(rbd, nom, cod_com, cod_reg, cod_slep, cod_depe2) |>
+  dplyr::transmute(rbd, nom, cur, cod_com, cod_reg, cod_slep, cod_depe2) |>
   dplyr::arrange(cod_reg, cod_com, nom)
 
 # Etiqueta de region desde NOMBRES_REGION (fuente unica, con tildes). Encoding
