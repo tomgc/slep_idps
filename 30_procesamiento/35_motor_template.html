@@ -47,7 +47,7 @@ __FONTS_CSS__
   .wrap{max-width:1320px;margin:0 auto;padding:16px 24px 70px;}
 
   /* Barra de controles tipo referencia: sticky, acento azul, grupos label(overline)+control segmentado */
-  .nav{background:var(--panel);border:1px solid var(--linea);border-top:3px solid var(--azul);border-radius:var(--radius-3);padding:14px 18px;margin-bottom:14px;box-shadow:var(--shadow-1);position:sticky;top:0;z-index:40;}
+  .nav{background:var(--panel);border:1px solid var(--linea);border-top:3px solid var(--azul);border-radius:var(--radius-3);padding:14px 18px;margin-bottom:14px;box-shadow:var(--shadow-1);}
   .nav-row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;}
   .ctl label{display:block;font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-xs);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);margin-bottom:6px;}
   select{font-family:var(--font-body);font-weight:var(--fw-medium);font-size:var(--fs-base);color:var(--tinta);padding:6px 10px;border:1px solid var(--border-2);border-radius:var(--radius-2);background:var(--paper);min-width:150px;}
@@ -77,12 +77,9 @@ __FONTS_CSS__
   .help{background:#eef3f7;border:1px solid #d4e2ec;border-radius:8px;padding:10px 13px;font-size:12.5px;color:#3d5566;margin-bottom:14px;}
   .help b{color:var(--azul);}
 
-  .gse-group{margin-bottom:24px;}
-  .gse-head{display:flex;align-items:center;gap:10px;margin:6px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--linea);}
-  .gse-head .tag{background:var(--azul);color:#fff;border-radius:6px;padding:3px 11px;font-size:12px;font-weight:600;}
-  .gse-head .cnt{font-size:12px;color:var(--gris);}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:14px;}
+  /* Fase 3: CSS muerto eliminado (.gse-group/.gse-head/.tag/.cnt/.grid -> reemplazados por .gse-sec/.pan-grid). */
   .card{background:var(--panel);border:1px solid var(--linea);border-radius:9px;padding:11px;cursor:pointer;transition:box-shadow .12s,transform .12s;}
+  .card:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   .card:hover{box-shadow:var(--sombra);transform:translateY(-1px);}
   .card.foco{border-color:var(--foco);box-shadow:0 0 0 1px var(--foco) inset;}
   .card .nom{font-size:12px;font-weight:700;line-height:1.25;height:2.5em;overflow:hidden;}
@@ -114,39 +111,16 @@ __FONTS_CSS__
   .radar-cmp .sw-line.cmp{border-top-style:dashed;border-top-color:#C77D3A;}
   .radar-cmp .cmp-hint{font-size:10.5px;color:var(--gris);font-style:italic;text-align:center;max-width:34ch;}
 
-  .detail{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:20px;box-shadow:var(--sombra);}
-  .back{border:0;background:none;color:var(--foco);cursor:pointer;font-size:13px;padding:0;font-family:inherit;}
-  .detail h2{margin:.15em 0;font-size:20px;}
-  .dmeta{font-size:12.5px;color:var(--gris);margin-bottom:8px;}
-  .dcrumb{font-size:13px;margin:10px 0 14px;}
-  .dcrumb button{border:0;background:none;color:var(--foco);cursor:pointer;font-size:13px;padding:0;font-family:inherit;}
-  .dcrumb span{color:var(--gris);}
-  .dcrumb b{color:var(--tinta);}
-  .row2{display:grid;grid-template-columns:340px 1fr;gap:26px;}
-  @media(max-width:860px){.row2{grid-template-columns:1fr;}}
-  .blk h3{font-size:13px;letter-spacing:.4px;color:var(--azul);margin:0 0 10px;border-bottom:1px solid var(--linea);padding-bottom:5px;}
-
-  /* GSE protagonista: fila de indicador/dimension con doble ancla */
-  .anchor-row{padding:9px 0;border-bottom:1px solid var(--linea);cursor:pointer;}
-  .anchor-row:hover{background:#fbf7ea;}
-  .anchor-row.flat{cursor:default;}
-  .anchor-row.flat:hover{background:none;}
-  .ar-top{display:flex;align-items:center;gap:9px;}
-  .ar-sw{width:12px;height:12px;border-radius:3px;flex:none;}
-  .ar-nom{font-weight:600;font-size:13px;}
-  .ar-prom{margin-left:auto;font-weight:800;font-size:17px;}
-  .ar-prom .u{font-size:10px;color:var(--gris);font-weight:400;}
-  .anclas{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+  /* Fase 3: CSS muerto eliminado (.detail/.back/.dmeta/.dcrumb/.row2/.blk del
+     antiguo Detalle; .anchor-row/.ar-*/.anclas del antiguo AnchorRow). Se
+     conservan .ancla/.arr (usados por <Ancla/>). */
   .ancla{font-size:11px;padding:3px 9px;border-radius:7px;border:1px solid var(--linea);background:#fff;display:flex;gap:5px;align-items:center;}
   .ancla .k{color:var(--gris);font-size:9.5px;letter-spacing:.3px;}
   .ancla.al{background:var(--alerta-bg);border-color:#f3c9c2;color:var(--alerta);}
   .ancla.de{background:var(--destaca-bg);border-color:#c5e4cd;color:var(--destaca);}
   .arr{font-weight:800;}
-  .go{margin-left:6px;color:var(--foco);font-size:11px;}
-
-  .distrow{margin:11px 0;}
-  .distrow .lbl{font-size:12.5px;font-weight:600;}
-  .distrow .actores{font-size:10px;color:var(--gris);font-weight:400;}
+  /* Fase 3: .go/.distrow muertos eliminados; .actores standalone (lo usa SubDist). */
+  .actores{font-size:10px;color:var(--gris);font-weight:var(--fw-regular);}
   .bar{display:flex;height:19px;border-radius:5px;overflow:hidden;border:1px solid var(--linea);background:#f4f1e8;}
   .bar span{display:flex;align-items:center;justify-content:center;font-size:10px;color:#2e2710;font-weight:600;}
   .nivel-txt{font-size:11px;color:#5a5142;margin-top:3px;}
@@ -316,6 +290,37 @@ __FONTS_CSS__
   .hist-dims{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:6px 16px 16px;}
   @media(max-width:900px){.hist-dims{grid-template-columns:1fr;}}
   .nota-inv{margin:14px 22px;}
+
+  /* ============================================================
+     Fase 3 — Panorama territorial (secciones por GSE + barras apiladas de
+     estado vs GSE + grilla de tarjetas mini-radar). Portado de Propuesta
+     IDPS.html (clases .pan-, .gse-sec, .pan-grid, .gcard, .s100-) a los
+     tokens del motor. Colores de ESTADO (alerta/gris/destaca) distintos de la
+     paleta de 4 indicadores; estos ultimos solo etiquetan filas/vertices.
+     ============================================================ */
+  /* RBD en linea aparte en la tarjeta (sin negrita, sin parentesis) */
+  .card-rbd{font-size:10px;color:var(--gris);font-weight:var(--fw-regular);margin-top:1px;}
+  .pan-state-leg{margin-top:-2px;}
+  /* Seccion por GSE */
+  .gse-sec{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radius-3);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-1);}
+  .pan-sec{overflow:visible;}
+  .gse-sec-h{background:var(--cream-200);padding:11px 18px;display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--linea);flex-wrap:wrap;}
+  .gse-sec-name{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:17px;color:var(--azul);}
+  .gse-sec-sub{font-size:11.5px;color:var(--gris);font-weight:var(--fw-bold);}
+  .pan-gse-body{padding:16px 20px 20px;}
+  .pan-sub-h{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:14px;color:var(--tinta);margin:0 0 12px;}
+  .pan-sub-note{font-family:var(--font-body);font-weight:var(--fw-regular);font-size:12px;color:var(--gris);}
+  .pan-dist{display:flex;flex-direction:column;gap:11px;}
+  .pan-dist-row{display:grid;grid-template-columns:300px 1fr;align-items:center;gap:16px;}
+  @media(max-width:760px){.pan-dist-row{grid-template-columns:1fr;gap:5px;}}
+  .pan-dist-lab{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:var(--fw-bold);color:var(--tinta);}
+  .pan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:14px;}
+  /* Barra apilada 100% por estado vs GSE */
+  .s100{display:flex;height:26px;border-radius:var(--radius-2);overflow:hidden;border:1px solid var(--linea);background:var(--cream-200);}
+  .s100-seg{display:flex;align-items:center;justify-content:center;min-width:0;transition:width .25s ease;}
+  .s100-seg span{font-size:11px;font-weight:var(--fw-bold);color:#fff;white-space:nowrap;padding:0 4px;}
+  .s100-empty{align-items:center;justify-content:center;}
+  .s100-nd{font-size:11px;color:var(--gris);font-style:italic;}
 </style>
 </head>
 <body>
@@ -496,8 +501,12 @@ __FONTS_CSS__
     const axes=DATA.indicadores.map(ind=>({label:ind.corto,value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
     const foco=FOCO.has(e?.cod_com); const al=alertSummary(im);
     return (
-      <div className={"card"+(foco?" foco":"")} onClick={()=>onSel(rbd)}>
-        <div className="nom">{e&&e.nom?tc(e.nom):rbd}</div>
+      <div className={"card"+(foco?" foco":"")} role="button" tabIndex={0}
+        aria-label={(e&&e.nom?nomEE(e):("RBD "+rbd))+" — ver Panorama IDPS por establecimiento"}
+        onClick={()=>onSel(rbd)}
+        onKeyDown={ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();onSel(rbd);}}}>
+        <div className="nom">{e&&e.nom?nomEE(e):rbd}</div>
+        <div className="card-rbd">RBD {rbd}</div>
         <div className="meta">{est[rbd]?comNom(est[rbd].cod_com):""} · {DEPE[e?.cod_depe2]||"—"}</div>
         <Radar axes={axes} size={168} showLabels={false} showValues={true}/>
         <div className="alerts">
@@ -512,12 +521,54 @@ __FONTS_CSS__
 
   const comNom=cod=>{const c=DATA.comunas.find(x=>x.cod===cod);return c?tc(c.nom):cod;};
   const regNom=cod=>{const r=DATA.regiones.find(x=>x.cod===cod);return r?r.nom:cod;};
+  // Nombre de presentacion del EE (Fase 3): curado (caracterizacion SLEP) -> VERBATIM
+  // (ya trae tildes/mayusculas correctas; tc() lo romperia: "La Greda"->"la Greda");
+  // resto del pais -> tc() sobre el nombre del directorio ya saneado en 35.R
+  // (apostrofo/comilla). Unica via de nombre de EE en toda la UI.
+  const nomEE=e=>!e?"":(e.cur?(e.nom||""):tc(e.nom||""));
 
   // ===== Distribucion de niveles de una subdimension =====
   function DistBar({v}){
     const segs=[["bajo","var(--bajo)"],["medio","var(--medio)"],["alto","var(--alto)"]];
     return <div className="bar">{segs.map(([k,c])=>{const val=v[k];if(val==null||val===0)return null;
       return <span key={k} style={{width:val+"%",background:c}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val):""}</span>;})}</div>;
+  }
+
+  // ===== Reparto de estado vs GSE (Fase 3 — CONTEO de EE, NO promedio) =====
+  // Por indicador, cuenta EE del grupo en ▼ bajo / = sin diferencia / ▲ sobre,
+  // LEIDO de sigdifgru (misma clasificacion que alertSummary/la tarjeta). NA NO
+  // cuenta como estado ni como 0: queda FUERA del reparto; N = EE con dato. Cero
+  // agregacion: es % (n) de establecimientos, jamas un promedio de puntajes.
+  function repartoInd(items,indId,grado,agno){
+    let bajo=0,neutro=0,sobre=0,N=0;
+    items.forEach(u=>{const d=indOf(u.rbd,grado,agno)[indId];
+      if(d&&d.prom!=null){N++; if(d.sigdifgru===-1)bajo++; else if(d.sigdifgru===1)sobre++; else neutro++;}});
+    return {bajo,neutro,sobre,N};
+  }
+  // Redondeo a enteros que suma 100 exacto (reparte el residuo por parte fraccional).
+  function pctRound(parts){
+    const total=parts.reduce((a,b)=>a+b.count,0)||1;
+    const out=parts.map(p=>({...p,raw:p.count/total*100}));
+    out.forEach(p=>{p.p=Math.floor(p.raw);}); let rem=100-out.reduce((a,b)=>a+b.p,0);
+    const order=[...out].sort((a,b)=>(b.raw-b.p)-(a.raw-a.p)); for(let i=0;i<rem;i++) order[i%order.length].p++;
+    return out;
+  }
+  // Barra apilada 100% por estado vs GSE. Colores de ESTADO del motor
+  // (alerta/gris/destaca), DISTINTOS de la paleta de 4 indicadores (invariante).
+  // Significancia comunicada por texto (en el title de cada segmento).
+  function StackedBar({rep}){
+    if(rep.N===0) return <div className="s100 s100-empty"><span className="s100-nd">sin dato</span></div>;
+    const parts=pctRound([
+      {k:"bajo",c:"var(--alerta)",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
+      {k:"neutro",c:"var(--gris)",count:rep.neutro,lbl:"= sin diferencia significativa"},
+      {k:"sobre",c:"var(--destaca)",count:rep.sobre,lbl:"▲ sobre su GSE (significativo)"}]);
+    // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
+    // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
+    const aria="Distribución de "+rep.N+" establecimientos con dato: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ");
+    return <div className="s100" role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con dato"}>{parts.map(s=>{if(s.p===0)return null;
+      const lab=s.p>=16?(s.p+"% ("+s.count+")"):(s.p>=9?s.p+"%":"");
+      return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
+        title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{lab&&<span>{lab}</span>}</div>;})}</div>;
   }
 
   // ===== Tonos derivados del color del indicador (para dimensiones) =====
@@ -698,7 +749,7 @@ __FONTS_CSS__
         <div className="ficha-bar">
           <div className="ficha-id">
             <button className="ficha-back" onClick={onBack}>‹ Volver a la grilla</button>
-            <div className="ficha-name">{e&&e.nom?tc(e.nom):rbd}<span className="ficha-rbd">RBD {rbd}</span></div>
+            <div className="ficha-name">{e&&e.nom?nomEE(e):rbd}<span className="ficha-rbd">RBD {rbd}</span></div>
             <div className="ficha-meta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
           </div>
           <div className="ficha-tools">
@@ -847,7 +898,7 @@ __FONTS_CSS__
     if(tab==="dependencia") return DEPS_OPTS.filter(s=>!ql||s.nom.toLowerCase().includes(ql))
       .map(s=>({kind:"dependencia",cod:s.cod,nom:s.nom,sub:s.n+" establecimientos"}));
     return ql ? DATA.establecimientos.filter(e=>(e.nom&&e.nom.toLowerCase().includes(ql))||String(e.rbd).includes(ql)).slice(0,60)
-      .map(e=>({kind:"establecimiento",cod:e.rbd,nom:tc(e.nom)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
+      .map(e=>({kind:"establecimiento",cod:e.rbd,nom:nomEE(e)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
   }
   const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar…";
   const emptyTextFor=(tab,ql)=>tab==="establecimiento"&&!ql?"Escribe para buscar un establecimiento":"Sin resultados";
@@ -876,8 +927,10 @@ __FONTS_CSS__
     const [agno,setAgno]=useState(anios[anios.length-1]);
     const [gse,setGse]=useState("TODOS");
     const [rbdSel,setRbdSel]=useState(null);
-    const [pantalla,setPantalla]=useState("ficha");   // andamiaje 3 pantallas; default = unica funcional
+    const [pantalla,setPantalla]=useState("territorio");   // Fase 3: entrada = panorama territorial (grilla por GSE)
     const [vistaFicha,setVistaFicha]=useState("actual");   // Fase 2: vista de la ficha (actual|historica), local a la pantalla
+    // Abrir la ficha de un EE desde la grilla territorial (setea EE y salta de pantalla).
+    const irFicha=r=>{setRbdSel(r);setPantalla("ficha");};
 
     // grado/agno NO limpian rbdSel: en Fase 2 se pueden cambiar DENTRO de la
     // ficha sin volver a la grilla. Solo se valida que el agno exista para el grado.
@@ -938,45 +991,71 @@ __FONTS_CSS__
 
         {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
 
-        {/* Paso 3 — router de pantalla. Stubs sin datos ni cifra agregada. */}
-        {pantalla==="territorio" && <ScreenStub titulo="Panorama territorial"/>}
+        {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
         {pantalla==="comparar" && <ScreenStub titulo="Comparación entre territorios"/>}
+
+        {/* Paso 3-5 — PANORAMA TERRITORIAL: controles + secciones por GSE
+            (encabezado + barras apiladas de estado vs GSE + grilla mini-radar). */}
+        {pantalla==="territorio" && <div>
+          <div className="nav">
+            <div className="nav-row">
+              <div className="ctl"><label>Grado</label>
+                <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
+              <div className="ctl"><label>Año</label>
+                <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{PRELIM.has(String(a))?"*":""}</button>)}</div></div>
+              <div className="ctl"><label>Grupo socioeconómico</label>
+                <div className="gse-pills">
+                  <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
+                  {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{GSE[g]}</button>)}</div></div>
+            </div>
+          </div>
+          <div className="crumb">Panorama territorial de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""} · {unidades.length} establecimientos</div>
+          <div className="help"><b>El territorio acota, no agrega.</b> Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia) y la grilla para abrir el Panorama IDPS de cada uno. Las barras son <b>% (n) de establecimientos, nunca un promedio</b>. Cada tarjeta es un <b>establecimiento individual</b>; haz clic para ver su ficha.</div>
+          <div className="leyenda">{DATA.indicadores.map(i=>(
+            i.definicion
+              ? <button key={i.id} type="button" className="leg-item"
+                  aria-label={i.nombre+". ¿Qué mide? "+i.definicion}
+                  onMouseMove={e=>showTT("<b>"+i.nombre+"</b><br>"+i.definicion,e)} onMouseLeave={hideTT}
+                  onFocus={e=>showTTEl("<b>"+i.nombre+"</b><br>"+i.definicion,e.currentTarget)} onBlur={hideTT}>
+                  <i style={{background:i.color}}></i>{i.nombre}<span className="leg-info" aria-hidden="true">ⓘ</span></button>
+              : <span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>
+          ))}<span>· ★ Costa Central</span></div>
+          <div className="leyenda pan-state-leg">
+            <span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span>
+            <span><i style={{background:"var(--gris)"}}></i>= sin diferencia</span>
+            <span><i style={{background:"var(--destaca)"}}></i>▲ sobre su GSE</span>
+            <span>· estado leído de difgru/sigdifgru (significativo); el color es de estado, no de indicador</span>
+          </div>
+          {unidades.length===0
+            ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, grado, año y GSE.</div>
+            : grupos.map(grp=>(
+                <section className="gse-sec pan-sec" key={grp.gse}>
+                  <div className="gse-sec-h"><span className="gse-sec-name">GSE · {GSE[grp.gse]||"sin clasificar"}</span><span className="gse-sec-sub">{grp.items.length} establecimientos · grupo socioeconómico</span></div>
+                  <div className="pan-gse-body">
+                    <div className="pan-sub-h">Distribución por estado vs su GSE <span className="pan-sub-note">· % (n) de establecimientos con dato, no promedio</span></div>
+                    <div className="pan-dist">
+                      {DATA.indicadores.map(ind=>{const rep=repartoInd(grp.items,ind.id,grado,agno);
+                        return (
+                          <div className="pan-dist-row" key={ind.id}>
+                            <div className="pan-dist-lab"><span className="sw" style={{background:ind.color}}></span>{ind.nombre}</div>
+                            <StackedBar rep={rep}/>
+                          </div>);})}
+                    </div>
+                    <div className="pan-sub-h" style={{marginTop:18}}>Establecimientos <span className="pan-sub-note">· clic para ver su Panorama IDPS</span></div>
+                    <div className="pan-grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={grado} agno={agno} onSel={irFicha}/>)}</div>
+                  </div>
+                </section>))}
+        </div>}
+
+        {/* Pantalla ficha: EE seleccionado (Fase 2) o invitacion a elegir uno. */}
         {pantalla==="ficha" && (rbdSel
           ? <Ficha rbd={rbdSel} grado={grado} agno={agno} grados={grados} anios={anios}
                    onGrado={setGrado} onAgno={setAgno} vista={vistaFicha} onVista={setVistaFicha}
-                   onBack={()=>setRbdSel(null)}/>
-          : <div>
-              {/* Grilla territorial (sin cambios en Fase 2): filtros sticky + tarjetas por GSE */}
-              <div className="nav">
-                <div className="nav-row">
-                  <div className="ctl"><label>Grado</label>
-                    <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
-                  <div className="ctl"><label>Año</label>
-                    <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{PRELIM.has(String(a))?"*":""}</button>)}</div></div>
-                  <div className="ctl"><label>Grupo socioeconómico</label>
-                    <div className="gse-pills">
-                      <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
-                      {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{GSE[g]}</button>)}</div></div>
-                </div>
-              </div>
-              <div className="crumb">Mostrando establecimientos educacionales de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""} · {unidades.length} establecimientos</div>
-              <div className="help">Cada tarjeta es un <b>establecimiento individual</b> (su dato crudo, nunca un promedio). El color de alerta resume cuántos indicadores están <span style={{color:"var(--alerta)"}}>significativamente bajo su GSE (▼)</span> o <span style={{color:"var(--destaca)"}}>sobre él (▲)</span>. El territorio solo acota la lista; no produce cifras agregadas. Haz clic en un establecimiento para ver su ficha desplegada (radar + dimensiones + subdimensiones).</div>
-              <div className="leyenda">{DATA.indicadores.map(i=>(
-                i.definicion
-                  ? <button key={i.id} type="button" className="leg-item"
-                      aria-label={i.nombre+". ¿Qué mide? "+i.definicion}
-                      onMouseMove={e=>showTT("<b>"+i.nombre+"</b><br>"+i.definicion,e)} onMouseLeave={hideTT}
-                      onFocus={e=>showTTEl("<b>"+i.nombre+"</b><br>"+i.definicion,e.currentTarget)} onBlur={hideTT}>
-                      <i style={{background:i.color}}></i>{i.nombre}<span className="leg-info" aria-hidden="true">ⓘ</span></button>
-                  : <span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>
-              ))}<span>· ★ Costa Central</span></div>
-              {unidades.length===0
-                ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, grado, año y GSE.</div>
-                : grupos.map(grp=>(
-                    <div className="gse-group" key={grp.gse}>
-                      <div className="gse-head"><span className="tag">GSE · {GSE[grp.gse]||"sin clasificar"}</span><span className="cnt">{grp.items.length} establecimientos educacionales</span></div>
-                      <div className="grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={grado} agno={agno} onSel={setRbdSel}/>)}</div>
-                    </div>))}
+                   onBack={()=>{setRbdSel(null);setPantalla("territorio");}}/>
+          : <div className="screen-stub">
+              <div className="screen-stub-title">Panorama IDPS por establecimiento</div>
+              <div className="screen-stub-msg">Elige un establecimiento en <b>Panorama territorial</b> (clic en una tarjeta) o búscalo con <b>“Explorar / cambiar selección”</b>.</div>
+              <div style={{marginTop:16}}><button className="nav-trigger" onClick={()=>setPantalla("territorio")}>Ir a Panorama territorial →</button></div>
             </div>)}
       </div>);
   }
