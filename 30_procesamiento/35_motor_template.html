@@ -203,6 +203,12 @@ __FONTS_CSS__
   const est={}; DATA.establecimientos.forEach(e=>est[e.rbd]=e);
   const GSE=DATA.meta.gse_labels, DEPE=DATA.meta.depe2_labels;
   const FOCO=new Set(DATA.meta.comunas_foco);
+  // Foco de apertura: SLEP Costa Central (cod del SLEP en el dato; sus
+  // establecimientos tienen cod_slep === SLEP_FOCO). Es el ESTADO inicial de
+  // navegacion, no un filtro fijo: el usuario lo cambia con EntityModal.
+  const SLEP_FOCO=DATA.meta.slep_foco||null;
+  const SLEP_FOCO_NOM=(DATA.sleps.find(s=>String(s.cod_slep)===String(SLEP_FOCO))||{}).nombre_slep||"Costa Central";
+  const FOCO_INICIAL=SLEP_FOCO!=null?{kind:"foco"}:{kind:"region",cod:DATA.meta.region_foco||DATA.regiones[0].cod};
   const CICLO={"4b":"basica","6b":"basica","2m":"media"};      // 8b -> sin texto
   const PRELIM=new Set((DATA.meta.anios_preliminar||[]).map(String));  // anios preliminares (del dato)
   const fmt=v=>(v==null||isNaN(v))?"—":Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
@@ -536,7 +542,7 @@ __FONTS_CSS__
   // ===== Navegacion territorial via EntityModal: region/comuna/sostenedor/EE =====
   function App(){
     const grados=Object.keys(DATA.meta.grados);
-    const [terr,setTerr]=useState({kind:"region",cod:DATA.meta.region_foco||DATA.regiones[0].cod});
+    const [terr,setTerr]=useState(FOCO_INICIAL);   // apertura: foco SLEP Costa Central (estado, no filtro fijo)
     const [sostenedor,setSostenedor]=useState("");   // cod_depe2 (combinable con el territorio)
     const [modalOpen,setModalOpen]=useState(false);
     const [grado,setGrado]=useState(grados.includes("4b")?"4b":grados[0]);
@@ -560,7 +566,8 @@ __FONTS_CSS__
     const unidades=useMemo(()=>{const b=DATA.roster,out=[];
       for(let i=0;i<b.rows;i++){if(b.grado[i]!==grado||b.agno[i]!==agno)continue;
         const e=est[b.rbd[i]]; if(!e)continue;
-        if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
+        if(terr.kind==="foco"){ if(e.cod_slep!==SLEP_FOCO)continue; }
+        else if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
         else { if(e.cod_reg!==terr.cod)continue; }
         if(sostenedor && e.cod_depe2!==sostenedor)continue;
         if(gse!=="TODOS" && b.gse[i]!==gse)continue;
@@ -571,7 +578,10 @@ __FONTS_CSS__
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
 
     const sostNom = sostenedor ? (DEPE[sostenedor]||sostenedor) : null;
-    const territorioTxt = (terr.kind==="comuna" ? "comuna de "+comNom(terr.cod) : "Región de "+regNom(terr.cod)) + (sostNom?(" · sostenedor: "+sostNom):"");
+    const terrTxt = terr.kind==="foco" ? "SLEP "+SLEP_FOCO_NOM
+                  : terr.kind==="comuna" ? "comuna de "+comNom(terr.cod)
+                  : "Región de "+regNom(terr.cod);
+    const territorioTxt = terrTxt + (sostNom?(" · sostenedor: "+sostNom):"");
 
     return (
       <div className="wrap">
@@ -589,8 +599,9 @@ __FONTS_CSS__
                 {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{g} {GSE[g]}</button>)}</div></div>
           </div>
           <div className="nav-sel">
-            <span className="sel-chip"><span className="k">territorio</span> {terr.kind==="comuna"?comNom(terr.cod):regNom(terr.cod)}</span>
+            <span className="sel-chip"><span className="k">territorio</span> {terrTxt}</span>
             {sostenedor && <span className="sel-chip"><span className="k">sostenedor</span> {DEPE[sostenedor]} <button onClick={()=>setSostenedor("")} aria-label="Quitar filtro de sostenedor">✕</button></span>}
+            {SLEP_FOCO!=null && (terr.kind!=="foco"||sostenedor) && <button className="sel-link" onClick={()=>{setTerr(FOCO_INICIAL);setSostenedor("");}}>volver a {SLEP_FOCO_NOM}</button>}
           </div>
         </div>
 
