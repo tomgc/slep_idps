@@ -71,16 +71,27 @@ source("00_escanear_proyecto.R")  # snapshot de estructura (al abrir y cerrar se
 
 ## Ultimos cambios
 
-1. **Producto completo + deploy** (encargo 2): motor ampliado a TODO CHILE (8353
+1. **Auditoria de datos (FASE I) + saneamiento/mejoras (FASE II)** (sesion 6,
+   3er tramo). Auditoria exhaustiva: join RBD->geo 100% correcto vs directorio,
+   cifras 1:1 con el crudo (0 discrepancias), Costa Central 60 en 4b 2025. Fixes
+   SOLO de presentacion (`run_all(only=35)`, `idps_largo` intacto, cifras sin
+   cambio): nombres completos de comuna/EE y geo desde el directorio publico
+   (estaban TRUNCADOS en `idps_largo`); tildes en indicador/dimension
+   (`INDICADOR_LABELS`+`DIMENSION_LABELS`); Sostenedor->**Dependencia** (rename +
+   pestana blindada a 4 categorias); radar con nombre+puntaje por vertice y
+   comparacion de 2 anios superpuestos; leyenda con definicion (P-meta, accesible);
+   GSE sin enumeracion. PENDIENTE decision titular: 120 EE SLEP-por-traspaso
+   marcados Municipal (desfase de vigencia, NO cambia cifras). `docs/` NO
+   republicado (queda para el cierre v06 del Encargo 2).
+2. **Producto completo + deploy** (encargo 2): motor ampliado a TODO CHILE (8353
    establecimientos, 16 regiones); navegacion territorial region->SLEP/comuna->
    establecimiento; GSE de referencia protagonista (doble ancla + alerta);
    drill-down indicador->dimension->subdimension; tendencia eje fijo 0-100;
    fuentes de marca embebidas. Copiado a `docs/index.html` para GitHub Pages.
    Decode ~340ms, indice de rangos 7ms. Spot-check fuera de Valparaiso 1:1.
-2. **Motor HTML base**: grilla de radares por establecimiento agrupada por GSE
+3. **Motor HTML base**: grilla de radares por establecimiento agrupada por GSE
    (sin agregacion), detalle, distribucion de niveles, marca de desvio, evolucion.
-3. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1.
-4. **Textos de nivel por ciclo** anexados a `catalogo_idps.parquet` (solo EST).
+4. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1.
 5. **P6 — pipeline** (`34_leer_normalizar_idps.R`): 3 familias, homologa
    texto<->id por anio, resuelve `cod_depe2`, GSE a niveles -> `idps_largo.parquet`
    (1.485.103 filas). Catalogos (`33`) + orquestador `run_all()` (`00_build.R`).
