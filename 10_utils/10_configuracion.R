@@ -37,6 +37,19 @@ DEPENDENCIAS <- c(
   "4" = "SLEP"
 )
 
+# Homologacion de dependencia: COD_DEPE2 del DIRECTORIO (esquema 5-cat) -> cod_depe2
+# del motor IDPS (esquema 4-cat). Regla de VIGENCIA (decision titular, H6): el motor
+# muestra la dependencia ACTUAL del directorio oficial, no la del momento de la
+# evaluacion IDPS; asi un RBD evaluado siendo Municipal pero ya traspasado aparece
+# como SLEP. Es de PRESENTACION: 35_generar_motor_html.R sobrescribe la dependencia
+# al serializar (igual que nombre/geo); idps_largo.parquet NO se altera y ninguna
+# cifra IDPS cambia. Directorio 5-cat: 1 Municipal, 2 Part.subv, 3 Part.pagado,
+# 4 Adm.Delegada, 5 SLEP. Adm.Delegada (4) -> 2 Part.subv (criterio de la Agencia,
+# confirmado en la auditoria; el esquema 4-cat IDPS no tiene Adm.Delegada).
+CW_DEPE_DIRECTORIO_A_IDPS <- c(
+  "1" = "1", "2" = "2", "3" = "3", "4" = "2", "5" = "4"
+)
+
 # Grupo socioeconomico (GSE) — segmentacion INVIOLABLE en todo output.
 GSE_LABELS <- c(
   "1" = "Bajo",
