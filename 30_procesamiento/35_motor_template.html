@@ -321,6 +321,48 @@ __FONTS_CSS__
   .s100-seg span{font-size:11px;font-weight:var(--fw-bold);color:#fff;white-space:nowrap;padding:0 4px;}
   .s100-empty{align-items:center;justify-content:center;}
   .s100-nd{font-size:11px;color:var(--gris);font-style:italic;}
+
+  /* ============================================================
+     Fase 4 — Comparación entre territorios (banner del comparador + banda
+     "no se agrega" + chips de territorio + segmentador GSE + matriz: filas
+     = territorios, columnas = 4 indicadores). Adaptado de Propuesta IDPS.html
+     (clases cmp-...) a los tokens del motor. La celda es <StackedBar/> (estado
+     vs GSE): usa los colores de ESTADO (alerta/gris/destaca), NO la paleta de 4
+     indicadores. Los swatches de columna (th-sw) SI usan la paleta: etiquetan el
+     indicador, no codifican el dato de la celda. Reusa .gse-sec/.gse-sec-h y
+     .leyenda.pan-state-leg ya definidas en Fase 3.
+     ============================================================ */
+  .cmp-chrome{background:var(--azul);color:var(--cream);padding:20px 24px;border-radius:var(--radius-3) var(--radius-3) 0 0;}
+  .cmp-bar{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;}
+  .cmp-bar-tt{flex:1;min-width:0;}
+  .cmp-eyebrow{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-xs);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--cream);opacity:.72;}
+  .cmp-title{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-h1);margin:6px 0 0;letter-spacing:-.01em;color:var(--cream);line-height:1.12;}
+  .cmp-title-sub{font-weight:var(--fw-regular);opacity:.75;}
+  .cmp-noagg{background:rgba(255,201,46,.16);border:1px solid rgba(255,201,46,.45);border-top:0;border-radius:0 0 var(--radius-3) var(--radius-3);padding:11px 24px;font-size:12.5px;line-height:1.5;color:#5a4a2a;margin-bottom:18px;}
+  .cmp-noagg b{color:#8A6400;}
+  .cmp-controls{margin-bottom:10px;}
+  .cmp-cl{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-sm);letter-spacing:.02em;color:var(--gris);}
+  .cmp-chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:flex-start;}
+  .cmp-chip{display:flex;align-items:flex-start;gap:9px;background:var(--paper);border:1px solid var(--linea);border-radius:var(--radius-2);padding:9px 11px;max-width:280px;box-shadow:var(--shadow-1);}
+  .cmp-ct{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
+  .cmp-cn{font-weight:var(--fw-bold);font-size:13.5px;color:var(--tinta);}
+  .cmp-cm{font-size:11.5px;color:var(--gris);margin-top:1px;}
+  .cmp-x{background:none;border:0;cursor:pointer;color:var(--gris);font-size:13px;padding:0 0 0 2px;line-height:1;}
+  .cmp-x:hover{color:var(--alerta);}
+  .cmp-add{border:1px dashed var(--linea);background:transparent;border-radius:var(--radius-2);color:var(--foco);font-weight:var(--fw-medium);font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;}
+  .cmp-add:hover{border-color:var(--foco);background:var(--cream-200);}
+  .cmp-invite{font-size:12px;color:var(--gris);font-style:italic;margin-top:10px;}
+  .cmp-gse-ctl{margin:6px 0 12px;}
+  .cmp-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+  .cmp-table th{text-align:center;font-size:11.5px;font-weight:var(--fw-bold);color:var(--gris);letter-spacing:.01em;padding:10px 12px;border-bottom:1px solid var(--linea);white-space:nowrap;}
+  .cmp-table th.th-terr{text-align:left;width:210px;}
+  .th-sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle;}
+  .cmp-table td{padding:11px 12px;border-bottom:1px solid var(--linea);vertical-align:middle;}
+  .cmp-table tr:last-child td{border-bottom:0;}
+  .td-terr{white-space:normal;text-align:left;}
+  .td-terr .td-tn{font-size:13px;font-weight:var(--fw-bold);color:var(--tinta);}
+  .cmp-empty{padding:40px;text-align:center;color:var(--gris);border:1px dashed var(--linea);border-radius:var(--radius-3);background:var(--panel);}
+  .cmp-tscroll{overflow-x:auto;}
 </style>
 </head>
 <body>
@@ -846,7 +888,7 @@ __FONTS_CSS__
   // Replica de 50_documentacion/andamios/diseno/entity_modal/EntityModal.jsx
   // (andamio congelado). Se anade a11y en ESTA copia: role=dialog, aria-modal,
   // cierre con Escape. Modo simple (multiple=false): clic en fila => onSelect.
-  function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null}){
+  function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia"}){
     const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
     const [tab,setTab]=useState(tabInicial);
     const [q,setQ]=useState("");
@@ -858,8 +900,8 @@ __FONTS_CSS__
     const emptyText=(emptyTextFor&&emptyTextFor(tab,ql))||"Sin resultados";
     return (
       <div className="modal-backdrop" onClick={onCancel}>
-        <div className="modal" role="dialog" aria-modal="true" aria-label="Seleccionar territorio o dependencia" onClick={e=>e.stopPropagation()}>
-          <div className="modal-header"><h2 className="modal-title">Seleccionar territorio o dependencia</h2></div>
+        <div className="modal" role="dialog" aria-modal="true" aria-label={title} onClick={e=>e.stopPropagation()}>
+          <div className="modal-header"><h2 className="modal-title">{title}</h2></div>
           <div className="modal-tabs">
             {tabs.map(([k,lbl])=>(
               <button key={k} className={"modal-tab"+(tab===k?" is-active":"")} onClick={()=>{setTab(k);setQ("");}}>{lbl}</button>))}
@@ -903,18 +945,129 @@ __FONTS_CSS__
   const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar…";
   const emptyTextFor=(tab,ql)=>tab==="establecimiento"&&!ql?"Escribe para buscar un establecimiento":"Sin resultados";
 
-  // ===== Andamiaje de navegacion: 3 pantallas (rediseno Fase 1) =====
-  // ficha = unica pantalla funcional hoy; territorio/comparar son stubs.
+  // ===== Comparador (Fase 4): catalogos de seleccion via EntityModal =====
+  // El comparador compara TERRITORIOS arbitrarios (SLEP/comuna/region), no
+  // dependencias ni un EE: por eso usa SUS PROPIOS tabs y buildList (kind ∈
+  // {slep,comuna,region}). Conteo de comunas/EE por SLEP (del directorio publico)
+  // SOLO para la etiqueta del picker; la meta del chip se calcula del roster real
+  // por grado/año (D-s8-4).
+  const SLEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_slep!=null){const k=e.cod_slep;(m[k]=m[k]||{ee:0,coms:new Set()});m[k].ee++;if(e.cod_com!=null)m[k].coms.add(e.cod_com);}});
+    return (DATA.sleps||[]).map(s=>({cod:s.cod_slep,nom:s.nombre_slep,ee:(m[s.cod_slep]?m[s.cod_slep].ee:0),ncom:(m[s.cod_slep]?m[s.cod_slep].coms.size:0)}))
+      .filter(s=>s.ee>0).sort((a,b)=>String(a.nom).localeCompare(String(b.nom)));})();
+  const TABS_CMP=[["slep","SLEP"],["comuna","Comuna"],["region","Región"]];
+  function buildListCmp(tab,ql){
+    if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
+      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:s.ncom+" comunas · "+s.ee+" establecimientos"}));
+    if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
+      .sort((a,b)=>a.nom.localeCompare(b.nom))
+      .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
+    return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
+      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
+  }
+  const cmpPlaceholderFor=tab=>tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":"Buscar una región…";
+
+  // ===== Roster de un territorio para (grado, agno), TODOS los GSE. =====
+  // Espejo de App.unidades pero parametrizado por territorio y SIN filtro de
+  // dependencia (el comparador no usa dep). El territorio solo ACOTA la lista
+  // (continue); jamas agrega una cifra. kind "slep" compara por cod_slep del EE
+  // (D-s8-5; cod_slep vive en est[rbd], igual que el foco de App). comuna/region
+  // como en el panorama territorial.
+  function rosterTerr(t,grado,agno){const b=DATA.roster,out=[];
+    for(let i=0;i<b.rows;i++){if(b.grado[i]!==grado||b.agno[i]!==agno)continue;
+      const e=est[b.rbd[i]]; if(!e)continue;
+      if(t.kind==="slep"){ if(String(e.cod_slep)!==String(t.cod))continue; }
+      else if(t.kind==="comuna"){ if(e.cod_com!==t.cod)continue; }
+      else { if(e.cod_reg!==t.cod)continue; }
+      out.push({rbd:b.rbd[i],gse:b.gse[i]});}
+    return out;}
+
+  // ===== Comparador: matriz territorios x indicadores, una tabla por GSE visible.
+  //       Cada celda = <StackedBar rep={repartoInd(itemsTerrGse, indId, cmpGrado,
+  //       agnoCmp)}/> = % (n) de EE por estado vs su propio GSE. CONTEO, jamas
+  //       promedio (cero agregacion); LEE sigdifgru, no reconstruye GSE absoluto.
+  //       Sin selector de año: agnoCmp = año mas reciente del grado a nivel del
+  //       dato (D-s8-1), igual para los 4 territorios; territorio sin EE ese año
+  //       => N=0 ("sin dato"), nunca se desliza a un año anterior. =====
+  function Comparador({cmpTerr,cmpGrado,agnoCmp,cmpGseVis,grados,onNivel,onToggleGse,onRemove,onAdd}){
+    const agno=agnoCmp;
+    // roster por territorio (todos los GSE) en (cmpGrado, agnoCmp); cada celda
+    // re-filtra por su GSE. Memoizado: solo recomputa al cambiar territorios/nivel.
+    const rosters=useMemo(()=>cmpTerr.map(t=>rosterTerr(t,cmpGrado,agno)),[cmpTerr,cmpGrado,agno]);
+    const metas=useMemo(()=>rosters.map(r=>{const coms=new Set();r.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)coms.add(e.cod_com);});return {ncom:coms.size,nee:r.length};}),[rosters]);
+    const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
+    const prelim=PRELIM.has(String(agno));
+    return (
+      <div>
+        <div className="cmp-chrome">
+          <div className="cmp-bar">
+            <div className="cmp-bar-tt">
+              <span className="cmp-eyebrow">Comparador IDPS</span>
+              <h3 className="cmp-title"><b>Comparación entre territorios</b> <span className="cmp-title-sub">por nivel y GSE</span></h3>
+            </div>
+            <div className="nivelsel"><span className="nivelsel-lab">Nivel</span>
+              <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===cmpGrado?" on":"")} onClick={()=>onNivel(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
+          </div>
+        </div>
+        <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda reparte el <b>100% de los establecimientos</b> del territorio (en ese GSE e indicador) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes. Año {agno==null?"—":agno}{prelim?"*":""} · {DATA.meta.grados[cmpGrado]} (el más reciente del nivel, igual para los {cmpTerr.length} territorios).</div>
+
+        <div className="cmp-controls">
+          <span className="cmp-cl">Territorios a comparar · {cmpTerr.length} de 4</span>
+          <div className="cmp-chips">
+            {cmpTerr.map((t,i)=>(
+              <div className="cmp-chip" key={t.kind+"|"+t.cod}>
+                <span className="cmp-ct"><span className="cmp-cn">{t.nom}</span>
+                  <span className="cmp-cm">{metas[i]?metas[i].ncom:0} {metas[i]&&metas[i].ncom===1?"comuna":"comunas"} · {metas[i]?metas[i].nee:0} {metas[i]&&metas[i].nee===1?"establecimiento":"establecimientos"}</span></span>
+                <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
+              </div>))}
+            {cmpTerr.length<4 && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
+          </div>
+          {cmpTerr.length<2 && <div className="cmp-invite">Agrega al menos un territorio más para comparar (hasta 4).</div>}
+        </div>
+
+        <div className="cmp-gse-ctl ctl">
+          <label>Segmentar por GSE</label>
+          <div className="gse-pills">
+            {DATA.meta.gse.map(g=><button key={g} className={cmpGseVis.has(g)?"on":""} onClick={()=>onToggleGse(g)}>{GSE[g]}</button>)}
+          </div>
+        </div>
+
+        <div className="leyenda pan-state-leg">
+          <span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span>
+          <span><i style={{background:"var(--gris)"}}></i>= sin diferencia</span>
+          <span><i style={{background:"var(--destaca)"}}></i>▲ sobre su GSE</span>
+          <span>· estado leído de difgru/sigdifgru (significativo); el color es de estado, no de indicador</span>
+        </div>
+
+        {visGse.length===0
+          ? <div className="cmp-empty">Selecciona al menos un grupo socioeconómico (GSE).</div>
+          : visGse.map(g=>(
+              <section className="gse-sec" key={g}>
+                <div className="gse-sec-h"><span className="gse-sec-name">GSE · {GSE[g]||"sin clasificar"}</span><span className="gse-sec-sub">grupo socioeconómico · % (n) de establecimientos por estado vs su GSE</span></div>
+                <div className="cmp-tscroll">
+                  <table className="cmp-table">
+                    <thead><tr><th className="th-terr">Territorio</th>{DATA.indicadores.map(i=><th key={i.id}><span className="th-sw" style={{background:i.color}}></span>{i.corto}</th>)}</tr></thead>
+                    <tbody>
+                      {cmpTerr.map((t,ti)=>(
+                        <tr key={t.kind+"|"+t.cod}>
+                          <td className="td-terr"><span className="td-tn">{t.nom}</span></td>
+                          {DATA.indicadores.map(ind=>{const items=rosters[ti].filter(u=>u.gse===g);
+                            return <td key={ind.id}><StackedBar rep={repartoInd(items,ind.id,cmpGrado,agno)}/></td>;})}
+                        </tr>))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>))}
+      </div>);
+  }
+
+  // ===== Andamiaje de navegacion: 3 pantallas (rediseno Fase 1; completado en Fase 4) =====
+  // Las 3 pantallas estan funcionales: territorio (panorama por GSE), ficha (todo
+  // desplegado) y comparar (matriz territorios x GSE x indicador). Ya no quedan
+  // stubs "en construccion"; el unico estado vacio es la invitacion de la ficha
+  // cuando no hay establecimiento seleccionado.
   const PANTALLAS=[["territorio","Panorama territorial"],
                    ["ficha","Panorama IDPS por establecimiento"],
                    ["comparar","Comparación entre territorios"]];
-  function ScreenStub({titulo}){
-    return (
-      <div className="screen-stub">
-        <div className="screen-stub-title">{titulo}</div>
-        <div className="screen-stub-msg">En construcción · próxima fase</div>
-      </div>);
-  }
 
   // ===== Navegacion territorial via EntityModal: region/comuna/dependencia/EE =====
   function App(){
@@ -929,6 +1082,17 @@ __FONTS_CSS__
     const [rbdSel,setRbdSel]=useState(null);
     const [pantalla,setPantalla]=useState("territorio");   // Fase 3: entrada = panorama territorial (grilla por GSE)
     const [vistaFicha,setVistaFicha]=useState("actual");   // Fase 2: vista de la ficha (actual|historica), local a la pantalla
+    // Fase 4 — estado del comparador (independiente del picker territorial). Chip
+    // inicial: el SLEP foco (Costa Central). Nivel propio (cmpGrado) y set de GSE
+    // visibles propio (todos al abrir). agnoCmp = año mas reciente del grado a
+    // nivel del dato (no hay selector de año; D-s8-1).
+    const [cmpTerr,setCmpTerr]=useState(()=>SLEP_FOCO!=null
+      ? [{kind:"slep",cod:SLEP_FOCO,nom:"SLEP "+SLEP_FOCO_NOM}]
+      : [{kind:"region",cod:(DATA.meta.region_foco||DATA.regiones[0].cod),nom:regNom(DATA.meta.region_foco||DATA.regiones[0].cod)}]);
+    const [cmpGrado,setCmpGrado]=useState(grados.includes("4b")?"4b":grados[0]);
+    const [cmpGseVis,setCmpGseVis]=useState(()=>new Set(DATA.meta.gse));
+    const [cmpModalOpen,setCmpModalOpen]=useState(false);
+    const agnoCmp=(DATA.meta.grado_anios[cmpGrado]||[]).at(-1);
     // Abrir la ficha de un EE desde la grilla territorial (setea EE y salta de pantalla).
     const irFicha=r=>{setRbdSel(r);setPantalla("ficha");};
 
@@ -945,6 +1109,19 @@ __FONTS_CSS__
       else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod});
       else if(item.kind==="dependencia") setDep(item.cod);
       else if(item.kind==="establecimiento"){setRbdSel(item.cod);setPantalla("ficha");}};
+
+    // Comparador: el modal AGREGA un territorio a la lista (no acota como onPick).
+    // Valida max 4 y no-duplicado por kind+cod (D-s8-3); guarda el nombre de
+    // presentacion ya resuelto por buildListCmp (sin la ★ del marcador de foco).
+    const addTerr=item=>{setCmpModalOpen(false);
+      setCmpTerr(prev=>{
+        if(prev.length>=4) return prev;
+        const k=t=>t.kind+"|"+t.cod;
+        if(prev.some(t=>k(t)===k(item))) return prev;
+        return [...prev,{kind:item.kind,cod:item.cod,nom:(item.nom||"").replace(" ★","")}];
+      });};
+    const removeTerr=(kind,cod)=>setCmpTerr(prev=>prev.filter(t=>!(t.kind===kind&&t.cod===cod)));
+    const toggleCmpGse=g=>setCmpGseVis(prev=>{const n=new Set(prev);n.has(g)?n.delete(g):n.add(g);return n;});
 
     // roster del territorio seleccionado, para (grado, agno). El territorio y la
     // dependencia solo ACOTAN la lista (continue); jamas agregan una cifra.
@@ -978,8 +1155,9 @@ __FONTS_CSS__
               onClick={()=>setPantalla(k)}>{lbl}</button>))}
         </div>
 
-        {/* Paso 4 — franja de picker territorial, visible en las 3 pantallas */}
-        <div className="picker-strip">
+        {/* Paso 4 — franja de picker territorial. Visible en territorio y ficha;
+            OCULTA en comparar (el comparador tiene su propia seleccion por chips). */}
+        {pantalla!=="comparar" && <div className="picker-strip">
           <div className="ctl"><label>Territorio / dependencia</label>
             <button className="nav-trigger" onClick={()=>setModalOpen(true)} aria-label="Abrir selector de territorio o dependencia">Explorar / cambiar selección ▾</button></div>
           <div className="nav-sel">
@@ -987,12 +1165,14 @@ __FONTS_CSS__
             {dep && <span className="sel-chip"><span className="k">dependencia</span> {DEPE[dep]} <button onClick={()=>setDep("")} aria-label="Quitar filtro de dependencia">✕</button></span>}
             {SLEP_FOCO!=null && (terr.kind!=="foco"||dep) && <button className="sel-link" onClick={()=>{setTerr(FOCO_INICIAL);setDep("");}}>volver a {SLEP_FOCO_NOM}</button>}
           </div>
-        </div>
+        </div>}
 
         {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
+        {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={buildListCmp} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar territorio a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}/>}
 
         {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
-        {pantalla==="comparar" && <ScreenStub titulo="Comparación entre territorios"/>}
+        {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
+          onNivel={setCmpGrado} onToggleGse={toggleCmpGse} onRemove={removeTerr} onAdd={()=>setCmpModalOpen(true)}/>}
 
         {/* Paso 3-5 — PANORAMA TERRITORIAL: controles + secciones por GSE
             (encabezado + barras apiladas de estado vs GSE + grilla mini-radar). */}
