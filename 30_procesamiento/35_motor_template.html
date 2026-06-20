@@ -31,9 +31,19 @@ __FONTS_CSS__
   body{margin:0;background:var(--cream);color:var(--tinta);
     font-family:var(--font-body);font-size:var(--fs-base);line-height:1.5;}
   h1,h2,h3,.gob{font-family:"gobCL","Museo Sans",system-ui,sans-serif;}
-  header.app{background:var(--azul);color:#fff;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
-  header.app h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.4px;}
-  header.app .sub{font-size:12px;opacity:.85;max-width:760px;}
+  /* Header tipo referencia (eyebrow + titulo display + subtitulo + objetivo); azul gobCL + cream */
+  header.app{background:var(--azul);color:var(--cream);padding:30px 28px 26px;}
+  .app-header-inner{max-width:1320px;margin:0 auto;}
+  .brand-eyebrow-row{display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap;}
+  .brand-eyebrow{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-xs);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--cream);opacity:.92;}
+  .brand-eyebrow-muted{opacity:.55;font-weight:var(--fw-medium);}
+  .brand-divider{color:var(--cream);opacity:.35;font-size:var(--fs-xs);}
+  .app-title{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-display);letter-spacing:-.01em;color:var(--cream);line-height:1.07;margin:0 0 9px;}
+  .app-title-sub{font-family:var(--font-display);font-weight:var(--fw-regular);font-size:var(--fs-h1);color:var(--cream);opacity:.72;letter-spacing:0;}
+  .app-subtitle{font-family:var(--font-body);color:rgba(255,246,224,.62);margin:0;font-size:var(--fs-sm);line-height:1.5;font-weight:var(--fw-medium);letter-spacing:.01em;}
+  .app-objective{font-family:var(--font-body);color:rgba(255,246,224,.82);margin:16px 0 0;font-size:var(--fs-base);line-height:1.55;padding-top:16px;border-top:1px solid rgba(255,246,224,.15);max-width:900px;}
+  .app-objective strong{font-weight:var(--fw-bold);color:var(--cream);}
+  .app-objective-note{display:block;margin-top:9px;font-size:var(--fs-sm);line-height:1.5;color:rgba(255,246,224,.6);max-width:760px;}
   .wrap{max-width:1320px;margin:0 auto;padding:16px 24px 70px;}
 
   .nav{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;margin-bottom:14px;box-shadow:var(--sombra);}
@@ -185,8 +195,16 @@ __FONTS_CSS__
 </head>
 <body>
   <header class="app">
-    <h1>Motor IDPS</h1>
-    <span class="sub">Indicadores de Desarrollo Personal y Social — Agencia de Calidad de la Educación · dato por establecimiento educacional de todo Chile, leído vs su grupo socioeconómico (GSE). Sin agregación territorial.</span>
+    <div class="app-header-inner">
+      <div class="brand-eyebrow-row">
+        <span class="brand-eyebrow">Agencia de Calidad de la Educación</span>
+        <span class="brand-divider">·</span>
+        <span class="brand-eyebrow brand-eyebrow-muted">Motor IDPS</span>
+      </div>
+      <h1 class="app-title">Indicadores de Desarrollo Personal y Social<span class="app-title-sub"> — por establecimiento, leído vs su GSE</span></h1>
+      <p class="app-subtitle">Cuestionarios de Calidad y Contexto · 4° básico y 2° medio · establecimientos de todo Chile</p>
+      <p class="app-objective">Cada establecimiento se lee por su <strong>desvío vs su grupo socioeconómico (GSE)</strong> y su <strong>variación vs la evaluación anterior</strong>, con la significancia que entrega la Agencia.<span class="app-objective-note">Sin agregación territorial: el territorio y la dependencia acotan la lista de establecimientos, nunca promedian una cifra.</span></p>
+    </div>
   </header>
   <div id="root"></div>
   <div class="tt" id="tt"></div>
