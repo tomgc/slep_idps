@@ -457,7 +457,7 @@ __FONTS_CSS__
   }
 
   function gseLbl(rbd,grado,agno){const b=DATA.roster,r=RIX.roster[rbd];if(!r)return "—";
-    for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno){const g=b.gse[i];return g?g+" "+(GSE[g]||""):"—";}return "—";}
+    for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno){const g=b.gse[i];return g?(GSE[g]||g):"—";}return "—";}
 
   // ===== Vista de subdimensiones (distribucion de niveles, solo EST) =====
   function SubdimView({rbd,grado,agno,dimId,nm,ciclo}){
@@ -599,7 +599,7 @@ __FONTS_CSS__
             <div className="ctl"><label>Grupo socioeconómico</label>
               <div className="gse-pills">
                 <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
-                {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{g} {GSE[g]}</button>)}</div></div>
+                {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{GSE[g]}</button>)}</div></div>
           </div>
           <div className="nav-sel">
             <span className="sel-chip"><span className="k">territorio</span> {terrTxt}</span>
@@ -620,7 +620,7 @@ __FONTS_CSS__
                 ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, grado, año y GSE.</div>
                 : grupos.map(grp=>(
                     <div className="gse-group" key={grp.gse}>
-                      <div className="gse-head"><span className="tag">GSE {grp.gse} · {GSE[grp.gse]||"sin clasificar"}</span><span className="cnt">{grp.items.length} establecimientos educacionales</span></div>
+                      <div className="gse-head"><span className="tag">GSE · {GSE[grp.gse]||"sin clasificar"}</span><span className="cnt">{grp.items.length} establecimientos educacionales</span></div>
                       <div className="grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={grado} agno={agno} onSel={setRbdSel}/>)}</div>
                     </div>))}
             </div>}
