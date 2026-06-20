@@ -59,11 +59,24 @@ NOMBRES_REGION <- c(
 )
 
 # Indicadores IDPS y sus dimensiones (id_indicador -> id_dimension).
+# Etiquetas con tildes (UTF-8). El corpus/catalogo viene en ASCII; estas etiquetas
+# de PRESENTACION restituyen la acentuacion correcta (mismo patron que
+# NOMBRES_REGION). 35_generar_motor_html.R fuerza Encoding<-"UTF-8" antes de
+# serializar a JSON para evitar mojibake en locale C (regla Bug 2).
 INDICADOR_LABELS <- c(
-  "1" = "Autoestima Academica y Motivacion Escolar",
+  "1" = "Autoestima Académica y Motivación Escolar",
   "2" = "Clima de Convivencia Escolar",
-  "3" = "Participacion y Formacion Ciudadana",
-  "4" = "Habitos de Vida Saludable"
+  "3" = "Participación y Formación Ciudadana",
+  "4" = "Hábitos de Vida Saludable"
+)
+# Etiquetas de DIMENSION con tildes (id_dimension -> nombre oficial acentuado).
+# Override de presentacion sobre dimension_nombre del catalogo (ASCII). El corpus
+# (referencia/andamio) NO se edita; aqui solo viven las etiquetas visibles.
+DIMENSION_LABELS <- c(
+  "11" = "Autopercepción y autovaloración académica", "12" = "Motivación escolar",
+  "21" = "Ambiente de respeto", "22" = "Ambiente organizado", "23" = "Ambiente seguro",
+  "31" = "Participación", "32" = "Vida democrática", "33" = "Sentido de pertenencia",
+  "41" = "Hábitos de vida activa", "42" = "Hábitos alimenticios", "43" = "Hábitos de autocuidado"
 )
 INDICADOR_DIMENSIONES <- list(
   "1" = c(11L, 12L),

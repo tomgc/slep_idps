@@ -41,8 +41,14 @@ source(here::here("10_utils", "10_configuracion.R"))
 # Paleta canonica de los 4 indicadores (madre / prototipo) y etiquetas cortas.
 INDICADOR_COLORS <- c("1" = "#EE2D49", "2" = "#FFC92E", "3" = "#9BC93E", "4" = "#2A8FD9")
 INDICADOR_CORTO  <- c("1" = "Autoestima", "2" = "Convivencia",
-                      "3" = "Participacion", "4" = "Habitos")
+                      "3" = "Participación", "4" = "Hábitos")
 REGION_FOCO <- "5"  # Valparaiso (default de navegacion; foco Costa Central)
+
+# Encoding UTF-8 defensivo sobre las etiquetas con tildes antes de serializar
+# (regla Bug 2: literales no-ASCII pueden quedar "unknown" en locale C -> mojibake).
+Encoding(INDICADOR_LABELS) <- "UTF-8"
+Encoding(INDICADOR_CORTO)  <- "UTF-8"
+Encoding(DIMENSION_LABELS) <- "UTF-8"
 
 
 # ============================================================================
@@ -96,11 +102,17 @@ indicadores_lst <- lapply(as.character(1:4), function(id) {
        definicion = if (length(d) == 0 || is.na(d)) NULL else d)
 })
 
+# Nombre de dimension: etiqueta acentuada de presentacion (DIMENSION_LABELS),
+# con fallback al nombre del catalogo (ASCII) si faltara. La definicion (P-meta)
+# se conserva 1:1 desde el catalogo, sin tocar.
 dimensiones_lst <- CAT |>
   dplyr::distinct(id_dimension, id_indicador, dimension_nombre, dimension_definicion) |>
   dplyr::arrange(id_dimension) |>
   dplyr::transmute(id = as.integer(id_dimension), id_ind = as.integer(id_indicador),
-                   nombre = dimension_nombre, definicion = dimension_definicion)
+                   nombre = dplyr::coalesce(unname(DIMENSION_LABELS[as.character(id_dimension)]),
+                                            dimension_nombre),
+                   definicion = dimension_definicion)
+Encoding(dimensiones_lst$nombre) <- "UTF-8"
 
 subdim_lst <- lapply(seq_len(nrow(CAT)), function(i) {
   r <- CAT[i, ]
