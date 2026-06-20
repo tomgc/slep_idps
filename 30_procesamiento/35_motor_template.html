@@ -75,6 +75,10 @@ __FONTS_CSS__
   .radar-cmp .leyenda{margin:0;justify-content:center;}
   .radar-cmp .cmp-label{font-size:11.5px;color:var(--gris);}
   .radar-cmp select{padding:3px 7px;font-size:12px;min-width:auto;border:1px solid var(--linea);border-radius:6px;background:#fff;font-family:inherit;}
+  /* Muestras de leyenda que REPLICAN el trazo del radar: solido (actual) vs discontinuo (comparacion) */
+  .radar-cmp .sw-line{display:inline-block;width:18px;height:0;margin-right:5px;vertical-align:3px;border-top:2.5px solid var(--azul);}
+  .radar-cmp .sw-line.cmp{border-top-style:dashed;border-top-color:#C77D3A;}
+  .radar-cmp .cmp-hint{font-size:10.5px;color:var(--gris);font-style:italic;text-align:center;max-width:34ch;}
 
   .detail{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:20px;box-shadow:var(--sombra);}
   .back{border:0;background:none;color:var(--foco);cursor:pointer;font-size:13px;padding:0;font-family:inherit;}
@@ -484,8 +488,8 @@ __FONTS_CSS__
               {nivel===0 && cmpOpts.length>0 &&
                 <div className="radar-cmp">
                   <div className="leyenda">
-                    <span><i style={{background:"var(--azul)"}}></i>{agno}{PRELIM.has(String(agno))?"*":""} · actual</span>
-                    {cmpAgno!=null && <span><i style={{background:"#C77D3A"}}></i>{cmpAgno}{PRELIM.has(String(cmpAgno))?"*":""} · comparación</span>}
+                    <span><span className="sw-line"></span>{agno}{PRELIM.has(String(agno))?"*":""} · actual</span>
+                    {cmpAgno!=null && <span><span className="sw-line cmp"></span>{cmpAgno}{PRELIM.has(String(cmpAgno))?"*":""} · comparación</span>}
                   </div>
                   <label className="cmp-label">Comparar con:{" "}
                     <select value={cmpAgno!=null?cmpAgno:""} onChange={ev=>setCmpA(ev.target.value===""?-1:Number(ev.target.value))}>
@@ -493,6 +497,8 @@ __FONTS_CSS__
                       <option value="">— sin comparación</option>
                     </select>
                   </label>
+                  {cmpAgno!=null &&
+                    <div className="cmp-hint">El puntaje en cada vértice es del año actual; el del año comparado, al pasar el mouse sobre sus puntos.</div>}
                 </div>}
               {nivel===1 && <div className="leyenda">{(dimsByInd[drillInd]||[]).map(d=>(<span key={d.id}>{d.id}. {d.nombre}</span>))}</div>}
             </div>
