@@ -64,9 +64,9 @@ SLE <- arrow::read_parquet(here::here("40_salidas", "intermedios", "sleps_chile.
 # Directorio publico = AUTORIDAD de etiquetas geograficas y de nombre de EE.
 # idps_largo trae nom_rbd/nom_com_rbd TRUNCADOS por el export de la Agencia
 # (~37 chars en EE, ~13 en comuna) y geo NA en algunos RBD; el directorio publico
-# los tiene completos y cubre el 100% de los RBD del motor. Se usa SOLO para
-# etiquetas/geo de PRESENTACION (Hallazgos H1/H2/H8). Las cifras y la dependencia
-# cod_depe2 (4-cat) NO cambian: siguen viniendo de idps_largo. Llaves character.
+# los tiene completos y cubre el 100% de los RBD del motor. Se usa para etiquetas/
+# geo/DEPENDENCIA de PRESENTACION (Hallazgos H1/H2/H8 y H6: dependencia vigente).
+# Las CIFRAS NO cambian: siguen viniendo de idps_largo. Llaves character.
 DIR <- readr::read_delim(
   here::here("20_insumos", "auxiliares", "directorio_oficial_ee_publico.csv"),
   delim = ";", locale = readr::locale(encoding = "UTF-8"),
@@ -147,17 +147,21 @@ rbds_idps <- unique(P$rbd)
 #  - nombre de EE y geografia (comuna/region/provincia): del DIRECTORIO publico
 #    (completos, sin truncar; H1/H2). Cubre el 100% de los RBD del motor y
 #    rellena los pocos RBD con geo NA en idps_largo (H8). Llave rbd character.
-#  - cod_depe2 (dependencia 4-cat) y cod_slep: NO cambian (idps_largo / sleps_chile).
+#  - cod_depe2 (dependencia 4-cat): VIGENTE del directorio (H6, homologada 5->4).
+#  - cod_slep: de sleps_chile.
 estab_slep <- SLE |> dplyr::distinct(rbd, cod_slep, nombre_slep)
 dir_attr <- DIR |>
   dplyr::transmute(rbd = as.character(RBD), nom_dir = NOM_RBD,
                    cod_com_dir = as.character(COD_COM_RBD),
                    cod_reg_dir = as.character(COD_REG_RBD),
-                   cod_pro_dir = as.character(COD_PRO_RBD)) |>
+                   cod_pro_dir = as.character(COD_PRO_RBD),
+                   # Dependencia VIGENTE (actual) del directorio, homologada 5->4 (H6).
+                   cod_depe2_dir = unname(CW_DEPE_DIRECTORIO_A_IDPS[as.character(COD_DEPE2)])) |>
   dplyr::distinct(rbd, .keep_all = TRUE)
 
 est_attr <- P |>
   dplyr::distinct(rbd, nom_rbd, cod_com_rbd, cod_reg_rbd, cod_pro_rbd, cod_depe2) |>
+  dplyr::rename(cod_depe2_idps = cod_depe2) |>
   dplyr::left_join(dir_attr, by = "rbd") |>
   dplyr::transmute(
     rbd,
@@ -166,8 +170,24 @@ est_attr <- P |>
     cod_com = dplyr::coalesce(cod_com_dir, cod_com_rbd),
     cod_reg = dplyr::coalesce(cod_reg_dir, cod_reg_rbd),
     cod_pro = dplyr::coalesce(cod_pro_dir, cod_pro_rbd),
-    cod_depe2) |>
+    # Dependencia VIGENTE del directorio (H6); fallback al valor por-evaluacion
+    # de idps_largo solo si el directorio no cubre el RBD.
+    cod_depe2 = dplyr::coalesce(cod_depe2_dir, cod_depe2_idps)) |>
   dplyr::left_join(estab_slep, by = "rbd")
+
+# Validacion H6: reporta el delta de dependencia (vigente vs por-evaluacion) y
+# asegura que ningun RBD del motor pierde dependencia (coalesce cubre los faltantes).
+depe2_idps_rbd <- P |> dplyr::distinct(rbd, cod_depe2) |> dplyr::rename(depe2_idps = cod_depe2)
+chk_h6 <- est_attr |> dplyr::distinct(rbd, cod_depe2) |>
+  dplyr::left_join(depe2_idps_rbd, by = "rbd")
+n_sin_dep <- sum(is.na(chk_h6$cod_depe2))
+n_recl    <- sum(!is.na(chk_h6$cod_depe2) & !is.na(chk_h6$depe2_idps) &
+                   chk_h6$cod_depe2 != chk_h6$depe2_idps)
+stopifnot("H6: hay RBD del motor sin dependencia resuelta" = n_sin_dep == 0)
+fmt_tab <- function(x) paste(sprintf("%s=%d", names(table(x)), as.integer(table(x))), collapse = ", ")
+message(sprintf("[H6] Dependencia reclasificada en %d RBD (vigencia actual del directorio).", n_recl))
+message(sprintf("     antes (idps): %s", fmt_tab(chk_h6$depe2_idps)))
+message(sprintf("     ahora (dir):  %s", fmt_tab(chk_h6$cod_depe2)))
 
 establecimientos_lst <- est_attr |>
   dplyr::transmute(rbd, nom, cod_com, cod_reg, cod_slep, cod_depe2) |>
@@ -211,7 +231,9 @@ message("[3] Datos columnares (nacional, ordenados por rbd)...")
 
 roster <- P |>
   dplyr::filter(.data$familia == "indicador") |>
-  dplyr::distinct(rbd, grado, agno, cod_grupo, cod_depe2) |>
+  dplyr::distinct(rbd, grado, agno, cod_grupo) |>
+  # Dependencia VIGENTE del directorio (H6), coherente con establecimientos_lst.
+  dplyr::left_join(dplyr::distinct(est_attr, rbd, cod_depe2), by = "rbd") |>
   dplyr::arrange(rbd, grado, agno)
 roster_lst <- list(rows = nrow(roster), rbd = roster$rbd, grado = roster$grado,
                    agno = as.integer(roster$agno), gse = roster$cod_grupo, depe2 = roster$cod_depe2)
