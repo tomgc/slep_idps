@@ -35,7 +35,7 @@ library(here)
 library(fs)
 
 source(here::here("10_utils", "10_utils.R"))
-instalar_si_falta(c("dplyr", "arrow", "jsonlite"))
+instalar_si_falta(c("dplyr", "arrow", "jsonlite", "readr"))
 source(here::here("10_utils", "10_configuracion.R"))
 
 # Paleta canonica de los 4 indicadores (madre / prototipo) y etiquetas cortas.
@@ -54,6 +54,18 @@ P   <- arrow::read_parquet(here::here("40_salidas", "intermedios", "idps_largo.p
 CAT <- arrow::read_parquet(here::here("40_salidas", "intermedios", "catalogo_idps.parquet"))
 COM <- arrow::read_parquet(here::here("40_salidas", "intermedios", "comunas_chile.parquet"))
 SLE <- arrow::read_parquet(here::here("40_salidas", "intermedios", "sleps_chile.parquet"))
+
+# Directorio publico = AUTORIDAD de etiquetas geograficas y de nombre de EE.
+# idps_largo trae nom_rbd/nom_com_rbd TRUNCADOS por el export de la Agencia
+# (~37 chars en EE, ~13 en comuna) y geo NA en algunos RBD; el directorio publico
+# los tiene completos y cubre el 100% de los RBD del motor. Se usa SOLO para
+# etiquetas/geo de PRESENTACION (Hallazgos H1/H2/H8). Las cifras y la dependencia
+# cod_depe2 (4-cat) NO cambian: siguen viniendo de idps_largo. Llaves character.
+DIR <- readr::read_delim(
+  here::here("20_insumos", "auxiliares", "directorio_oficial_ee_publico.csv"),
+  delim = ";", locale = readr::locale(encoding = "UTF-8"),
+  show_col_types = FALSE, progress = FALSE,
+  col_types = readr::cols(.default = readr::col_character()))
 
 # Filtro de PRESENTACION (decision de alcance): el motor expone solo GRADOS_MOTOR
 # (4b/2m). El dato completo de los 4 grados permanece intacto en idps_largo.parquet;
@@ -119,39 +131,60 @@ subdim_lst <- lapply(seq_len(nrow(CAT)), function(i) {
 # navegacion no ofrezca ramas vacias.
 rbds_idps <- unique(P$rbd)
 
-# Atributos canonicos por establecimiento (ya homologados en 34): region, comuna,
-# dependencia, nombre. cod_slep desde sleps_chile (mapeo rbd->SLEP).
+# Atributos de PRESENTACION por establecimiento:
+#  - nombre de EE y geografia (comuna/region/provincia): del DIRECTORIO publico
+#    (completos, sin truncar; H1/H2). Cubre el 100% de los RBD del motor y
+#    rellena los pocos RBD con geo NA en idps_largo (H8). Llave rbd character.
+#  - cod_depe2 (dependencia 4-cat) y cod_slep: NO cambian (idps_largo / sleps_chile).
 estab_slep <- SLE |> dplyr::distinct(rbd, cod_slep, nombre_slep)
+dir_attr <- DIR |>
+  dplyr::transmute(rbd = as.character(RBD), nom_dir = NOM_RBD,
+                   cod_com_dir = as.character(COD_COM_RBD),
+                   cod_reg_dir = as.character(COD_REG_RBD),
+                   cod_pro_dir = as.character(COD_PRO_RBD)) |>
+  dplyr::distinct(rbd, .keep_all = TRUE)
+
 est_attr <- P |>
-  dplyr::distinct(rbd, nom_rbd, cod_com_rbd, nom_com_rbd, cod_reg_rbd, nom_reg_rbd, cod_depe2) |>
+  dplyr::distinct(rbd, nom_rbd, cod_com_rbd, cod_reg_rbd, cod_pro_rbd, cod_depe2) |>
+  dplyr::left_join(dir_attr, by = "rbd") |>
+  dplyr::transmute(
+    rbd,
+    # Directorio = autoridad; fallback al dato IDPS solo si faltara (no deberia).
+    nom     = dplyr::coalesce(nom_dir, nom_rbd),
+    cod_com = dplyr::coalesce(cod_com_dir, cod_com_rbd),
+    cod_reg = dplyr::coalesce(cod_reg_dir, cod_reg_rbd),
+    cod_pro = dplyr::coalesce(cod_pro_dir, cod_pro_rbd),
+    cod_depe2) |>
   dplyr::left_join(estab_slep, by = "rbd")
 
 establecimientos_lst <- est_attr |>
-  dplyr::transmute(rbd, nom = nom_rbd, cod_com = cod_com_rbd,
-                   cod_reg = cod_reg_rbd, cod_slep, cod_depe2) |>
+  dplyr::transmute(rbd, nom, cod_com, cod_reg, cod_slep, cod_depe2) |>
   dplyr::arrange(cod_reg, cod_com, nom)
 
-# Etiqueta de region desde NOMBRES_REGION (fuente unica, con tildes), no del
-# nom_reg_rbd del parquet. Encoding UTF-8 forzado antes de serializar (Bug 2).
+# Etiqueta de region desde NOMBRES_REGION (fuente unica, con tildes). Encoding
+# UTF-8 forzado antes de serializar (Bug 2).
 regiones_lst <- est_attr |>
-  dplyr::distinct(cod_reg_rbd, nom_reg_rbd) |>
-  dplyr::filter(!is.na(cod_reg_rbd)) |>
-  dplyr::transmute(cod = cod_reg_rbd,
-                   nom = dplyr::coalesce(unname(NOMBRES_REGION[cod_reg_rbd]), nom_reg_rbd)) |>
+  dplyr::distinct(cod_reg) |>
+  dplyr::filter(!is.na(cod_reg)) |>
+  dplyr::transmute(cod = cod_reg,
+                   nom = dplyr::coalesce(unname(NOMBRES_REGION[cod_reg]), cod_reg)) |>
   dplyr::arrange(suppressWarnings(as.integer(cod)))
 Encoding(regiones_lst$nom) <- "UTF-8"
 
-comunas_lst <- est_attr |>
-  dplyr::distinct(cod_com_rbd, nom_com_rbd, cod_reg_rbd) |>
-  dplyr::transmute(cod = cod_com_rbd, nom = nom_com_rbd, cod_reg = cod_reg_rbd) |>
-  dplyr::filter(!is.na(cod)) |>
+# Comuna: nombre COMPLETO del catalogo territorial (comunas_chile, ex-directorio),
+# no la copia truncada de idps_largo (H1). Solo comunas con EE en el motor.
+coms_motor <- unique(est_attr$cod_com)
+comunas_lst <- COM |>
+  dplyr::transmute(cod = as.character(cod_com_rbd), nom = nom_com_rbd,
+                   cod_reg = as.character(cod_reg_rbd)) |>
+  dplyr::filter(cod %in% coms_motor) |>
+  dplyr::distinct(cod, .keep_all = TRUE) |>
   dplyr::arrange(nom)
 
-# SLEPs con datos, con su region (via las comunas de sus establecimientos).
+# SLEPs con datos, con su region (via la geo del directorio).
 sleps_lst <- est_attr |>
   dplyr::filter(!is.na(cod_slep)) |>
-  dplyr::distinct(cod_slep, nombre_slep, cod_reg_rbd) |>
-  dplyr::transmute(cod_slep, nombre_slep, cod_reg = cod_reg_rbd) |>
+  dplyr::distinct(cod_slep, nombre_slep, cod_reg) |>
   dplyr::distinct() |>
   dplyr::arrange(nombre_slep)
 
