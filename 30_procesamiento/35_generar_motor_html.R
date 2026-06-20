@@ -131,11 +131,15 @@ establecimientos_lst <- est_attr |>
                    cod_reg = cod_reg_rbd, cod_slep, cod_depe2) |>
   dplyr::arrange(cod_reg, cod_com, nom)
 
+# Etiqueta de region desde NOMBRES_REGION (fuente unica, con tildes), no del
+# nom_reg_rbd del parquet. Encoding UTF-8 forzado antes de serializar (Bug 2).
 regiones_lst <- est_attr |>
   dplyr::distinct(cod_reg_rbd, nom_reg_rbd) |>
-  dplyr::transmute(cod = cod_reg_rbd, nom = nom_reg_rbd) |>
-  dplyr::filter(!is.na(cod)) |>
+  dplyr::filter(!is.na(cod_reg_rbd)) |>
+  dplyr::transmute(cod = cod_reg_rbd,
+                   nom = dplyr::coalesce(unname(NOMBRES_REGION[cod_reg_rbd]), nom_reg_rbd)) |>
   dplyr::arrange(suppressWarnings(as.integer(cod)))
+Encoding(regiones_lst$nom) <- "UTF-8"
 
 comunas_lst <- est_attr |>
   dplyr::distinct(cod_com_rbd, nom_com_rbd, cod_reg_rbd) |>

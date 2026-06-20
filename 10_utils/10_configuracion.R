@@ -47,12 +47,15 @@ GSE_LABELS <- c(
 )
 
 # Nombres oficiales de region por codigo (para limpiar nom_reg_rbd).
+# Nombres oficiales de region con tildes/enie (UTF-8). 35_generar_motor_html.R
+# fuerza Encoding<-"UTF-8" sobre estas etiquetas antes de serializar (regla Bug 2).
+# Se usan formas cortas para que combinen con el prefijo "Región de ..." del motor.
 NOMBRES_REGION <- c(
-  "1" = "Tarapaca", "2" = "Antofagasta", "3" = "Atacama", "4" = "Coquimbo",
-  "5" = "Valparaiso", "6" = "O'Higgins", "7" = "Maule", "8" = "Biobio",
-  "9" = "La Araucania", "10" = "Los Lagos", "11" = "Aysen", "12" = "Magallanes",
-  "13" = "Metropolitana", "14" = "Los Rios", "15" = "Arica y Parinacota",
-  "16" = "Nuble"
+  "1" = "Tarapacá", "2" = "Antofagasta", "3" = "Atacama", "4" = "Coquimbo",
+  "5" = "Valparaíso", "6" = "O'Higgins", "7" = "Maule", "8" = "Biobío",
+  "9" = "La Araucanía", "10" = "Los Lagos", "11" = "Aysén", "12" = "Magallanes",
+  "13" = "Metropolitana", "14" = "Los Ríos", "15" = "Arica y Parinacota",
+  "16" = "Ñuble"
 )
 
 # Indicadores IDPS y sus dimensiones (id_indicador -> id_dimension).
