@@ -211,6 +211,111 @@ __FONTS_CSS__
   .ring{fill:none;stroke:var(--linea);}
   .tt{position:fixed;background:#23303a;color:#fff;font-size:11px;padding:5px 8px;border-radius:5px;pointer-events:none;display:none;z-index:80;max-width:260px;}
   code{background:#eee5cf;padding:0 4px;border-radius:3px;font-size:11px;}
+
+  /* ============================================================
+     Rediseño Fase 2 — Ficha "todo desplegado" (radar de 4 indicadores +
+     paneles indicador->dimension->subdimension + toggle vista actual/historica).
+     Portado de Propuesta IDPS.html (clases .ficha-, .indp, .dimb, .sub, .rcard,
+     .rquad, .hist-wrap), adaptando los nombres de variable a los tokens del motor.
+     La PALETA de 4 indicadores y la identidad gobCL+cream quedan INTACTAS.
+     ============================================================ */
+  /* Barra de identidad del establecimiento (oscura) + herramientas (Vista/Grado/Año) */
+  .ficha-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;
+    background:var(--azul);color:var(--cream);padding:18px 22px;border-radius:var(--radius-3) var(--radius-3) 0 0;}
+  .ficha-id{flex:1;min-width:0;}
+  .ficha-back{appearance:none;background:none;border:0;color:rgba(255,246,224,.85);font-family:inherit;
+    font-size:var(--fs-sm);font-weight:var(--fw-medium);cursor:pointer;padding:0 0 7px;text-decoration:underline;text-underline-offset:3px;}
+  .ficha-back:hover{color:#fff;}
+  .ficha-name{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-h1);line-height:1.12;color:var(--cream);}
+  /* RBD en linea aparte, sin negrita, sin parentesis (invariante) */
+  .ficha-rbd{display:block;font-family:var(--font-body);font-weight:var(--fw-regular);font-size:var(--fs-base);margin-top:2px;opacity:.9;}
+  .ficha-meta{font-size:var(--fs-sm);opacity:.82;margin-top:4px;}
+  .ficha-tools{display:flex;flex-direction:row;gap:16px;align-items:flex-end;flex-wrap:wrap;justify-content:flex-end;}
+  /* Segmentador para barra oscura (cream translucido); misma estetica para Vista/Grado/Año */
+  .nivelsel{display:flex;flex-direction:column;gap:6px;}
+  .nivelsel-lab{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-xs);
+    letter-spacing:var(--tracking-overline);text-transform:uppercase;color:rgba(255,246,224,.74);}
+  .seg-lvl{display:inline-flex;background:var(--cream-200);border:1px solid var(--linea);border-radius:var(--radius-2);padding:3px;}
+  .seg-lvl .lvl-b{background:transparent;border:0;font:inherit;font-weight:var(--fw-bold);font-size:var(--fs-base);
+    color:var(--gris);padding:6px 14px;border-radius:var(--radius-1);cursor:pointer;white-space:nowrap;transition:background .12s,color .12s;}
+  .seg-lvl .lvl-b.on{background:var(--paper);color:var(--azul);box-shadow:var(--shadow-1);}
+  .seg-lvl .lvl-b.is-off{opacity:.45;cursor:not-allowed;text-decoration:line-through;}
+  .seg-lvl.big{background:rgba(255,246,224,.12);border-color:rgba(255,246,224,.28);}
+  .seg-lvl.big .lvl-b{color:rgba(255,246,224,.7);}
+  .seg-lvl.big .lvl-b.on{background:var(--cream);color:var(--azul);}
+  /* Tarjeta que envuelve el contenido de la ficha (bajo la barra oscura) */
+  .ficha-card{background:var(--panel);border:1px solid var(--linea);border-top:0;
+    border-radius:0 0 var(--radius-3) var(--radius-3);overflow:hidden;box-shadow:var(--shadow-1);}
+  .ficha-explain{background:#eef3f7;border-bottom:1px solid #d4e2ec;padding:12px 22px;font-size:12.5px;line-height:1.55;color:#3d5566;}
+  .ficha-explain b{color:var(--azul);}
+  /* Radar (solo 4 indicadores) + 4 tarjetas por vertice */
+  .ficha-radar{padding:18px 22px 18px;border-bottom:1px solid var(--linea);background:var(--panel);}
+  .fr-head{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-sm);letter-spacing:.01em;color:var(--gris);text-align:center;}
+  .fr-note{font-size:11.5px;color:var(--gris);text-align:center;max-width:640px;margin:10px auto 0;line-height:1.5;}
+  .rquad{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto auto;
+    align-items:center;justify-items:center;gap:10px 16px;max-width:880px;margin:12px auto 0;}
+  .rquad-svg{grid-column:2;grid-row:2;width:300px;height:300px;display:flex;align-items:center;justify-content:center;}
+  .rcard{display:flex;flex-direction:column;gap:7px;background:var(--paper);border:1px solid var(--linea);
+    border-radius:var(--radius-2);padding:9px 11px;box-shadow:var(--shadow-1);max-width:280px;width:100%;}
+  .rcard.pos-top{grid-column:2;grid-row:1;} .rcard.pos-bottom{grid-column:2;grid-row:3;}
+  .rcard.pos-left{grid-column:1;grid-row:2;justify-self:end;} .rcard.pos-right{grid-column:3;grid-row:2;justify-self:start;}
+  .rcard-top{display:flex;gap:8px;align-items:flex-start;}
+  .rcard-dot{width:12px;height:12px;border-radius:3px;margin-top:2px;flex:none;}
+  .rcard-tt{min-width:0;}
+  .rcard-name{font-weight:var(--fw-bold);font-size:12.5px;line-height:1.18;display:block;color:var(--tinta);}
+  .rcard-vals{font-size:11px;color:var(--gris);display:block;margin-top:2px;}
+  .rcard-vals b{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:16px;color:var(--tinta);}
+  .rcard-vals .u{font-size:9px;margin-left:1px;}
+  .rcard-anc{display:flex;flex-wrap:wrap;gap:6px;}
+  @media(max-width:760px){
+    .rquad{grid-template-columns:1fr;}
+    .rquad-svg{grid-column:1;grid-row:auto;}
+    .rcard,.rcard.pos-top,.rcard.pos-right,.rcard.pos-bottom,.rcard.pos-left{grid-column:1;grid-row:auto;justify-self:stretch;max-width:none;}
+  }
+  /* Paneles por indicador (todo desplegado) */
+  .ficha-panels-head{padding:14px 22px 0;}
+  .ficha-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:12px 22px 24px;}
+  @media(max-width:980px){.ficha-panels{grid-template-columns:1fr;}}
+  .indp{border:1px solid var(--linea);border-top:3px solid var(--ic,var(--azul));border-radius:var(--radius-3);background:var(--paper);overflow:hidden;}
+  .indp-head{display:flex;align-items:center;gap:11px;padding:14px 16px 10px;}
+  .indp-dot{width:15px;height:15px;border-radius:4px;flex:none;}
+  .indp-tt{flex:1;min-width:0;}
+  .indp-name{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:16px;line-height:1.15;color:var(--tinta);}
+  .indp-sub{font-size:11.5px;color:var(--gris);margin-top:3px;}
+  .indp-score{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:24px;color:var(--tinta);}
+  .indp-score .u{font-size:12px;color:var(--gris);font-weight:var(--fw-regular);}
+  .indp-anc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 16px 12px;}
+  .indp-def{padding:0 16px 12px;border-bottom:1px solid var(--linea);}
+  .indp-body{padding:4px 16px 10px;}
+  .dimb{padding:14px 0;border-bottom:1px solid var(--linea);}
+  .dimb:last-child{border-bottom:0;}
+  .dim-head{display:flex;align-items:center;gap:9px;}
+  .dim-name{font-weight:var(--fw-bold);font-size:13.5px;flex:1;min-width:0;color:var(--tinta);}
+  .dim-score{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:16px;color:var(--tinta);}
+  .dim-score .u{font-size:10px;color:var(--gris);font-weight:var(--fw-regular);}
+  .dim-bar{margin-top:8px;}
+  .dim-anc{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:9px;}
+  .subs{margin-top:13px;display:flex;flex-direction:column;gap:12px;padding-left:13px;border-left:2px solid var(--cream-200);}
+  .sub-head{display:flex;align-items:baseline;gap:7px;}
+  .sub-name{font-weight:var(--fw-bold);font-size:12px;color:var(--tinta);line-height:1.25;}
+  .sw{width:12px;height:12px;border-radius:3px;flex:none;} .sw.sm{width:11px;height:11px;} .sw.xs{width:9px;height:9px;border-radius:2px;}
+  /* Barra de puntaje 0-100 (SOLO el prom del establecimiento; SIN marca de GSE,
+     invariante "lee, no deriva" — ver ScoreBar en el script) */
+  .sbar{position:relative;}
+  .sbar-track{position:relative;height:22px;background:var(--cream-200);border:1px solid var(--linea);border-radius:var(--radius-2);overflow:hidden;}
+  .sbar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:4px 0 0 4px;min-width:2px;}
+  /* Vista historica (small-multiples por indicador + sus dimensiones) */
+  .hist-ind{border:1px solid var(--linea);border-top:3px solid var(--ic,var(--azul));border-radius:var(--radius-3);
+    background:var(--paper);margin:0 22px 16px;box-shadow:var(--shadow-1);}
+  .hist-ind:first-of-type{margin-top:16px;}
+  .hist-ind-h{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--linea);}
+  .hist-ind-name{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:16px;color:var(--tinta);}
+  .hist-main{padding:12px 16px 4px;}
+  .hist-main .evol-panel{border:0;padding:0;}
+  .hist-dims-lab{font-size:var(--fs-xs);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);padding:4px 16px 0;}
+  .hist-dims{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:6px 16px 16px;}
+  @media(max-width:900px){.hist-dims{grid-template-columns:1fr;}}
+  .nota-inv{margin:14px 22px;}
 </style>
 </head>
 <body>
@@ -375,24 +480,8 @@ __FONTS_CSS__
       <span style={{fontSize:"9px",opacity:.8}}>{significativo?"· sig.":"· n.s."}</span></div>;
   }
 
-  // ===== Fila de indicador/dimension con doble ancla (GSE protagonista) =====
-  function AnchorRow({color,nombre,d,definicion,onClick}){
-    return (
-      <div className={"anchor-row"+(onClick?"":" flat")} onClick={onClick}>
-        <div className="ar-top">
-          <span className="ar-sw" style={{background:color}}></span>
-          <span className="ar-nom">{nombre}</span>
-          {onClick && <span className="go">ver ›</span>}
-          <span className="ar-prom">{d&&d.prom!=null?fmt(d.prom):<span className="sup" style={{fontSize:13}}>sin dato</span>}{d&&d.prom!=null&&<span className="u"> /100</span>}</span>
-        </div>
-        {d&&d.prom!=null &&
-          <div className="anclas">
-            <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>
-            <Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/>
-          </div>}
-        <Definicion texto={definicion}/>
-      </div>);
-  }
+  // (AnchorRow eliminado en Fase 2: la lectura indicador/dimension se reorganiza
+  //  en los paneles "todo desplegado"; las anclas se arman con <Ancla/> directo.)
 
   // ===== Resumen de alertas de un establecimiento (para la tarjeta) =====
   function alertSummary(im){
@@ -431,6 +520,32 @@ __FONTS_CSS__
       return <span key={k} style={{width:val+"%",background:c}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val):""}</span>;})}</div>;
   }
 
+  // ===== Tonos derivados del color del indicador (para dimensiones) =====
+  // Portado de idps-demo.js: aclara/oscurece el color del indicador para teñir
+  // sus dimensiones. PARTE de la paleta invariante de 4 indicadores (ind.color),
+  // no introduce colores de codificacion nuevos. Degrada (devuelve el color tal
+  // cual) si el color no es un hex #rrggbb.
+  const _hx=h=>{h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];};
+  const _toHex=a=>'#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+  const _mix=(a,b,t)=>{const A=_hx(a),B=_hx(b);return _toHex(A.map((v,i)=>v+(B[i]-v)*t));};
+  const _lighten=(h,t)=>_mix(h,'#ffffff',t), _darken=(h,t)=>_mix(h,'#000000',t);
+  function dimColor(mother,di,total){if(!mother||mother[0]!=='#')return mother||"var(--azul)";
+    const t=total<=1?0.5:di/(total-1); const f=-0.05+t*0.40; return f<0?_darken(mother,-f):_lighten(mother,f);}
+
+  // ===== Barra de puntaje 0-100 (SOLO el prom del establecimiento) =====
+  // Adaptada de bar0100() del prototipo (idps-demo.js ~133) ELIMINANDO el
+  // parametro gseRef y la marca .bar-gse: el promedio ABSOLUTO del GSE no existe
+  // en el dato de la Agencia (solo difgru/sigdifgru, el DESVIO). Dibujar
+  // "GSE N puntos" exigiria derivar prom - difgru, lo que viola el invariante
+  // "lee, no deriva". El desvio vs GSE se comunica con las anclas textuales.
+  function ScoreBar({value,color}){
+    if(value==null||isNaN(value)) return <div className="sup" style={{fontSize:11}}>sin dato</div>;
+    return (
+      <div className="sbar"><div className="sbar-track">
+        <div className="sbar-fill" style={{width:Math.max(0,Math.min(100,value))+"%",background:color}}></div>
+      </div></div>);
+  }
+
   // serie completa de una metrica (indicador o dimension) por anio: prom + dif +
   // sigdif (vs evaluacion anterior, LEIDOS de la Agencia, no calculados).
   function serieFull(ofFn,rbd,grado,id,anios){return anios.map(a=>{const d=ofFn(rbd,grado,a)[id]||{};
@@ -438,7 +553,7 @@ __FONTS_CSS__
 
   // ===== Panel de evolucion de UNA metrica: linea eje FIJO 0-100 (sin autoescala,
   //       sin interpolar huecos) + marcas inter-anuales (dif absoluto + sigdif). =====
-  function PanelEvolucion({nombre,color,pts}){
+  function PanelEvolucion({nombre,color,pts,hideHead}){
     const ref=useRef(null);
     useEffect(()=>{const el=ref.current;el.innerHTML="";
       const anios=pts.map(p=>String(p.a));
@@ -458,7 +573,7 @@ __FONTS_CSS__
     const marcas=pts.filter(p=>p.dif!=null);   // anios con cambio vs evaluacion anterior
     return (
       <div className="evol-panel">
-        <div className="evol-h"><span className="evol-sw" style={{background:color}}></span>{nombre}</div>
+        {!hideHead && <div className="evol-h"><span className="evol-sw" style={{background:color}}></span>{nombre}</div>}
         <div ref={ref}></div>
         <div className="evol-marks">
           {marcas.length===0
@@ -473,19 +588,98 @@ __FONTS_CSS__
       </div>);
   }
 
-  // ===== Detalle de establecimiento con drill-down indicador->dimension->subdim =====
-  function Detalle({rbd,grado,agno,onBack}){
-    const [drillInd,setDrillInd]=useState(null);
-    const [drillDim,setDrillDim]=useState(null);
-    const [cmpA,setCmpA]=useState(null);              // II.6 — anio de comparacion en el radar (-1 = ninguno)
-    useEffect(()=>{setDrillInd(null);setDrillDim(null);setCmpA(null);},[rbd,grado,agno]);
-    const e=est[rbd]; const im=indOf(rbd,grado,agno),dm=dimOf(rbd,grado,agno),nm=nivOf(rbd,grado,agno);
-    const ciclo=CICLO[grado]; const anios=DATA.meta.grado_anios[grado]||[]; const serie=anios.length>1;
+  // ===== Distribucion de niveles de las subdimensiones de UNA dimension =====
+  // Reusa DistBar (alimentado por nivOf): la subdimension es DISTRIBUCION de
+  // niveles (% bajo/medio/alto), NUNCA una barra de puntaje. Conserva el manejo
+  // de "sin dato" (resguardo estadistico) y la nota de 8° basico (sin texto
+  // cualitativo por ciclo). Logica identica a la del antiguo SubdimView.
+  function SubDist({dimId,nm,ciclo}){
+    const subs=subByDim[dimId]||[];
+    if(!subs.length) return null;
+    return (
+      <div className="subs">
+        {subs.map(s=>{const v=nm[s.id]; const txt=(s.texto&&ciclo&&s.texto[ciclo])?s.texto[ciclo]:null;
+          return (
+            <div className="sub" key={s.id}>
+              <div className="sub-head"><span className="sw xs" style={{background:"var(--linea)"}}></span><span className="sub-name">{s.nombre} <span className="actores">[{s.actores}]</span></span></div>
+              {s.definicion && <div className="defn">{s.definicion}</div>}
+              {(!v||v.bajo==null)
+                ? <div className="sup" style={{fontSize:11}}>sin dato (resguardo estadístico)</div>
+                : <DistBar v={v}/>}
+              {v&&v.bajo!=null&&txt&&<div className="nivel-txt"><b>Nivel Alto:</b> {txt.alto}</div>}
+              {v&&v.bajo!=null&&!ciclo&&<div className="nivel-txt sup">Texto de nivel no disponible para este grado (8° básico).</div>}
+            </div>);})}
+      </div>);
+  }
+
+  // ===== Bloque de una dimension: prom + barra 0-100 (SOLO establecimiento) +
+  //       UNA ancla (vs año anterior). NO hay ancla vs GSE: el dato de dimension
+  //       (dimOf) trae prom/dif/sigdif pero NO difgru/sigdifgru — el desvio vs
+  //       GSE SOLO existe a nivel indicador (invariante). Debajo, las
+  //       subdimensiones como distribucion de niveles. =====
+  function DimBlock({dimo,dimTone,dm,nm,ciclo}){
+    const dd=dm[dimo.id];
+    return (
+      <div className="dimb">
+        <div className="dim-head">
+          <span className="sw sm" style={{background:dimTone}}></span>
+          <span className="dim-name">{dimo.nombre}</span>
+          <span className="dim-score">{dd&&dd.prom!=null?fmt(dd.prom):<span className="sup" style={{fontSize:12}}>sin dato</span>}{dd&&dd.prom!=null&&<span className="u">/100</span>}</span>
+        </div>
+        <div className="dim-bar"><ScoreBar value={dd?dd.prom:null} color={dimTone}/></div>
+        {dd&&dd.prom!=null &&
+          <div className="dim-anc"><Ancla tipo="vs año anterior" dif={dd.dif} sig={dd.sigdif}/></div>}
+        {dimo.definicion && <Definicion texto={dimo.definicion} etiqueta="Sobre esta dimensión"/>}
+        <SubDist dimId={dimo.id} nm={nm} ciclo={ciclo}/>
+      </div>);
+  }
+
+  // ===== Panel de UN indicador: encabezado (prom + DOS anclas: vs GSE y vs año)
+  //       + definicion (P-meta) + todas sus dimensiones desplegadas. =====
+  function IndPanel({ind,im,dm,nm,ciclo}){
+    const d=im[ind.id]; const dims=dimsByInd[ind.id]||[];
+    const nSubs=dims.reduce((a,dd)=>a+((subByDim[dd.id]||[]).length),0);
+    return (
+      <section className="indp" style={{"--ic":ind.color}}>
+        <header className="indp-head">
+          <span className="indp-dot" style={{background:ind.color}}></span>
+          <div className="indp-tt">
+            <div className="indp-name">{ind.nombre}</div>
+            <div className="indp-sub">{dims.length} {dims.length===1?"dimensión":"dimensiones"}{nSubs>0?" · "+nSubs+" subdimensiones":""}</div>
+          </div>
+          <div className="indp-score">{d&&d.prom!=null?fmt(d.prom):<span className="sup" style={{fontSize:14}}>sin dato</span>}{d&&d.prom!=null&&<span className="u">/100</span>}</div>
+        </header>
+        {d&&d.prom!=null &&
+          <div className="indp-anc">
+            <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>
+            <Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/>
+          </div>}
+        {ind.definicion && <div className="indp-def"><Definicion texto={ind.definicion} etiqueta="¿Qué mide este indicador?"/></div>}
+        <div className="indp-body">
+          {dims.map((dimo,di)=><DimBlock key={dimo.id} dimo={dimo} dimTone={dimColor(ind.color,di,dims.length)} dm={dm} nm={nm} ciclo={ciclo}/>)}
+        </div>
+      </section>);
+  }
+
+  // ===== Ficha de establecimiento (rediseño Fase 2): TODO DESPLEGADO. Radar de
+  //       4 indicadores + 4 paneles (indicador->dimension->subdimension visibles
+  //       de una vez) con toggle Vista actual / Vista historica. Reemplaza el
+  //       drill-down secuencial; reusa la lectura de datos (indOf/dimOf/nivOf,
+  //       Radar, Ancla, ScoreBar, DistBar, serieFull, PanelEvolucion, Definicion).
+  //       grado/agno/vista los gobierna App; aqui solo se leen y se cambian.  =====
+  function Ficha({rbd,grado,agno,grados,anios,onGrado,onAgno,vista,onVista,onBack}){
+    const [cmpA,setCmpA]=useState(null);          // anio de comparacion del radar (-1 = ninguno)
+    useEffect(()=>{setCmpA(null);},[rbd,grado,agno]);
+    const e=est[rbd];
+    const im=indOf(rbd,grado,agno),dm=dimOf(rbd,grado,agno),nm=nivOf(rbd,grado,agno);
+    const ciclo=CICLO[grado];
+    const serie=anios.length>1;
+    const isHist = vista==="historica" && serie;
     const axInd=DATA.indicadores.map(ind=>({label:ind.corto,value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
 
-    // II.6 — comparacion de DOS anios del MISMO rbd/grado en el radar (solo nivel 0).
-    // Default: anio actual vs el inmediatamente anterior CON serie; el usuario lo
-    // cambia o lo apaga. Cada anio se LEE (prom por indicador); NA no se grafica.
+    // Comparacion de DOS anios del MISMO rbd/grado en el radar (cada anio se LEE;
+    // NA no se grafica). El segundo trazo es el dato del PROPIO establecimiento en
+    // otro anio, NO una referencia de GSE.
     const aniosCD=anios.filter(a=>{const o=indOf(rbd,grado,a);return DATA.indicadores.some(ind=>o[ind.id]&&o[ind.id].prom!=null);});
     const cmpPrev=aniosCD.filter(a=>a<agno);
     const cmpDef=cmpPrev.length?Math.max.apply(null,cmpPrev):null;
@@ -495,110 +689,107 @@ __FONTS_CSS__
     const axIndB = DATA.indicadores.map(ind=>({label:ind.corto,value:imB[ind.id]?imB[ind.id].prom:null}));
     const cmpOpts = aniosCD.filter(a=>a!==agno);
 
-    let nivel=0,tituloNivel="Indicadores",radarAxes=axInd,radarTitle="Mirada integral — 4 indicadores";
-    let filas=DATA.indicadores.map(ind=>({id:ind.id,color:ind.color,nombre:ind.nombre,d:im[ind.id],
-      definicion:ind.definicion,
-      onClick:()=>{setDrillInd(ind.id);setDrillDim(null);}}));
-    if(drillInd!=null){nivel=1;const ind=indById[drillInd];tituloNivel="Dimensiones de "+ind.nombre;
-      const dims=dimsByInd[drillInd]||[];
-      radarAxes=dims.map(d=>({label:String(d.id),value:dm[d.id]?dm[d.id].prom:null,color:ind.color}));
-      radarTitle="Dimensiones del indicador";
-      filas=dims.map(d=>({id:d.id,color:ind.color,nombre:d.nombre,d:dm[d.id],
-        definicion:d.definicion,
-        onClick:(subByDim[d.id]&&subByDim[d.id].length)?()=>setDrillDim(d.id):null}));}
+    const pos=["pos-top","pos-right","pos-bottom","pos-left"];
 
     return (
-      <div className="detail">
-        <button className="back" onClick={onBack}>‹ Volver a la grilla</button>
-        <h2>{e&&e.nom?tc(e.nom):rbd}</h2>
-        <div className="dmeta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
-        <div className="help">La escala <b>0–100 es relativa</b>: por sí sola no dice si el establecimiento va bien o mal. Las anclas de lectura son el <b>desvío vs su GSE</b> (mismo grupo socioeconómico) y la <b>variación vs la evaluación anterior</b>, ambas con su significancia. <span style={{color:"var(--alerta)"}}>▼ rojo = significativamente bajo (alerta)</span>; <span style={{color:"var(--destaca)"}}>▲ verde = significativamente sobre (destacado)</span>.</div>
-
-        <div className="dcrumb">
-          <button onClick={()=>{setDrillInd(null);setDrillDim(null);}}>Indicadores</button>
-          {drillInd!=null && <span> ▸ <b>{indById[drillInd].nombre}</b></span>}
-          {drillDim!=null && <span> ▸ <b>{dimById[drillDim].nombre}</b></span>}
+      <div>
+        {/* Cabecera de ficha (oscura): identidad + Vista/Grado/Año. El grado y la
+            vista viven DENTRO de la pantalla ficha (no en el banner estatico). */}
+        <div className="ficha-bar">
+          <div className="ficha-id">
+            <button className="ficha-back" onClick={onBack}>‹ Volver a la grilla</button>
+            <div className="ficha-name">{e&&e.nom?tc(e.nom):rbd}<span className="ficha-rbd">RBD {rbd}</span></div>
+            <div className="ficha-meta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
+          </div>
+          <div className="ficha-tools">
+            <div className="nivelsel"><span className="nivelsel-lab">Vista</span>
+              <div className="seg-lvl big">
+                <button className={"lvl-b"+(!isHist?" on":"")} onClick={()=>onVista("actual")}>Vista actual</button>
+                <button className={"lvl-b"+(isHist?" on":"")+(serie?"":" is-off")} onClick={()=>serie&&onVista("historica")} disabled={!serie} title={serie?"Evolución por año":"Sin serie suficiente"}>Vista histórica</button>
+              </div></div>
+            <div className="nivelsel"><span className="nivelsel-lab">Grado</span>
+              <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===grado?" on":"")} onClick={()=>onGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
+            <div className="nivelsel"><span className="nivelsel-lab">Año</span>
+              <div className="seg-lvl big">{anios.map(a=><button key={a} className={"lvl-b"+(a===agno?" on":"")} onClick={()=>onAgno(a)}>{a}{PRELIM.has(String(a))?"*":""}</button>)}</div></div>
+          </div>
         </div>
 
-        {drillInd!=null && drillDim==null &&
-          <Definicion texto={indById[drillInd].definicion} etiqueta="Sobre este indicador" contexto={true}/>}
+        <div className="ficha-card">
+          {isHist
+            ? (
+            <div className="hist-wrap">
+              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares; los huecos son años sin aplicación (no se interpola, p. ej. 4° básico no aplica 2024).</div>
+              {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[];
+                return (
+                <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
+                  <div className="hist-ind-h"><span className="indp-dot" style={{background:ind.color}}></span><span className="hist-ind-name">{ind.nombre}</span></div>
+                  <div className="hist-main"><PanelEvolucion nombre={ind.nombre} color={ind.color} pts={serieFull(indOf,rbd,grado,ind.id,anios)} hideHead={true}/></div>
+                  {idims.length>0 && <>
+                    <div className="hist-dims-lab">Dimensiones</div>
+                    <div className="hist-dims">
+                      {idims.map((dimo,di)=><PanelEvolucion key={dimo.id} nombre={dimo.nombre} color={dimColor(ind.color,di,idims.length)} pts={serieFull(dimOf,rbd,grado,dimo.id,anios)}/>)}
+                    </div></>}
+                </section>);})}
+              <div className="nota nota-inv">Cada panel tiene su propio eje fijo 0–100 (escala común, comparable); la marca de cada año muestra la diferencia (dif) vs la evaluación anterior y su significancia (▲/▼/= + texto), <b>leídas de la Agencia</b>. La subdimensión no aparece aquí: es <b>distribución de niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
+            </div>)
+            : (
+            <div>
+              <div className="ficha-explain"><b>Una sola pantalla, todo desplegado.</b> Arriba el radar de los <b>4 indicadores</b>; debajo, cada indicador con sus dimensiones y subdimensiones de una vez. La escala <b>0–100 es relativa</b>: se lee por el <b>desvío vs su GSE</b> y la <b>variación vs la evaluación anterior</b>, ambas con su significancia (texto, nunca solo color). <span style={{color:"var(--alerta)"}}>▼ rojo = sig. bajo</span>; <span style={{color:"var(--destaca)"}}>▲ verde = sig. sobre</span>.</div>
 
-        {drillDim!=null
-          ? <SubdimView rbd={rbd} grado={grado} agno={agno} dimId={drillDim} nm={nm} ciclo={ciclo}/>
-          : (
-          <div className="row2">
-            <div className="blk">
-              <h3>{radarTitle}</h3>
-              <div style={{display:"flex",justifyContent:"center"}}><Radar axes={radarAxes}
-                axesB={nivel===0&&cmpAgno!=null?axIndB:undefined} colB="#C77D3A"
-                labelB={cmpAgno!=null?String(cmpAgno):null}
-                size={nivel===0?280:250} showLabels={true} showValues={true}/></div>
-              {nivel===0 && cmpOpts.length>0 &&
-                <div className="radar-cmp">
-                  <div className="leyenda">
-                    <span><span className="sw-line"></span>{agno}{PRELIM.has(String(agno))?"*":""} · actual</span>
-                    {cmpAgno!=null && <span><span className="sw-line cmp"></span>{cmpAgno}{PRELIM.has(String(cmpAgno))?"*":""} · comparación</span>}
-                  </div>
-                  <label className="cmp-label">Comparar con:{" "}
-                    <select value={cmpAgno!=null?cmpAgno:""} onChange={ev=>setCmpA(ev.target.value===""?-1:Number(ev.target.value))}>
-                      {cmpOpts.map(a=><option key={a} value={a}>{a}{PRELIM.has(String(a))?"*":""}</option>)}
-                      <option value="">— sin comparación</option>
-                    </select>
-                  </label>
-                  {cmpAgno!=null &&
-                    <div className="cmp-hint">El puntaje en cada vértice es del año actual; el del año comparado, al pasar el mouse sobre sus puntos.</div>}
-                </div>}
-              {nivel===1 && <div className="leyenda">{(dimsByInd[drillInd]||[]).map(d=>(<span key={d.id}>{d.id}. {d.nombre}</span>))}</div>}
-            </div>
-            <div className="blk">
-              <h3>{tituloNivel} — lectura vs GSE y vs año anterior</h3>
-              {filas.map(f=><AnchorRow key={f.id} color={f.color} nombre={f.nombre} d={f.d} definicion={f.definicion} onClick={f.onClick}/>)}
-              <div className="nota">Cada cifra se interpreta por su <b>desvío</b>, no por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); no reconstruye el puntaje del GSE.</div>
-            </div>
-          </div>)}
-
-        {drillDim==null &&
-          <div className="blk" style={{marginTop:20}}>
-            <h3>Evolución {nivel===1?"por dimensión":"por indicador"} <span style={{fontWeight:400,color:"var(--gris)"}}>· eje fijo 0–100, un panel por {nivel===1?"dimensión":"indicador"}</span></h3>
-            {serie
-              ? <div>
-                  <div className="evol-grid">
-                    {(nivel===1
-                       ? (dimsByInd[drillInd]||[]).map(d=>({key:d.id,nombre:d.nombre,color:indById[drillInd].color,pts:serieFull(dimOf,rbd,grado,d.id,anios)}))
-                       : DATA.indicadores.map(ind=>({key:ind.id,nombre:ind.nombre,color:ind.color,pts:serieFull(indOf,rbd,grado,ind.id,anios)}))
-                     ).map(p=><PanelEvolucion key={p.key} nombre={p.nombre} color={p.color} pts={p.pts}/>)}
-                  </div>
-                  <div className="nota">Cada panel es una {nivel===1?"dimensión":"indicador"} con su propio eje fijo 0–100 (escala común, comparable). La marca de cada año muestra la diferencia absoluta (dif) vs la evaluación anterior y su significancia (▲/▼/= + texto), <b>leídas de la Agencia</b> (no calculadas). Años sin punto = sin aplicación (no se interpola). {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
+              <div className="ficha-radar">
+                <div className="fr-head">Mirada integral · 4 indicadores</div>
+                <div className="rquad">
+                  <div className="rquad-svg"><Radar axes={axInd} axesB={cmpAgno!=null?axIndB:undefined} colB="#C77D3A" labelB={cmpAgno!=null?String(cmpAgno):null} size={300} showLabels={true} showValues={true}/></div>
+                  {DATA.indicadores.map((ind,k)=>{const d=im[ind.id];
+                    return (
+                      <div className={"rcard "+pos[k]} key={ind.id}>
+                        <div className="rcard-top">
+                          <span className="rcard-dot" style={{background:ind.color}}></span>
+                          <div className="rcard-tt">
+                            <span className="rcard-name">{ind.corto}</span>
+                            <span className="rcard-vals">{d&&d.prom!=null?<b>{fmt(d.prom)}</b>:<b className="sup">sin dato</b>}{d&&d.prom!=null&&<span className="u">/100</span>}</span>
+                          </div>
+                        </div>
+                        {d&&d.prom!=null &&
+                          <div className="rcard-anc"><Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/><Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/></div>}
+                      </div>);})}
                 </div>
-              : <div className="nota">Sin serie suficiente para evolución: {DATA.meta.grados[grado]} tiene un solo año de aplicación ({anios.join(", ")}).</div>}
-          </div>}
+                {cmpOpts.length>0 &&
+                  <div className="radar-cmp">
+                    <div className="leyenda">
+                      <span><span className="sw-line"></span>{agno}{PRELIM.has(String(agno))?"*":""} · actual</span>
+                      {cmpAgno!=null && <span><span className="sw-line cmp"></span>{cmpAgno}{PRELIM.has(String(cmpAgno))?"*":""} · comparación</span>}
+                    </div>
+                    <label className="cmp-label">Comparar radar con:{" "}
+                      <select value={cmpAgno!=null?cmpAgno:""} onChange={ev=>setCmpA(ev.target.value===""?-1:Number(ev.target.value))}>
+                        {cmpOpts.map(a=><option key={a} value={a}>{a}{PRELIM.has(String(a))?"*":""}</option>)}
+                        <option value="">— sin comparación</option>
+                      </select>
+                    </label>
+                    {cmpAgno!=null &&
+                      <div className="cmp-hint">El puntaje en cada vértice es del año actual; el del año comparado, al pasar el mouse sobre sus puntos. Ambos trazos son del propio establecimiento.</div>}
+                  </div>}
+                <p className="fr-note">El radar es solo para los <b>4 indicadores</b>. Las dimensiones y subdimensiones se leen en los paneles de abajo (barras 0–100 en tonos del color de su indicador).</p>
+              </div>
+
+              {/* Sobrevive la nota del invariante "lee, no deriva" (antes en Detalle). */}
+              <div className="nota nota-inv">Cada cifra se interpreta por su <b>desvío</b>, no por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); <b>no reconstruye el puntaje del GSE</b>. Por eso las barras muestran solo el promedio del establecimiento y el desvío vs GSE se comunica con las anclas.</div>
+
+              <div className="ficha-panels-head">
+                <div className="leyenda"><span><i style={{background:"var(--bajo)"}}></i>Bajo</span><span><i style={{background:"var(--medio)"}}></i>Medio</span><span><i style={{background:"var(--alto)"}}></i>Alto</span><span>· distribución de subdimensiones · solo respuestas de estudiantes (EST)</span></div>
+              </div>
+              <div className="ficha-panels">
+                {DATA.indicadores.map(ind=><IndPanel key={ind.id} ind={ind} im={im} dm={dm} nm={nm} ciclo={ciclo}/>)}
+              </div>
+            </div>)}
+        </div>
       </div>);
   }
 
   function gseLbl(rbd,grado,agno){const b=DATA.roster,r=RIX.roster[rbd];if(!r)return "—";
     for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno){const g=b.gse[i];return g?(GSE[g]||g):"—";}return "—";}
-
-  // ===== Vista de subdimensiones (distribucion de niveles, solo EST) =====
-  function SubdimView({rbd,grado,agno,dimId,nm,ciclo}){
-    const subs=subByDim[dimId]||[];
-    return (
-      <div className="blk">
-        <h3>Distribución de niveles por subdimensión — {dimById[dimId].nombre}</h3>
-        <Definicion texto={dimById[dimId].definicion} etiqueta="Sobre esta dimensión" contexto={true}/>
-        <div className="leyenda"><span><i style={{background:"var(--bajo)"}}></i>Bajo</span><span><i style={{background:"var(--medio)"}}></i>Medio</span><span><i style={{background:"var(--alto)"}}></i>Alto</span><span>· solo respuestas de estudiantes (EST)</span></div>
-        {subs.map(s=>{const v=nm[s.id]; const txt=(s.texto&&ciclo&&s.texto[ciclo])?s.texto[ciclo]:null;
-          return (
-            <div className="distrow" key={s.id}>
-              <div className="lbl">{s.nombre} <span className="actores">[{s.actores}]</span></div>
-              {s.definicion && <div className="defn">{s.definicion}</div>}
-              {(!v||v.bajo==null)
-                ? <div className="sup">sin dato (resguardo estadístico)</div>
-                : <DistBar v={v}/>}
-              {v&&v.bajo!=null&&txt&&<div className="nivel-txt"><b>Nivel Alto:</b> {txt.alto}</div>}
-              {v&&v.bajo!=null&&!ciclo&&<div className="nivel-txt sup">Texto de nivel no disponible para este grado (8° básico).</div>}
-            </div>);})}
-      </div>);
-  }
+  // (SubdimView eliminado en Fase 2: su distribucion por subdimension se reusa en
+  //  SubDist, embebida dentro de cada DimBlock del panel "todo desplegado".)
 
   // ===== EntityModal (selector portable; copia del andamio + a11y) =====
   // Replica de 50_documentacion/andamios/diseno/entity_modal/EntityModal.jsx
@@ -686,9 +877,14 @@ __FONTS_CSS__
     const [gse,setGse]=useState("TODOS");
     const [rbdSel,setRbdSel]=useState(null);
     const [pantalla,setPantalla]=useState("ficha");   // andamiaje 3 pantallas; default = unica funcional
+    const [vistaFicha,setVistaFicha]=useState("actual");   // Fase 2: vista de la ficha (actual|historica), local a la pantalla
 
-    useEffect(()=>{const a=DATA.meta.grado_anios[grado]||[];if(!a.includes(agno))setAgno(a[a.length-1]);setRbdSel(null);},[grado]);
-    useEffect(()=>{setRbdSel(null);},[terr,dep,agno,gse]);
+    // grado/agno NO limpian rbdSel: en Fase 2 se pueden cambiar DENTRO de la
+    // ficha sin volver a la grilla. Solo se valida que el agno exista para el grado.
+    useEffect(()=>{const a=DATA.meta.grado_anios[grado]||[];if(!a.includes(agno))setAgno(a[a.length-1]);},[grado]);
+    useEffect(()=>{setRbdSel(null);},[terr,dep,gse]);
+    // Vista historica solo con serie (>1 anio); si el grado tiene un solo anio, vuelve a "actual".
+    useEffect(()=>{if((DATA.meta.grado_anios[grado]||[]).length<=1) setVistaFicha("actual");},[grado]);
 
     // EntityModal devuelve un item; se aplica segun su kind (acota, nunca agrega).
     const onPick=item=>{setModalOpen(false);
@@ -745,43 +941,43 @@ __FONTS_CSS__
         {/* Paso 3 — router de pantalla. Stubs sin datos ni cifra agregada. */}
         {pantalla==="territorio" && <ScreenStub titulo="Panorama territorial"/>}
         {pantalla==="comparar" && <ScreenStub titulo="Comparación entre territorios"/>}
-        {pantalla==="ficha" && <div>
-          <div className="nav">
-            <div className="nav-row">
-              <div className="ctl"><label>Grado</label>
-                <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
-              <div className="ctl"><label>Año</label>
-                <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{PRELIM.has(String(a))?"*":""}</button>)}</div></div>
-              <div className="ctl"><label>Grupo socioeconómico</label>
-                <div className="gse-pills">
-                  <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
-                  {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{GSE[g]}</button>)}</div></div>
-            </div>
-          </div>
-
-          {rbdSel
-            ? <Detalle rbd={rbdSel} grado={grado} agno={agno} onBack={()=>setRbdSel(null)}/>
-            : <div>
-                <div className="crumb">Mostrando establecimientos educacionales de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""} · {unidades.length} establecimientos</div>
-                <div className="help">Cada tarjeta es un <b>establecimiento individual</b> (su dato crudo, nunca un promedio). El color de alerta resume cuántos indicadores están <span style={{color:"var(--alerta)"}}>significativamente bajo su GSE (▼)</span> o <span style={{color:"var(--destaca)"}}>sobre él (▲)</span>. El territorio solo acota la lista; no produce cifras agregadas. Haz clic en un establecimiento para ver el detalle y bajar a dimensiones y subdimensiones.</div>
-                <div className="leyenda">{DATA.indicadores.map(i=>(
-                  i.definicion
-                    ? <button key={i.id} type="button" className="leg-item"
-                        aria-label={i.nombre+". ¿Qué mide? "+i.definicion}
-                        onMouseMove={e=>showTT("<b>"+i.nombre+"</b><br>"+i.definicion,e)} onMouseLeave={hideTT}
-                        onFocus={e=>showTTEl("<b>"+i.nombre+"</b><br>"+i.definicion,e.currentTarget)} onBlur={hideTT}>
-                        <i style={{background:i.color}}></i>{i.nombre}<span className="leg-info" aria-hidden="true">ⓘ</span></button>
-                    : <span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>
-                ))}<span>· ★ Costa Central</span></div>
-                {unidades.length===0
-                  ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, grado, año y GSE.</div>
-                  : grupos.map(grp=>(
-                      <div className="gse-group" key={grp.gse}>
-                        <div className="gse-head"><span className="tag">GSE · {GSE[grp.gse]||"sin clasificar"}</span><span className="cnt">{grp.items.length} establecimientos educacionales</span></div>
-                        <div className="grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={grado} agno={agno} onSel={setRbdSel}/>)}</div>
-                      </div>))}
-              </div>}
-        </div>}
+        {pantalla==="ficha" && (rbdSel
+          ? <Ficha rbd={rbdSel} grado={grado} agno={agno} grados={grados} anios={anios}
+                   onGrado={setGrado} onAgno={setAgno} vista={vistaFicha} onVista={setVistaFicha}
+                   onBack={()=>setRbdSel(null)}/>
+          : <div>
+              {/* Grilla territorial (sin cambios en Fase 2): filtros sticky + tarjetas por GSE */}
+              <div className="nav">
+                <div className="nav-row">
+                  <div className="ctl"><label>Grado</label>
+                    <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
+                  <div className="ctl"><label>Año</label>
+                    <div className="seg">{anios.map(a=><button key={a} className={a===agno?"on":""} onClick={()=>setAgno(a)}>{a}{PRELIM.has(String(a))?"*":""}</button>)}</div></div>
+                  <div className="ctl"><label>Grupo socioeconómico</label>
+                    <div className="gse-pills">
+                      <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
+                      {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{GSE[g]}</button>)}</div></div>
+                </div>
+              </div>
+              <div className="crumb">Mostrando establecimientos educacionales de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""} · {unidades.length} establecimientos</div>
+              <div className="help">Cada tarjeta es un <b>establecimiento individual</b> (su dato crudo, nunca un promedio). El color de alerta resume cuántos indicadores están <span style={{color:"var(--alerta)"}}>significativamente bajo su GSE (▼)</span> o <span style={{color:"var(--destaca)"}}>sobre él (▲)</span>. El territorio solo acota la lista; no produce cifras agregadas. Haz clic en un establecimiento para ver su ficha desplegada (radar + dimensiones + subdimensiones).</div>
+              <div className="leyenda">{DATA.indicadores.map(i=>(
+                i.definicion
+                  ? <button key={i.id} type="button" className="leg-item"
+                      aria-label={i.nombre+". ¿Qué mide? "+i.definicion}
+                      onMouseMove={e=>showTT("<b>"+i.nombre+"</b><br>"+i.definicion,e)} onMouseLeave={hideTT}
+                      onFocus={e=>showTTEl("<b>"+i.nombre+"</b><br>"+i.definicion,e.currentTarget)} onBlur={hideTT}>
+                      <i style={{background:i.color}}></i>{i.nombre}<span className="leg-info" aria-hidden="true">ⓘ</span></button>
+                  : <span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>
+              ))}<span>· ★ Costa Central</span></div>
+              {unidades.length===0
+                ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, grado, año y GSE.</div>
+                : grupos.map(grp=>(
+                    <div className="gse-group" key={grp.gse}>
+                      <div className="gse-head"><span className="tag">GSE · {GSE[grp.gse]||"sin clasificar"}</span><span className="cnt">{grp.items.length} establecimientos educacionales</span></div>
+                      <div className="grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={grado} agno={agno} onSel={setRbdSel}/>)}</div>
+                    </div>))}
+            </div>)}
       </div>);
   }
   const tRender0=performance.now();
