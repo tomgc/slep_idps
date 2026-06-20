@@ -497,8 +497,8 @@ __FONTS_CSS__
     const emptyText=(emptyTextFor&&emptyTextFor(tab,ql))||"Sin resultados";
     return (
       <div className="modal-backdrop" onClick={onCancel}>
-        <div className="modal" role="dialog" aria-modal="true" aria-label="Seleccionar territorio o sostenedor" onClick={e=>e.stopPropagation()}>
-          <div className="modal-header"><h2 className="modal-title">Seleccionar territorio o sostenedor</h2></div>
+        <div className="modal" role="dialog" aria-modal="true" aria-label="Seleccionar territorio o dependencia" onClick={e=>e.stopPropagation()}>
+          <div className="modal-header"><h2 className="modal-title">Seleccionar territorio o dependencia</h2></div>
           <div className="modal-tabs">
             {tabs.map(([k,lbl])=>(
               <button key={k} className={"modal-tab"+(tab===k?" is-active":"")} onClick={()=>{setTab(k);setQ("");}}>{lbl}</button>))}
@@ -522,28 +522,31 @@ __FONTS_CSS__
 
   // Catalogos para buildList (del JSON ya embebido; sin cambios en 35.R).
   const COMUNAS_POR_REGION=(()=>{const m={};DATA.comunas.forEach(c=>{m[c.cod_reg]=(m[c.cod_reg]||0)+1;});return m;})();
-  const SOST_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null)m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
-    return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c]||("Dependencia "+c),n:m[c]}));})();
-  const TABS=[["region","Región"],["comuna","Comuna"],["sostenedor","Sostenedor"],["establecimiento","Establecimiento"]];
+  // Opciones de DEPENDENCIA: SOLO las 4 categorias de cod_depe2 con etiqueta
+  // conocida en DEPE. Blindado (DEPE[e.cod_depe2]) para que la pestana jamas
+  // liste comunas u otros valores ajenos a la dependencia (Hallazgo H5).
+  const DEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null&&DEPE[e.cod_depe2])m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
+    return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c],n:m[c]}));})();
+  const TABS=[["region","Región"],["comuna","Comuna"],["dependencia","Dependencia"],["establecimiento","Establecimiento"]];
   function buildList(tab,ql){
     if(tab==="region") return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
       .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
-    if(tab==="sostenedor") return SOST_OPTS.filter(s=>!ql||s.nom.toLowerCase().includes(ql))
-      .map(s=>({kind:"sostenedor",cod:s.cod,nom:s.nom,sub:s.n+" establecimientos"}));
+    if(tab==="dependencia") return DEPS_OPTS.filter(s=>!ql||s.nom.toLowerCase().includes(ql))
+      .map(s=>({kind:"dependencia",cod:s.cod,nom:s.nom,sub:s.n+" establecimientos"}));
     return ql ? DATA.establecimientos.filter(e=>(e.nom&&e.nom.toLowerCase().includes(ql))||String(e.rbd).includes(ql)).slice(0,60)
       .map(e=>({kind:"establecimiento",cod:e.rbd,nom:tc(e.nom)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
   }
   const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar…";
   const emptyTextFor=(tab,ql)=>tab==="establecimiento"&&!ql?"Escribe para buscar un establecimiento":"Sin resultados";
 
-  // ===== Navegacion territorial via EntityModal: region/comuna/sostenedor/EE =====
+  // ===== Navegacion territorial via EntityModal: region/comuna/dependencia/EE =====
   function App(){
     const grados=Object.keys(DATA.meta.grados);
     const [terr,setTerr]=useState(FOCO_INICIAL);   // apertura: foco SLEP Costa Central (estado, no filtro fijo)
-    const [sostenedor,setSostenedor]=useState("");   // cod_depe2 (combinable con el territorio)
+    const [dep,setDep]=useState("");   // cod_depe2 (dependencia; combinable con el territorio)
     const [modalOpen,setModalOpen]=useState(false);
     const [grado,setGrado]=useState(grados.includes("4b")?"4b":grados[0]);
     const anios=DATA.meta.grado_anios[grado]||[];
@@ -552,43 +555,43 @@ __FONTS_CSS__
     const [rbdSel,setRbdSel]=useState(null);
 
     useEffect(()=>{const a=DATA.meta.grado_anios[grado]||[];if(!a.includes(agno))setAgno(a[a.length-1]);setRbdSel(null);},[grado]);
-    useEffect(()=>{setRbdSel(null);},[terr,sostenedor,agno,gse]);
+    useEffect(()=>{setRbdSel(null);},[terr,dep,agno,gse]);
 
     // EntityModal devuelve un item; se aplica segun su kind (acota, nunca agrega).
     const onPick=item=>{setModalOpen(false);
       if(item.kind==="region") setTerr({kind:"region",cod:item.cod});
       else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod});
-      else if(item.kind==="sostenedor") setSostenedor(item.cod);
+      else if(item.kind==="dependencia") setDep(item.cod);
       else if(item.kind==="establecimiento") setRbdSel(item.cod);};
 
-    // roster del territorio seleccionado, para (grado, agno). El territorio y el
-    // sostenedor solo ACOTAN la lista (continue); jamas agregan una cifra.
+    // roster del territorio seleccionado, para (grado, agno). El territorio y la
+    // dependencia solo ACOTAN la lista (continue); jamas agregan una cifra.
     const unidades=useMemo(()=>{const b=DATA.roster,out=[];
       for(let i=0;i<b.rows;i++){if(b.grado[i]!==grado||b.agno[i]!==agno)continue;
         const e=est[b.rbd[i]]; if(!e)continue;
         if(terr.kind==="foco"){ if(e.cod_slep!==SLEP_FOCO)continue; }
         else if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
         else { if(e.cod_reg!==terr.cod)continue; }
-        if(sostenedor && e.cod_depe2!==sostenedor)continue;
+        if(dep && e.cod_depe2!==dep)continue;
         if(gse!=="TODOS" && b.gse[i]!==gse)continue;
         out.push({rbd:b.rbd[i],gse:b.gse[i]});}
-      return out;},[terr,sostenedor,grado,agno,gse]);
+      return out;},[terr,dep,grado,agno,gse]);
 
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
 
-    const sostNom = sostenedor ? (DEPE[sostenedor]||sostenedor) : null;
+    const depNom = dep ? (DEPE[dep]||dep) : null;
     const terrTxt = terr.kind==="foco" ? "SLEP "+SLEP_FOCO_NOM
                   : terr.kind==="comuna" ? "comuna de "+comNom(terr.cod)
                   : "Región de "+regNom(terr.cod);
-    const territorioTxt = terrTxt + (sostNom?(" · sostenedor: "+sostNom):"");
+    const territorioTxt = terrTxt + (depNom?(" · dependencia: "+depNom):"");
 
     return (
       <div className="wrap">
         <div className="nav">
           <div className="nav-row">
-            <div className="ctl"><label>Territorio / sostenedor</label>
-              <button className="nav-trigger" onClick={()=>setModalOpen(true)} aria-label="Abrir selector de territorio o sostenedor">Explorar / cambiar selección ▾</button></div>
+            <div className="ctl"><label>Territorio / dependencia</label>
+              <button className="nav-trigger" onClick={()=>setModalOpen(true)} aria-label="Abrir selector de territorio o dependencia">Explorar / cambiar selección ▾</button></div>
             <div className="ctl"><label>Grado</label>
               <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
             <div className="ctl"><label>Año</label>
@@ -600,8 +603,8 @@ __FONTS_CSS__
           </div>
           <div className="nav-sel">
             <span className="sel-chip"><span className="k">territorio</span> {terrTxt}</span>
-            {sostenedor && <span className="sel-chip"><span className="k">sostenedor</span> {DEPE[sostenedor]} <button onClick={()=>setSostenedor("")} aria-label="Quitar filtro de sostenedor">✕</button></span>}
-            {SLEP_FOCO!=null && (terr.kind!=="foco"||sostenedor) && <button className="sel-link" onClick={()=>{setTerr(FOCO_INICIAL);setSostenedor("");}}>volver a {SLEP_FOCO_NOM}</button>}
+            {dep && <span className="sel-chip"><span className="k">dependencia</span> {DEPE[dep]} <button onClick={()=>setDep("")} aria-label="Quitar filtro de dependencia">✕</button></span>}
+            {SLEP_FOCO!=null && (terr.kind!=="foco"||dep) && <button className="sel-link" onClick={()=>{setTerr(FOCO_INICIAL);setDep("");}}>volver a {SLEP_FOCO_NOM}</button>}
           </div>
         </div>
 
