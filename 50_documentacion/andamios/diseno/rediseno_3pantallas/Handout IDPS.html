@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Handout — Motor IDPS · SLEP Costa Central</title>
+<style>
+@font-face{ font-family:"gobCL"; src:url("fonts/gobCL_Heavy.otf") format("opentype"); font-weight:900; font-display:swap; }
+@font-face{ font-family:"gobCL"; src:url("fonts/gobCL_Regular.otf") format("opentype"); font-weight:400; font-display:swap; }
+@font-face{ font-family:"gobCL"; src:url("fonts/gobCL_Light.otf") format("opentype"); font-weight:300; font-display:swap; }
+@font-face{ font-family:"Museo"; src:url("fonts/MuseoSans-300.otf") format("opentype"); font-weight:300; font-display:swap; }
+@font-face{ font-family:"Museo"; src:url("fonts/MuseoSans_500.otf") format("opentype"); font-weight:500; font-display:swap; }
+@font-face{ font-family:"Museo"; src:url("fonts/MuseoSans_700.otf") format("opentype"); font-weight:700; font-display:swap; }
+
+:root{
+  --navy:#0A3A5C; --ocean:#0062A0; --cream:#FFF6E0; --cream-50:#FFFBF0; --cream-200:#F3E9CF;
+  --ink:#1C2B36; --ink-2:#3C4A55; --muted:#6E7A84; --line:#E6DCC2;
+  --paper:#ffffff; --coral:#E88663; --plum:#4A2746;
+  --bajo:#EE2D49; --neutro:#8C8A86; --sobre:#2A8FD9;
+  --i-auto:#23519C; --i-conv:#45B9C3; --i-part:#009443; --i-hab:#ACC71A;
+  --font-display:"gobCL", system-ui, sans-serif;
+  --font-body:"Museo", system-ui, sans-serif;
+  --shadow:0 1px 2px rgba(10,58,92,.06), 0 8px 24px rgba(10,58,92,.07);
+}
+*{ box-sizing:border-box; }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{ margin:0; background:var(--cream); color:var(--ink); font-family:var(--font-body); font-weight:300; line-height:1.55; font-size:15px; }
+.doc{ max-width:920px; margin:0 auto; padding:0 0 80px; }
+
+/* ---- cover ---- */
+.cover{ background:var(--navy); color:#fff; padding:64px 60px 52px; }
+.cover .eyebrow{ font-size:13px; letter-spacing:.04em; color:#9EC2D8; font-weight:500; margin-bottom:20px; }
+.cover h1{ font-family:var(--font-display); font-weight:900; font-size:50px; line-height:1.02; margin:0 0 6px; }
+.cover h1 .lt{ font-weight:300; color:#BcD7E6; }
+.cover .sub{ font-size:17px; color:#CFE1EC; font-weight:300; max-width:680px; margin-top:18px; }
+.cover .meta{ margin-top:30px; display:flex; gap:28px; flex-wrap:wrap; font-size:13px; color:#9EC2D8; border-top:1px solid rgba(255,255,255,.16); padding-top:18px; }
+.cover .meta b{ color:#fff; font-weight:700; display:block; font-size:15px; margin-bottom:1px; }
+
+/* ---- sections ---- */
+section.blk{ padding:48px 60px 0; }
+.kicker{ display:inline-block; font-family:var(--font-display); font-weight:900; font-size:12px; letter-spacing:.08em; color:var(--ocean); background:#EAF3F9; border:1px solid #D4E6F2; padding:4px 11px; border-radius:5px; margin-bottom:16px; }
+h2{ font-family:var(--font-display); font-weight:900; font-size:30px; line-height:1.08; margin:0 0 10px; color:var(--navy); }
+h3{ font-family:var(--font-display); font-weight:900; font-size:19px; margin:30px 0 8px; color:var(--ink); }
+p{ margin:0 0 12px; max-width:760px; }
+p.lead{ font-size:17px; color:var(--ink-2); max-width:780px; }
+b,strong{ font-weight:700; color:var(--ink); }
+.rule{ height:1px; background:var(--line); margin:46px 60px 0; }
+
+/* ---- screens ---- */
+.screen{ margin-top:26px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--paper); box-shadow:var(--shadow); }
+.screen img{ width:100%; display:block; border-bottom:1px solid var(--line); }
+.screen .cap{ padding:16px 20px 18px; }
+.screen .cap .tag{ font-family:var(--font-display); font-weight:900; font-size:11px; letter-spacing:.06em; color:var(--ocean); }
+.screen .cap h4{ font-family:var(--font-display); font-weight:900; font-size:18px; margin:3px 0 6px; color:var(--navy); }
+.screen .cap p{ font-size:14px; margin:0; color:var(--ink-2); }
+.screen .cap ul{ margin:8px 0 0; padding-left:18px; font-size:13.5px; color:var(--ink-2); }
+.screen .cap li{ margin:3px 0; }
+
+/* ---- indicator cards ---- */
+.ind-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:18px; }
+.ind{ border:1px solid var(--line); border-left:5px solid var(--ic); border-radius:9px; padding:14px 16px; background:var(--cream-50); }
+.ind .h{ font-family:var(--font-display); font-weight:900; font-size:15px; color:var(--navy); display:flex; align-items:baseline; gap:8px; }
+.ind .h .n{ color:var(--ic); }
+.ind .d{ font-size:13px; color:var(--ink-2); margin:6px 0 9px; }
+.ind .dims{ font-size:12.5px; color:var(--ink); }
+.ind .dims .dim{ display:flex; gap:7px; padding:3px 0; border-top:1px dotted var(--line); }
+.ind .dims .dim:first-child{ border-top:0; }
+.ind .dims .dim b{ font-weight:700; }
+.ind .dims .dim .subs{ color:var(--muted); }
+
+/* ---- tokens ---- */
+.tok-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+.tok{ border:1px solid var(--line); border-radius:8px; overflow:hidden; width:150px; background:var(--paper); }
+.tok .sw{ height:54px; }
+.tok .lb{ padding:8px 10px; font-size:12px; }
+.tok .lb b{ display:block; font-weight:700; font-size:12.5px; }
+.tok .lb code{ font-family:ui-monospace,Menlo,monospace; font-size:11px; color:var(--muted); }
+
+/* ---- convention list ---- */
+.conv{ display:grid; grid-template-columns:1fr 1fr; gap:14px 30px; margin-top:18px; }
+.conv .c{ border-top:2px solid var(--navy); padding-top:11px; }
+.conv .c .t{ font-family:var(--font-display); font-weight:900; font-size:14px; color:var(--navy); display:flex; align-items:center; gap:8px; }
+.conv .c p{ font-size:13.5px; margin:6px 0 0; color:var(--ink-2); }
+.glyph{ display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 6px; border-radius:5px; font-weight:700; font-size:12px; color:#fff; }
+
+/* ---- callout ---- */
+.callout{ margin-top:20px; background:#EAF3F9; border:1px solid #D4E6F2; border-radius:10px; padding:16px 20px; font-size:14px; color:var(--ink-2); }
+.callout b{ color:var(--navy); }
+.callout.warn{ background:#FBEEE9; border-color:#F1D6CB; }
+.callout.warn b{ color:#B4502C; }
+
+/* ---- file table ---- */
+table.files{ width:100%; border-collapse:collapse; margin-top:16px; font-size:13.5px; }
+table.files th{ text-align:left; font-family:var(--font-display); font-weight:900; font-size:11px; letter-spacing:.05em; color:var(--muted); border-bottom:2px solid var(--line); padding:0 10px 8px; }
+table.files td{ border-bottom:1px solid var(--line); padding:9px 10px; vertical-align:top; color:var(--ink-2); }
+table.files td code{ font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--navy); font-weight:500; }
+
+ul.clean{ margin:10px 0 0; padding-left:18px; }
+ul.clean li{ margin:6px 0; color:var(--ink-2); }
+
+.foot{ margin-top:54px; padding:24px 60px; color:var(--muted); font-size:12.5px; border-top:1px solid var(--line); }
+
+@media print{
+  body{ background:#fff; font-size:12.5px; }
+  .doc{ max-width:100%; }
+  .cover{ padding:48px 44px 38px; }
+  section.blk{ padding:34px 44px 0; break-inside:avoid; }
+  .screen{ break-inside:avoid; }
+  .ind{ break-inside:avoid; }
+  .rule{ margin:30px 44px 0; }
+}
+@media (max-width:680px){
+  .cover, section.blk{ padding-left:24px; padding-right:24px; }
+  .ind-grid, .conv{ grid-template-columns:1fr; }
+  .cover h1{ font-size:36px; }
+}
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="eyebrow">SLEP Costa Central · Unidad de Monitoreo y Seguimiento</div>
+    <h1>Motor IDPS<br><span class="lt">Handout de diseño y traspaso</span></h1>
+    <p class="sub">Herramienta interna de lectura de los Indicadores de Desarrollo Personal y Social (IDPS) de la Agencia de Calidad de la Educación, establecimiento por establecimiento y segmentada por grupo socioeconómico (GSE).</p>
+    <div class="meta">
+      <div><b>Estado</b>Prototipo navegable · datos ilustrativos</div>
+      <div><b>Cobertura</b>2022–2025 · 4° básico y 2° medio</div>
+      <div><b>Unidad de análisis</b>El establecimiento (nunca se promedia)</div>
+      <div><b>Hermano</b>Motor SIMCE (sistema heredado)</div>
+    </div>
+  </header>
+
+  <!-- 1. QUÉ ES -->
+  <section class="blk">
+    <span class="kicker">01 · Qué es</span>
+    <h2>Una sola idea rectora</h2>
+    <p class="lead">Cada cifra IDPS se interpreta por <b>dos desvíos, no por su valor absoluto</b>: cuánto se aparta el establecimiento de su <b>grupo socioeconómico (GSE)</b>, y cuánto cambió respecto de la <b>evaluación anterior</b>. Ambos desvíos llevan siempre su <b>significancia estadística</b>. La unidad es el establecimiento individual: <b>el motor no promedia ni agrega</b> resultados de territorios.</p>
+    <div class="callout"><b>Por qué importa.</b> Un puntaje de 72/100 no dice nada por sí solo. Lo que orienta la gestión es si ese 72 está <b>bajo, igual o sobre</b> lo esperado para su GSE, y si <b>subió o bajó</b> de forma significativa desde la última medición. Todo el diseño existe para responder esas dos preguntas de un vistazo.</p></div>
+  </section>
+
+  <!-- 2. LAS TRES PANTALLAS -->
+  <section class="blk">
+    <span class="kicker">02 · Las tres pantallas</span>
+    <h2>Cómo se recorre</h2>
+    <p>El motor se navega por tres pestañas. Todas comparten la misma leyenda y la misma gramática de lectura (icono + texto, nunca color solo).</p>
+
+    <div class="screen">
+      <img src="img/01-territorial.png" alt="Panorama territorial">
+      <div class="cap">
+        <span class="tag">PANTALLA 1</span>
+        <h4>Panorama territorial</h4>
+        <p>Punto de entrada. El territorio (SLEP, comuna, región o país) <b>acota la lista</b> de establecimientos; no produce puntaje propio. Por cada GSE se muestra cómo se reparten sus establecimientos por estado vs su GSE, y una grilla de tarjetas con mini-radar para abrir cada uno.</p>
+        <ul>
+          <li>Selector de <b>Territorio</b> y de <b>Nivel</b> (4° básico / 2° medio).</li>
+          <li>Filtro <b>GSE</b> siempre visible: muestra u oculta cada grupo.</li>
+          <li>Cada tarjeta lleva el puntaje y el desvío vs GSE de los 4 indicadores.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img src="img/02-ficha.png" alt="Panorama IDPS por establecimiento">
+      <div class="cap">
+        <span class="tag">PANTALLA 2 · VISTA ACTUAL</span>
+        <h4>Panorama IDPS por establecimiento</h4>
+        <p>Toda la lectura de un establecimiento en una sola pantalla, desplegada: radar de los <b>4 indicadores</b>, y para cada uno sus <b>dimensiones</b> y <b>subdimensiones</b> en barras 0–100 con la referencia GSE marcada sobre la barra y la variación interanual al lado.</p>
+        <ul>
+          <li>Buscador de establecimiento (por nombre o RBD) para cambiar sin volver atrás.</li>
+          <li>Toggle <b>Vista actual / Vista histórica</b> y selector de <b>Nivel</b>.</li>
+          <li>Las dimensiones/subdimensiones usan barras (no radar): son 2–3 variables.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img src="img/04-historica.png" alt="Vista histórica">
+      <div class="cap">
+        <span class="tag">PANTALLA 2 · VISTA HISTÓRICA</span>
+        <h4>Evolución por año</h4>
+        <p>El mismo establecimiento, puntaje por año en eje fijo 0–100, para indicador, dimensión y subdimensión. Cada nivel muestra la <b>diferencia vs el año anterior con su significancia</b> ("▲ vs 2023: +5 · significativo"), con la misma sintaxis del resto.</p>
+        <ul>
+          <li>El año preliminar (2025) va con barra de borde discontinuo y asterisco (*).</li>
+          <li>4° básico no aplica 2024: el hueco no se interpola, se omite la barra.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img src="img/03-comparar.png" alt="Comparación entre territorios">
+      <div class="cap">
+        <span class="tag">PANTALLA 3</span>
+        <h4>Comparación entre territorios</h4>
+        <p>Hasta 4 territorios lado a lado, por GSE e indicador. Cada celda reparte el <b>100% de los establecimientos</b> de ese territorio en tres estados vs su propio GSE — es <b>% (n) de establecimientos, no una media de puntajes</b>.</p>
+        <ul>
+          <li>Chips de territorios (máx. 4) y selector de Nivel.</li>
+          <li>Segmentador GSE horizontal: una sección de tabla por grupo.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 3. MARCO CONCEPTUAL -->
+  <section class="blk">
+    <span class="kicker">03 · Marco conceptual</span>
+    <h2>4 indicadores · 11 dimensiones</h2>
+    <p>Los IDPS son índices de la Agencia de Calidad que miden el desarrollo personal y social de las y los estudiantes, complementando el SIMCE. Se miden por cuestionarios tipo Likert (estudiantes, docentes, apoderados), escala 0–100 (100 = percepciones más positivas), e insumo de la Categoría de Desempeño.</p>
+    <div class="ind-grid">
+
+      <div class="ind" style="--ic:var(--i-auto)">
+        <div class="h"><span class="n">1</span> Autoestima académica y motivación escolar</div>
+        <div class="d">Autopercepción del estudiante sobre su capacidad de aprender y sus actitudes hacia el estudio.</div>
+        <div class="dims">
+          <div class="dim"><b>Autopercepción y autovaloración</b></div>
+          <div class="dim"><b>Motivación escolar</b></div>
+        </div>
+      </div>
+
+      <div class="ind" style="--ic:var(--i-conv)">
+        <div class="h"><span class="n">2</span> Clima de convivencia escolar</div>
+        <div class="d">Percepción de un ambiente de respeto, organizado y seguro.</div>
+        <div class="dims">
+          <div class="dim"><b>Ambiente de respeto</b></div>
+          <div class="dim"><b>Ambiente organizado</b></div>
+          <div class="dim"><b>Ambiente seguro</b></div>
+        </div>
+      </div>
+
+      <div class="ind" style="--ic:var(--i-part)">
+        <div class="h"><span class="n">3</span> Participación y formación ciudadana</div>
+        <div class="d">Actitudes frente al establecimiento y fomento de la vida democrática.</div>
+        <div class="dims">
+          <div class="dim"><b>Participación</b></div>
+          <div class="dim"><b>Vida democrática</b></div>
+          <div class="dim"><b>Sentido de pertenencia</b></div>
+        </div>
+      </div>
+
+      <div class="ind" style="--ic:var(--i-hab)">
+        <div class="h"><span class="n">4</span> Hábitos de vida saludable</div>
+        <div class="d">Actitudes y conductas autodeclaradas sobre vida saludable y su promoción.</div>
+        <div class="dims">
+          <div class="dim"><b>Hábitos alimenticios</b></div>
+          <div class="dim"><b>Hábitos de vida activa</b></div>
+          <div class="dim"><b>Hábitos de autocuidado</b></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="callout"><b>Regla de oro de contenido.</b> El producto no sirve si el usuario no entiende qué mide cada indicador. Las definiciones viven en la interfaz: intro del header, tarjetas del radar (definición + "los que puntúan alto…"), y de forma contextual. Cada indicador y dimensión debe quedar definido y accesible.</div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 4. GRAMÁTICA DE LECTURA -->
+  <section class="blk">
+    <span class="kicker">04 · Gramática de lectura</span>
+    <h2>Convenciones que no se rompen</h2>
+    <div class="conv">
+      <div class="c">
+        <div class="t"><span class="glyph" style="background:var(--bajo)">▼</span> Bajo su GSE</div>
+        <p>El establecimiento puntúa significativamente <b>bajo</b> lo esperado para su grupo socioeconómico.</p>
+      </div>
+      <div class="c">
+        <div class="t"><span class="glyph" style="background:var(--neutro)">=</span> Sin diferencia</div>
+        <p>No hay diferencia estadísticamente significativa con su GSE (o con el año anterior).</p>
+      </div>
+      <div class="c">
+        <div class="t"><span class="glyph" style="background:var(--sobre)">▲</span> Sobre su GSE</div>
+        <p>Puntúa significativamente <b>sobre</b> lo esperado para su grupo socioeconómico.</p>
+      </div>
+      <div class="c">
+        <div class="t">Significancia explícita</div>
+        <p>Toda diferencia se acompaña de "<b>significativo</b>" o "<b>no significativo</b>" por texto. Nunca se comunica solo por color.</p>
+      </div>
+      <div class="c">
+        <div class="t">GSE inviolable</div>
+        <p>El filtro de grupo socioeconómico está <b>siempre presente</b> y nunca colapsa. Toda lectura está segmentada por GSE.</p>
+      </div>
+      <div class="c">
+        <div class="t">Sin dato ≠ cero</div>
+        <p>Datos suprimidos por resguardo estadístico se marcan "<b>sin dato</b>". Jamás se dibuja un cero ni se interpola un hueco.</p>
+      </div>
+      <div class="c">
+        <div class="t">Preliminar marcado</div>
+        <p>2025 es preliminar: asterisco (*) y barra de borde discontinuo en todas las visualizaciones.</p>
+      </div>
+      <div class="c">
+        <div class="t">No se agrega</div>
+        <p>Los territorios acotan la lista; nunca se promedian sus establecimientos en un puntaje único. La comparación es distribución <b>% (n)</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 5. SISTEMA VISUAL -->
+  <section class="blk">
+    <span class="kicker">05 · Sistema visual</span>
+    <h2>Paleta y tipografía</h2>
+    <h3>Colores de los 4 indicadores (Agencia de Calidad)</h3>
+    <div class="tok-row">
+      <div class="tok"><div class="sw" style="background:var(--i-auto)"></div><div class="lb"><b>Autoestima</b><code>#23519C</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--i-conv)"></div><div class="lb"><b>Convivencia</b><code>#45B9C3</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--i-part)"></div><div class="lb"><b>Participación</b><code>#009443</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--i-hab)"></div><div class="lb"><b>Hábitos</b><code>#ACC71A</code></div></div>
+    </div>
+    <h3>Estado vs GSE (sin semáforo)</h3>
+    <div class="tok-row">
+      <div class="tok"><div class="sw" style="background:var(--bajo)"></div><div class="lb"><b>Bajo</b><code>#EE2D49</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--neutro)"></div><div class="lb"><b>Sin diferencia</b><code>#8C8A86</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--sobre)"></div><div class="lb"><b>Sobre</b><code>#2A8FD9</code></div></div>
+    </div>
+    <h3>Marco institucional (heredado del motor hermano)</h3>
+    <div class="tok-row">
+      <div class="tok"><div class="sw" style="background:var(--navy)"></div><div class="lb"><b>Navy header</b><code>#0A3A5C</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--ocean)"></div><div class="lb"><b>Ocean / Costa Central</b><code>#0062A0</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--cream)"></div><div class="lb"><b>Cream fondo</b><code>#FFF6E0</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--coral)"></div><div class="lb"><b>Coral acento</b><code>#E88663</code></div></div>
+      <div class="tok"><div class="sw" style="background:var(--plum)"></div><div class="lb"><b>Plum</b><code>#4A2746</code></div></div>
+    </div>
+    <h3>Tipografía</h3>
+    <p style="font-family:var(--font-display);font-weight:900;font-size:26px;color:var(--navy);margin:4px 0 2px">gobCL Heavy — titulares</p>
+    <p style="font-family:var(--font-body);font-weight:300;margin:0 0 2px">Museo Sans — cuerpo y UI (pesos 300 / 500 / 700). Fallback a system-ui si no cargan.</p>
+    <div class="callout warn"><b>Antitropos.</b> Sin semáforo rojo/verde como único canal. Sin gradientes decorativos. Sin sombras pesadas. Radios pequeños (2–12px). Mucho aire. Sin "data slop": cada cifra debe ganarse su lugar. Sin ALL CAPS salvo siglas (IDPS, GSE, SLEP, RBD).</div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 6. MODELO DE DATOS -->
+  <section class="blk">
+    <span class="kicker">06 · Modelo de datos</span>
+    <h2>Cómo está construido</h2>
+    <p>El prototipo usa <b>datos ilustrativos deterministas</b> (un hash genera cifras 0–100 estables por clave). No hay pipeline real. La jerarquía es <b>indicador → dimensión → subdimensión</b>, y cada nodo produce el mismo objeto de lectura ("ancla"):</p>
+    <ul class="clean">
+      <li><b>v</b> — puntaje 0–100.</li>
+      <li><b>gd / gs</b> — desvío vs GSE y si es significativo; <b>gseRef</b> = puntaje de referencia del GSE.</li>
+      <li><b>yd / ys</b> — variación interanual y su significancia.</li>
+      <li><b>noData</b> — supresión por resguardo (→ "sin dato").</li>
+      <li><b>estado</b> — bajo / neutro / sobre, derivado de gd + gs.</li>
+    </ul>
+    <h3>Cobertura temporal real (asimétrica)</h3>
+    <ul class="clean">
+      <li><b>2° medio:</b> 2022–2025 (única serie larga).</li>
+      <li><b>4° básico:</b> 2022, 2023, 2025 (falta 2024 → hueco, no se interpola).</li>
+      <li>Cuando un grado tiene un solo año, la Vista histórica se deshabilita. <b>2025 siempre es preliminar.</b></li>
+    </ul>
+    <h3>Archivos del prototipo</h3>
+    <table class="files">
+      <thead><tr><th>Archivo</th><th>Rol</th></tr></thead>
+      <tbody>
+        <tr><td><code>Propuesta IDPS.html</code></td><td>Shell: chrome institucional, todo el CSS (tokens + componentes), contenedores de las 3 pantallas y carga del script.</td></tr>
+        <tr><td><code>idps-demo.js</code></td><td>Toda la lógica: marco conceptual (IND→dim→sub), generador determinista, radar SVG, barras 0–100, stacked 100%, las 3 pantallas y el enrutado por eventos.</td></tr>
+        <tr><td><code>fonts/</code></td><td>gobCL (Heavy/Regular/Light) y Museo Sans (300/500/700).</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><b>Nota de implementación.</b> El prototipo de la propuesta es <b>vanilla JS + SVG</b> (un solo script, render por <code>innerHTML</code>). El motor de producción hermano usa React + D3; el traspaso a producción puede portar estas pantallas a ese stack manteniendo las convenciones de este documento.</div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 7. DECISIONES -->
+  <section class="blk">
+    <span class="kicker">07 · Decisiones cerradas</span>
+    <h2>Lo que ya está resuelto</h2>
+    <ul class="clean">
+      <li>Radar <b>solo para los 4 indicadores</b>; dimensiones y subdimensiones van en barras 0–100 (2–3 variables no se leen bien en radar).</li>
+      <li>Referencia GSE marcada <b>sobre la barra</b> ("GSE n puntos"), no como segunda barra.</li>
+      <li>Comparación entre territorios = <b>distribución % (n)</b> de establecimientos por estado, nunca media de puntajes.</li>
+      <li>Selectores homogéneos entre pantallas: <b>banner primero, picker (Territorio/Establecimiento) debajo</b>, y Nivel/Vista en el banner con el mismo componente y tamaño.</li>
+      <li>RBD en línea aparte, sin negrita y sin paréntesis, bajo el nombre del establecimiento.</li>
+      <li>Leyenda idéntica en las 3 pantallas, alineada a la columna de contenido.</li>
+      <li>Vista histórica muestra la diferencia entre años con su significancia en indicador, dimensión y subdimensión.</li>
+    </ul>
+    <h3>Posibles próximos pasos (no comprometidos)</h3>
+    <ul class="clean">
+      <li>Drill-down de comuna → establecimientos dentro del comparador.</li>
+      <li>Exportar gráficos / tabla a imagen o CSV.</li>
+      <li>Portar las 3 pantallas al stack React + D3 del motor hermano.</li>
+      <li>Conectar el pipeline de datos reales (hoy todo es ilustrativo).</li>
+    </ul>
+  </section>
+
+  <div class="foot">
+    Motor IDPS · SLEP Costa Central · Unidad de Monitoreo y Seguimiento · Prototipo con datos ilustrativos, no oficiales.<br>
+    Para continuar el trabajo con asistencia de IA, usa el archivo <code>PROMPT para Claude.md</code> incluido en este paquete.
+  </div>
+
+</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#0A3A5C"/><g transform="translate(50 50)"><polygon points="0,-26 22,-8 14,20 -14,20 -22,-8" fill="none" stroke="#9EC2D8" stroke-width="2.5"/><polygon points="0,-16 13,-5 9,12 -9,12 -13,-5" fill="rgba(158,194,216,.25)" stroke="#fff" stroke-width="2"/></g></svg>
+</template>
+</body>
+</html>
