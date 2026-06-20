@@ -252,25 +252,47 @@ __FONTS_CSS__
   }
 
   // ===== Radar D3 (rompe en NA: honesto con la supresion) =====
-  function Radar({axes,size,showLabels}){
+  // axes  = serie principal [{label,value,color}]
+  // axesB = serie de comparacion opcional (mismo orden de ejes; II.6 dos anios)
+  // showLabels = nombre corto del eje; showValues = puntaje (prom) en el vertice
+  // colB/labelB = color y tooltip de la serie de comparacion.
+  function Radar({axes,axesB,size,showLabels,showValues,colB,labelB}){
     const ref=useRef(null);
     useEffect(()=>{const el=ref.current;el.innerHTML="";
-      const R=size/2,cx=R,cy=R,rad=R-(showLabels?34:12),n=axes.length;
-      const svg=d3.select(el).append("svg").attr("width",size).attr("height",size);
+      const small=size<210, COLB=colB||"#C77D3A";
+      const margen=(showLabels||showValues)?(small?28:42):12;
+      const R=size/2,cx=R,cy=R,rad=R-margen,n=axes.length;
+      // overflow visible: las etiquetas laterales (Convivencia/Habitos) pueden
+      // exceder el cuadro del svg sin recortarse (hay holgura en la columna).
+      const svg=d3.select(el).append("svg").attr("width",size).attr("height",size).style("overflow","visible");
       const ang=i=>(Math.PI*2*i/n)-Math.PI/2, rsc=d3.scaleLinear().domain([0,100]).range([0,rad]);
       [20,40,60,80,100].forEach(t=>svg.append("circle").attr("cx",cx).attr("cy",cy).attr("r",rsc(t)).attr("class","ring"));
       axes.forEach((a,i)=>{const x=cx+Math.cos(ang(i))*rad,y=cy+Math.sin(ang(i))*rad;
         svg.append("line").attr("x1",cx).attr("y1",cy).attr("x2",x).attr("y2",y).attr("stroke","var(--linea)");
-        if(showLabels){const lx=cx+Math.cos(ang(i))*(rad+13),ly=cy+Math.sin(ang(i))*(rad+13);
-          svg.append("text").attr("x",lx).attr("y",ly).attr("class","axis-lab b")
-            .attr("text-anchor",Math.abs(Math.cos(ang(i)))<.3?"middle":(Math.cos(ang(i))>0?"start":"end"))
-            .attr("dominant-baseline","middle").text(a.label);}});
-      const pts=axes.map((a,i)=>({a,x:cx+Math.cos(ang(i))*rsc(a.value||0),y:cy+Math.sin(ang(i))*rsc(a.value||0)}));
-      const line=d3.line().defined(d=>d.a.value!=null).x(d=>d.x).y(d=>d.y).curve(d3.curveLinearClosed);
-      svg.append("path").datum(pts).attr("d",line).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.6);
-      pts.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",showLabels?4:2.6).attr("fill",p.a.color||"var(--azul)")
+        if(showLabels||showValues){
+          const lx=cx+Math.cos(ang(i))*(rad+(small?9:13)),ly=cy+Math.sin(ang(i))*(rad+(small?9:13));
+          const anchor=Math.abs(Math.cos(ang(i)))<.3?"middle":(Math.cos(ang(i))>0?"start":"end");
+          const t=svg.append("text").attr("x",lx).attr("y",ly).attr("class","axis-lab b")
+            .attr("text-anchor",anchor).attr("dominant-baseline","middle");
+          if(showLabels) t.append("tspan").attr("x",lx).attr("fill",a.color||"var(--gris)")
+            .attr("font-weight",600).attr("font-size",small?"8px":"10.5px").text(a.label);
+          if(showValues) t.append("tspan").attr("x",lx).attr("dy",showLabels?(small?"0.95em":"1.1em"):0)
+            .attr("font-weight",800).attr("font-size",small?"9.5px":"12px").attr("fill","var(--tinta)")
+            .text(a.value==null?"—":fmt(a.value));
+        }});
+      const mkpts=ax=>ax.map((a,i)=>({a,x:cx+Math.cos(ang(i))*rsc(a.value||0),y:cy+Math.sin(ang(i))*rsc(a.value||0)}));
+      const lineGen=d3.line().defined(d=>d.a.value!=null).x(d=>d.x).y(d=>d.y).curve(d3.curveLinearClosed);
+      // Serie de comparacion (debajo): linea discontinua de otro color.
+      if(axesB){const ptsB=mkpts(axesB);
+        svg.append("path").datum(ptsB).attr("d",lineGen).attr("fill","none").attr("stroke",COLB)
+          .attr("stroke-width",1.7).attr("stroke-dasharray","4 3").attr("opacity",.95);
+        ptsB.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",small?2.3:3).attr("fill",COLB)
+          .on("mousemove",e=>showTT("<b>"+p.a.label+"</b>"+(labelB?" · "+labelB:"")+"<br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});}
+      const pts=mkpts(axes);
+      svg.append("path").datum(pts).attr("d",lineGen).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.8);
+      pts.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",(showLabels||showValues)?4:2.6).attr("fill",p.a.color||"var(--azul)")
         .on("mousemove",e=>showTT("<b>"+p.a.label+"</b><br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});
-    },[axes,size,showLabels]);
+    },[axes,axesB,size,showLabels,showValues,colB,labelB]);
     return <div ref={ref}></div>;
   }
 
@@ -322,7 +344,7 @@ __FONTS_CSS__
       <div className={"card"+(foco?" foco":"")} onClick={()=>onSel(rbd)}>
         <div className="nom">{e&&e.nom?tc(e.nom):rbd}</div>
         <div className="meta">{est[rbd]?comNom(est[rbd].cod_com):""} · {DEPE[e?.cod_depe2]||"—"}</div>
-        <Radar axes={axes} size={168} showLabels={false}/>
+        <Radar axes={axes} size={168} showLabels={false} showValues={true}/>
         <div className="alerts">
           {al.bajo>0 && <span className="chip al" title="indicadores significativamente bajo su GSE">▼ {al.bajo} bajo GSE</span>}
           {al.sobre>0 && <span className="chip de" title="indicadores significativamente sobre su GSE">▲ {al.sobre} sobre GSE</span>}
@@ -428,7 +450,7 @@ __FONTS_CSS__
           <div className="row2">
             <div className="blk">
               <h3>{radarTitle}</h3>
-              <div style={{display:"flex",justifyContent:"center"}}><Radar axes={radarAxes} size={nivel===0?280:250} showLabels={true}/></div>
+              <div style={{display:"flex",justifyContent:"center"}}><Radar axes={radarAxes} size={nivel===0?280:250} showLabels={true} showValues={true}/></div>
               {nivel===1 && <div className="leyenda">{(dimsByInd[drillInd]||[]).map(d=>(<span key={d.id}>{d.id}. {d.nombre}</span>))}</div>}
             </div>
             <div className="blk">
