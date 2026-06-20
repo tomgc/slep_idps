@@ -91,6 +91,36 @@ DIMENSION_LABELS <- c(
   "31" = "Participación", "32" = "Vida democrática", "33" = "Sentido de pertenencia",
   "41" = "Hábitos de vida activa", "42" = "Hábitos alimenticios", "43" = "Hábitos de autocuidado"
 )
+# Etiquetas de SUBDIMENSION con tildes (id_subdimension -> nombre acentuado).
+# Solo las 22 subdimensiones de actor EST (las que el motor MUESTRA en la vista de
+# niveles); las 8 no-EST no se renderizan. Override de presentacion sobre el nombre
+# ASCII del catalogo (corpus congelado). Son terminos cortos y verificables
+# (ortografia estandar); las DEFINICIONES largas NO se acentuan aqui por falta de
+# fuente acentuada verificable (quedan ASCII; decision del titular).
+SUBDIMENSION_LABELS <- c(
+  "111" = "Autovaloración académica",
+  "112" = "Promoción de la autovaloración académica",
+  "121" = "Interés y disposición al aprendizaje",
+  "122" = "Promoción de la motivación al aprendizaje",
+  "211" = "Cohesión social entre estudiantes",
+  "212" = "Apoyo y buen trato de los docentes",
+  "221" = "Ambiente organizado para el aprendizaje",
+  "222" = "Promoción de mecanismos constructivos de resolución de conflictos",
+  "231" = "Mecanismos de prevención y acción ante la violencia",
+  "232" = "Testimonios de violencia personal",
+  "311" = "Participación",
+  "312" = "Promoción de la participación",
+  "321" = "Expresión de opiniones",
+  "322" = "Representación democrática",
+  "323" = "Promoción de la deliberación democrática",
+  "331" = "Identificación con el establecimiento",
+  "411" = "Actitud frente a la actividad física",
+  "412" = "Promoción de vida activa",
+  "421" = "Actitud frente a la alimentación",
+  "422" = "Promoción de hábitos alimenticios",
+  "431" = "Actitud de autocuidado",
+  "432" = "Promoción de conductas de autocuidado"
+)
 INDICADOR_DIMENSIONES <- list(
   "1" = c(11L, 12L),
   "2" = c(21L, 22L, 23L),
