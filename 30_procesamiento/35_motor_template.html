@@ -64,6 +64,12 @@ __FONTS_CSS__
   .sup{color:#b06a4f;font-style:italic;}
   .leyenda{display:flex;gap:14px;font-size:11px;color:var(--gris);margin:4px 0 12px;flex-wrap:wrap;align-items:center;}
   .leyenda i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px;}
+  /* II.7 — item de leyenda con definicion (tooltip hover + foco teclado) */
+  .leyenda .leg-item{border:0;background:none;color:inherit;font:inherit;font-size:11px;font-family:inherit;
+    cursor:help;padding:1px 2px;display:inline-flex;align-items:center;border-radius:3px;}
+  .leyenda .leg-item:hover{background:#f3ecd6;}
+  .leyenda .leg-item:focus-visible{outline:2px solid var(--foco);outline-offset:1px;}
+  .leyenda .leg-info{color:var(--foco);margin-left:3px;font-size:10px;}
   /* II.6 — control de comparacion de dos anios en el radar */
   .radar-cmp{display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:8px;}
   .radar-cmp .leyenda{margin:0;justify-content:center;}
@@ -241,6 +247,9 @@ __FONTS_CSS__
 
   const tt=()=>document.getElementById("tt");
   const showTT=(h,e)=>{const t=tt();t.innerHTML=h;t.style.display="block";t.style.left=(e.clientX+12)+"px";t.style.top=(e.clientY+12)+"px";};
+  // Variante para foco por TECLADO: posiciona el tooltip bajo el elemento (sin cursor).
+  const showTTEl=(h,el)=>{const t=tt();t.innerHTML=h;t.style.display="block";const r=el.getBoundingClientRect();
+    t.style.left=Math.max(8,Math.min(r.left,window.innerWidth-272))+"px";t.style.top=(r.bottom+6)+"px";};
   const hideTT=()=>{tt().style.display="none";};
 
   // ===== Definicion metodologica contextual (colapsable; del catalogo embebido) =====
@@ -671,7 +680,15 @@ __FONTS_CSS__
           : <div>
               <div className="crumb">Mostrando establecimientos educacionales de <b>{territorioTxt}</b> · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""} · {unidades.length} establecimientos</div>
               <div className="help">Cada tarjeta es un <b>establecimiento individual</b> (su dato crudo, nunca un promedio). El color de alerta resume cuántos indicadores están <span style={{color:"var(--alerta)"}}>significativamente bajo su GSE (▼)</span> o <span style={{color:"var(--destaca)"}}>sobre él (▲)</span>. El territorio solo acota la lista; no produce cifras agregadas. Haz clic en un establecimiento para ver el detalle y bajar a dimensiones y subdimensiones.</div>
-              <div className="leyenda">{DATA.indicadores.map(i=>(<span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>))}<span>· ★ Costa Central</span></div>
+              <div className="leyenda">{DATA.indicadores.map(i=>(
+                i.definicion
+                  ? <button key={i.id} type="button" className="leg-item"
+                      aria-label={i.nombre+". ¿Qué mide? "+i.definicion}
+                      onMouseMove={e=>showTT("<b>"+i.nombre+"</b><br>"+i.definicion,e)} onMouseLeave={hideTT}
+                      onFocus={e=>showTTEl("<b>"+i.nombre+"</b><br>"+i.definicion,e.currentTarget)} onBlur={hideTT}>
+                      <i style={{background:i.color}}></i>{i.nombre}<span className="leg-info" aria-hidden="true">ⓘ</span></button>
+                  : <span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>
+              ))}<span>· ★ Costa Central</span></div>
               {unidades.length===0
                 ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, grado, año y GSE.</div>
                 : grupos.map(grp=>(
