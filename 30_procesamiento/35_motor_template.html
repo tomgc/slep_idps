@@ -13,6 +13,9 @@ __FONTS_CSS__
     --bajo:#E88663; --medio:#FFC92E; --alto:#75924E;
     --alerta:#c0392b; --alerta-bg:#fbe9e7; --destaca:#3a8f4a; --destaca-bg:#eaf5ec;
     --sombra:0 2px 8px rgba(74,39,70,.10);
+    /* Tokens que consume EntityModal (mapeados a la identidad del motor) */
+    --border-2:var(--linea); --radius-2:8px; --ink:var(--tinta); --fs-base:14px;
+    --font-body:"Museo Sans","Helvetica Neue",system-ui,Arial,sans-serif;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--tinta);
@@ -120,6 +123,35 @@ __FONTS_CSS__
   .evol-mark.nt{background:#eef0ee;color:var(--gris);}
   .evol-mark .arr{font-weight:800;}
   .evol-sig{font-size:9.5px;opacity:.8;}
+  /* --- Disparador de navegacion + chips de seleccion (reemplaza los selects) --- */
+  .nav-trigger{appearance:none;border:1px solid var(--foco);background:#fff;color:var(--foco);
+    padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .nav-trigger:hover{background:#eef3f7;}
+  .nav-sel{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;}
+  .sel-chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--linea);
+    border-radius:14px;padding:3px 10px;font-size:12px;}
+  .sel-chip .k{color:var(--gris);font-size:10px;text-transform:none;}
+  .sel-chip button{border:0;background:none;color:var(--gris);cursor:pointer;font-size:12px;padding:0 0 0 2px;}
+  .sel-chip button:hover{color:var(--alerta);}
+  .sel-link{border:0;background:none;color:var(--foco);cursor:pointer;font-size:12px;font-family:inherit;text-decoration:underline;}
+  /* --- EntityModal (selector portable, andamio; tokens del motor) --- */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(10,58,92,.42);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+  .modal{background:#fff;border-radius:var(--radius-2);width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 14px 44px rgba(10,58,92,.30);overflow:hidden;}
+  .modal-header{padding:16px 18px 8px;}
+  .modal-title{margin:0;font-family:"gobCL",var(--font-body);font-size:16px;font-weight:800;color:var(--azul);}
+  .modal-tabs{display:flex;gap:4px;padding:0 18px;border-bottom:1px solid var(--border-2);flex-wrap:wrap;}
+  .modal-tab{appearance:none;background:none;border:none;padding:8px 12px;font-family:var(--font-body);font-size:var(--fs-base);color:var(--gris);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .modal-tab.is-active{color:var(--foco);font-weight:700;border-bottom-color:var(--foco);}
+  .modal-body{padding:14px 18px;overflow-y:auto;}
+  .comuna-checklist{display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+  .check-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-2);cursor:pointer;}
+  .check-row:hover{background:#f3f0e8;}
+  .check-name{flex:1 1 auto;font-family:var(--font-body);font-size:var(--fs-base);color:var(--ink);}
+  .check-region{flex:0 0 auto;font-size:11px;color:var(--gris);}
+  .empty-state{padding:24px 10px;text-align:center;color:var(--gris);font-size:var(--fs-base);}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--border-2);}
+  .estab-popup-btn{appearance:none;border:1px solid var(--border-2);background:#fff;padding:8px 14px;border-radius:var(--radius-2);font-family:var(--font-body);font-size:var(--fs-base);cursor:pointer;color:var(--ink);}
+  .estab-popup-btn:hover{background:#f3f0e8;}
   .axis-lab{font-size:9px;fill:var(--gris);} .axis-lab.b{font-size:10px;}
   .ring{fill:none;stroke:var(--linea);}
   .tt{position:fixed;background:#23303a;color:#fff;font-size:11px;padding:5px 8px;border-radius:5px;pointer-events:none;display:none;z-index:80;max-width:260px;}
@@ -282,7 +314,7 @@ __FONTS_CSS__
     const foco=FOCO.has(e?.cod_com); const al=alertSummary(im);
     return (
       <div className={"card"+(foco?" foco":"")} onClick={()=>onSel(rbd)}>
-        <div className="nom">{e?tc(e.nom):rbd}</div>
+        <div className="nom">{e&&e.nom?tc(e.nom):rbd}</div>
         <div className="meta">{est[rbd]?comNom(est[rbd].cod_com):""} · {DEPE[e?.cod_depe2]||"—"}</div>
         <Radar axes={axes} size={168} showLabels={false}/>
         <div className="alerts">
@@ -371,7 +403,7 @@ __FONTS_CSS__
     return (
       <div className="detail">
         <button className="back" onClick={onBack}>‹ Volver a la grilla</button>
-        <h2>{e?tc(e.nom):rbd}</h2>
+        <h2>{e&&e.nom?tc(e.nom):rbd}</h2>
         <div className="dmeta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
         <div className="help">La escala <b>0–100 es relativa</b>: por sí sola no dice si el establecimiento va bien o mal. Las anclas de lectura son el <b>desvío vs su GSE</b> (mismo grupo socioeconómico) y la <b>variación vs la evaluación anterior</b>, ambas con su significancia. <span style={{color:"var(--alerta)"}}>▼ rojo = significativamente bajo (alerta)</span>; <span style={{color:"var(--destaca)"}}>▲ verde = significativamente sobre (destacado)</span>.</div>
 
@@ -443,12 +475,70 @@ __FONTS_CSS__
       </div>);
   }
 
-  // ===== Navegacion territorial: region -> SLEP/comuna -> grilla =====
+  // ===== EntityModal (selector portable; copia del andamio + a11y) =====
+  // Replica de 50_documentacion/andamios/diseno/entity_modal/EntityModal.jsx
+  // (andamio congelado). Se anade a11y en ESTA copia: role=dialog, aria-modal,
+  // cierre con Escape. Modo simple (multiple=false): clic en fila => onSelect.
+  function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null}){
+    const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
+    const [tab,setTab]=useState(tabInicial);
+    const [q,setQ]=useState("");
+    const ql=q.trim().toLowerCase();
+    useEffect(()=>{const h=e=>{if(e.key==="Escape")onCancel();};
+      window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h);},[onCancel]);
+    const list=buildList(tab,ql)||[];
+    const placeholder=(searchPlaceholderFor&&searchPlaceholderFor(tab))||"Buscar…";
+    const emptyText=(emptyTextFor&&emptyTextFor(tab,ql))||"Sin resultados";
+    return (
+      <div className="modal-backdrop" onClick={onCancel}>
+        <div className="modal" role="dialog" aria-modal="true" aria-label="Seleccionar territorio o sostenedor" onClick={e=>e.stopPropagation()}>
+          <div className="modal-header"><h2 className="modal-title">Seleccionar territorio o sostenedor</h2></div>
+          <div className="modal-tabs">
+            {tabs.map(([k,lbl])=>(
+              <button key={k} className={"modal-tab"+(tab===k?" is-active":"")} onClick={()=>{setTab(k);setQ("");}}>{lbl}</button>))}
+          </div>
+          <div className="modal-body">
+            <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
+              style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-base)"}}/>
+            <div className="comuna-checklist" style={{maxHeight:340}}>
+              {list.length===0 && <div className="empty-state">{emptyText}</div>}
+              {list.map(item=>(
+                <div key={item.kind+"|"+item.cod} className="check-row" onClick={()=>onSelect(item)}>
+                  <span className="check-name">{item.nom}</span>
+                  <span className="check-region">{item.sub}</span>
+                </div>))}
+            </div>
+          </div>
+          <div className="modal-footer"><button className="estab-popup-btn" onClick={onCancel}>Cancelar</button></div>
+        </div>
+      </div>);
+  }
+
+  // Catalogos para buildList (del JSON ya embebido; sin cambios en 35.R).
+  const COMUNAS_POR_REGION=(()=>{const m={};DATA.comunas.forEach(c=>{m[c.cod_reg]=(m[c.cod_reg]||0)+1;});return m;})();
+  const SOST_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null)m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
+    return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c]||("Dependencia "+c),n:m[c]}));})();
+  const TABS=[["region","Región"],["comuna","Comuna"],["sostenedor","Sostenedor"],["establecimiento","Establecimiento"]];
+  function buildList(tab,ql){
+    if(tab==="region") return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
+      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
+    if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
+      .sort((a,b)=>a.nom.localeCompare(b.nom))
+      .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
+    if(tab==="sostenedor") return SOST_OPTS.filter(s=>!ql||s.nom.toLowerCase().includes(ql))
+      .map(s=>({kind:"sostenedor",cod:s.cod,nom:s.nom,sub:s.n+" establecimientos"}));
+    return ql ? DATA.establecimientos.filter(e=>(e.nom&&e.nom.toLowerCase().includes(ql))||String(e.rbd).includes(ql)).slice(0,60)
+      .map(e=>({kind:"establecimiento",cod:e.rbd,nom:tc(e.nom)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
+  }
+  const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar…";
+  const emptyTextFor=(tab,ql)=>tab==="establecimiento"&&!ql?"Escribe para buscar un establecimiento":"Sin resultados";
+
+  // ===== Navegacion territorial via EntityModal: region/comuna/sostenedor/EE =====
   function App(){
     const grados=Object.keys(DATA.meta.grados);
-    const [region,setRegion]=useState(DATA.meta.region_foco||DATA.regiones[0].cod);
-    const [sostenedor,setSostenedor]=useState("");   // tipo de dependencia (cod_depe2), reemplaza SLEP
-    const [comuna,setComuna]=useState("");
+    const [terr,setTerr]=useState({kind:"region",cod:DATA.meta.region_foco||DATA.regiones[0].cod});
+    const [sostenedor,setSostenedor]=useState("");   // cod_depe2 (combinable con el territorio)
+    const [modalOpen,setModalOpen]=useState(false);
     const [grado,setGrado]=useState(grados.includes("4b")?"4b":grados[0]);
     const anios=DATA.meta.grado_anios[grado]||[];
     const [agno,setAgno]=useState(anios[anios.length-1]);
@@ -456,45 +546,39 @@ __FONTS_CSS__
     const [rbdSel,setRbdSel]=useState(null);
 
     useEffect(()=>{const a=DATA.meta.grado_anios[grado]||[];if(!a.includes(agno))setAgno(a[a.length-1]);setRbdSel(null);},[grado]);
-    useEffect(()=>{setRbdSel(null);},[region,sostenedor,comuna,agno,gse]);
+    useEffect(()=>{setRbdSel(null);},[terr,sostenedor,agno,gse]);
 
-    const comunasReg=useMemo(()=>DATA.comunas.filter(c=>c.cod_reg===region).sort((a,b)=>a.nom.localeCompare(b.nom)),[region]);
-    // Sostenedores = tipos de dependencia (cod_depe2, esquema IDPS 4-cat); conteo
-    // de establecimientos por categoria (nacional, informativo). Acota, no agrega.
-    const sostenedorOpts=useMemo(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null)m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
-      return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c]||("Dependencia "+c),n:m[c]}));},[]);
+    // EntityModal devuelve un item; se aplica segun su kind (acota, nunca agrega).
+    const onPick=item=>{setModalOpen(false);
+      if(item.kind==="region") setTerr({kind:"region",cod:item.cod});
+      else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod});
+      else if(item.kind==="sostenedor") setSostenedor(item.cod);
+      else if(item.kind==="establecimiento") setRbdSel(item.cod);};
 
-    // roster del territorio seleccionado, para (grado, agno)
+    // roster del territorio seleccionado, para (grado, agno). El territorio y el
+    // sostenedor solo ACOTAN la lista (continue); jamas agregan una cifra.
     const unidades=useMemo(()=>{const b=DATA.roster,out=[];
       for(let i=0;i<b.rows;i++){if(b.grado[i]!==grado||b.agno[i]!==agno)continue;
-        const e=est[b.rbd[i]]; if(!e||e.cod_reg!==region)continue;
+        const e=est[b.rbd[i]]; if(!e)continue;
+        if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
+        else { if(e.cod_reg!==terr.cod)continue; }
         if(sostenedor && e.cod_depe2!==sostenedor)continue;
-        if(comuna && e.cod_com!==comuna)continue;
         if(gse!=="TODOS" && b.gse[i]!==gse)continue;
         out.push({rbd:b.rbd[i],gse:b.gse[i]});}
-      return out;},[region,sostenedor,comuna,grado,agno,gse]);
+      return out;},[terr,sostenedor,grado,agno,gse]);
 
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
 
     const sostNom = sostenedor ? (DEPE[sostenedor]||sostenedor) : null;
-    const territorioTxt = (comuna?("comuna de "+comNom(comuna)):("Región de "+regNom(region))) + (sostNom?(" · sostenedor: "+sostNom):"");
+    const territorioTxt = (terr.kind==="comuna" ? "comuna de "+comNom(terr.cod) : "Región de "+regNom(terr.cod)) + (sostNom?(" · sostenedor: "+sostNom):"");
 
     return (
       <div className="wrap">
         <div className="nav">
           <div className="nav-row">
-            <div className="ctl"><label>Región</label>
-              <select value={region} onChange={e=>{setRegion(e.target.value);setComuna("");}}>
-                {DATA.regiones.map(r=><option key={r.cod} value={r.cod}>{r.nom}</option>)}</select></div>
-            <div className="ctl"><label>Comuna</label>
-              <select value={comuna} onChange={e=>setComuna(e.target.value)}>
-                <option value="">— todas —</option>
-                {comunasReg.map(c=><option key={c.cod} value={c.cod}>{tc(c.nom)}{FOCO.has(c.cod)?" ★":""}</option>)}</select></div>
-            <div className="ctl"><label>Sostenedor</label>
-              <select value={sostenedor} onChange={e=>setSostenedor(e.target.value)}>
-                <option value="">— todos —</option>
-                {sostenedorOpts.map(s=><option key={s.cod} value={s.cod}>{s.nom} ({s.n} establecimientos)</option>)}</select></div>
+            <div className="ctl"><label>Territorio / sostenedor</label>
+              <button className="nav-trigger" onClick={()=>setModalOpen(true)} aria-label="Abrir selector de territorio o sostenedor">Explorar / cambiar selección ▾</button></div>
             <div className="ctl"><label>Grado</label>
               <div className="seg">{grados.map(g=><button key={g} className={g===grado?"on":""} onClick={()=>setGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
             <div className="ctl"><label>Año</label>
@@ -504,7 +588,13 @@ __FONTS_CSS__
                 <button className={gse==="TODOS"?"on":""} onClick={()=>setGse("TODOS")}>Todos</button>
                 {DATA.meta.gse.map(g=><button key={g} className={gse===g?"on":""} onClick={()=>setGse(g)}>{g} {GSE[g]}</button>)}</div></div>
           </div>
+          <div className="nav-sel">
+            <span className="sel-chip"><span className="k">territorio</span> {terr.kind==="comuna"?comNom(terr.cod):regNom(terr.cod)}</span>
+            {sostenedor && <span className="sel-chip"><span className="k">sostenedor</span> {DEPE[sostenedor]} <button onClick={()=>setSostenedor("")} aria-label="Quitar filtro de sostenedor">✕</button></span>}
+          </div>
         </div>
+
+        {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
 
         {rbdSel
           ? <Detalle rbd={rbdSel} grado={grado} agno={agno} onBack={()=>setRbdSel(null)}/>
