@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-19 20:08:16
-- **Totales:** 22 carpetas, 130 archivos
+- **Fecha:** 2026-06-20 10:21:57
+- **Totales:** 23 carpetas, 133 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -10,10 +10,10 @@
 ```
 slep_idps/
 ├── .claude/
-│   ├── launch.json  (196)
+│   ├── launch.json  (246)
 │   └── settings.local.json  (88)
 ├── 10_utils/
-│   ├── 10_configuracion.R  (6.92K)
+│   ├── 10_configuracion.R  (10.2K)
 │   ├── 10_utils.R  (1.68K)
 │   ├── d3.min.js  (273K)
 │   └── pako.min.js  (45.8K)
@@ -47,6 +47,7 @@ slep_idps/
 │   │   ├── listado_slep_2026.xlsx  (55.5K)
 │   │   ├── rex_1440.pdf  (995K)
 │   │   └── rex_1459.pdf  (3.16M)
+│   ├── .DS_Store  (8K)
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
@@ -81,8 +82,8 @@ slep_idps/
 │   ├── 32_censo_insumos.R  (9.37K)
 │   ├── 33_construir_catalogos.R  (15.2K)
 │   ├── 34_leer_normalizar_idps.R  (17.5K)
-│   ├── 35_generar_motor_html.R  (15.2K)
-│   └── 35_motor_template.html  (43.5K)
+│   ├── 35_generar_motor_html.R  (19.4K)
+│   └── 35_motor_template.html  (54K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
@@ -94,7 +95,7 @@ slep_idps/
 │   │   ├── idps_largo.parquet  (5.61M)
 │   │   └── sleps_chile.parquet  (58.7K)
 │   ├── .DS_Store  (6K)
-│   └── motor_idps.html  (4.59M)
+│   └── motor_idps.html  (4.6M)
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
@@ -132,33 +133,36 @@ slep_idps/
 │   │   │   │   ├── PROMPT.md  (9.01K)
 │   │   │   │   └── slep_idps_fuente_completa.md  (100K)
 │   │   │   └── .DS_Store  (6K)
+│   │   ├── logs/
+│   │   │   └── 20260619_sesion6_encargo2_log.md  (23.5K)
 │   │   ├── .DS_Store  (8K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260619_180616_estructura.md  (7.83K)
-│   │   ├── 20260619_180616_estructura.txt  (7.9K)
-│   │   ├── 20260619_193834_estructura.md  (8.12K)
-│   │   ├── 20260619_193834_estructura.txt  (8.21K)
-│   │   ├── estructura_actual.md  (8.12K)
-│   │   └── estructura_actual.txt  (8.21K)
+│   │   ├── 20260619_200816_estructura.md  (8.14K)
+│   │   ├── 20260619_200816_estructura.txt  (8.22K)
+│   │   ├── 20260620_090504_estructura.md  (8.25K)
+│   │   ├── 20260620_090504_estructura.txt  (8.33K)
+│   │   ├── estructura_actual.md  (8.25K)
+│   │   └── estructura_actual.txt  (8.33K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
 │   │   ├── traspaso_cierre_v02.md  (22.8K)
 │   │   ├── traspaso_cierre_v03.md  (23.9K)
 │   │   ├── traspaso_cierre_v04.md  (26.2K)
-│   │   └── traspaso_cierre_v05.md  (33.8K)
+│   │   ├── traspaso_cierre_v05.md  (33.8K)
+│   │   └── traspaso_cierre_v06.md  (15.7K)
 │   └── .DS_Store  (8K)
 ├── docs/
 │   └── index.html  (4.59M)
 ├── tests/
 │   └── .gitkeep  (0)
-├── .DS_Store  (8K)
+├── .DS_Store  (14K)
 ├── .gitignore  (759)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
-├── CLAUDE.md  (4.68K)
+├── CLAUDE.md  (5.5K)
 ├── README.md  (1.74K)
 └── slep_idps.Rproj  (195)
 ```
@@ -168,8 +172,8 @@ slep_idps/
 | Extension | Archivos |
 |---|---|
 | xlsx | 37 |
-| md | 21 |
-| (sin extension) | 14 |
+| md | 23 |
+| (sin extension) | 15 |
 | pdf | 13 |
 | r | 9 |
 | otf | 7 |
