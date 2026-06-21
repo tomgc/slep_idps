@@ -64,6 +64,11 @@ message("[1] Construyendo manifiesto de xlsx IDPS...")
 # Patron de nombre: idps{grado}{anio}_{fragmento}_{estado}.xlsx
 PATRON_DATOS <- "^idps(2m|4b|6b|8b)(\\d{4})_(.+)_(final|preliminar)$"
 
+# Historico 2014-2019 (P5 fase 3): nomenclatura canonica fijada en la fase 2,
+# idps{grado}{anio}_rbd_historico.{xls,xlsx} en 20_insumos/historico/. Es formato
+# ANCHO (indicador/dimension como columnas), se lee con su propia rama (Bloque 3b).
+PATRON_HISTORICO <- "^idps(2m|4b|6b|8b)(\\d{4})_rbd_historico$"
+
 # Fragmento intermedio del nombre -> familia logica. La de niveles cambia de
 # nombre por anio (2023 *_niveles, 2024 *_rbd_niveles, 2025 *_rbd_subdim_niveles):
 # se detecta por substring, jamas por nombre exacto (aprendizaje v02-7).
@@ -72,11 +77,12 @@ clasificar_familia <- function(fragmento) {
          ifelse(grepl("rbd_dim|^dim", fragmento), "rbd_dim", "rbd"))
 }
 
+# --- Manifiesto MODERNO (raiz, 2022-2025): exactamente como antes ---
 archivos <- fs::dir_ls(here::here("20_insumos"), glob = "*.xlsx", type = "file") |>
   fs::path_file() |>
   (\(x) x[grepl("^idps", x) & !grepl("GLOSAS|glosa", x)])()
 
-manifiesto <- lapply(archivos, function(nm) {
+manifiesto_moderno <- lapply(archivos, function(nm) {
   base <- fs::path_ext_remove(nm)
   m <- stringr::str_match(base, PATRON_DATOS)
   tibble::tibble(
@@ -84,20 +90,56 @@ manifiesto <- lapply(archivos, function(nm) {
     grado   = m[, 2],
     anio    = as.integer(m[, 3]),
     familia = clasificar_familia(m[, 4]),
-    estado  = m[, 5]
+    estado  = m[, 5],
+    regimen = "moderno"
   )
 }) |> dplyr::bind_rows()
 
 stopifnot(
   "Algun xlsx no cumple el patron idps<grado><anio>_..._<estado>" =
-    !any(is.na(manifiesto$grado) | is.na(manifiesto$anio) | is.na(manifiesto$estado))
+    !any(is.na(manifiesto_moderno$grado) | is.na(manifiesto_moderno$anio) |
+           is.na(manifiesto_moderno$estado))
 )
 
-message(sprintf("    OK: %d archivos (rbd=%d, rbd_dim=%d, niveles=%d).",
-                nrow(manifiesto),
-                sum(manifiesto$familia == "rbd"),
-                sum(manifiesto$familia == "rbd_dim"),
-                sum(manifiesto$familia == "niveles")))
+# --- Manifiesto HISTORICO (20_insumos/historico/, 2014-2019; .xls y .xlsx) ---
+# Segundo dir_ls propio: NO recursivo (no entra a glosas/), sin tocar el moderno.
+archivos_hist <- fs::dir_ls(here::here("20_insumos", "historico"), type = "file",
+                            regexp = "\\.(xls|xlsx)$") |>
+  fs::path_file() |>
+  (\(x) x[grepl("^idps", x) & !grepl("GLOSAS|glosa", x)])()
+
+manifiesto_hist <- lapply(archivos_hist, function(nm) {
+  base <- fs::path_ext_remove(nm)
+  m <- stringr::str_match(base, PATRON_HISTORICO)
+  tibble::tibble(
+    archivo = nm,
+    grado   = m[, 2],
+    anio    = as.integer(m[, 3]),
+    familia = "rbd",        # primaria; el lector 3b deriva indicador (+ dim 2018)
+    estado  = "final",      # el historico es dato final, no preliminar
+    regimen = "historico"
+  )
+}) |> dplyr::bind_rows()
+
+stopifnot(
+  "Algun historico no cumple idps<grado><anio>_rbd_historico" =
+    nrow(manifiesto_hist) == 0 ||
+    !any(is.na(manifiesto_hist$grado) | is.na(manifiesto_hist$anio))
+)
+
+# Hook de verificacion (P5 fase 3): idps_solo_moderno=TRUE excluye el historico
+# para aislar el efecto del dato moderno (4b2024) en la verificacion bit-a-bit.
+# Default FALSE: operacion normal lee moderno + historico.
+if (isTRUE(getOption("idps_solo_moderno", FALSE))) manifiesto_hist <- manifiesto_hist[0, ]
+
+manifiesto <- dplyr::bind_rows(manifiesto_moderno, manifiesto_hist)
+
+message(sprintf("    OK: %d archivos (moderno=%d [rbd=%d, rbd_dim=%d, niveles=%d]; historico=%d).",
+                nrow(manifiesto), nrow(manifiesto_moderno),
+                sum(manifiesto_moderno$familia == "rbd"),
+                sum(manifiesto_moderno$familia == "rbd_dim"),
+                sum(manifiesto_moderno$familia == "niveles"),
+                nrow(manifiesto_hist)))
 
 
 # ============================================================================
@@ -241,16 +283,124 @@ leer_un_archivo <- function(archivo, grado, anio, familia, estado) {
 
 
 # ============================================================================
+# Bloque 3b — Lectura del HISTORICO ancho 2014-2019 (P5 fase 3)
+# ============================================================================
+# El historico publica el dato en formato ANCHO: una fila por RBD, con el prom
+# del indicador (ind_am, ind_cc, ...) y —solo 2018— de la dimension
+# (dim_am_aa_rbd, ...) como COLUMNAS. Aqui se pivota a largo al esquema canonico.
+# Reusa los crosswalks CW_INDICADOR/CW_DIMENSION via map_codigo (aborta si un
+# sufijo no calza, igual que el moderno; NO se construye un mapeo nuevo).
+# Lo que el historico NO trae (significancia, subdimension, niveles; y geo/GSE en
+# 2014-2016) va NA: ausencia legitima, nunca un valor inventado.
+
+# Inversos de etiqueta para el 2017, que trae cod_grupo/cod_depe2 en TEXTO.
+# Derivados de las constantes del config (no es un crosswalk nuevo: invierte
+# GSE_LABELS y DEPENDENCIAS, ya validados).
+GSE_TEXTO_A_COD  <- stats::setNames(names(GSE_LABELS),  unname(GSE_LABELS))
+DEPE_TEXTO_A_COD <- stats::setNames(names(DEPENDENCIAS), unname(DEPENDENCIAS))
+
+# Normaliza un codigo que puede venir numerico (2018-2019), en texto (2017) o
+# ausente (2014-2016): texto -> codigo via el inverso; numerico -> se conserva;
+# vacio/NA -> NA. El dominio se valida sin relajar en el Bloque 6.2.
+normalizar_cod_texto <- function(x, mapa_texto) {
+  x <- limpiar_marca(x)
+  es_txt <- !is.na(x) & is.na(suppressWarnings(as.numeric(x)))
+  if (any(es_txt)) x[es_txt] <- unname(mapa_texto[x[es_txt]])
+  as.character(x)
+}
+
+leer_un_archivo_historico <- function(archivo, grado, anio, estado) {
+  ruta <- here::here("20_insumos", "historico", archivo)
+  df <- readxl::read_excel(ruta, guess_max = 200000)  # primera hoja (Sheet1 en .xls)
+  names(df) <- trimws(tolower(names(df)))
+  n <- nrow(df)
+
+  # Geo divergente 2018 -> canonica. nom_reg_rbd se completa luego en el Bloque
+  # 5.1 desde cod_reg_rbd via NOMBRES_REGION; aqui solo nom_comuna -> nom_com_rbd
+  # (y nom_regi_n por si se necesitara). cod_reg/cod_pro/cod_com/nom_rbd ya son
+  # canonicos en 2018.
+  if ("nom_regi_n" %in% names(df) && !("nom_reg_rbd" %in% names(df))) df$nom_reg_rbd <- df$nom_regi_n
+  if ("nom_comuna" %in% names(df) && !("nom_com_rbd" %in% names(df))) df$nom_com_rbd <- df$nom_comuna
+
+  # Atributos por RBD (una fila por RBD en el ancho). 2017: cod_grupo/cod_depe2
+  # en texto -> codigo. 2014-2016: ausentes -> NA (supresion legitima).
+  base <- tibble::tibble(
+    rbd         = as.character(df$rbd),
+    cod_grupo   = normalizar_cod_texto(col_o_na(df, "cod_grupo", "chr", n), GSE_TEXTO_A_COD),
+    cod_depe2   = normalizar_cod_texto(col_o_na(df, "cod_depe2", "chr", n), DEPE_TEXTO_A_COD),
+    cod_com_rbd = col_o_na(df, "cod_com_rbd", "chr", n),
+    nom_com_rbd = col_o_na(df, "nom_com_rbd", "chr", n),
+    cod_reg_rbd = col_o_na(df, "cod_reg_rbd", "chr", n),
+    nom_reg_rbd = col_o_na(df, "nom_reg_rbd", "chr", n),
+    cod_pro_rbd = col_o_na(df, "cod_pro_rbd", "chr", n),
+    nom_rbd     = col_o_na(df, "nom_rbd", "chr", n)
+  )
+
+  # --- Pivote INDICADOR (todos los anios): ind_{xx} o ind_{xx}_rbd -> filas ---
+  cols_ind <- names(df)[grepl("^ind_[a-z]{2}(_rbd)?$", names(df))]
+  if (length(cols_ind) == 0)
+    stop(sprintf("%s: sin columnas de indicador ind_* en el historico.", archivo))
+  ind_long <- dplyr::bind_rows(lapply(cols_ind, function(col) {
+    code <- toupper(sub("^ind_([a-z]{2})(_rbd)?$", "\\1", col))
+    id   <- map_codigo(code, CW_INDICADOR, "indicador", archivo)  # aborta si no calza
+    tibble::tibble(
+      rbd = as.character(df$rbd), familia = "indicador",
+      id_indicador = id, id_dimension = NA_integer_, id_subdimension = NA_integer_,
+      prom = col_o_na(df, col, "num", n)
+    )
+  }))
+
+  # --- Pivote DIMENSION (solo 2018): dim_{ind}_{dim}_rbd -> filas ---
+  # El par MEDIO (dim) da id_dimension; el indicador sale de la decena (no del
+  # primer par, redundante). map_codigo aborta si un sufijo de dimension no calza.
+  cols_dim <- names(df)[grepl("^dim_[a-z]{2}_[a-z]{2}_rbd$", names(df))]
+  dim_long <- if (length(cols_dim) > 0) {
+    dplyr::bind_rows(lapply(cols_dim, function(col) {
+      mid <- toupper(sub("^dim_[a-z]{2}_([a-z]{2})_rbd$", "\\1", col))
+      idd <- map_codigo(mid, CW_DIMENSION, "dimension", archivo)
+      tibble::tibble(
+        rbd = as.character(df$rbd), familia = "dimension",
+        id_indicador = idd %/% 10L, id_dimension = idd, id_subdimension = NA_integer_,
+        prom = col_o_na(df, col, "num", n)
+      )
+    }))
+  } else NULL
+
+  largo <- dplyr::bind_rows(ind_long, dim_long)
+
+  # Adjuntar atributos por RBD y completar el esquema canonico con NA donde el
+  # historico no trae columna (significancia, niveles; tipos identicos al moderno).
+  out <- largo |>
+    dplyr::left_join(base, by = "rbd") |>
+    dplyr::mutate(
+      agno            = as.integer(anio),
+      grado           = grado,
+      ciclo_texto     = unname(GRADO_CICLO_TEXTO[grado]),
+      preliminar      = (estado == "preliminar"),
+      dif = NA_real_, sigdif = NA_integer_, difgru = NA_real_, sigdifgru = NA_integer_,
+      mdif = NA_character_, mdifgru = NA_character_,
+      niv_bajo_por = NA_real_, niv_medio_por = NA_real_, niv_alto_por = NA_real_,
+      niv_mbajo_por = NA_character_, niv_mmedio_por = NA_character_, niv_malto_por = NA_character_
+    )
+  out[, COLS_CANONICAS]
+}
+
+
+# ============================================================================
 # Bloque 4 — Iterar y consolidar por familia
 # ============================================================================
 
 message("[2] Leyendo y normalizando archivos...")
 
-partes <- purrr::pmap(manifiesto, function(archivo, grado, anio, familia, estado) {
-  df <- leer_un_archivo(archivo, grado, anio, familia, estado)
-  message(sprintf("    %s%s — %s %d: %d filas",
+partes <- purrr::pmap(manifiesto, function(archivo, grado, anio, familia, estado, regimen) {
+  df <- if (regimen == "historico") {
+    leer_un_archivo_historico(archivo, grado, anio, estado)
+  } else {
+    leer_un_archivo(archivo, grado, anio, familia, estado)
+  }
+  message(sprintf("    %s%s — %s %d [%s]: %d filas",
                   ifelse(estado == "preliminar", "*", " "),
-                  archivo, grado, anio, nrow(df)))
+                  archivo, grado, anio, substr(regimen, 1, 4), nrow(df)))
   df
 })
 datos <- dplyr::bind_rows(partes)
@@ -280,16 +430,29 @@ message(sprintf("    Subtotales: indicador=%d, dimension=%d, niveles=%d.",
 message("[3] Homologando atributos (depe2/geo canonicos por RBD; GSE por anio)...")
 
 # 5.1 — Atributos canonicos por RBD: familia indicador, anio mas reciente.
-attr_estab <- datos |>
-  dplyr::filter(.data$familia == "indicador") |>
-  dplyr::arrange(rbd, dplyr::desc(agno)) |>
-  dplyr::distinct(rbd, .keep_all = TRUE) |>
-  dplyr::transmute(
-    rbd, cod_depe2,
-    cod_com_rbd, nom_com_rbd, cod_reg_rbd,
-    nom_reg_rbd = dplyr::coalesce(unname(NOMBRES_REGION[cod_reg_rbd]), nom_reg_rbd),
-    cod_pro_rbd, nom_rbd
-  )
+# Resolucion por REGIMEN (P5 fase 3, invariante "el moderno no cambia"): las
+# filas MODERNAS (agno>=2022) toman el atributo del indicador MODERNO mas
+# reciente — asi el historico jamas altera una fila 2022-2025, ni siquiera la de
+# un RBD sin indicador moderno (queda NA, como antes). Las filas HISTORICAS toman
+# el indicador mas reciente GLOBAL, de modo que un RBD solo-historico recibe su
+# geo/depe historica (Fase B.4). Para un RBD con dato moderno ambas resoluciones
+# coinciden (el moderno es el mas reciente): atributo unico por RBD en la practica.
+construir_attr <- function(d) {
+  d |>
+    dplyr::arrange(rbd, dplyr::desc(agno)) |>
+    dplyr::distinct(rbd, .keep_all = TRUE) |>
+    dplyr::transmute(
+      rbd, cod_depe2,
+      cod_com_rbd, nom_com_rbd, cod_reg_rbd,
+      nom_reg_rbd = dplyr::coalesce(unname(NOMBRES_REGION[cod_reg_rbd]), nom_reg_rbd),
+      cod_pro_rbd, nom_rbd
+    )
+}
+ind_rows <- dplyr::filter(datos, .data$familia == "indicador")
+attr_estab <- dplyr::bind_rows(
+  construir_attr(dplyr::filter(ind_rows, as.integer(agno) >= 2022L)) |> dplyr::mutate(.hist = FALSE),
+  construir_attr(ind_rows) |> dplyr::mutate(.hist = TRUE)
+)
 
 # 5.2 — GSE por (rbd, agno, grado) desde la familia indicador (canonica).
 mapa_gse <- datos |>
@@ -301,12 +464,17 @@ if (nrow(dup_gse) > 0) {
   stop("GSE inconsistente por (rbd, agno, grado) en la familia indicador.")
 }
 
-# 5.3 — Reemplazar depe2/geo (todas las filas, por rbd) y cod_grupo (por anio).
+# 5.3 — Reemplazar depe2/geo (por rbd y regimen) y cod_grupo (por anio).
+# .hist marca la fila por regimen y empalma con la resolucion correcta de 5.1
+# (moderno congelado / historico global). El moderno (agno>=2022) nunca recibe
+# atributo de origen historico.
 n_total <- nrow(datos)
 datos <- datos |>
+  dplyr::mutate(.hist = as.integer(agno) <= 2019L) |>
   dplyr::select(-cod_depe2, -cod_com_rbd, -nom_com_rbd, -cod_reg_rbd,
                 -nom_reg_rbd, -cod_pro_rbd, -nom_rbd) |>
-  dplyr::left_join(attr_estab, by = "rbd") |>
+  dplyr::left_join(attr_estab, by = c("rbd", ".hist")) |>
+  dplyr::select(-.hist) |>
   dplyr::select(-cod_grupo) |>
   dplyr::left_join(mapa_gse, by = c("rbd", "agno", "grado"))
 stopifnot("El join de atributos cambio el numero de filas" = nrow(datos) == n_total)
@@ -383,8 +551,11 @@ message("[5] Escribiendo idps_largo.parquet...")
 
 dir_out <- here::here("40_salidas", "intermedios")
 if (!fs::dir_exists(dir_out)) fs::dir_create(dir_out, recurse = TRUE)
-ruta_final <- fs::path(dir_out, "idps_largo.parquet")
-ruta_tmp   <- fs::path(dir_out, "idps_largo.parquet.tmp")
+# Ruta de salida sobreescribible: por defecto el parquet canonico; el arnes de
+# verificacion (P5 fase 3) la redirige a un temporal para comparar bit-a-bit el
+# dato moderno ANTES de promover sobre idps_largo.parquet.
+ruta_final <- getOption("idps_largo_out", default = fs::path(dir_out, "idps_largo.parquet"))
+ruta_tmp   <- fs::path(paste0(ruta_final, ".tmp"))
 
 arrow::write_parquet(datos, ruta_tmp)
 fs::file_move(ruta_tmp, ruta_final)
