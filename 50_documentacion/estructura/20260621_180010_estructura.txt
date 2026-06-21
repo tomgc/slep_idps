@@ -1,7 +1,7 @@
 ESCANEO DE ESTRUCTURA — slep_idps
 Raiz   : /Users/tomgc/Projects/slep_idps
-Fecha  : 2026-06-20 23:09:27
-Totales: 25 carpetas, 150 archivos
+Fecha  : 2026-06-21 18:00:10
+Totales: 27 carpetas, 201 archivos
 Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 slep_idps/
@@ -28,7 +28,6 @@ slep_idps/
 │   │   │   ├── otros_indicadores_calidad_2014.pdf  (909K)
 │   │   │   ├── otros_indicadores_calidad_2019.pdf  (357K)
 │   │   │   └── subdimensiones_idps.pdf  (2.8M)
-│   │   ├── .DS_Store  (6K)
 │   │   ├── caracterizacion_establecimientos.xlsx  (16.5K)
 │   │   ├── diccionario_territorios.xlsx  (16.8K)
 │   │   ├── directorio_oficial_ee_publico.csv  (3.42M)
@@ -38,13 +37,39 @@ slep_idps/
 │   │   ├── idps2m2024_GLOSAS_web_final.xlsx  (34K)
 │   │   ├── idps2m2025_GLOSAS_web_preliminar.xlsx  (34.4K)
 │   │   ├── idps4b2023_GLOSAS_rbd_público_final.xlsx  (37.5K)
+│   │   ├── idps4b2024_GLOSAS_web_final.xlsx  (34K)
 │   │   ├── idps4b2025_GLOSAS_web_preliminar.xlsx  (34.4K)
 │   │   ├── idps6b2024_GLOSAS_web_final.xlsx  (34K)
 │   │   ├── idps8b2025_GLOSAS_web_preliminar.xlsx  (34.3K)
 │   │   ├── listado_slep_2026.xlsx  (55.5K)
 │   │   ├── rex_1440.pdf  (995K)
 │   │   └── rex_1459.pdf  (3.16M)
-│   ├── .DS_Store  (8K)
+│   ├── historico/
+│   │   ├── glosas/
+│   │   │   ├── idps2014_rbd_GLOSAS.xlsx  (33.1K)
+│   │   │   ├── idps2015_rbd_GLOSAS.xlsx  (33.1K)
+│   │   │   ├── idps2016_rbd_GLOSAS.xlsx  (31.5K)
+│   │   │   ├── idps2017_rbd_GLOSAS.xlsx  (34.2K)
+│   │   │   ├── idps2018_rbd_GLOSAS.xlsx  (35.2K)
+│   │   │   └── idps2019_rbd_GLOSAS.xlsx  (29.6K)
+│   │   ├── idps2m2014_rbd_historico.xls  (268K)
+│   │   ├── idps2m2015_rbd_historico.xls  (280K)
+│   │   ├── idps2m2016_rbd_historico.xls  (282K)
+│   │   ├── idps2m2017_rbd_historico.xlsx  (349K)
+│   │   ├── idps2m2018_rbd_historico.xlsx  (766K)
+│   │   ├── idps4b2014_rbd_historico.xls  (730K)
+│   │   ├── idps4b2015_rbd_historico.xls  (718K)
+│   │   ├── idps4b2016_rbd_historico.xls  (712K)
+│   │   ├── idps4b2017_rbd_historico.xlsx  (861K)
+│   │   ├── idps4b2018_rbd_historico.xlsx  (1.83M)
+│   │   ├── idps6b2014_rbd_historico.xls  (721K)
+│   │   ├── idps6b2015_rbd_historico.xls  (714K)
+│   │   ├── idps6b2016_rbd_historico.xls  (708K)
+│   │   ├── idps6b2018_rbd_historico.xlsx  (1.81M)
+│   │   ├── idps8b2014_rbd_historico.xls  (572K)
+│   │   ├── idps8b2015_rbd_historico.xls  (576K)
+│   │   ├── idps8b2017_rbd_historico.xlsx  (703K)
+│   │   └── idps8b2019_rbd_historico.xlsx  (626K)
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
@@ -64,6 +89,9 @@ slep_idps/
 │   ├── idps4b2023_niveles_final.xlsx  (7.59M)
 │   ├── idps4b2023_rbd_dim_final.xlsx  (4.69M)
 │   ├── idps4b2023_rbd_final.xlsx  (1.68M)
+│   ├── idps4b2024_rbd_dim_final.xlsx  (5.65M)
+│   ├── idps4b2024_rbd_final.xlsx  (2.45M)
+│   ├── idps4b2024_rbd_niveles_final.xlsx  (9.03M)
 │   ├── idps4b2025_rbd_dim_preliminar.xlsx  (5.08M)
 │   ├── idps4b2025_rbd_preliminar.xlsx  (2.09M)
 │   ├── idps4b2025_rbd_subdim_niveles_preliminar.xlsx  (7.01M)
@@ -78,9 +106,9 @@ slep_idps/
 │   ├── 31_depurar_directorio_oficial.R  (3.55K)
 │   ├── 32_censo_insumos.R  (9.37K)
 │   ├── 33_construir_catalogos.R  (15.2K)
-│   ├── 34_leer_normalizar_idps.R  (17.5K)
-│   ├── 35_generar_motor_html.R  (23K)
-│   └── 35_motor_template.html  (98.6K)
+│   ├── 34_leer_normalizar_idps.R  (26.1K)
+│   ├── 35_generar_motor_html.R  (23.4K)
+│   └── 35_motor_template.html  (105K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
@@ -88,11 +116,14 @@ slep_idps/
 │   │   ├── censo_insumos.md  (3.58K)
 │   │   ├── censo_insumos.parquet  (7.23K)
 │   │   ├── comunas_chile.parquet  (7.18K)
+│   │   ├── diagnostico_historico_idps.md  (82.2K)
 │   │   ├── establecimientos_chile.parquet  (260K)
-│   │   ├── idps_largo.parquet  (5.61M)
+│   │   ├── idps_largo.parquet  (13M)
+│   │   ├── inventario_historico_idps.parquet  (5.63K)
+│   │   ├── inventario_universo_idps.parquet  (6.57K)
 │   │   └── sleps_chile.parquet  (58.7K)
 │   ├── .DS_Store  (6K)
-│   └── motor_idps.html  (4.65M)
+│   └── motor_idps.html  (4.66M)
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
@@ -101,8 +132,16 @@ slep_idps/
 │   │   │   └── 20260612_decision_ponderacion_idps.md  (7.21K)
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
+│   │   ├── .DS_Store  (6K)
+│   │   ├── censo_universo_idps.md  (117K)
+│   │   ├── encargo_claude_code_idps_censo_universo.md  (22.3K)
 │   │   ├── encargo_claude_code_idps_cierre_v05.md  (6.72K)
+│   │   ├── encargo_claude_code_idps_diagnostico_historico.md  (23K)
+│   │   ├── encargo_claude_code_idps_integracion_historico.md  (25.9K)
+│   │   ├── encargo_claude_code_idps_organizacion.md  (21.2K)
+│   │   ├── encargo_claude_code_idps_pestana_slep_selector.md  (14.5K)
 │   │   ├── encargo_claude_code_idps_producto_deploy.md  (14K)
+│   │   ├── encargo_claude_code_idps_vista_historica_barras.md  (16.2K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
 │   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (24.7K)
@@ -147,17 +186,23 @@ slep_idps/
 │   │   │   ├── 20260620_rediseno_fase1_log.md  (8.04K)
 │   │   │   ├── 20260620_rediseno_fase2_log.md  (13.7K)
 │   │   │   ├── 20260620_rediseno_fase3_log.md  (16.1K)
-│   │   │   └── 20260620_rediseno_fase4_log.md  (5.47K)
+│   │   │   ├── 20260620_rediseno_fase4_log.md  (5.47K)
+│   │   │   ├── 20260621_censo_universo_idps_log.md  (7.9K)
+│   │   │   ├── 20260621_diagnostico_historico_idps_log.md  (8.95K)
+│   │   │   ├── 20260621_integracion_historico_idps_log.md  (9.64K)
+│   │   │   ├── 20260621_pestana_slep_selector_log.md  (7.08K)
+│   │   │   ├── 20260621_reorganizacion_universo_idps_log.md  (9.96K)
+│   │   │   └── 20260621_vista_historica_barras_log.md  (8.07K)
 │   │   ├── .DS_Store  (10K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260620_224516_estructura.md  (9.35K)
-│   │   ├── 20260620_224516_estructura.txt  (9.43K)
-│   │   ├── 20260620_230506_estructura.md  (9.35K)
-│   │   ├── 20260620_230506_estructura.txt  (9.43K)
-│   │   ├── estructura_actual.md  (9.35K)
-│   │   └── estructura_actual.txt  (9.43K)
+│   │   ├── 20260621_130930_estructura.md  (15.2K)
+│   │   ├── 20260621_130930_estructura.txt  (15.3K)
+│   │   ├── 20260621_175929_estructura.md  (12.6K)
+│   │   ├── 20260621_175929_estructura.txt  (12.7K)
+│   │   ├── estructura_actual.md  (12.6K)
+│   │   └── estructura_actual.txt  (12.7K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
@@ -167,10 +212,12 @@ slep_idps/
 │   │   ├── traspaso_cierre_v05.md  (33.8K)
 │   │   ├── traspaso_cierre_v06.md  (15.7K)
 │   │   ├── traspaso_cierre_v07.md  (30.3K)
-│   │   └── traspaso_cierre_v08.md  (24.9K)
+│   │   ├── traspaso_cierre_v08.md  (24.9K)
+│   │   ├── traspaso_cierre_v09.md  (27.3K)
+│   │   └── traspaso_cierre_v10.md  (25.9K)
 │   └── .DS_Store  (10K)
 ├── docs/
-│   └── index.html  (4.65M)
+│   └── index.html  (4.66M)
 ├── tests/
 │   └── .gitkeep  (0)
 ├── .DS_Store  (14K)
@@ -179,17 +226,24 @@ slep_idps/
 ├── 00_escanear_proyecto.R  (8.99K)
 ├── CLAUDE.md  (5.5K)
 ├── README.md  (1.74K)
-└── slep_idps.Rproj  (195)
+├── reorganizar_universo_idps.R  (17.7K)
+├── slep_idps.Rproj  (195)
+├── verificar_censo_universo.R  (18.8K)
+├── verificar_checkpoint_historico.R  (6.39K)
+├── verificar_descomposicion_historico.R  (4.53K)
+├── verificar_historico_idps.R  (23.1K)
+└── verificar_integracion_historico.R  (7.4K)
 
 Conteo por extension:
-  xlsx               37
-  md                 31
-  (sin extension)    17
+  xlsx               54
+  md                 47
+  (sin extension)    16
+  r                  15
   pdf                13
-  r                  9
+  xls                11
+  parquet            8
   otf                7
   html               6
-  parquet            6
   jsx                5
   png                5
   js                 4
