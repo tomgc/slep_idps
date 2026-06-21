@@ -71,7 +71,16 @@ source("00_escanear_proyecto.R")  # snapshot de estructura (al abrir y cerrar se
 
 ## Ultimos cambios
 
-1. **Auditoria de datos (FASE I) + saneamiento/mejoras (FASE II)** (sesion 6,
+1. **P5 — carga historica IDPS 2014-2019 completa** (sesion 10). `34` extendido para
+   leer dos regimenes (moderno largo en la raiz 2022-2025 + historico ancho en
+   `20_insumos/historico/` 2014-2019), pivotando el ancho a largo y fundiendo en
+   `idps_largo.parquet` (ahora 2014->2025, 2.362.447 filas). Indicador 2014-2019 +
+   dimension 2018; sin subdimension/niveles/significancia historica (NA legitimo);
+   hueco pandemia 2020-2021. 4b2024 traspapelado rescatado a la raiz. Verificado: 0
+   cifras IDPS modernas alteradas (panel adversarial 4/4). PENDIENTE: el motor `35`
+   aun muestra 2022-2025; mostrar la serie historica extendida es la proxima sesion
+   (trabajo de motor).
+2. **Auditoria de datos (FASE I) + saneamiento/mejoras (FASE II)** (sesion 6,
    3er tramo). Auditoria exhaustiva: join RBD->geo 100% correcto vs directorio,
    cifras 1:1 con el crudo (0 discrepancias), Costa Central 60 en 4b 2025. Fixes
    SOLO de presentacion (`run_all(only=35)`, `idps_largo` intacto, cifras sin
@@ -83,15 +92,12 @@ source("00_escanear_proyecto.R")  # snapshot de estructura (al abrir y cerrar se
    GSE sin enumeracion. PENDIENTE decision titular: 120 EE SLEP-por-traspaso
    marcados Municipal (desfase de vigencia, NO cambia cifras). `docs/` NO
    republicado (queda para el cierre v06 del Encargo 2).
-2. **Producto completo + deploy** (encargo 2): motor ampliado a TODO CHILE (8353
+3. **Producto completo + deploy** (encargo 2): motor ampliado a TODO CHILE (8353
    establecimientos, 16 regiones); navegacion territorial region->SLEP/comuna->
    establecimiento; GSE de referencia protagonista (doble ancla + alerta);
    drill-down indicador->dimension->subdimension; tendencia eje fijo 0-100;
    fuentes de marca embebidas. Copiado a `docs/index.html` para GitHub Pages.
    Decode ~340ms, indice de rangos 7ms. Spot-check fuera de Valparaiso 1:1.
-3. **Motor HTML base**: grilla de radares por establecimiento agrupada por GSE
+4. **Motor HTML base**: grilla de radares por establecimiento agrupada por GSE
    (sin agregacion), detalle, distribucion de niveles, marca de desvio, evolucion.
-4. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1.
-5. **P6 — pipeline** (`34_leer_normalizar_idps.R`): 3 familias, homologa
-   texto<->id por anio, resuelve `cod_depe2`, GSE a niveles -> `idps_largo.parquet`
-   (1.485.103 filas). Catalogos (`33`) + orquestador `run_all()` (`00_build.R`).
+5. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1.
