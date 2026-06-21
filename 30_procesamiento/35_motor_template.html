@@ -1059,19 +1059,24 @@ __FONTS_CSS__
   // liste comunas u otros valores ajenos a la dependencia (Hallazgo H5).
   const DEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null&&DEPE[e.cod_depe2])m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
     return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c],n:m[c]}));})();
-  const TABS=[["region","Región"],["comuna","Comuna"],["dependencia","Dependencia"],["establecimiento","Establecimiento"]];
+  const TABS=[["comuna","Comuna"],["slep","SLEP"],["region","Región"],["dependencia","Dependencia"],["establecimiento","Establecimiento"]];
   function buildList(tab,ql){
     if(tab==="region") return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
       .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
+    // Pestaña SLEP: "Traspaso AAAA" es etiqueta de contexto (regla de dominio),
+    // NO un filtro temporal; elegir un SLEP agrupa TODA su serie historica por
+    // cod_slep, igual que el foco y el comparador.
+    if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
+      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:"Traspaso "+(s.anio!=null?s.anio:"—")}));
     if(tab==="dependencia") return DEPS_OPTS.filter(s=>!ql||s.nom.toLowerCase().includes(ql))
       .map(s=>({kind:"dependencia",cod:s.cod,nom:s.nom,sub:s.n+" establecimientos"}));
     return ql ? DATA.establecimientos.filter(e=>(e.nom&&e.nom.toLowerCase().includes(ql))||String(e.rbd).includes(ql)).slice(0,60)
       .map(e=>({kind:"establecimiento",cod:e.rbd,nom:nomEE(e)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
   }
-  const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar…";
+  const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":tab==="slep"?"Buscar un SLEP…":"Buscar…";
   const emptyTextFor=(tab,ql)=>tab==="establecimiento"&&!ql?"Escribe para buscar un establecimiento":"Sin resultados";
 
   // ===== Buscador de establecimiento embebido en la ficha (revision P3 #19) =====
@@ -1105,7 +1110,7 @@ __FONTS_CSS__
   // SOLO para la etiqueta del picker; la meta del chip se calcula del roster real
   // por grado/año (D-s8-4).
   const SLEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_slep!=null){const k=e.cod_slep;(m[k]=m[k]||{ee:0,coms:new Set()});m[k].ee++;if(e.cod_com!=null)m[k].coms.add(e.cod_com);}});
-    return (DATA.sleps||[]).map(s=>({cod:s.cod_slep,nom:s.nombre_slep,ee:(m[s.cod_slep]?m[s.cod_slep].ee:0),ncom:(m[s.cod_slep]?m[s.cod_slep].coms.size:0)}))
+    return (DATA.sleps||[]).map(s=>({cod:s.cod_slep,nom:s.nombre_slep,anio:s.anio_traspaso,ee:(m[s.cod_slep]?m[s.cod_slep].ee:0),ncom:(m[s.cod_slep]?m[s.cod_slep].coms.size:0)}))
       .filter(s=>s.ee>0).sort((a,b)=>String(a.nom).localeCompare(String(b.nom)));})();
   const TABS_CMP=[["slep","SLEP"],["comuna","Comuna"],["region","Región"]];
   function buildListCmp(tab,ql){
@@ -1261,6 +1266,7 @@ __FONTS_CSS__
     // EntityModal devuelve un item; se aplica segun su kind (acota, nunca agrega).
     const onPick=item=>{setModalOpen(false);
       if(item.kind==="region") setTerr({kind:"region",cod:item.cod});
+      else if(item.kind==="slep") setTerr({kind:"slep",cod:item.cod});   // agrupa toda la serie por cod_slep (sin filtro de anio_traspaso)
       else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod});
       else if(item.kind==="dependencia") setDep(item.cod);
       else if(item.kind==="establecimiento"){setRbdSel(item.cod);setPantalla("ficha");}};
@@ -1284,6 +1290,7 @@ __FONTS_CSS__
       for(let i=0;i<b.rows;i++){if(b.grado[i]!==panGrado||b.agno[i]!==panAgno)continue;
         const e=est[b.rbd[i]]; if(!e)continue;
         if(terr.kind==="foco"){ if(e.cod_slep!==SLEP_FOCO)continue; }
+        else if(terr.kind==="slep"){ if(String(e.cod_slep)!==String(terr.cod))continue; }
         else if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
         else { if(e.cod_reg!==terr.cod)continue; }
         if(dep && e.cod_depe2!==dep)continue;
@@ -1297,6 +1304,7 @@ __FONTS_CSS__
 
     const depNom = dep ? (DEPE[dep]||dep) : null;
     const terrTxt = terr.kind==="foco" ? "SLEP "+SLEP_FOCO_NOM
+                  : terr.kind==="slep" ? "SLEP "+((SLEPS_OPTS.find(s=>String(s.cod)===String(terr.cod))||{}).nom||terr.cod)
                   : terr.kind==="comuna" ? "comuna de "+comNom(terr.cod)
                   : "Región de "+regNom(terr.cod);
 
