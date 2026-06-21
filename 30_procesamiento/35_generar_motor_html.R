@@ -282,11 +282,17 @@ comunas_lst <- COM |>
   dplyr::distinct(cod, .keep_all = TRUE) |>
   dplyr::arrange(nom)
 
-# SLEPs con datos, con su region (via la geo del directorio).
+# SLEPs con datos, con su region (via la geo del directorio) y su anio_traspaso.
+# anio_traspaso es ETIQUETA DE CONTEXTO por SLEP (constante por cod_slep en el
+# catalogo sleps_chile), NO un filtro temporal: el SLEP agrupa toda su serie
+# historica, incluidos los años previos al traspaso. Se expone para mostrarlo en
+# la fila del SLEP del selector ("Traspaso AAAA"); nunca recorta que años se
+# atribuyen al SLEP.
 sleps_lst <- est_attr |>
   dplyr::filter(!is.na(cod_slep)) |>
   dplyr::distinct(cod_slep, nombre_slep, cod_reg) |>
   dplyr::distinct() |>
+  dplyr::left_join(dplyr::distinct(SLE, cod_slep, anio_traspaso), by = "cod_slep") |>
   dplyr::arrange(nombre_slep)
 
 slep_foco <- unique(SLE$cod_slep[SLE$nombre_slep == "Costa Central"])
