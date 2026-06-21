@@ -721,6 +721,8 @@ __FONTS_CSS__
 
   // ===== Panel de evolucion de UNA metrica: linea eje FIJO 0-100 (sin autoescala,
   //       sin interpolar huecos) + marcas inter-anuales (dif absoluto + sigdif). =====
+  // HUERFANO desde P3-s9: la vista historica ahora usa BarrasAnio (barras por año).
+  // Se conserva definido (sin uso) por si se revierte la decision de barras.
   function PanelEvolucion({nombre,color,pts,hideHead}){
     const ref=useRef(null);
     useEffect(()=>{const el=ref.current;el.innerHTML="";
@@ -928,18 +930,23 @@ __FONTS_CSS__
             ? (
             <div className="hist-wrap">
               <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares; los huecos son años sin aplicación (no se interpola, p. ej. 4° básico no aplica 2024).</div>
-              {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[];
+              {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieFull(indOf,rbd,grado,ind.id,anios);
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
-                  <div className="hist-ind-h"><span className="indp-dot" style={{background:ind.color}}></span><span className="hist-ind-name">{ind.nombre}</span></div>
-                  <div className="hist-main"><PanelEvolucion nombre={ind.nombre} color={ind.color} pts={serieFull(indOf,rbd,grado,ind.id,anios)} hideHead={true}/></div>
+                  <div className="hist-ind-h"><span className="indp-dot" style={{background:ind.color}}></span><span className="hist-ind-name">{ind.nombre}</span><HistTrend pts={ipts}/></div>
+                  <div className="hist-main"><BarrasAnio nombre={ind.nombre} color={ind.color} pts={ipts}/></div>
                   {idims.length>0 && <>
                     <div className="hist-dims-lab">Dimensiones</div>
                     <div className="hist-dims">
-                      {idims.map((dimo,di)=><PanelEvolucion key={dimo.id} nombre={dimo.nombre} color={dimColor(ind.color,di,idims.length)} pts={serieFull(dimOf,rbd,grado,dimo.id,anios)}/>)}
+                      {idims.map((dimo,di)=>{const dpts=serieFull(dimOf,rbd,grado,dimo.id,anios); const dcol=dimColor(ind.color,di,idims.length);
+                        return (
+                          <div className="hist-dim" key={dimo.id}>
+                            <div className="hist-dim-h"><span className="sw sm" style={{background:dcol}}></span><span className="hist-dim-name">{dimo.nombre}</span><HistTrend pts={dpts} tiny/></div>
+                            <BarrasAnio nombre={dimo.nombre} color={dcol} pts={dpts}/>
+                          </div>);})}
                     </div></>}
                 </section>);})}
-              <div className="nota nota-inv">Cada panel tiene su propio eje fijo 0–100 (escala común, comparable); la marca de cada año muestra la diferencia (dif) vs la evaluación anterior y su significancia (▲/▼/= + texto), <b>leídas de la Agencia</b>. La subdimensión no aparece aquí: es <b>distribución de niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
+              <div className="nota nota-inv">Cada panel usa barras por año sobre un eje fijo 0–100 (escala común, comparable); la <b>marca de tendencia</b> en cada cabecera muestra la diferencia (dif) del último año con dato vs la evaluación anterior y su significancia (▲/▼/= + texto), <b>leídas de la Agencia</b>. La subdimensión no aparece aquí: es <b>distribución de niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
             </div>)
             : (
             <div>
