@@ -16,6 +16,7 @@
 .RData
 .vscode/
 .idea/
+.claude/
 .DS_Store
 Thumbs.db
 # Nota: *.Rproj SI se versiona (ancla del proyecto; sin el, here::here() no
@@ -28,7 +29,7 @@ _archivo/
 # Outputs accidentales en raiz y scripts de diagnostico
 /*.docx
 /*.pdf
-/diagnostico_*.md
+diagnostico_*.md
 /verificar_*.R
 /listar_*.R
 
