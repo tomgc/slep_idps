@@ -3,7 +3,7 @@
 - **Fecha:** 2026-06-22
 - **Encargo:** P-PALETA (`50_documentacion/activa/encargo_claude_code_idps_paleta.md`)
 - **Tipo:** decisión de presentación (identidad de marca). NO afecta ninguna cifra.
-- **Estado:** adoptada y desplegada (sesión 12, tras panel adversarial de fidelidad).
+- **Estado:** adoptada y desplegada (sesión 14, tras panel adversarial de fidelidad).
 
 ---
 
