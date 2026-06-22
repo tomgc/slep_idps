@@ -1,13 +1,9 @@
-# Estructura actual — slep_idps
+ESCANEO DE ESTRUCTURA — slep_idps
+Raiz   : /Users/tomgc/Projects/slep_idps
+Fecha  : 2026-06-22 11:48:30
+Totales: 30 carpetas, 241 archivos
+Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
-- **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-22 07:40:45
-- **Totales:** 27 carpetas, 217 archivos
-- **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
-
-## Arbol
-
-```
 slep_idps/
 ├── .claude/
 │   ├── launch.json  (246)
@@ -112,8 +108,8 @@ slep_idps/
 │   ├── 32_censo_insumos.R  (9.37K)
 │   ├── 33_construir_catalogos.R  (15.2K)
 │   ├── 34_leer_normalizar_idps.R  (26.1K)
-│   ├── 35_generar_motor_html.R  (26.8K)
-│   └── 35_motor_template.html  (107K)
+│   ├── 35_generar_motor_html.R  (28.2K)
+│   └── 35_motor_template.html  (109K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
@@ -128,18 +124,20 @@ slep_idps/
 │   │   ├── inventario_universo_idps.parquet  (6.57K)
 │   │   └── sleps_chile.parquet  (58.7K)
 │   ├── .DS_Store  (6K)
-│   └── motor_idps.html  (6.23M)
+│   └── motor_idps.html  (5.04M)
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
 │   │   │   ├── .gitkeep  (0)
 │   │   │   ├── 20260611_decision_gobernanza_insumos_publicos.md  (3.23K)
 │   │   │   ├── 20260612_decision_ponderacion_idps.md  (7.21K)
-│   │   │   └── 20260622_decision_etiqueta_dependencia.md  (3.33K)
+│   │   │   ├── 20260622_decision_etiqueta_dependencia.md  (3.33K)
+│   │   │   └── 20260622_decision_paleta_indicadores.md  (3.94K)
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
 │   │   ├── .DS_Store  (6K)
 │   │   ├── censo_universo_idps.md  (117K)
+│   │   ├── encargo_ajustes_motor_s14.md  (15.4K)
 │   │   ├── encargo_claude_code_idps_censo_universo.md  (22.3K)
 │   │   ├── encargo_claude_code_idps_cierre_v05.md  (6.72K)
 │   │   ├── encargo_claude_code_idps_diagnostico_historico.md  (23K)
@@ -148,6 +146,7 @@ slep_idps/
 │   │   ├── encargo_claude_code_idps_integracion_historico.md  (25.9K)
 │   │   ├── encargo_claude_code_idps_motor_historico.md  (15.8K)
 │   │   ├── encargo_claude_code_idps_organizacion.md  (21.2K)
+│   │   ├── encargo_claude_code_idps_paleta.md  (12.8K)
 │   │   ├── encargo_claude_code_idps_pestana_slep_selector.md  (14.5K)
 │   │   ├── encargo_claude_code_idps_producto_deploy.md  (14K)
 │   │   ├── encargo_claude_code_idps_verificacion_integracion_historico.md  (16.4K)
@@ -155,7 +154,7 @@ slep_idps/
 │   │   ├── encargo_claude_code_idps_vista_historica_barras.md  (16.2K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
-│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (24.7K)
+│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (32.9K)
 │   ├── andamios/
 │   │   ├── diseno/
 │   │   │   ├── entity_modal/
@@ -208,17 +207,40 @@ slep_idps/
 │   │   │   ├── 20260621_reorganizacion_universo_idps_log.md  (9.96K)
 │   │   │   ├── 20260621_verificacion_integracion_historico_log.md  (7.73K)
 │   │   │   ├── 20260621_verificacion_valores_historico_log.md  (7.3K)
-│   │   │   └── 20260621_vista_historica_barras_log.md  (8.07K)
+│   │   │   ├── 20260621_vista_historica_barras_log.md  (8.07K)
+│   │   │   ├── 20260622_ajustes_motor_s14_log.md  (8.05K)
+│   │   │   ├── 20260622_auditoria_decimales_prom_log.md  (4.04K)
+│   │   │   └── 20260622_paleta_indicadores_log.md  (8.47K)
 │   │   ├── .DS_Store  (10K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260621_200738_estructura.md  (13.1K)
-│   │   ├── 20260621_200738_estructura.txt  (13.2K)
-│   │   ├── 20260622_071548_estructura.md  (13.6K)
-│   │   ├── 20260622_071548_estructura.txt  (13.7K)
-│   │   ├── estructura_actual.md  (13.6K)
-│   │   └── estructura_actual.txt  (13.7K)
+│   │   ├── 20260622_090251_estructura.md  (14K)
+│   │   ├── 20260622_090251_estructura.txt  (14.1K)
+│   │   ├── 20260622_111622_estructura.md  (15.1K)
+│   │   ├── 20260622_111622_estructura.txt  (15.2K)
+│   │   ├── estructura_actual.md  (15.1K)
+│   │   └── estructura_actual.txt  (15.2K)
+│   ├── suite/
+│   │   ├── assets/
+│   │   │   ├── logo-color-stacked.png  (126K)
+│   │   │   ├── logo-mark-cc.png  (118K)
+│   │   │   └── logo-white-stacked.png  (143K)
+│   │   ├── fonts/
+│   │   │   ├── gobCL_Heavy.otf  (43.7K)
+│   │   │   ├── gobCL_Light.otf  (37.1K)
+│   │   │   ├── gobCL_Regular.otf  (35.7K)
+│   │   │   ├── MuseoSans_500.otf  (61K)
+│   │   │   ├── MuseoSans_700.otf  (62.1K)
+│   │   │   └── MuseoSans-300.otf  (61.5K)
+│   │   ├── .DS_Store  (6K)
+│   │   ├── arquitectura_general_slep_idps.html  (8.89K)
+│   │   ├── arquitectura_slep_idps.html  (18.9K)
+│   │   ├── documentacion_general_slep_idps.html  (7.52K)
+│   │   ├── documentacion_proyecto_slep_idps.html  (11.8K)
+│   │   ├── documentar.R  (40.6K)
+│   │   ├── inline_suite.R  (6.29K)
+│   │   └── suite_estilos.css  (21.7K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
@@ -232,14 +254,15 @@ slep_idps/
 │   │   ├── traspaso_cierre_v09.md  (27.3K)
 │   │   ├── traspaso_cierre_v10.md  (25.9K)
 │   │   ├── traspaso_cierre_v11.md  (20.3K)
-│   │   └── traspaso_cierre_v12.md  (26K)
-│   └── .DS_Store  (10K)
+│   │   ├── traspaso_cierre_v12.md  (26K)
+│   │   └── traspaso_cierre_v13.md  (19.6K)
+│   └── .DS_Store  (14K)
 ├── docs/
-│   └── index.html  (6.23M)
+│   └── index.html  (5.04M)
 ├── tests/
 │   └── .gitkeep  (0)
-├── .DS_Store  (14K)
-├── .gitignore  (1.14K)
+├── .DS_Store  (16K)
+├── .gitignore  (1.47K)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
 ├── CLAUDE.md  (7.41K)
@@ -253,26 +276,22 @@ slep_idps/
 ├── verificar_descomposicion_historico.R  (4.53K)
 ├── verificar_historico_idps.R  (23.1K)
 └── verificar_integracion_historico.R  (7.4K)
-```
 
-## Conteo por extension
-
-| Extension | Archivos |
-|---|---|
-| md | 60 |
-| xlsx | 54 |
-| (sin extension) | 17 |
-| r | 17 |
-| pdf | 13 |
-| xls | 11 |
-| parquet | 8 |
-| otf | 7 |
-| html | 6 |
-| jsx | 5 |
-| png | 5 |
-| js | 4 |
-| json | 3 |
-| txt | 3 |
-| csv | 2 |
-| css | 1 |
-| rproj | 1 |
+Conteo por extension:
+  md                 67
+  xlsx               54
+  r                  19
+  (sin extension)    18
+  otf                13
+  pdf                13
+  xls                11
+  html               10
+  parquet            8
+  png                8
+  jsx                5
+  js                 4
+  json               3
+  txt                3
+  css                2
+  csv                2
+  rproj              1
