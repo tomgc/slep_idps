@@ -204,8 +204,12 @@ __FONTS_CSS__
      La PALETA de 4 indicadores y la identidad gobCL+cream quedan INTACTAS.
      ============================================================ */
   /* Barra de identidad del establecimiento (oscura) + herramientas (Vista/Grado/Año) */
+  /* Banner autonomo (s14): igual espaciado que la pestaña territorial (.pan-bar):
+     radio completo + margin-bottom. Antes era radio top-only (diseño conectado a
+     .ficha-card) pero el buscador interpuesto ya rompia esa conexion -> quedaba el
+     header pegado al buscador/explicacion. */
   .ficha-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;
-    background:var(--azul);color:var(--cream);padding:18px 22px;border-radius:var(--radius-3) var(--radius-3) 0 0;}
+    background:var(--azul);color:var(--cream);padding:18px 22px;border-radius:var(--radius-3);margin-bottom:16px;}
   .ficha-id{flex:1;min-width:0;}
   .ficha-back{appearance:none;background:none;border:0;color:rgba(255,246,224,.85);font-family:inherit;
     font-size:var(--fs-sm);font-weight:var(--fw-medium);cursor:pointer;padding:0 0 7px;text-decoration:underline;text-underline-offset:3px;}
@@ -228,8 +232,8 @@ __FONTS_CSS__
   .seg-lvl.big .lvl-b{color:rgba(255,246,224,.7);}
   .seg-lvl.big .lvl-b.on{background:var(--cream);color:var(--azul);}
   /* Tarjeta que envuelve el contenido de la ficha (bajo la barra oscura) */
-  .ficha-card{background:var(--panel);border:1px solid var(--linea);border-top:0;
-    border-radius:0 0 var(--radius-3) var(--radius-3);overflow:hidden;box-shadow:var(--shadow-1);}
+  .ficha-card{background:var(--panel);border:1px solid var(--linea);
+    border-radius:var(--radius-3);overflow:hidden;box-shadow:var(--shadow-1);}
   .ficha-explain{background:#eef3f7;border-bottom:1px solid #d4e2ec;padding:12px 22px;font-size:12.5px;line-height:1.55;color:#3d5566;}
   .ficha-explain b{color:var(--azul);}
   /* Radar (solo 4 indicadores) + 4 tarjetas por vertice */
