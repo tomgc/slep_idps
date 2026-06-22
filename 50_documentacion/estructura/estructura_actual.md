@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-22 12:31:36
-- **Totales:** 30 carpetas, 244 archivos
+- **Fecha:** 2026-06-22 14:12:36
+- **Totales:** 30 carpetas, 250 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -74,7 +74,7 @@ slep_idps/
 │   │   ├── idps8b2015_rbd_historico.xls  (576K)
 │   │   ├── idps8b2017_rbd_historico.xlsx  (703K)
 │   │   └── idps8b2019_rbd_historico.xlsx  (626K)
-│   ├── .DS_Store  (10K)
+│   ├── .DS_Store  (8K)
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
@@ -113,7 +113,7 @@ slep_idps/
 │   ├── 33_construir_catalogos.R  (15.2K)
 │   ├── 34_leer_normalizar_idps.R  (26.1K)
 │   ├── 35_generar_motor_html.R  (28.2K)
-│   └── 35_motor_template.html  (109K)
+│   └── 35_motor_template.html  (111K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
@@ -158,6 +158,7 @@ slep_idps/
 │   │   ├── encargo_claude_code_idps_verificacion_integracion_historico.md  (16.4K)
 │   │   ├── encargo_claude_code_idps_verificacion_valores_historico.md  (12.3K)
 │   │   ├── encargo_claude_code_idps_vista_historica_barras.md  (16.2K)
+│   │   ├── encargo_paleta_v2_s15.md  (20.6K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
 │   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (32.9K)
@@ -216,17 +217,18 @@ slep_idps/
 │   │   │   ├── 20260621_vista_historica_barras_log.md  (8.07K)
 │   │   │   ├── 20260622_ajustes_motor_s14_log.md  (8.05K)
 │   │   │   ├── 20260622_auditoria_decimales_prom_log.md  (4.04K)
-│   │   │   └── 20260622_paleta_indicadores_log.md  (8.47K)
+│   │   │   ├── 20260622_paleta_indicadores_log.md  (8.47K)
+│   │   │   └── 20260622_paleta_v2_s15_log.md  (9.1K)
 │   │   ├── .DS_Store  (10K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260622_111622_estructura.md  (15.1K)
-│   │   ├── 20260622_111622_estructura.txt  (15.2K)
 │   │   ├── 20260622_114830_estructura.md  (15.2K)
 │   │   ├── 20260622_114830_estructura.txt  (15.3K)
-│   │   ├── estructura_actual.md  (15.2K)
-│   │   └── estructura_actual.txt  (15.3K)
+│   │   ├── 20260622_123136_estructura.md  (15.3K)
+│   │   ├── 20260622_123136_estructura.txt  (15.4K)
+│   │   ├── estructura_actual.md  (15.3K)
+│   │   └── estructura_actual.txt  (15.4K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -240,12 +242,16 @@ slep_idps/
 │   │   │   ├── MuseoSans_700.otf  (62.1K)
 │   │   │   └── MuseoSans-300.otf  (61.5K)
 │   │   ├── .DS_Store  (6K)
+│   │   ├── arquitectura_general_slep_idps_standalone.html  (432K)
 │   │   ├── arquitectura_general_slep_idps.html  (8.89K)
+│   │   ├── arquitectura_slep_idps_standalone.html  (442K)
 │   │   ├── arquitectura_slep_idps.html  (18.9K)
+│   │   ├── documentacion_general_slep_idps_standalone.html  (431K)
 │   │   ├── documentacion_general_slep_idps.html  (7.52K)
+│   │   ├── documentacion_proyecto_slep_idps_standalone.html  (435K)
 │   │   ├── documentacion_proyecto_slep_idps.html  (11.8K)
 │   │   ├── documentar.R  (40.6K)
-│   │   ├── inline_suite.R  (6.29K)
+│   │   ├── inline_suite.R  (6.83K)
 │   │   └── suite_estilos.css  (21.7K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
@@ -269,7 +275,7 @@ slep_idps/
 ├── tests/
 │   └── .gitkeep  (0)
 ├── .DS_Store  (16K)
-├── .gitignore  (1.47K)
+├── .gitignore  (1.55K)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
 ├── CLAUDE.md  (7.99K)
@@ -289,14 +295,14 @@ slep_idps/
 
 | Extension | Archivos |
 |---|---|
-| md | 70 |
+| md | 72 |
 | xlsx | 54 |
 | r | 19 |
 | (sin extension) | 18 |
+| html | 14 |
 | otf | 13 |
 | pdf | 13 |
 | xls | 11 |
-| html | 10 |
 | parquet | 8 |
 | png | 8 |
 | jsx | 5 |
