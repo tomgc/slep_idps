@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v14 (2026-06-22). **Total reconciliado: 104 cambios.**
+> **Versión:** consolidado a v15 (2026-06-22). **Total reconciliado: 106 cambios.**
 
 ---
 
@@ -62,7 +62,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 12 | v12 | 6 | 91–96 | Opus 4.8 | Serie histórica en motor (P-MOTOR) + 3 bugfixes + verificación de fidelidad |
 | 13 | v13 | 4 | 97–100 | Opus 4.8 | Decisión H-FID-2 + higiene de repo (inventarios, glosas, escáner) |
 | 14 | v14 | 4 | 101–104 | Opus 4.8 | Paleta folleto + auditoría decimales + suite suitedoc + ajustes de motor |
-| **Total** | | **104** | **1–104** | | |
+| 15 | v15 | 2 | 105–106 | Opus 4.8 | P-PALETA-v2 rampa+separador + P-DOC-RENDER suite |
+| **Total** | | **106** | **1–106** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -76,7 +77,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (recalculada a v14, sobre 104 cambios)
+## Clasificación temática (recalculada a v15, sobre 106 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -88,7 +89,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Infraestructura y scaffold | 5 | 5% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
 | Gobernanza de datos | 5 | 5% | Verificación sensibilidad, decisión Rama A, depuración directorio, ignore, gitignore inventarios scratch |
 | Visualización / diseño — motor base/datos | 14 | 13% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
-| Visualización / diseño — rediseño UI | 15 | 14% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP |
+| Visualización / diseño — rediseño UI | 16 | 15% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2) |
 | Perfilado / exploración de datos | 4 | 4% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
 | Limpieza / deuda técnica | 11 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner |
 | Documentación conceptual / contenido | 9 | 9% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
@@ -97,7 +98,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Deploy / publicación | 9 | 9% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
 | Verificación / auditoría (independiente) | 6 | 6% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
 | Decisión / gobernanza de producto | 3 | 3% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
-| Documentación de proyecto (suite/política) | 1 | 1% | Suite `suitedoc` (4 HTML) — categoría nueva en v14 |
+| Documentación de proyecto (suite/política) | 2 | 2% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) |
 
 **Refinamientos de taxonomía aplicados en la consolidación v14:**
 - **Categoría nueva "Verificación / auditoría (independiente)"** (6%): las
@@ -135,6 +136,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 - **Sesión 12** (2026-06-21): cambios **91–96** (detalle en v12 §4). Serie histórica en el motor y bugfixes: **91** P-MOTOR (serie histórica server-side: eje contiguo, render de años desactivados, header dinámico, pulido geo-NA, deploy — una solicitud, varias piezas C2/C3/C6); **92** bugfix H6 dependencia-NA; **93** bugfix dedup de establecimientos; **94** bugfix fantasma rbd=NA (H-FID-1); **95** diagnóstico del build (C1); **96** auditoría de fidelidad censal parquet→sitio (C7, P-DISPLAY-FIDELITY).
 - **Sesión 13** (2026-06-22): cambios **97–100** (detalle en v13 §4). Decisiones e higiene: **97** decisión H-FID-2 (etiqueta Dependencia, opción A); **98** gitignore de inventarios scratch (P-INVENTARIOS); **99** renombrado de 4 glosas sin tildes (P-HIGIENE-TILDES); **100** snapshot del escáner post-higiene.
 - **Sesión 14** (2026-06-22): cambios **101–104** (detalle en v14 §4). Paleta, auditoría, documentación y motor: **101** P-PALETA — adopción de la identidad cromática del folleto de la Agencia en los 4 indicadores (desplegada, `1d41c17`); **102** auditoría de decimales en `prom` (solo lectura: veredicto nativos de la Agencia, leídos verbatim por `34`); **103** suite de documentación `suitedoc` (4 HTML generados; P-DOC, entrega sustantiva con verificación de render pendiente); **104** ajustes de presentación del motor (una solicitud, 4 fases: decimales→entero, recorte de eje por familia, borde por dimensión, espaciado — fases 1/2/4 aprobadas, fase 3 rechazada en revisión visual → reabre en P-PALETA-v2; build local sin push por decisión del titular, camino A).
+- **Sesión 15** (2026-06-22): cambios **105–106** (detalle en v15 §4). P-PALETA-v2 y documentación de la suite: **105** P-PALETA-v2 — rampa de niveles monocromática por indicador (reemplaza el semáforo en `DistBar`, derivada del color del indicador padre; Bajo claro→Alto oscuro) + separador de dimensión como contenedor a escala (rehace la fase 3 rechazada de s14); presentación pura (fidelidad censal mismatch 0, panel adversarial 3/3), desplegado `ed240a6`; **106** P-DOC-RENDER — render autocontenido de la suite (4 HTML `*_standalone` con CSS/fuentes/logos en base64) + 2 bugfixes de `inline_suite.R` (href con `regexec`; saltos del base64) + versionado del tema (css/fonts/assets) para reproducir la suite desde el repo.
 
 ---
 
@@ -154,3 +156,13 @@ distinguibles que el titular pidió, no como cada commit técnico.
   (1 entrada); se absorbe en una sesión futura si no acumula. "Decisión /
   gobernanza de producto" (3%) y "Verificación / auditoría" (6%) quedan por encima
   del umbral de absorción.
+
+---
+
+## Delta del backlog (consolidación v15)
+
+- **+2 entradas** (105–106): P-PALETA-v2 (#105) y P-DOC-RENDER (#106). Total 104 → **106**.
+- **Sin categorías nuevas:** #105 entra en "Visualización / diseño — rediseño UI"
+  (15 → 16); #106 en "Documentación de proyecto (suite/política)" (1 → 2).
+- **"Documentación de proyecto (suite/política)" alcanza el 2%** (2 entradas): sale
+  del umbral de absorción <2% en el que quedó en observación en v14.
