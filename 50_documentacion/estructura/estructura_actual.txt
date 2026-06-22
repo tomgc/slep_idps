@@ -1,7 +1,7 @@
 ESCANEO DE ESTRUCTURA — slep_idps
 Raiz   : /Users/tomgc/Projects/slep_idps
-Fecha  : 2026-06-22 07:40:45
-Totales: 27 carpetas, 217 archivos
+Fecha  : 2026-06-22 07:52:21
+Totales: 27 carpetas, 218 archivos
 Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 slep_idps/
@@ -209,12 +209,12 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260621_200738_estructura.md  (13.1K)
-│   │   ├── 20260621_200738_estructura.txt  (13.2K)
 │   │   ├── 20260622_071548_estructura.md  (13.6K)
 │   │   ├── 20260622_071548_estructura.txt  (13.7K)
-│   │   ├── estructura_actual.md  (13.6K)
-│   │   └── estructura_actual.txt  (13.7K)
+│   │   ├── 20260622_074045_estructura.md  (13.7K)
+│   │   ├── 20260622_074045_estructura.txt  (13.8K)
+│   │   ├── estructura_actual.md  (13.7K)
+│   │   └── estructura_actual.txt  (13.8K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
@@ -228,7 +228,8 @@ slep_idps/
 │   │   ├── traspaso_cierre_v09.md  (27.3K)
 │   │   ├── traspaso_cierre_v10.md  (25.9K)
 │   │   ├── traspaso_cierre_v11.md  (20.3K)
-│   │   └── traspaso_cierre_v12.md  (26K)
+│   │   ├── traspaso_cierre_v12.md  (26K)
+│   │   └── traspaso_cierre_v13.md  (19.6K)
 │   └── .DS_Store  (10K)
 ├── docs/
 │   └── index.html  (6.23M)
@@ -251,7 +252,7 @@ slep_idps/
 └── verificar_integracion_historico.R  (7.4K)
 
 Conteo por extension:
-  md                 60
+  md                 61
   xlsx               54
   (sin extension)    17
   r                  17
