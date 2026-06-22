@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-22 14:12:36
-- **Totales:** 30 carpetas, 250 archivos
+- **Fecha:** 2026-06-22 16:01:54
+- **Totales:** 30 carpetas, 251 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -74,7 +74,7 @@ slep_idps/
 │   │   ├── idps8b2015_rbd_historico.xls  (576K)
 │   │   ├── idps8b2017_rbd_historico.xlsx  (703K)
 │   │   └── idps8b2019_rbd_historico.xlsx  (626K)
-│   ├── .DS_Store  (8K)
+│   ├── .DS_Store  (10K)
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
@@ -223,12 +223,12 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260622_114830_estructura.md  (15.2K)
-│   │   ├── 20260622_114830_estructura.txt  (15.3K)
 │   │   ├── 20260622_123136_estructura.md  (15.3K)
 │   │   ├── 20260622_123136_estructura.txt  (15.4K)
-│   │   ├── estructura_actual.md  (15.3K)
-│   │   └── estructura_actual.txt  (15.4K)
+│   │   ├── 20260622_141236_estructura.md  (15.7K)
+│   │   ├── 20260622_141236_estructura.txt  (15.8K)
+│   │   ├── estructura_actual.md  (15.7K)
+│   │   └── estructura_actual.txt  (15.8K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -268,7 +268,8 @@ slep_idps/
 │   │   ├── traspaso_cierre_v11.md  (20.3K)
 │   │   ├── traspaso_cierre_v12.md  (26K)
 │   │   ├── traspaso_cierre_v13.md  (19.6K)
-│   │   └── traspaso_cierre_v14.md  (32.4K)
+│   │   ├── traspaso_cierre_v14.md  (32.4K)
+│   │   └── traspaso_cierre_v15.md  (27.6K)
 │   └── .DS_Store  (14K)
 ├── docs/
 │   └── index.html  (5.04M)
@@ -295,7 +296,7 @@ slep_idps/
 
 | Extension | Archivos |
 |---|---|
-| md | 72 |
+| md | 73 |
 | xlsx | 54 |
 | r | 19 |
 | (sin extension) | 18 |
