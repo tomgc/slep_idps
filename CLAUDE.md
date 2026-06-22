@@ -71,16 +71,34 @@ source("00_escanear_proyecto.R")  # snapshot de estructura (al abrir y cerrar se
 
 ## Ultimos cambios
 
-1. **P5 — carga historica IDPS 2014-2019 completa** (sesion 10). `34` extendido para
+1. **Serie historica 2014->2025 en el motor + 3 fixes + fidelidad censal** (sesion 12).
+   El motor `35` ya muestra la serie historica completa (antes solo 2022-2025): eje
+   historico CONTIGUO por grado decidido server-side (con_dato / pandemia 2020-2021 /
+   no_eval p.ej. 2019; el motivo del vacio se resuelve en R, el template solo lo pinta),
+   header dinamico (`cobertura_anios`, no el literal "2022-2025"), y degradacion a "—"
+   para geo-NA y dependencia-NA de RBD solo-historicos (cerrados). 3 bugs corregidos
+   (solo presentacion; `idps_largo` intacto, cifras sin cambio): (a) **H6 dependencia-NA**
+   — RBD solo-historicos sin dependencia ni en el directorio ni en 2014-2016: NA legitimo,
+   degrada a "—" (no se inventa); aborta solo si un RBD moderno >=2022 la perdiera;
+   (b) **dedup de establecimientos** — un RBD con atributos historico/moderno distintos
+   generaba tarjetas duplicadas (20 RBD x2); `est_attr` toma una fila por RBD (la mas
+   reciente): 9157->9137; (c) **fantasma rbd=NA** — 4 filas crudas 4b/2017 con rbd=NA
+   colapsaban en 1 EE "fantasma" alcanzable por el buscador; se filtra al serializar
+   (`!is.na(rbd)` tras GRADOS_MOTOR): 9137->9136. **P-DISPLAY-FIDELITY**: verificacion
+   CENSAL parquet->sitio **PASA** (0 discrepancias en ~2,9M comparaciones de cifra:
+   ind/dim/niv + dif/sigdif/difgru/sigdifgru), por decode triple independiente
+   (R / node / 2 subagentes a ciegas) + panel adversarial. Build desplegado
+   `docs/index.html` md5 `0b7b0b08`. PENDIENTES VIVOS: **H-FID-2** (etiqueta Dependencia
+   del directorio vigente, por diseno H6 — decision titular), **P-DOC**,
+   **P-INVENTARIOS** (`inventario_*.parquet` sin clasificar), **P-HIGIENE-CASE**.
+2. **P5 — carga historica IDPS 2014-2019 completa** (sesion 10). `34` extendido para
    leer dos regimenes (moderno largo en la raiz 2022-2025 + historico ancho en
    `20_insumos/historico/` 2014-2019), pivotando el ancho a largo y fundiendo en
    `idps_largo.parquet` (ahora 2014->2025, 2.362.447 filas). Indicador 2014-2019 +
    dimension 2018; sin subdimension/niveles/significancia historica (NA legitimo);
    hueco pandemia 2020-2021. 4b2024 traspapelado rescatado a la raiz. Verificado: 0
-   cifras IDPS modernas alteradas (panel adversarial 4/4). PENDIENTE: el motor `35`
-   aun muestra 2022-2025; mostrar la serie historica extendida es la proxima sesion
-   (trabajo de motor).
-2. **Auditoria de datos (FASE I) + saneamiento/mejoras (FASE II)** (sesion 6,
+   cifras IDPS modernas alteradas (panel adversarial 4/4).
+3. **Auditoria de datos (FASE I) + saneamiento/mejoras (FASE II)** (sesion 6,
    3er tramo). Auditoria exhaustiva: join RBD->geo 100% correcto vs directorio,
    cifras 1:1 con el crudo (0 discrepancias), Costa Central 60 en 4b 2025. Fixes
    SOLO de presentacion (`run_all(only=35)`, `idps_largo` intacto, cifras sin
@@ -92,12 +110,11 @@ source("00_escanear_proyecto.R")  # snapshot de estructura (al abrir y cerrar se
    GSE sin enumeracion. PENDIENTE decision titular: 120 EE SLEP-por-traspaso
    marcados Municipal (desfase de vigencia, NO cambia cifras). `docs/` NO
    republicado (queda para el cierre v06 del Encargo 2).
-3. **Producto completo + deploy** (encargo 2): motor ampliado a TODO CHILE (8353
+4. **Producto completo + deploy** (encargo 2): motor ampliado a TODO CHILE (8353
    establecimientos, 16 regiones); navegacion territorial region->SLEP/comuna->
    establecimiento; GSE de referencia protagonista (doble ancla + alerta);
    drill-down indicador->dimension->subdimension; tendencia eje fijo 0-100;
    fuentes de marca embebidas. Copiado a `docs/index.html` para GitHub Pages.
    Decode ~340ms, indice de rangos 7ms. Spot-check fuera de Valparaiso 1:1.
-4. **Motor HTML base**: grilla de radares por establecimiento agrupada por GSE
+5. **Motor HTML base**: grilla de radares por establecimiento agrupada por GSE
    (sin agregacion), detalle, distribucion de niveles, marca de desvio, evolucion.
-5. **Fix encoding** (`31_depurar`): el crudo es UTF-8, no latin1.
