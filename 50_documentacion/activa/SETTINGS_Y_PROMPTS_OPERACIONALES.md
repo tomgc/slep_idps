@@ -1,6 +1,6 @@
 # SETTINGS_Y_PROMPTS_OPERACIONALES.md
 
-> **Versión 1 (consolidada).** Vive permanentemente en la knowledge base
+> **Versión 3 (consolidada).** Vive permanentemente en la knowledge base
 > del Project (y se copia a `50_documentacion/activa/` de cada proyecto).
 > Absorbe y reemplaza a: `prompt-apertura-sesion.md` (v3),
 > `prompt-cierre-sesion.md` (v4), `prompt_orquestador.md`,
@@ -8,6 +8,18 @@
 > `prompt_portabilidad_cross_os.md`. La arquitectura que esos prompts
 > implementaban vive ahora en `POLITICA_PROYECTO.md` v5; aquí viven los
 > PROTOCOLOS de sesión y de operación.
+>
+> **Cambios respecto a v2:** nueva regla 4.6.3.6 (terminología
+> institucional del SLEP: "establecimiento educacional" como término
+> genérico, completo en la primera mención de cada párrafo y abreviado a
+> "establecimiento(s)" en las repeticiones; prohibición de "EE" en texto
+> visible y de "colegio" como sustantivo genérico, con excepciones para
+> la voz del lector en FAQ, los ejemplos del universo y nombres propios
+> externos).
+>
+> **Cambios respecto a v1:** nueva sección 4.6 (generar la documentación
+> de un proyecto con el paquete `suitedoc`: guion de insumos, mapeo a la
+> `cfg`, reglas de gobernanza y de no-invención de metodología).
 >
 > **Regla crítica de automatización:** este documento y la política viven
 > en la knowledge base. El asistente los procesa proactivamente al inicio
@@ -265,6 +277,17 @@ en `50_documentacion/traspasos/`. El traspaso es el **único puente**
 entre sesiones: todo lo que no quede ahí, se pierde. Antes de cerrar:
 ejecutar el escáner y referenciarlo.
 
+> **Convención de nombre — no negociable.** El separador es SIEMPRE
+> guión bajo: `traspaso_cierre_vNN.md`. NUNCA con guión medio
+> (`traspaso-cierre-vNN.md` es no-canónico y no se versiona). Esto
+> aplica a todo archivo que Claude genere o nombre en el proyecto:
+> snake_case, sin guiones medios, sin tildes, sin ñ, sin espacios
+> (política, sección 2). Antes de entregar o commitear cualquier
+> archivo nuevo, verificar que el nombre no contenga `-`, ` `, ni
+> caracteres acentuados. Si el escáner muestra un archivo canónico
+> existente con cierta grafía, esa grafía manda; no introducir una
+> variante.
+
 Incluir TODAS las secciones de 2.2; si una no aplica, incluirla con
 "No aplica en esta sesión" y justificación breve.
 
@@ -372,7 +395,7 @@ jamás placeholders**.
      `SETTINGS_Y_PROMPTS_OPERACIONALES.md`.
   2. *Opcionales según el foco real de la próxima sesión* (solo los
      que apliquen, no todos): `CLAUDE.md` si correrá en Claude Code;
-     protocolos 4.1-4.5 de este documento según la tarea;
+     protocolos 4.1-4.6 de este documento según la tarea;
      `auditoria_codigo_proyecto_md_v1.md` si habrá auditoría de cifras.
   3. *Específicos de la sesión* (SÍ se adjuntan): el traspaso
      `traspaso_cierre_vNN.md`; el escáner `estructura_actual.md`; los
@@ -538,3 +561,121 @@ calcula por dos caminos independientes (caché vs. recálculo desde el
 objeto crudo) y se comparan con tolerancias definidas como constantes
 nombradas. Llaves siempre `character`; patrón índice-primero en Excel
 (jamás `worksheetOrder()`); una familia que falla no aborta las demás.
+
+### 4.6 Generar la documentación de un proyecto con `suitedoc`
+
+Produce los 4 documentos HTML de la suite (`arquitectura_*`,
+`documentacion_proyecto_*`, `arquitectura_general_*`,
+`documentacion_general_*`) para un proyecto, llenando su `cfg` a partir
+del material existente del proyecto, sin que el usuario edite la
+configuración a mano. El motor genérico vive en el paquete `suitedoc`;
+este protocolo cubre cómo se arma el `documentar.R` de un proyecto
+concreto.
+
+**Tipo de sesión:** BIBLIOTECA (produce un artefacto reutilizable, el
+`documentar.R` del proyecto), no CONTINUATION del proyecto documentado.
+Sin acuse de recibo ni ruta de desarrollo: se entra directo al guion de
+insumos. Si produce el `documentar.R` más los 4 HTML, ofrecer el cierre
+liviano de 1.5.
+
+**Regla de automatización:** el asistente NO pide al usuario que llene la
+`cfg`. Pide los insumos del proyecto (abajo), extrae de ellos todo lo
+inferible, y solo pregunta por lo que ningún archivo contiene (la prosa
+de comunidad). El producto es un `documentar.R` completo, no una
+plantilla con huecos para que el usuario rellene.
+
+#### 4.6.1 Insumos a solicitar (en un solo mensaje)
+
+El asistente pide estos archivos del proyecto a documentar. Los que
+existan en la knowledge base del Project no se piden; se leen desde ahí.
+
+| Insumo | Qué aporta a la `cfg` |
+|---|---|
+| `estructura_actual.md` (escáner) | Diagrama técnico: `insumos`, `etapas`, `intermedios`, rutas reales de los `rotulos`. **Imprescindible:** sin él, las rutas del diagrama se inventan. |
+| `README.md` | Identidad (`slug`, `area`, `fuente`); `prosa$doc_que`; origen de los datos. |
+| `CLAUDE.md` (si existe) | Convenciones técnicas → `glosario_tec`, flags de `etapas`. |
+| Traspaso `traspaso_cierre_vNN.md` (el último) | `decisiones`, `anomalias`, `reglas_calculo`, restricciones técnicas. **Imprescindible:** es la fuente principal de las decisiones metodológicas. |
+| Decisiones (`50_documentacion/activa/decisiones/`) | `decisiones` con su porqué; `gobernanza`. |
+| Scripts del pipeline (los del flujo, no los utils) | Diccionario de datos (`dic_crudos`, `dic_intermedios`); detalle de `etapas`. |
+| `gobernanza_datos.md` (si el proyecto tiene datos sensibles) | `cfg$gobernanza`; qué NO publicar. |
+
+Si faltan los dos imprescindibles (escáner y traspaso), pedirlos y
+detenerse: sin ellos el diagrama y las decisiones se inventarían,
+violando B.1 (sin supuestos implícitos).
+
+#### 4.6.2 Procedimiento
+
+1. **Leer todos los insumos** de principio a fin. No resumir
+   prematuramente.
+2. **Verificar la versión del paquete.** Confirmar que el `suitedoc`
+   instalado expone los campos que el `documentar.R` va a llenar
+   (`rotulos`, `reglas_calculo`, `leyenda`, `textos`, `pie_extra`,
+   `gobernanza`, `prosa$etapas_pipeline`). Si el paquete es una versión
+   anterior sin esos campos, declararlo: el `documentar.R` generado los
+   incluirá igual (caen al fallback del motor), pero conviene actualizar
+   el paquete.
+3. **Extraer lo inferible** y mapearlo a la `cfg`:
+   - Del escáner: el `slug` (nombre de la carpeta raíz), las etapas del
+     pipeline (los ejecutables de `30_procesamiento/` en orden), los
+     insumos (`20_insumos/`), los intermedios (`40_salidas/`), y los
+     `rotulos` con las rutas reales (`31_<...>.R`, etc.).
+   - Del README y los scripts: identidad, diccionario de datos, origen.
+   - Del traspaso y las decisiones: `decisiones` (cada una con `id`,
+     `titulo`, `cuerpo`, `por_que`), `anomalias`, `reglas_calculo`, y
+     `gobernanza`.
+4. **Determinar la gobernanza.** Si el proyecto trata datos personales o
+   de NNA, fijar `cfg$gobernanza` con la categoría (p. ej. "Datos
+   personales de NNA") y aplicar la regla de no incluir nombres reales de
+   establecimientos, estudiantes ni funcionarios en ningún documento (los
+   generales se publican). Describir universos en abstracto.
+5. **Redactar la prosa de comunidad.** Lo que ningún archivo contiene:
+   `faq`, `garantias`, `notas`, `prosa$gen_porque`, hero-notes de los
+   documentos generales. El asistente la redacta desde lo que el proyecto
+   hace, en el registro de la audiencia (directivos / comunidad). Si el
+   usuario tiene un texto de referencia de voz (un documento ejecutivo,
+   un correo tipo), se pide y se usa como base del tono; si no, se redacta
+   y se marca para revisión.
+6. **Entregar el `documentar.R` completo**, con todos los bloques llenos.
+   Las zonas redactadas sin fuente directa (prosa de comunidad) se marcan
+   con un comentario `# REVISAR (voz): ...` para que el usuario afine el
+   tono, pero el contenido va completo, no en blanco.
+7. **No ejecutar por el usuario.** Generar los 4 HTML es tarea del
+   usuario (correr `source("documentar.R")` desde su máquina, donde está
+   R y el paquete instalado). El asistente entrega el `documentar.R` y la
+   instrucción de una línea para generarlo y revisarlo.
+
+#### 4.6.3 Reglas no negociables
+
+1. **Sobrescribir todos los bloques que los builders consumen.** Un
+   bloque sin personalizar saldría con el fallback genérico del motor o,
+   peor, con residuo del ejemplo. `generar_suite(verificar = TRUE)` (el
+   default) aborta si detecta texto del ejemplo de fábrica; el
+   `documentar.R` se entrega de modo que pase esa verificación.
+2. **Gobernanza prevalece.** En proyectos con datos sensibles, ningún
+   nombre real de EE/estudiante/funcionario entra a la `cfg`, porque los
+   documentos generales se publican (política, sección 6).
+3. **No inventar metodología.** Las `decisiones` y `anomalias` salen del
+   traspaso y de los archivos de decisión, nunca de la deducción del
+   asistente. Si una decisión no consta, se pregunta; no se fabrica un
+   porqué (B.1).
+4. **La prosa de comunidad se redacta, no se extrae** — y se marca como
+   revisable, porque el tono es del usuario.
+5. **Ubicación canónica de la salida:** `50_documentacion/suite/`
+   (`documentar.R` + tema + los 4 HTML). Versionar el tema solo si los
+   HTML se publican desde el repo; si no, `fonts/` y `assets/` al
+   `.gitignore`.
+6. **Terminología institucional del SLEP.** El término genérico para
+   referirse a escuelas, liceos, jardines infantiles, centros de
+   educación de adultos y similares es **"establecimiento educacional"**
+   (plural "establecimientos educacionales"). Se despliega completo en
+   la **primera mención de cada párrafo**; en las repeticiones siguientes
+   del mismo párrafo se usa **"establecimiento(s)"** a secas, para no
+   recargar la prosa. La regla aplica a prosa técnica y de comunidad por
+   igual. Nunca usar la abreviatura "EE" en texto visible al usuario (sí
+   se conserva en notación técnica de fórmulas, p. ej. `conteo de EE`,
+   `n_EE`). No usar "colegio" como sustantivo genérico. Excepciones: (a)
+   la voz simulada del lector en una FAQ puede usar lenguaje coloquial;
+   (b) "escuela/liceo/jardín" se usan deliberadamente cuando se
+   ejemplifica el universo que el término genérico engloba; (c) nombres
+   propios de productos externos se conservan literalmente (p. ej.
+   "Localiza tu colegio" de la Agencia de Calidad).
