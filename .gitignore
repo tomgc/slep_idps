@@ -44,3 +44,11 @@ diagnostico_*.md
 *_freeze/
 .quarto/
 20_insumos/auxiliares/directorio_oficial_ee.csv
+
+# suitedoc: documentación interna (NO se publica desde el repo). El tema y los
+# HTML son reproducibles con source(50_documentacion/suite/documentar.R).
+# Se versiona solo documentar.R (fuente no reproducible).
+50_documentacion/suite/assets/
+50_documentacion/suite/fonts/
+50_documentacion/suite/suite_estilos.css
+50_documentacion/suite/*.html
