@@ -244,11 +244,11 @@ cfg$entidades_tec <- list(
   list(ct='Serie por establecimiento', cd='Evolución 2014→2025 del establecimiento, con años sin evaluación marcados.')
 )
 cfg$entidades_gen <- list(
-  list(ct='Un establecimiento', cd='El panorama de un colegio en los cuatro indicadores.'),
-  list(ct='Colegios del mismo grupo', cd='Varios establecimientos de un mismo nivel socioeconómico, lado a lado.'),
-  list(ct='Comparación con su grupo', cd='Si el colegio está sobre, bajo o igual a otros de su mismo grupo.'),
-  list(ct='Un filtro de zona', cd='Mirar solo los colegios de una comuna, un Servicio Local o una región.'),
-  list(ct='La evolución en el tiempo', cd='Cómo cambió un colegio desde 2014, con los años sin medición marcados.')
+  list(ct='Un establecimiento', cd='El panorama de un establecimiento educacional en los cuatro indicadores.'),
+  list(ct='Establecimientos del mismo grupo', cd='Varios establecimientos de un mismo nivel socioeconómico, lado a lado.'),
+  list(ct='Comparación con su grupo', cd='Si el establecimiento está sobre, bajo o igual a otros de su mismo grupo.'),
+  list(ct='Un filtro de zona', cd='Mirar solo los establecimientos de una comuna, un Servicio Local o una región.'),
+  list(ct='La evolución en el tiempo', cd='Cómo cambió un establecimiento desde 2014, con los años sin medición marcados.')
 )
 
 # ---- 1.9 Línea de producción (arquitectura general) ------------------------
@@ -266,11 +266,11 @@ cfg$estaciones <- list(
        parrafos=c('Los indicadores IDPS tienen una estructura: cada uno se abre en dimensiones y subdimensiones. Ese mapa conceptual se arma como un catálogo de cuatro niveles, para que el motor pueda mostrar el detalle ordenado.',
                   'Aquí <strong>no se promedia ni se junta nada por territorio</strong>: el dato se conserva tal como lo publica la Agencia, establecimiento por establecimiento.'),
        chip_in=list(ico='check', tx='Datos limpios por establecimiento'),
-       chip_out=list(ico='sitemap', tx='Conceptos ordenados en 4 niveles')),
+       chip_out=list(ico='network', tx='Conceptos ordenados en 4 niveles')),
   list(icon='bar-chart-3', color='var(--plum-80)', paso='Paso 4 · Producto', titulo='Se arma el tablero',
        parrafos=c('Los datos y el catálogo se empaquetan dentro de una <strong>interfaz interactiva</strong>: radares por establecimiento, comparación con su grupo, distribución de niveles y la evolución en el tiempo. Todo en un solo archivo.',
                   'Ese archivo <strong>lleva los datos adentro</strong>: no necesita conexión ni programas especiales.'),
-       chip_in=list(ico='sitemap', tx='Datos y conceptos listos'),
+       chip_in=list(ico='network', tx='Datos y conceptos listos'),
        chip_out=list(ico='file-code-2', tx='Un archivo navegable')),
   list(icon='monitor', color='var(--plum)', paso='Paso 5 · Producto terminado', titulo='La herramienta lista',
        parrafos=c('El resultado es un <strong>tablero que se abre en cualquier navegador</strong>, sin instalar nada. Permite elegir un establecimiento (filtrando por zona o por grupo socioeconómico) y ver su panorama IDPS y su evolución desde 2014.',
@@ -281,20 +281,20 @@ cfg$estaciones <- list(
 # ---- 1.10 Garantías (lenguaje simple) --------------------------------------
 cfg$garantias <- list(
   list(icon='copy-check', titulo='Mostramos la cifra oficial, no una propia', d='El motor lee los puntajes y comparaciones tal como los publica la Agencia. No recalcula ni promedia nada por su cuenta.'),
-  list(icon='scale', titulo='Cada establecimiento se compara con su grupo', d='Un colegio se mira frente a otros de su mismo nivel socioeconómico, usando la comparación que la propia Agencia ya calculó. No inventamos un promedio del grupo ni de la zona.'),
+  list(icon='scale', titulo='Cada establecimiento se compara con su grupo', d='Un establecimiento educacional se mira frente a otros de su mismo nivel socioeconómico, usando la comparación que la propia Agencia ya calculó. No inventamos un promedio del grupo ni de la zona.'),
   list(icon='calendar-x', titulo='No inventamos años sin medición', d='En 2020 y 2021 no hubo evaluación (pandemia), y algunos grados no se midieron ciertos años. Esos vacíos se muestran como vacíos, nunca como una línea continua.'),
   list(icon='shapes', titulo='No mezclamos indicadores ni grados', d='Cada indicador y cada grado se ven por separado. Combinarlos daría un número sin sentido.'),
   list(icon='eye-off', titulo='Sin datos de estudiantes', d='Toda la información es agregada por establecimiento. El motor no contiene ni muestra datos de estudiantes individuales.'),
-  list(icon='info', titulo='La dependencia es la de hoy', d='Un colegio traspasado a un Servicio Local aparece como tal también en años anteriores. Es una decisión explicada: el motor muestra de quién depende hoy.')
+  list(icon='info', titulo='La dependencia es la de hoy', d='Un establecimiento educacional traspasado a un Servicio Local aparece como tal también en años anteriores. Es una decisión explicada: el motor muestra de quién depende hoy.')
 )
 
 # ---- 1.11 "En qué fijarte" --------------------------------------------------
 cfg$notas <- list(
   list(icon='palette', tx='<strong>Cada indicador tiene siempre el mismo color,</strong> el de la identidad oficial de la Agencia. No hay que memorizar leyendas distintas entre vistas.'),
   list(icon='scale', tx='<strong>Siempre verás el resultado junto a su grupo socioeconómico.</strong> No es un detalle: es lo que permite comparar con justicia. Un único número mezclaría realidades distintas.'),
-  list(icon='git-compare', tx='<strong>La comparación es contra el mismo grupo, no contra un promedio de la zona.</strong> El motor muestra si el colegio está sobre, bajo o igual a su grupo, con la marca que calcula la Agencia.'),
+  list(icon='git-compare', tx='<strong>La comparación es contra el mismo grupo, no contra un promedio de la zona.</strong> El motor muestra si el establecimiento está sobre, bajo o igual a su grupo, con la marca que calcula la Agencia.'),
   list(icon='calendar-x', tx='<strong>Hay años en gris.</strong> No es un error: o no hubo evaluación (2020–2021) o ese grado no se midió ese año. Se marca a propósito.'),
-  list(icon='flag', tx='<strong>La dependencia que ves es la actual.</strong> Para colegios traspasados a un Servicio Local, eso significa que figuran como SLEP también en años en que dependían del municipio.')
+  list(icon='flag', tx='<strong>La dependencia que ves es la actual.</strong> Para establecimientos traspasados a un Servicio Local, eso significa que figuran como SLEP también en años en que dependían del municipio.')
 )
 
 # ---- 1.12 Preguntas frecuentes ---------------------------------------------
@@ -302,17 +302,17 @@ cfg$faq <- list(
   list(q='¿Por qué cuatro indicadores y no ocho?', a='Los IDPS son ocho en total, pero cuatro se miden por cuestionario (los de este motor: autoestima y motivación, convivencia, participación, hábitos de vida saludable) y cuatro por información administrativa (asistencia, retención, equidad de género, titulación técnico-profesional). Este motor cubre los cuatro de cuestionario.', abierta=TRUE),
   list(q='¿Qué significa que un año aparezca en gris?', a='Que no hubo evaluación de ese indicador ese año: por la pandemia (2020 y 2021) o porque ese grado no se evaluó ese año (por ejemplo 2019 en 4° básico y II medio). No es un dato faltante por error: es que no se midió.', abierta=FALSE),
   list(q='¿Comparado con qué está un establecimiento?', a='Con su mismo grupo socioeconómico, usando la comparación que la propia Agencia ya calculó (sobre, bajo o igual a su grupo, con su significancia). El motor no inventa un promedio del grupo ni del territorio.', abierta=FALSE),
-  list(q='¿Por qué no hay un promedio por comuna o por SLEP?', a='Porque las fuentes IDPS no informan cuántos estudiantes respondieron en cada establecimiento. Sin ese dato no se puede promediar de forma válida entre establecimientos, así que el motor muestra el dato establecimiento por establecimiento. Los filtros de zona solo acotan qué colegios se listan.', abierta=FALSE),
-  list(q='¿Qué dependencia muestra la ficha?', a='La dependencia vigente del establecimiento según el directorio oficial de hoy. Para colegios traspasados a un Servicio Local, eso significa que aparecen como SLEP aunque en años anteriores dependieran del municipio.', abierta=FALSE),
+  list(q='¿Por qué no hay un promedio por comuna o por SLEP?', a='Porque las fuentes IDPS no informan cuántos estudiantes respondieron en cada establecimiento. Sin ese dato no se puede promediar de forma válida entre establecimientos, así que el motor muestra el dato establecimiento por establecimiento. Los filtros de zona solo acotan qué establecimientos se listan.', abierta=FALSE),
+  list(q='¿Qué dependencia muestra la ficha?', a='La dependencia vigente del establecimiento según el directorio oficial de hoy. Para establecimientos traspasados a un Servicio Local, eso significa que aparecen como SLEP aunque en años anteriores dependieran del municipio.', abierta=FALSE),
   list(q='¿Necesito instalar algo para usarlo?', a='No. Es un archivo que se abre en cualquier navegador y funciona sin conexión. También está publicado en línea para consultarlo directamente.', abierta=FALSE)
 )
 
 # ---- 1.13 Prosa de los documentos de lectura -------------------------------
-# REVISAR (voz): afinar el tono; el dato es correcto.
+# REVISAR (voz): afinar el tono; el dato es correcto y la terminologia ya cumple 4.6.3.6 (establecimiento educacional).
 cfg$prosa <- list(
   doc_que = c(
     '<code class="inl">slep_idps</code> es una herramienta para <strong>explorar los Indicadores de Desarrollo Personal y Social (IDPS) de cada establecimiento</strong>, tal como los publica la Agencia de Calidad de la Educación. Muestra el panorama de un establecimiento en los cuatro indicadores de cuestionario, su desglose por dimensión y subdimensión, su evolución desde 2014, y cómo se sitúa respecto de establecimientos de su mismo grupo socioeconómico.',
-    'El problema que resuelve es concreto: los resultados IDPS se publican por establecimiento, grado y año, en planillas dispersas cuyo formato cambia con el tiempo. A diferencia de las pruebas estandarizadas de aprendizaje, las fuentes IDPS no informan cuántos estudiantes respondieron, de modo que no existe una forma válida de promediar entre establecimientos. Por eso el motor <strong>no agrega por territorio</strong>: muestra el dato al nivel en que la Agencia lo entrega, el establecimiento, y deja que la comparación se haga estableciendo cada colegio frente a su mismo grupo.',
+    'El problema que resuelve es concreto: los resultados IDPS se publican por establecimiento, grado y año, en planillas dispersas cuyo formato cambia con el tiempo. A diferencia de las pruebas estandarizadas de aprendizaje, las fuentes IDPS no informan cuántos estudiantes respondieron, de modo que no existe una forma válida de promediar entre establecimientos. Por eso el motor <strong>no agrega por territorio</strong>: muestra el dato al nivel en que la Agencia lo entrega, el establecimiento, y deja que la comparación se haga estableciendo cada establecimiento frente a su mismo grupo.',
     'El producto final es un <strong>archivo HTML autónomo</strong> (<code class="inl">motor_idps.html</code>): se abre en cualquier navegador, sin instalar nada, y está publicado para consulta en línea. La regla rectora es leer la cifra oficial, nunca derivarla.'
   ),
   doc_pipeline = c(
@@ -376,7 +376,7 @@ cfg$textos <- list(
   anom_titulo      = 'Casos de origen resueltos H1–H4 (detalle)',
   anom_intro       = 'Particularidades de los datos crudos que el pipeline resuelve de forma trazable <strong>antes</strong> de mostrar nada. No son errores del proyecto.',
   doc_s2_intro     = 'El motor permite explorar el panorama IDPS de distintos <strong>establecimientos</strong>:',
-  doc_s2_cierre    = 'Para cada establecimiento se muestra el panorama de los <strong>cuatro indicadores</strong>, su <strong>desglose</strong> por dimensión y subdimensión, su <strong>evolución</strong> desde 2014 y su <strong>desvío respecto del mismo GSE</strong>. La comparación entre colegios se hace poniendo sus radares lado a lado, sin promediar.',
+  doc_s2_cierre    = 'Para cada establecimiento se muestra el panorama de los <strong>cuatro indicadores</strong>, su <strong>desglose</strong> por dimensión y subdimensión, su <strong>evolución</strong> desde 2014 y su <strong>desvío respecto del mismo GSE</strong>. La comparación entre establecimientos se hace poniendo sus radares lado a lado, sin promediar.',
   doc_dec_intro    = 'Reglas que gobiernan todo el motor. Cada una corrige una forma específica de leer mal los datos IDPS.',
   doc_s5_intro     = 'Todos los datos provienen de la <strong>Agencia de Calidad de la Educación</strong> y son <strong>públicos</strong>. Las planillas crudas traen particularidades de origen que el pipeline resuelve antes de mostrar nada:',
   gen_hero         = 'Piensa en este proyecto como una <strong>pequeña fábrica de datos</strong>. Llegan materias primas —las planillas IDPS de la Agencia—, pasan por una línea que las limpia, las ordena y las ensambla, y al final sale un <strong>producto terminado</strong>: una herramienta para mirar el panorama de cada establecimiento de forma justa.',
@@ -398,4 +398,4 @@ cfg$textos <- list(
 )
 
 # ---- Generar ---------------------------------------------------------------
-generar_suite(cfg, salida_dir = DESTINO_SUITE)
+generar_suite(cfg, salida_dir = DESTINO_SUITE, standalone = TRUE)
