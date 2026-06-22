@@ -1,7 +1,7 @@
 # Log de verificación — P-DISPLAY-FIDELITY (slep_idps, sesión 12)
 
 > Cierre de la cadena de fidelidad: **parquet → cifra que el sitio DESPLEGADO muestra**.
-> Encargo: `50_documentacion/activa/encargo_claude_code_idps_display_fidelity.md`.
+> Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_display_fidelity.md`.
 > Tipo: SOLO LECTURA y verificación. No se modificó parquet, generador, template ni `docs/`.
 > Fecha: 2026-06-21 · HEAD: `99597d8` · Generado por Claude Code (autónomo).
 

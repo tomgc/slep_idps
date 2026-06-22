@@ -84,7 +84,7 @@ habia pusheado durante la sesion; el push se hace en este cierre, en bloque.
 
 **C1 — Auditoria adversarial de la integracion (estructura + moderno-intacto)**
 [auditoria/verificacion]. Encargo
-`50_documentacion/activa/encargo_claude_code_idps_verificacion_integracion_historico.md`.
+`50_documentacion/activa/encargos/encargo_claude_code_idps_verificacion_integracion_historico.md`.
 Panel adversarial de 5 dimensiones, codigo independiente (sin funciones de `34`):
 cobertura vs los 18 archivos; NA legitimo; **moderno intacto** (join vs respaldo
 `50d9de4f…`, 17 columnas sagradas 0 diffs por 3 metodos + `max|delta|=0`,

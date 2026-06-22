@@ -1,6 +1,6 @@
 # Log — Integración del histórico IDPS 2014-2019 al pipeline (P5, fase 3)
 
-> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargo_claude_code_idps_integracion_historico.md`
+> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_integracion_historico.md`
 > Ejecutor: Claude Code (Opus). Arquitectura (a): un solo `idps_largo.parquet`.
 > **NO se hizo push** (el titular revisa, valida con el motor 35 y decide push y cierre).
 

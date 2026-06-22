@@ -1,6 +1,6 @@
 # Log — Reorganización del universo IDPS (P5, fase 2)
 
-> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargo_claude_code_idps_organizacion.md`
+> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_organizacion.md`
 > Ejecutor: Claude Code (Opus). Modo autónomo con compuerta DRY_RUN interna.
 > **NO se hizo push** (el titular revisa y valida, incluido correr el pipeline, antes).
 

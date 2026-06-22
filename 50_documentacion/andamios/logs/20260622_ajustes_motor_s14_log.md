@@ -1,6 +1,6 @@
 # Log — Ajustes de presentación del motor IDPS (sesión 14)
 
-> Encargo: `50_documentacion/activa/encargo_ajustes_motor_s14.md`. 4 ajustes de
+> Encargo: `50_documentacion/activa/encargos/encargo_ajustes_motor_s14.md`. 4 ajustes de
 > PRESENTACIÓN del motor `35` + regeneración + verificación censal de fidelidad +
 > panel adversarial. Ninguno toca el dato. Fecha: 2026-06-22.
 > Parquet md5 `4c764d8c9f0bf70004f8aa52661ae901` (inicio == fin).

@@ -1,6 +1,6 @@
 # Log — Verificación adversarial de la integración histórica IDPS (sesión 11)
 
-> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargo_claude_code_idps_verificacion_integracion_historico.md`
+> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_verificacion_integracion_historico.md`
 > Naturaleza: **auditoría READ-ONLY** del `idps_largo.parquet` integrado en la sesión 10 (P5).
 > Ejecutor: Claude Code (Opus). **Sin cambios de datos ni de código; sin push; sin Pages.**
 

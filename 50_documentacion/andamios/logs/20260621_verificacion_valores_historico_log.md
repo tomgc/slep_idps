@@ -1,6 +1,6 @@
 # Log — Censo de valores del histórico IDPS 2014-2019 (sesión 11, complemento)
 
-> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargo_claude_code_idps_verificacion_valores_historico.md`
+> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_verificacion_valores_historico.md`
 > Naturaleza: **auditoría READ-ONLY, censo celda-por-celda** de los valores históricos
 > (`prom` + `cod_grupo`) vs el crudo ancho. Complemento del audit previo (que dejó el
 > moderno exhaustivo y el histórico solo por conteos + 14 anclas).
