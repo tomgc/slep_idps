@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-22 11:48:30
-- **Totales:** 30 carpetas, 241 archivos
+- **Fecha:** 2026-06-22 12:31:36
+- **Totales:** 30 carpetas, 244 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -140,6 +140,8 @@ slep_idps/
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
 │   │   ├── .DS_Store  (6K)
+│   │   ├── backlog_historico.md  (12.8K)
+│   │   ├── backlog_volcado_crudo.md  (40.9K)
 │   │   ├── censo_universo_idps.md  (117K)
 │   │   ├── encargo_ajustes_motor_s14.md  (15.4K)
 │   │   ├── encargo_claude_code_idps_censo_universo.md  (22.3K)
@@ -219,12 +221,12 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260622_090251_estructura.md  (14K)
-│   │   ├── 20260622_090251_estructura.txt  (14.1K)
 │   │   ├── 20260622_111622_estructura.md  (15.1K)
 │   │   ├── 20260622_111622_estructura.txt  (15.2K)
-│   │   ├── estructura_actual.md  (15.1K)
-│   │   └── estructura_actual.txt  (15.2K)
+│   │   ├── 20260622_114830_estructura.md  (15.2K)
+│   │   ├── 20260622_114830_estructura.txt  (15.3K)
+│   │   ├── estructura_actual.md  (15.2K)
+│   │   └── estructura_actual.txt  (15.3K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -259,7 +261,8 @@ slep_idps/
 │   │   ├── traspaso_cierre_v10.md  (25.9K)
 │   │   ├── traspaso_cierre_v11.md  (20.3K)
 │   │   ├── traspaso_cierre_v12.md  (26K)
-│   │   └── traspaso_cierre_v13.md  (19.6K)
+│   │   ├── traspaso_cierre_v13.md  (19.6K)
+│   │   └── traspaso_cierre_v14.md  (32.4K)
 │   └── .DS_Store  (14K)
 ├── docs/
 │   └── index.html  (5.04M)
@@ -269,7 +272,7 @@ slep_idps/
 ├── .gitignore  (1.47K)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
-├── CLAUDE.md  (7.41K)
+├── CLAUDE.md  (7.99K)
 ├── README.md  (1.74K)
 ├── reorganizar_universo_idps.R  (17.7K)
 ├── slep_idps.Rproj  (195)
@@ -286,7 +289,7 @@ slep_idps/
 
 | Extension | Archivos |
 |---|---|
-| md | 67 |
+| md | 70 |
 | xlsx | 54 |
 | r | 19 |
 | (sin extension) | 18 |
