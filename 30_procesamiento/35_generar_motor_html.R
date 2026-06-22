@@ -43,6 +43,8 @@ INDICADOR_COLORS <- c("1" = "#EE2D49", "2" = "#FFC92E", "3" = "#9BC93E", "4" = "
 INDICADOR_CORTO  <- c("1" = "Autoestima", "2" = "Convivencia",
                       "3" = "Participación", "4" = "Hábitos")
 REGION_FOCO <- "5"  # Valparaiso (default de navegacion; foco Costa Central)
+# Anios sin evaluacion del sistema por pandemia (eje historico contiguo, D-s12-EJE).
+ANIOS_PANDEMIA <- c(2020L, 2021L)
 
 # Encoding UTF-8 defensivo sobre las etiquetas con tildes antes de serializar
 # (regla Bug 2: literales no-ASCII pueden quedar "unknown" en locale C -> mojibake).
@@ -341,11 +343,32 @@ grados_lbl <- GRADO_LABELS[names(grado_anios)]; Encoding(grados_lbl) <- "UTF-8"
 # en 34). I() fuerza array aunque sea un solo anio.
 anios_prelim <- sort(unique(as.integer(P$agno[P$preliminar %in% TRUE])))
 
+# Eje historico CONTIGUO por grado (D-s12-EJE): rango seq(min..max) de los anios con
+# dato; cada anio se clasifica con_dato / pandemia (2020-2021) / no_eval (anio del
+# rango sin dato que NO es pandemia, p.ej. 2019). El motivo del vacio se decide AQUI
+# (server-side, con constante nombrada), no en el JS; el template solo lo pinta.
+eje_historico <- lapply(names(grado_anios), function(g) {
+  ad  <- grado_anios[[g]]
+  eje <- seq.int(min(ad), max(ad))
+  lapply(eje, function(y) {
+    estado <- if (y %in% ANIOS_PANDEMIA) "pandemia"
+              else if (y %in% ad)        "con_dato"
+              else                       "no_eval"
+    list(agno = as.integer(y), estado = estado, preliminar = y %in% anios_prelim)
+  })
+})
+names(eje_historico) <- names(grado_anios)
+
+# Cobertura real de anios del motor (header dinamico, en vez del literal "2022-2025").
+cobertura_anios <- list(min = min(unlist(grado_anios, use.names = FALSE)),
+                        max = max(unlist(grado_anios, use.names = FALSE)))
+
 meta <- list(
   fecha_generacion = format(Sys.Date()),
   cobertura = "Todo Chile",
   region_foco = REGION_FOCO, slep_foco = if (length(slep_foco)) slep_foco else NULL,
   grados = as.list(grados_lbl), grado_anios = grado_anios, anios_preliminar = I(anios_prelim),
+  eje_historico = eje_historico, cobertura_anios = cobertura_anios,
   gse = names(GSE_LABELS), gse_labels = as.list(GSE_LABELS),
   depe2 = names(DEPENDENCIAS), depe2_labels = as.list(DEPENDENCIAS),
   comunas_foco = comunas_foco,
