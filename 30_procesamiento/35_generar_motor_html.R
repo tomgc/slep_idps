@@ -254,7 +254,22 @@ chk_h6 <- est_attr |> dplyr::distinct(rbd, cod_depe2) |>
 n_sin_dep <- sum(is.na(chk_h6$cod_depe2))
 n_recl    <- sum(!is.na(chk_h6$cod_depe2) & !is.na(chk_h6$depe2_idps) &
                    chk_h6$cod_depe2 != chk_h6$depe2_idps)
-stopifnot("H6: hay RBD del motor sin dependencia resuelta" = n_sin_dep == 0)
+# Con la serie historica, algunos RBD solo-historicos (cerrados; max año <=2018) no
+# traen dependencia: ni el directorio publico (no lista EE cerrados) ni el dato
+# 2014-2016 (sin columna cod_depe2). Es NA legitimo (no se fabrica; 🔒 "no inventar
+# donde el dato trae NA"); el motor degrada a "—", mismo criterio que la geo-NA
+# (D-s12-GEONA). Se REPORTA, no se aborta (el stopifnot original era valido cuando el
+# universo era solo-moderno). PERO se aborta si un RBD con año MODERNO (>=2022) perdiera
+# dependencia: eso seria un bug real, no NA historico legitimo.
+rbd_sin_dep <- chk_h6$rbd[is.na(chk_h6$cod_depe2)]
+if (length(rbd_sin_dep) > 0) {
+  max_agno_sin <- P |> dplyr::filter(.data$rbd %in% rbd_sin_dep) |>
+    dplyr::summarise(mx = max(as.integer(.data$agno)), .by = rbd)
+  stopifnot("H6: RBD con año moderno (>=2022) sin dependencia (bug, no NA historico)" =
+              sum(max_agno_sin$mx >= 2022) == 0)
+  message(sprintf("[H6] %d RBD sin dependencia: NA legitimo (solo-historicos, max año <=2018); degradan a '—'.",
+                  length(rbd_sin_dep)))
+}
 fmt_tab <- function(x) paste(sprintf("%s=%d", names(table(x)), as.integer(table(x))), collapse = ", ")
 message(sprintf("[H6] Dependencia reclasificada en %d RBD (vigencia actual del directorio).", n_recl))
 message(sprintf("     antes (idps): %s", fmt_tab(chk_h6$depe2_idps)))
