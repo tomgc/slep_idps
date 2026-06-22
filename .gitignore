@@ -33,6 +33,13 @@ diagnostico_*.md
 /verificar_*.R
 /listar_*.R
 
+# Intermedios scratch no reproducibles por el pipeline.
+# Los inventarios fueron generados por encargos one-off (s11); ningun script
+# del flujo (00_build.R, 30_procesamiento/) los regenera, por lo que no son
+# trazables y no se versionan. El resto de 40_salidas/intermedios/ (parquets
+# del pipeline: idps_largo, catalogo_idps, etc.) SI se versiona.
+40_salidas/intermedios/inventario_*.parquet
+
 # Outputs temporales
 *_freeze/
 .quarto/
