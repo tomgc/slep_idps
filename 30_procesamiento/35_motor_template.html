@@ -283,6 +283,13 @@ __FONTS_CSS__
   .sub-head{display:flex;align-items:baseline;gap:7px;}
   .sub-name{font-weight:var(--fw-bold);font-size:12px;color:var(--tinta);line-height:1.25;}
   .sw{width:12px;height:12px;border-radius:3px;flex:none;} .sw.sm{width:11px;height:11px;} .sw.xs{width:9px;height:9px;border-radius:2px;}
+  /* P-PALETA · a11y (WCAG 1.4.11, contraste de objetos graficos): hairline sutil
+     para DELINEAR los fills claros de indicador (#61BDC6/#4BA560/#AACB58) y sus
+     tonos de dimension sobre cream/blanco, donde el contraste fill-vs-fondo cae bajo
+     3:1. NO altera el hex de marca (solo el borde del swatch/dot). El texto legible
+     del motor va en --tinta sobre fondos claros, nunca sobre el fill de indicador,
+     por lo que NO hay fallback de color de texto que aplicar. */
+  .indp-dot,.rcard-dot,.th-sw,.sw,.evol-sw{box-shadow:inset 0 0 0 1px rgba(35,48,58,.22);}
   /* Barra de puntaje 0-100 (SOLO el prom del establecimiento; SIN marca de GSE,
      invariante "lee, no deriva" — ver ScoreBar en el script) */
   .sbar{position:relative;}
