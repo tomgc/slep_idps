@@ -356,19 +356,19 @@ roster_lst <- list(rows = nrow(roster), rbd = roster$rbd, grado = roster$grado,
 
 ind <- P |> dplyr::filter(.data$familia == "indicador") |> dplyr::arrange(rbd, grado, agno, id_indicador)
 ind_lst <- list(rows = nrow(ind), rbd = ind$rbd, grado = ind$grado, agno = as.integer(ind$agno),
-                ind = as.integer(ind$id_indicador), prom = round(ind$prom, 1),
+                ind = as.integer(ind$id_indicador), prom = round(ind$prom, 0),  # entero presentacion (s14)
                 dif = ind$dif, sigdif = ind$sigdif, difgru = ind$difgru, sigdifgru = ind$sigdifgru)
 
 dim <- P |> dplyr::filter(.data$familia == "dimension") |> dplyr::arrange(rbd, grado, agno, id_dimension)
 dim_lst <- list(rows = nrow(dim), rbd = dim$rbd, grado = dim$grado, agno = as.integer(dim$agno),
-                dim = as.integer(dim$id_dimension), prom = round(dim$prom, 1),
+                dim = as.integer(dim$id_dimension), prom = round(dim$prom, 0),  # entero presentacion (s14)
                 dif = dim$dif, sigdif = dim$sigdif)
 
 niv <- P |> dplyr::filter(.data$familia == "niveles") |> dplyr::arrange(rbd, grado, agno, id_subdimension)
 niv_lst <- list(rows = nrow(niv), rbd = niv$rbd, grado = niv$grado, agno = as.integer(niv$agno),
                 sub = as.integer(niv$id_subdimension),
-                bajo = round(niv$niv_bajo_por, 1), medio = round(niv$niv_medio_por, 1),
-                alto = round(niv$niv_alto_por, 1))
+                bajo = round(niv$niv_bajo_por, 0), medio = round(niv$niv_medio_por, 0),  # entero (s14)
+                alto = round(niv$niv_alto_por, 0))
 
 grado_anios <- lapply(names(GRADO_LABELS), function(g) {
   a <- sort(unique(roster$agno[roster$grado == g])); if (length(a) == 0) NULL else as.integer(a)
