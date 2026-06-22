@@ -309,6 +309,11 @@ __FONTS_CSS__
   .ybar-val{position:absolute;top:-19px;left:50%;transform:translateX(-50%);font-size:12.5px;font-weight:var(--fw-heavy);color:var(--tinta);font-variant-numeric:tabular-nums;}
   .ybar-yr{text-align:center;font-size:11px;color:var(--gris);font-weight:var(--fw-bold);}
   .ybar-empty{align-self:center;margin:auto auto;font-size:10px;color:var(--gris);font-style:italic;}
+  /* Año desactivado del eje contiguo (pandemia / no_eval): columna gris de ESTADO,
+     no barra ni hueco. Mismo gris para ambos motivos; el tooltip los distingue.
+     Reusa --gris (no introduce color nuevo de la paleta de indicadores). */
+  .ybar-col.is-off .ybar-yr{opacity:.5;}
+  .ybar-off{position:absolute;top:0;bottom:0;left:16%;right:16%;background:var(--gris);opacity:.12;border-radius:5px;cursor:default;}
   .hist-main .ybars{--yh:152px;}
   .hist-dim .ybars{--yh:118px;}
   /* Cabecera de cada dimension en el historico: nombre + marca de tendencia */
@@ -448,7 +453,7 @@ __FONTS_CSS__
   <header class="app">
     <div class="app-header-inner">
       <h1 class="app-title">Motor IDPS<span class="app-title-sub"> — Indicadores de Desarrollo Personal y Social</span></h1>
-      <p class="app-eyebrow">Datos 2022–2025 · Lectura por establecimiento, segmentada por grupo socioeconómico (GSE) · Agencia de Calidad de la Educación</p>
+      <p class="app-eyebrow">Datos <span id="cob-anios">2022–2025</span> · Lectura por establecimiento, segmentada por grupo socioeconómico (GSE) · Agencia de Calidad de la Educación</p>
       <p class="app-desc">Esta herramienta de análisis interno del <strong>SLEP Costa Central</strong> permite leer los <strong>Indicadores de Desarrollo Personal y Social</strong> (IDPS) de la Agencia de Calidad de la Educación, establecimiento por establecimiento y para cualquier territorio del país. Cada cifra se interpreta por su <strong>desvío respecto de su grupo socioeconómico (GSE)</strong> y su <strong>variación respecto de la evaluación anterior</strong>, ambas con su significancia estadística. La unidad es el establecimiento individual: <strong>nunca se promedia ni se agrega</strong>.</p>
     </div>
   </header>
@@ -471,6 +476,9 @@ __FONTS_CSS__
     const DATA = JSON.parse(pako.inflate(
       Uint8Array.from(atob("__JSON_DATA__"), c => c.charCodeAt(0)), { to: "string" }));
     window.__tDecode = performance.now() - window.__t0;
+    // Header dinamico: cobertura real de anios desde el dato (no el literal estatico).
+    (function(){var c=DATA.meta.cobertura_anios,el=document.getElementById("cob-anios");
+      if(c&&el)el.textContent=c.min+"–"+c.max;})();
   </script>
 
   <script type="text/babel" data-presets="env,react">
@@ -636,8 +644,14 @@ __FONTS_CSS__
       </div>);
   }
 
-  const comNom=cod=>{const c=DATA.comunas.find(x=>x.cod===cod);return c?tc(c.nom):cod;};
-  const regNom=cod=>{const r=DATA.regiones.find(x=>x.cod===cod);return r?r.nom:cod;};
+  const comNom=cod=>{if(cod==null)return"";const c=DATA.comunas.find(x=>x.cod===cod);return c?tc(c.nom):cod;};
+  const regNom=cod=>{if(cod==null)return"";const r=DATA.regiones.find(x=>x.cod===cod);return r?r.nom:cod;};
+  // Etiqueta de territorio de la ficha (D-s12-GEONA): degrada a leyenda legible cuando
+  // el RBD no tiene geo (solo-historico, comuna/region NA en el directorio), en vez de
+  // NA crudo o "undefined". No crea cubo "Sin territorio" en los selectores.
+  const terrFicha=e=>(!e||(e.cod_com==null&&e.cod_reg==null))
+    ? "Sin territorio asignado · solo registro histórico"
+    : comNom(e.cod_com)+" · "+regNom(e.cod_reg);
   // Nombre de presentacion del EE (Fase 3): curado (caracterizacion SLEP) -> VERBATIM
   // (ya trae tildes/mayusculas correctas; tc() lo romperia: "La Greda"->"la Greda");
   // resto del pais -> tc() sobre el nombre del directorio ya saneado en 35.R
@@ -719,6 +733,16 @@ __FONTS_CSS__
   function serieFull(ofFn,rbd,grado,id,anios){return anios.map(a=>{const d=ofFn(rbd,grado,a)[id]||{};
     return {a, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null)};});}
 
+  // serie sobre el EJE CONTIGUO (meta.eje_historico): un punto por año del rango, con
+  // su estado. Los años desactivados (pandemia/no_eval) no llevan valor ni cambio
+  // (v=null, dif=null): se pintan como columna gris. Los con_dato leen el dato del
+  // propio EE (igual que serieFull); el hueco "sin dato" (EE sin fila ese año con_dato)
+  // se conserva. El motivo del vacio (pandemia vs no_eval) viene del dato, no del JS.
+  function serieEje(ofFn,rbd,grado,id,eje){return eje.map(y=>{
+    if(y.estado!=="con_dato") return {a:y.agno, v:null, dif:null, sig:null, estado:y.estado};
+    const d=ofFn(rbd,grado,y.agno)[id]||{};
+    return {a:y.agno, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null), estado:"con_dato"};});}
+
   // ===== Panel de evolucion de UNA metrica: linea eje FIJO 0-100 (sin autoescala,
   //       sin interpolar huecos) + marcas inter-anuales (dif absoluto + sigdif). =====
   // HUERFANO desde P3-s9: la vista historica ahora usa BarrasAnio (barras por año).
@@ -768,11 +792,17 @@ __FONTS_CSS__
   function BarrasAnio({nombre,color,pts}){
     return (
       <div className="ybars">
-        {pts.map(p=>{const prelim=PRELIM.has(String(p.a)); const hueco=(p.v==null||isNaN(p.v));
+        {pts.map(p=>{const prelim=PRELIM.has(String(p.a));
+          const off=(p.estado==="pandemia"||p.estado==="no_eval");
+          const hueco=!off && (p.v==null||isNaN(p.v));
+          const offTip=p.estado==="pandemia"?"Sin evaluación (pandemia)":"Este grado no se evaluó este año";
           return (
-            <div className="ybar-col" key={p.a}>
+            <div className={"ybar-col"+(off?" is-off":"")} key={p.a}>
               <div className="ybar-plot">
-                {hueco
+                {off
+                  ? <div className="ybar-off"
+                      onMouseMove={e=>showTT("<b>"+p.a+"</b><br>"+offTip,e)} onMouseLeave={hideTT}></div>
+                  : hueco
                   ? <span className="ybar-empty">sin dato</span>
                   : <div className={"ybar-fill"+(prelim?" is-prelim":"")} style={{height:Math.max(0,Math.min(100,p.v))+"%",background:color}}
                       onMouseMove={e=>showTT("<b>"+nombre+"</b><br>"+p.a+(prelim?"*":"")+": "+fmt(p.v)+" (0–100)",e)} onMouseLeave={hideTT}>
@@ -900,6 +930,9 @@ __FONTS_CSS__
     const imB = cmpAgno!=null?indOf(rbd,grado,cmpAgno):{};
     const axIndB = DATA.indicadores.map(ind=>({label:ind.corto,value:imB[ind.id]?imB[ind.id].prom:null}));
     const cmpOpts = aniosCD.filter(a=>a!==agno);
+    // Eje contiguo del grado (D-s12-EJE): incluye los años desactivados
+    // (pandemia/no_eval). Fallback a los años con dato si el build no trae eje_historico.
+    const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[grado])||anios.map(a=>({agno:a,estado:"con_dato"}));
 
     const pos=["pos-top","pos-right","pos-bottom","pos-left"];
 
@@ -911,7 +944,7 @@ __FONTS_CSS__
         <div className="ficha-bar">
           <div className="ficha-id">
             <div className="ficha-name">{e&&e.nom?nomEE(e):rbd}<span className="ficha-rbd">RBD {rbd}</span></div>
-            <div className="ficha-meta">{e?comNom(e.cod_com):""} · {e?regNom(e.cod_reg):""} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
+            <div className="ficha-meta">{terrFicha(e)} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
           </div>
           <div className="ficha-tools">
             <div className="nivelsel"><span className="nivelsel-lab">Vista</span>
@@ -929,8 +962,8 @@ __FONTS_CSS__
           {isHist
             ? (
             <div className="hist-wrap">
-              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares; los huecos son años sin aplicación (no se interpola, p. ej. 4° básico no aplica 2024).</div>
-              {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieFull(indOf,rbd,grado,ind.id,anios);
+              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares. Los años en <b>gris</b> no tuvieron evaluación del sistema (2020–2021 por pandemia; 2019 el grado no se evaluó); un año con dato donde <i>este</i> establecimiento no fue medido aparece como columna “sin dato” (no se interpola).</div>
+              {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,eje);
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
                   <div className="hist-ind-h"><span className="indp-dot" style={{background:ind.color}}></span><span className="hist-ind-name">{ind.nombre}</span><HistTrend pts={ipts}/></div>
@@ -938,7 +971,7 @@ __FONTS_CSS__
                   {idims.length>0 && <>
                     <div className="hist-dims-lab">Dimensiones</div>
                     <div className="hist-dims">
-                      {idims.map((dimo,di)=>{const dpts=serieFull(dimOf,rbd,grado,dimo.id,anios); const dcol=dimColor(ind.color,di,idims.length);
+                      {idims.map((dimo,di)=>{const dpts=serieEje(dimOf,rbd,grado,dimo.id,eje); const dcol=dimColor(ind.color,di,idims.length);
                         return (
                           <div className="hist-dim" key={dimo.id}>
                             <div className="hist-dim-h"><span className="sw sm" style={{background:dcol}}></span><span className="hist-dim-name">{dimo.nombre}</span><HistTrend pts={dpts} tiny/></div>
