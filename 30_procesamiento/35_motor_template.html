@@ -9,13 +9,17 @@ __FONTS_CSS__
   :root{
     --azul:#0A3A5C; --cream:#FFF6E0; --tinta:#23303a; --gris:#6b7780;
     --linea:#e4dcc6; --panel:#fffdf7; --foco:#0062A0;
-    --ind1:#EE2D49; --ind2:#FFC92E; --ind3:#9BC93E; --ind4:#2A8FD9;
+    /* Paleta de INDICADOR (token espejo de INDICADOR_COLORS en 35): identidad del
+       folleto oficial de la Agencia (P-PALETA). El runtime lee ind.color del JSON;
+       estos --ind* se mantienen por coherencia documental. */
+    --ind1:#3858A3; --ind2:#61BDC6; --ind3:#4BA560; --ind4:#AACB58;
     --bajo:#E88663; --medio:#FFC92E; --alto:#75924E;
     --coral:#E88663;
     /* Colores de ESTADO vs GSE (revision P3 C3): igualados al handout
-       (bajo #EE2D49, neutro #8C8A86, sobre #2A8FD9). Decision explicita del
-       diseñador: el sobre/bajo coincide con la paleta de indicadores 4 y 1; la
-       paleta de los 4 indicadores (codificacion de indicador) NO se toca. */
+       (bajo #EE2D49, neutro #8C8A86, sobre #2A8FD9). Eje semantico PROPIO,
+       independiente de la paleta de INDICADOR. Tras P-PALETA (folleto Agencia) la
+       antigua coincidencia sobre/bajo con los indicadores 4/1 ya NO existe, y es
+       correcto: estado e indicador son ejes distintos. Estos tokens NO se tocan. */
     --alerta:#EE2D49; --alerta-bg:#FBE3E6; --destaca:#2A8FD9; --destaca-bg:#E2F0FB;
     --st-neutro:#8C8A86;
     --cmp-year:#C77D3A;
