@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-21 18:00:10
-- **Totales:** 27 carpetas, 201 archivos
+- **Fecha:** 2026-06-21 20:07:38
+- **Totales:** 27 carpetas, 208 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -145,6 +145,8 @@ slep_idps/
 │   │   ├── encargo_claude_code_idps_organizacion.md  (21.2K)
 │   │   ├── encargo_claude_code_idps_pestana_slep_selector.md  (14.5K)
 │   │   ├── encargo_claude_code_idps_producto_deploy.md  (14K)
+│   │   ├── encargo_claude_code_idps_verificacion_integracion_historico.md  (16.4K)
+│   │   ├── encargo_claude_code_idps_verificacion_valores_historico.md  (12.3K)
 │   │   ├── encargo_claude_code_idps_vista_historica_barras.md  (16.2K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
@@ -196,17 +198,19 @@ slep_idps/
 │   │   │   ├── 20260621_integracion_historico_idps_log.md  (9.64K)
 │   │   │   ├── 20260621_pestana_slep_selector_log.md  (7.08K)
 │   │   │   ├── 20260621_reorganizacion_universo_idps_log.md  (9.96K)
+│   │   │   ├── 20260621_verificacion_integracion_historico_log.md  (7.73K)
+│   │   │   ├── 20260621_verificacion_valores_historico_log.md  (7.3K)
 │   │   │   └── 20260621_vista_historica_barras_log.md  (8.07K)
 │   │   ├── .DS_Store  (10K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260621_130930_estructura.md  (15.2K)
-│   │   ├── 20260621_130930_estructura.txt  (15.3K)
-│   │   ├── 20260621_175929_estructura.md  (12.6K)
-│   │   ├── 20260621_175929_estructura.txt  (12.7K)
-│   │   ├── estructura_actual.md  (12.6K)
-│   │   └── estructura_actual.txt  (12.7K)
+│   │   ├── 20260621_194919_estructura.md  (13.1K)
+│   │   ├── 20260621_194919_estructura.txt  (13.2K)
+│   │   ├── 20260621_200650_estructura.md  (13.1K)
+│   │   ├── 20260621_200650_estructura.txt  (13.2K)
+│   │   ├── estructura_actual.md  (13.1K)
+│   │   └── estructura_actual.txt  (13.2K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
@@ -218,21 +222,24 @@ slep_idps/
 │   │   ├── traspaso_cierre_v07.md  (30.3K)
 │   │   ├── traspaso_cierre_v08.md  (24.9K)
 │   │   ├── traspaso_cierre_v09.md  (27.3K)
-│   │   └── traspaso_cierre_v10.md  (25.9K)
+│   │   ├── traspaso_cierre_v10.md  (25.9K)
+│   │   └── traspaso_cierre_v11.md  (20.3K)
 │   └── .DS_Store  (10K)
 ├── docs/
 │   └── index.html  (4.66M)
 ├── tests/
 │   └── .gitkeep  (0)
 ├── .DS_Store  (14K)
-├── .gitignore  (759)
+├── .gitignore  (767)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
-├── CLAUDE.md  (5.5K)
+├── CLAUDE.md  (5.93K)
 ├── README.md  (1.74K)
 ├── reorganizar_universo_idps.R  (17.7K)
 ├── slep_idps.Rproj  (195)
+├── verificar_auditoria_historico_s11.R  (6.9K)
 ├── verificar_censo_universo.R  (18.8K)
+├── verificar_censo_valores_historico_s11.R  (6.5K)
 ├── verificar_checkpoint_historico.R  (6.39K)
 ├── verificar_descomposicion_historico.R  (4.53K)
 ├── verificar_historico_idps.R  (23.1K)
@@ -244,9 +251,9 @@ slep_idps/
 | Extension | Archivos |
 |---|---|
 | xlsx | 54 |
-| md | 47 |
+| md | 52 |
+| r | 17 |
 | (sin extension) | 16 |
-| r | 15 |
 | pdf | 13 |
 | xls | 11 |
 | parquet | 8 |
