@@ -330,10 +330,13 @@ __FONTS_CSS__
   .ybar-col.is-off .ybar-yr{opacity:.5;}
   .ybar-off{position:absolute;top:0;bottom:0;left:16%;right:16%;background:var(--gris);opacity:.12;border-radius:5px;cursor:default;}
   .hist-main .ybars{--yh:152px;}
-  /* Borde por dimension (s14): accent del color del indicador padre (var --ic,
-     heredado de .hist-ind) para separar cada dimension entre si y que sus barras
-     por anio no se lean como un continuo. Consume la paleta, no la redefine. */
-  .hist-dim{border-left:3px solid var(--ic,var(--azul));padding-left:11px;}
+  /* Separador de dimension (s15, rehace fase 3 de s14): contenedor a escala,
+     analogo a .hist-ind pero subordinado (borde mas fino, radio menor, accent
+     superior de 2px en vez de 3px). Marco completo con accent del color del
+     indicador padre (--ic, heredado de .hist-ind), no el border-left lateral
+     rechazado. Consume la paleta, no la redefine. */
+  .hist-dim{border:1px solid var(--cream-200);border-top:2px solid var(--ic,var(--azul));
+    border-radius:var(--radius-2);padding:10px 11px;background:var(--paper);}
   .hist-dim .ybars{--yh:118px;}
   /* Cabecera de cada dimension en el historico: nombre + marca de tendencia */
   .hist-dim-h{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
