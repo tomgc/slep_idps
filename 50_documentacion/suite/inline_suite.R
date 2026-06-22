@@ -42,7 +42,10 @@ DIR_SUITE <- here::here("50_documentacion", "suite")
     return(NA_character_)
   }
   bytes <- readBin(ruta, what = "raw", n = file.info(ruta)$size)
-  b64   <- jsonlite::base64_enc(bytes)   # jsonlite ya es dependencia del flujo
+  # base64_enc envuelve en lineas de 76 chars (estilo MIME); un salto de linea
+  # dentro de url('data:...') INVALIDA la regla CSS (el navegador deja de parsear).
+  # Se quitan los saltos -> data URI de una sola linea, como hace 35 con el JSON.
+  b64   <- gsub("[\r\n]", "", jsonlite::base64_enc(bytes))
   ext   <- tools::file_ext(ruta)
   sprintf("data:%s;base64,%s", .mime(ext), b64)
 }
@@ -75,8 +78,13 @@ DIR_SUITE <- here::here("50_documentacion", "suite")
 
   # 1) Localizar y leer el CSS enlazado.
   link_pat <- "<link[^>]*rel=[\"']stylesheet[\"'][^>]*href=[\"']([^\"']+)[\"'][^>]*>"
-  href <- sub(paste0(".*", link_pat, ".*"), "\\1", html, perl = TRUE)
-  if (identical(href, html) || !nzchar(href)) {
+  # Extraer el href del grupo de captura con regexec (NO con
+  # sub('.*'+pat+'.*','\\1',...): en PCRE '.*' no cruza saltos de linea y el HTML
+  # es multilinea, asi que sub solo reemplazaba la linea del <link> y dejaba el
+  # resto del documento dentro de href -> "CSS no encontrado: <doc completo>").
+  mm   <- regmatches(html, regexec(link_pat, html, perl = TRUE))[[1]]
+  href <- if (length(mm) >= 2) mm[2] else ""
+  if (!nzchar(href)) {
     message(sprintf("  (%s) sin <link stylesheet>; se deja igual.", basename(ruta_html)))
   } else {
     ruta_css <- file.path(dir_tema, href)
