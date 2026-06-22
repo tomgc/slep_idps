@@ -38,8 +38,12 @@ source(here::here("10_utils", "10_utils.R"))
 instalar_si_falta(c("dplyr", "arrow", "jsonlite", "readr", "readxl"))
 source(here::here("10_utils", "10_configuracion.R"))
 
-# Paleta canonica de los 4 indicadores (madre / prototipo) y etiquetas cortas.
-INDICADOR_COLORS <- c("1" = "#EE2D49", "2" = "#FFC92E", "3" = "#9BC93E", "4" = "#2A8FD9")
+# Paleta canonica de los 4 indicadores: identidad cromatica del folleto oficial de
+# la Agencia de Calidad ("¿Cuales son los Indicadores de Desarrollo Personal y
+# Social?", los 4 circulos). Mapeo confirmado contra los rotulos impresos. Reemplaza
+# la paleta interna previa (rojo/amarillo/verde-lima/azul). Ver decision P-PALETA
+# (50_documentacion/activa/decisiones/20260622_decision_paleta_indicadores.md).
+INDICADOR_COLORS <- c("1" = "#3858A3", "2" = "#61BDC6", "3" = "#4BA560", "4" = "#AACB58")
 INDICADOR_CORTO  <- c("1" = "Autoestima", "2" = "Convivencia",
                       "3" = "Participación", "4" = "Hábitos")
 REGION_FOCO <- "5"  # Valparaiso (default de navegacion; foco Costa Central)
