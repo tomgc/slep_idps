@@ -218,7 +218,15 @@ if (nrow(bt_odd)) {
 } else message("[NOMBRES] sin backticks impares en EE fuera del SLEP.")
 
 est_attr <- P |>
-  dplyr::distinct(rbd, nom_rbd, cod_com_rbd, cod_reg_rbd, cod_pro_rbd, cod_depe2) |>
+  # UN registro por RBD. Con la serie historica un mismo RBD puede traer atributos
+  # IDPS distintos entre filas (historico vs moderno, o nombres/geo truncados de modo
+  # distinto), lo que generaba establecimientos DUPLICADos (tarjetas repetidas). Se toma
+  # el del año MAS RECIENTE; la geo/nombre/dependencia canonicos vienen igual del
+  # directorio via coalesce mas abajo (antes, universo solo-moderno, cada RBD tenia un
+  # unico combo y el distinct por columnas bastaba).
+  dplyr::arrange(rbd, dplyr::desc(agno)) |>
+  dplyr::distinct(rbd, .keep_all = TRUE) |>
+  dplyr::select(rbd, nom_rbd, cod_com_rbd, cod_reg_rbd, cod_pro_rbd, cod_depe2) |>
   dplyr::rename(cod_depe2_idps = cod_depe2) |>
   dplyr::left_join(dir_attr, by = "rbd") |>
   dplyr::left_join(carac_map, by = "rbd") |>
