@@ -81,6 +81,18 @@ DIR <- readr::read_delim(
 # se acota AQUI el universo final que alimenta el motor (no a media tuberia).
 P <- dplyr::filter(P, .data$grado %in% GRADOS_MOTOR)
 stopifnot("Sin filas tras filtrar a GRADOS_MOTOR" = nrow(P) > 0)
+
+# Higiene de presentacion (H-FID-1, log 20260621_display_fidelity): el crudo
+# 4b/2017 trae filas con rbd=NA (sin establecimiento asociado) que se colapsaban
+# en un "fantasma" rbd=null (sin nombre/geo/GSE) alcanzable por el buscador. Se
+# descartan AQUI, al construir el universo que alimenta el motor; el parquet NO se
+# toca (md5 intacto, el dato sigue completo en idps_largo). Solo afecta filas con
+# rbd NA: ningun RBD real tiene rbd NA, asi que n_distinct(rbd real) no cambia.
+n_fantasma <- sum(is.na(P$rbd))
+P <- dplyr::filter(P, !is.na(.data$rbd))
+message(sprintf("    [H-FID-1] descartadas %d fila(s) con rbd=NA (fantasma 4b/2017); parquet intacto.",
+                n_fantasma))
+
 message(sprintf("    %d filas, %d establecimientos (grados del motor: %s).",
                 nrow(P), dplyr::n_distinct(P$rbd), paste(GRADOS_MOTOR, collapse = ", ")))
 
