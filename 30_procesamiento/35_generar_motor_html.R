@@ -402,12 +402,26 @@ names(eje_historico) <- names(grado_anios)
 cobertura_anios <- list(min = min(unlist(grado_anios, use.names = FALSE)),
                         max = max(unlist(grado_anios, use.names = FALSE)))
 
+# Primer anio con dato sistemico POR FAMILIA (recorte de eje, s14). DERIVADO del
+# dato (no hardcodeado), con la columna correcta de cada familia: niveles usa
+# niv_bajo_por (en niveles prom es NA siempre). P ya esta filtrado a GRADOS_MOTOR.
+# El template recorta el eje de cada panel a agno >= este valor; los huecos
+# internos (pandemia/no_eval) se conservan igual. Esperado: ind 2014, dim 2018,
+# niv 2023; si el dato difiere, manda el dato.
+primer_anio_familia <- list(
+  indicador = as.integer(min(P$agno[P$familia == "indicador" & !is.na(P$prom)])),
+  dimension = as.integer(min(P$agno[P$familia == "dimension" & !is.na(P$prom)])),
+  niveles   = as.integer(min(P$agno[P$familia == "niveles"   & !is.na(P$niv_bajo_por)])))
+message(sprintf("[s14] primer_anio_familia: ind=%d dim=%d niv=%d",
+                primer_anio_familia$indicador, primer_anio_familia$dimension, primer_anio_familia$niveles))
+
 meta <- list(
   fecha_generacion = format(Sys.Date()),
   cobertura = "Todo Chile",
   region_foco = REGION_FOCO, slep_foco = if (length(slep_foco)) slep_foco else NULL,
   grados = as.list(grados_lbl), grado_anios = grado_anios, anios_preliminar = I(anios_prelim),
   eje_historico = eje_historico, cobertura_anios = cobertura_anios,
+  primer_anio_familia = primer_anio_familia,
   gse = names(GSE_LABELS), gse_labels = as.list(GSE_LABELS),
   depe2 = names(DEPENDENCIAS), depe2_labels = as.list(DEPENDENCIAS),
   comunas_foco = comunas_foco,

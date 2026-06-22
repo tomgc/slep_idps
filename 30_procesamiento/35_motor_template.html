@@ -944,6 +944,11 @@ __FONTS_CSS__
     // Eje contiguo del grado (D-s12-EJE): incluye los años desactivados
     // (pandemia/no_eval). Fallback a los años con dato si el build no trae eje_historico.
     const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[grado])||anios.map(a=>({agno:a,estado:"con_dato"}));
+    // Recorte de eje POR FAMILIA (s14): cada familia arranca en su primer año con
+    // dato sistemico (meta.primer_anio_familia, derivado del dato server-side). Solo
+    // recorta el FRENTE; los huecos internos (pandemia/no_eval/sin dato) se conservan.
+    const PAF=(DATA.meta.primer_anio_familia)||{};
+    const ejeFam=(fam)=>{const y0=PAF[fam]; return (y0==null)?eje:eje.filter(y=>y.agno>=y0);};
 
     const pos=["pos-top","pos-right","pos-bottom","pos-left"];
 
@@ -974,7 +979,7 @@ __FONTS_CSS__
             ? (
             <div className="hist-wrap">
               <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares. Los años en <b>gris</b> no tuvieron evaluación del sistema (2020–2021 por pandemia; 2019 el grado no se evaluó); un año con dato donde <i>este</i> establecimiento no fue medido aparece como columna “sin dato” (no se interpola).</div>
-              {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,eje);
+              {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,ejeFam('indicador'));
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
                   <div className="hist-ind-h"><span className="indp-dot" style={{background:ind.color}}></span><span className="hist-ind-name">{ind.nombre}</span><HistTrend pts={ipts}/></div>
@@ -982,7 +987,7 @@ __FONTS_CSS__
                   {idims.length>0 && <>
                     <div className="hist-dims-lab">Dimensiones</div>
                     <div className="hist-dims">
-                      {idims.map((dimo,di)=>{const dpts=serieEje(dimOf,rbd,grado,dimo.id,eje); const dcol=dimColor(ind.color,di,idims.length);
+                      {idims.map((dimo,di)=>{const dpts=serieEje(dimOf,rbd,grado,dimo.id,ejeFam('dimension')); const dcol=dimColor(ind.color,di,idims.length);
                         return (
                           <div className="hist-dim" key={dimo.id}>
                             <div className="hist-dim-h"><span className="sw sm" style={{background:dcol}}></span><span className="hist-dim-name">{dimo.nombre}</span><HistTrend pts={dpts} tiny/></div>
