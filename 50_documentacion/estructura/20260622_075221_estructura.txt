@@ -1,7 +1,7 @@
 ESCANEO DE ESTRUCTURA — slep_idps
 Raiz   : /Users/tomgc/Projects/slep_idps
-Fecha  : 2026-06-22 07:15:48
-Totales: 27 carpetas, 215 archivos
+Fecha  : 2026-06-22 07:52:21
+Totales: 27 carpetas, 218 archivos
 Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 slep_idps/
@@ -33,10 +33,10 @@ slep_idps/
 │   │   ├── directorio_oficial_ee_publico.csv  (3.42M)
 │   │   ├── directorio_oficial_ee.csv  (3.6M)
 │   │   ├── glosas_directorio_oficial_ee.pdf  (457K)
-│   │   ├── idps2m2023_GLOSAS_rbd_público_final.xlsx  (38.2K)
+│   │   ├── idps2m2023_GLOSAS_rbd_publico_final.xlsx  (38.2K)
 │   │   ├── idps2m2024_GLOSAS_web_final.xlsx  (34K)
 │   │   ├── idps2m2025_GLOSAS_web_preliminar.xlsx  (34.4K)
-│   │   ├── idps4b2023_GLOSAS_rbd_público_final.xlsx  (37.5K)
+│   │   ├── idps4b2023_GLOSAS_rbd_publico_final.xlsx  (37.5K)
 │   │   ├── idps4b2024_GLOSAS_web_final.xlsx  (34K)
 │   │   ├── idps4b2025_GLOSAS_web_preliminar.xlsx  (34.4K)
 │   │   ├── idps6b2024_GLOSAS_web_final.xlsx  (34K)
@@ -74,7 +74,7 @@ slep_idps/
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
-│   ├── idps2m2022_rbd_glosa_pública_final.xlsx  (33K)
+│   ├── idps2m2022_rbd_glosa_publica_final.xlsx  (33K)
 │   ├── idps2m2023_niveles_final.xlsx  (3.44M)
 │   ├── idps2m2023_rbd_dim_final.xlsx  (1.99M)
 │   ├── idps2m2023_rbd_final.xlsx  (735K)
@@ -86,7 +86,7 @@ slep_idps/
 │   ├── idps2m2025_rbd_subdim_niveles_preliminar.xlsx  (3.2M)
 │   ├── idps4b2022_rbd_dim_final.xlsx  (4.78M)
 │   ├── idps4b2022_rbd_final.xlsx  (1.53M)
-│   ├── idps4b2022_rbd_glosa_pública_final.xlsx  (33K)
+│   ├── idps4b2022_rbd_glosa_publica_final.xlsx  (33K)
 │   ├── idps4b2023_niveles_final.xlsx  (7.59M)
 │   ├── idps4b2023_rbd_dim_final.xlsx  (4.69M)
 │   ├── idps4b2023_rbd_final.xlsx  (1.68M)
@@ -130,7 +130,8 @@ slep_idps/
 │   │   ├── decisiones/
 │   │   │   ├── .gitkeep  (0)
 │   │   │   ├── 20260611_decision_gobernanza_insumos_publicos.md  (3.23K)
-│   │   │   └── 20260612_decision_ponderacion_idps.md  (7.21K)
+│   │   │   ├── 20260612_decision_ponderacion_idps.md  (7.21K)
+│   │   │   └── 20260622_decision_etiqueta_dependencia.md  (3.33K)
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
 │   │   ├── .DS_Store  (6K)
@@ -208,12 +209,12 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260621_200650_estructura.md  (13.1K)
-│   │   ├── 20260621_200650_estructura.txt  (13.2K)
-│   │   ├── 20260621_200738_estructura.md  (13.1K)
-│   │   ├── 20260621_200738_estructura.txt  (13.2K)
-│   │   ├── estructura_actual.md  (13.1K)
-│   │   └── estructura_actual.txt  (13.2K)
+│   │   ├── 20260622_071548_estructura.md  (13.6K)
+│   │   ├── 20260622_071548_estructura.txt  (13.7K)
+│   │   ├── 20260622_074045_estructura.md  (13.7K)
+│   │   ├── 20260622_074045_estructura.txt  (13.8K)
+│   │   ├── estructura_actual.md  (13.7K)
+│   │   └── estructura_actual.txt  (13.8K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
 │   │   ├── traspaso_cierre_v01.md  (16.4K)
@@ -226,17 +227,19 @@ slep_idps/
 │   │   ├── traspaso_cierre_v08.md  (24.9K)
 │   │   ├── traspaso_cierre_v09.md  (27.3K)
 │   │   ├── traspaso_cierre_v10.md  (25.9K)
-│   │   └── traspaso_cierre_v11.md  (20.3K)
+│   │   ├── traspaso_cierre_v11.md  (20.3K)
+│   │   ├── traspaso_cierre_v12.md  (26K)
+│   │   └── traspaso_cierre_v13.md  (19.6K)
 │   └── .DS_Store  (10K)
 ├── docs/
 │   └── index.html  (6.23M)
 ├── tests/
 │   └── .gitkeep  (0)
 ├── .DS_Store  (14K)
-├── .gitignore  (767)
+├── .gitignore  (1.14K)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
-├── CLAUDE.md  (5.93K)
+├── CLAUDE.md  (7.41K)
 ├── README.md  (1.74K)
 ├── reorganizar_universo_idps.R  (17.7K)
 ├── slep_idps.Rproj  (195)
@@ -249,7 +252,7 @@ slep_idps/
 └── verificar_integracion_historico.R  (7.4K)
 
 Conteo por extension:
-  md                 58
+  md                 61
   xlsx               54
   (sin extension)    17
   r                  17
