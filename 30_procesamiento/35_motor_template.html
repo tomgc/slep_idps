@@ -678,10 +678,11 @@ __FONTS_CSS__
   const nomEE=e=>!e?"":(e.cur?(e.nom||""):tc(e.nom||""));
 
   // ===== Distribucion de niveles de una subdimension =====
-  function DistBar({v}){
-    const segs=[["bajo","var(--bajo)"],["medio","var(--medio)"],["alto","var(--alto)"]];
+  function DistBar({v,ramp}){
+    const r = ramp || {bajo:"var(--bajo)",medio:"var(--medio)",alto:"var(--alto)"};
+    const segs=[["bajo",r.bajo],["medio",r.medio],["alto",r.alto]];
     return <div className="bar">{segs.map(([k,c])=>{const val=v[k];if(val==null||val===0)return null;
-      return <span key={k} style={{width:val+"%",background:c}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val):""}</span>;})}</div>;
+      return <span key={k} style={{width:val+"%",background:c,color:_txtOn(c)}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val):""}</span>;})}</div>;
   }
 
   // ===== Reparto de estado vs GSE (Fase 3 — CONTEO de EE, NO promedio) =====
@@ -732,6 +733,23 @@ __FONTS_CSS__
   const _lighten=(h,t)=>_mix(h,'#ffffff',t), _darken=(h,t)=>_mix(h,'#000000',t);
   function dimColor(mother,di,total){if(!mother||mother[0]!=='#')return mother||"var(--azul)";
     const t=total<=1?0.5:di/(total-1); const f=-0.05+t*0.40; return f<0?_darken(mother,-f):_lighten(mother,f);}
+  // Rampa monocromatica de NIVELES derivada del color del indicador padre
+  // (D-s15-RAMPA, titular): Bajo = mas claro, Alto = mas oscuro/saturado. Reutiliza
+  // _lighten/_darken (misma familia que dimColor; sin colores nuevos). Factores
+  // calibrados s15 (constantes abajo): el 3:1 ADYACENTE no es alcanzable con 3 tonos
+  // del mismo matiz (limitacion inherente; la accesibilidad la dan los canales
+  // textuales: title por segmento, etiqueta de valor y leyenda). Degrada al semaforo
+  // (--bajo/--medio/--alto) solo si el color no es hex.
+  const RAMP_BAJO=0.45, RAMP_MEDIO=0.12, RAMP_ALTO=0.22;
+  function nivelRamp(mother){
+    if(!mother||mother[0]!=='#') return {bajo:"var(--bajo)",medio:"var(--medio)",alto:"var(--alto)"};
+    return { bajo:_lighten(mother,RAMP_BAJO), medio:_lighten(mother,RAMP_MEDIO), alto:_darken(mother,RAMP_ALTO) };
+  }
+  // Color de texto legible (claro/oscuro) sobre un fill segun su luminancia: la
+  // etiqueta de % dentro del segmento debe leerse tanto en bajo (claro) como en
+  // alto (oscuro). El title de hover y la leyenda NO dependen de esto.
+  const _txtOn=c=>{ if(!c||c[0]!=='#') return undefined; const a=_hx(c);
+    return (0.299*a[0]+0.587*a[1]+0.114*a[2])/255 < 0.55 ? '#fff' : '#2e2710'; };
 
   // ===== Barra de puntaje 0-100 (SOLO el prom del establecimiento) =====
   // Adaptada de bar0100() del prototipo (idps-demo.js ~133) ELIMINANDO el
@@ -854,7 +872,7 @@ __FONTS_CSS__
   // niveles (% bajo/medio/alto), NUNCA una barra de puntaje. Conserva el manejo
   // de "sin dato" (resguardo estadistico) y la nota de 8° basico (sin texto
   // cualitativo por ciclo). Logica identica a la del antiguo SubdimView.
-  function SubDist({dimId,nm,ciclo}){
+  function SubDist({dimId,nm,ciclo,ramp}){
     const subs=subByDim[dimId]||[];
     if(!subs.length) return null;
     return (
@@ -866,7 +884,7 @@ __FONTS_CSS__
               {s.definicion && <div className="defn">{s.definicion}</div>}
               {(!v||v.bajo==null)
                 ? <div className="sup" style={{fontSize:11}}>sin dato (resguardo estadístico)</div>
-                : <DistBar v={v}/>}
+                : <DistBar v={v} ramp={ramp}/>}
               {v&&v.bajo!=null&&txt&&<div className="nivel-txt"><b>Nivel Alto:</b> {txt.alto}</div>}
               {v&&v.bajo!=null&&!ciclo&&<div className="nivel-txt sup">Texto de nivel no disponible para este grado (8° básico).</div>}
             </div>);})}
@@ -878,7 +896,7 @@ __FONTS_CSS__
   //       (dimOf) trae prom/dif/sigdif pero NO difgru/sigdifgru — el desvio vs
   //       GSE SOLO existe a nivel indicador (invariante). Debajo, las
   //       subdimensiones como distribucion de niveles. =====
-  function DimBlock({dimo,dimTone,dm,nm,ciclo}){
+  function DimBlock({dimo,dimTone,dm,nm,ciclo,ramp}){
     const dd=dm[dimo.id];
     return (
       <div className="dimb">
@@ -891,7 +909,7 @@ __FONTS_CSS__
         {dd&&dd.prom!=null &&
           <div className="dim-anc"><Ancla tipo="vs año anterior" dif={dd.dif} sig={dd.sigdif}/></div>}
         {dimo.definicion && <Definicion texto={dimo.definicion} etiqueta="Sobre esta dimensión"/>}
-        <SubDist dimId={dimo.id} nm={nm} ciclo={ciclo}/>
+        <SubDist dimId={dimo.id} nm={nm} ciclo={ciclo} ramp={ramp}/>
       </div>);
   }
 
@@ -900,6 +918,7 @@ __FONTS_CSS__
   function IndPanel({ind,im,dm,nm,ciclo}){
     const d=im[ind.id]; const dims=dimsByInd[ind.id]||[];
     const nSubs=dims.reduce((a,dd)=>a+((subByDim[dd.id]||[]).length),0);
+    const ramp=nivelRamp(ind.color);   // rampa de niveles de ESTE indicador (D-s15-RAMPA)
     return (
       <section className="indp" style={{"--ic":ind.color}}>
         <header className="indp-head">
@@ -917,7 +936,7 @@ __FONTS_CSS__
           </div>}
         {ind.definicion && <div className="indp-def"><Definicion texto={ind.definicion} etiqueta="¿Qué mide este indicador?"/></div>}
         <div className="indp-body">
-          {dims.map((dimo,di)=><DimBlock key={dimo.id} dimo={dimo} dimTone={dimColor(ind.color,di,dims.length)} dm={dm} nm={nm} ciclo={ciclo}/>)}
+          {dims.map((dimo,di)=><DimBlock key={dimo.id} dimo={dimo} dimTone={dimColor(ind.color,di,dims.length)} dm={dm} nm={nm} ciclo={ciclo} ramp={ramp}/>)}
         </div>
       </section>);
   }
@@ -1055,7 +1074,7 @@ __FONTS_CSS__
               <div className="nota nota-inv">Cada cifra se interpreta por su <b>desvío</b>, no por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); <b>no reconstruye el puntaje del GSE</b>. Por eso las barras muestran solo el promedio del establecimiento y el desvío vs GSE se comunica con las anclas.</div>
 
               <div className="ficha-panels-head">
-                <div className="leyenda"><span><i style={{background:"var(--bajo)"}}></i>Bajo</span><span><i style={{background:"var(--medio)"}}></i>Medio</span><span><i style={{background:"var(--alto)"}}></i>Alto</span><span>· distribución de subdimensiones · solo respuestas de estudiantes (EST)</span></div>
+                <div className="leyenda"><span><i style={{background:"#c9ced1"}}></i>Bajo</span><span><i style={{background:"#838b90"}}></i>Medio</span><span><i style={{background:"#3c454b"}}></i>Alto</span><span>· distribución de subdimensiones · el tono lo da cada indicador (leyenda en gris neutro: rampa Bajo→Alto) · solo respuestas de estudiantes (EST)</span></div>
               </div>
               <div className="ficha-panels">
                 {DATA.indicadores.map(ind=><IndPanel key={ind.id} ind={ind} im={im} dm={dm} nm={nm} ciclo={ciclo}/>)}
