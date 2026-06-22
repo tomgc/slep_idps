@@ -1,6 +1,6 @@
 # Log — P-PALETA: adopción de la paleta del folleto de la Agencia
 
-> Encargo: `50_documentacion/activa/encargo_claude_code_idps_paleta.md`.
+> Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_paleta.md`.
 > Alcance: presentación pura — la paleta de los 4 indicadores IDPS pasa de la
 > interna (rojo/amarillo/verde-lima/azul) a la identidad cromática del folleto
 > oficial. Ninguna cifra cambia. Fecha: 2026-06-22. Base: HEAD `ce2604d` (cierre s13).

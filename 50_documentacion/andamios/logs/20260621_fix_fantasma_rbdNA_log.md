@@ -1,6 +1,6 @@
 # Log — Fix fantasma rbd=NA (H-FID-1) · slep_idps sesión 12
 
-> Higiene de presentación. Encargo: `50_documentacion/activa/encargo_claude_code_idps_fix_fantasma.md`.
+> Higiene de presentación. Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_fix_fantasma.md`.
 > Elimina del motor el establecimiento "fantasma" rbd=null que el spot-check de
 > P-DISPLAY-FIDELITY detectó alcanzable por el buscador. El parquet NO se toca
 > (el fantasma se filtra al SERIALIZAR). Fecha: 2026-06-21.

@@ -1,7 +1,7 @@
 # Decisión — Paleta cromática de los 4 indicadores IDPS del motor
 
 - **Fecha:** 2026-06-22
-- **Encargo:** P-PALETA (`50_documentacion/activa/encargo_claude_code_idps_paleta.md`)
+- **Encargo:** P-PALETA (`50_documentacion/activa/encargos/encargo_claude_code_idps_paleta.md`)
 - **Tipo:** decisión de presentación (identidad de marca). NO afecta ninguna cifra.
 - **Estado:** adoptada y desplegada (sesión 14, tras panel adversarial de fidelidad).
 

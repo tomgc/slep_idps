@@ -1,6 +1,6 @@
 # Log — Motor con serie histórica 2014→2025 (P-MOTOR, sesión 12)
 
-> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargo_claude_code_idps_motor_historico.md`
+> Fecha: 2026-06-21 · Encargo: `50_documentacion/activa/encargos/encargo_claude_code_idps_motor_historico.md`
 > Ejecutor: Claude Code (Opus). Autónomo, secuencial. **El parquet no se toca** (read-only sobre el dato).
 
 ## 1. Resumen
