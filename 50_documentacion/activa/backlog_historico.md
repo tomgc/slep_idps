@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v15 (2026-06-22). **Total reconciliado: 106 cambios.**
+> **Versión:** consolidado a v16 (2026-06-22). **Total reconciliado: 107 cambios.**
 
 ---
 
@@ -63,7 +63,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 13 | v13 | 4 | 97–100 | Opus 4.8 | Decisión H-FID-2 + higiene de repo (inventarios, glosas, escáner) |
 | 14 | v14 | 4 | 101–104 | Opus 4.8 | Paleta folleto + auditoría decimales + suite suitedoc + ajustes de motor |
 | 15 | v15 | 2 | 105–106 | Opus 4.8 | P-PALETA-v2 rampa+separador + P-DOC-RENDER suite |
-| **Total** | | **106** | **1–106** | | |
+| 16 | v16 | 1 | 107 | Opus 4.8 | P-ORG: reorganización del directorio (encargos + scripts) |
+| **Total** | | **107** | **1–107** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -77,7 +78,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (recalculada a v15, sobre 106 cambios)
+## Clasificación temática (recalculada a v16, sobre 107 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -91,7 +92,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Visualización / diseño — motor base/datos | 14 | 13% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
 | Visualización / diseño — rediseño UI | 16 | 15% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2) |
 | Perfilado / exploración de datos | 4 | 4% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
-| Limpieza / deuda técnica | 11 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner |
+| Limpieza / deuda técnica | 12 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG) |
 | Documentación conceptual / contenido | 9 | 9% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
 | Pipeline / motor (código productivo) | 7 | 7% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
 | Saneamiento / calidad de datos de presentación | 14 | 13% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres |
@@ -120,7 +121,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 > Numeración global permanente. Las entradas 1–83 conservan su trazabilidad a los
 > traspasos de origen tal como quedó en los consolidados v07/v08/v09; las entradas
-> 84–104 se reconcilian aquí por primera vez.
+> 84–107 se reconcilian aquí por primera vez.
 
 - **Sesión 1** (2026-06-11): cambios **1–6** (ver traspaso v01). Paso 0 + prototipo radar.
 - **Sesión 2** (2026-06-11): cambios **7–15** (ver traspaso v02). Limpieza + gobernanza + censo P5 + prompt diseño.
@@ -137,6 +138,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 - **Sesión 13** (2026-06-22): cambios **97–100** (detalle en v13 §4). Decisiones e higiene: **97** decisión H-FID-2 (etiqueta Dependencia, opción A); **98** gitignore de inventarios scratch (P-INVENTARIOS); **99** renombrado de 4 glosas sin tildes (P-HIGIENE-TILDES); **100** snapshot del escáner post-higiene.
 - **Sesión 14** (2026-06-22): cambios **101–104** (detalle en v14 §4). Paleta, auditoría, documentación y motor: **101** P-PALETA — adopción de la identidad cromática del folleto de la Agencia en los 4 indicadores (desplegada, `1d41c17`); **102** auditoría de decimales en `prom` (solo lectura: veredicto nativos de la Agencia, leídos verbatim por `34`); **103** suite de documentación `suitedoc` (4 HTML generados; P-DOC, entrega sustantiva con verificación de render pendiente); **104** ajustes de presentación del motor (una solicitud, 4 fases: decimales→entero, recorte de eje por familia, borde por dimensión, espaciado — fases 1/2/4 aprobadas, fase 3 rechazada en revisión visual → reabre en P-PALETA-v2; build local sin push por decisión del titular, camino A).
 - **Sesión 15** (2026-06-22): cambios **105–106** (detalle en v15 §4). P-PALETA-v2 y documentación de la suite: **105** P-PALETA-v2 — rampa de niveles monocromática por indicador (reemplaza el semáforo en `DistBar`, derivada del color del indicador padre; Bajo claro→Alto oscuro) + separador de dimensión como contenedor a escala (rehace la fase 3 rechazada de s14); presentación pura (fidelidad censal mismatch 0, panel adversarial 3/3), desplegado `ed240a6`; **106** P-DOC-RENDER — render autocontenido de la suite (4 HTML `*_standalone` con CSS/fuentes/logos en base64) + 2 bugfixes de `inline_suite.R` (href con `regexec`; saltos del base64) + versionado del tema (css/fonts/assets) para reproducir la suite desde el repo.
+- **Sesión 16** (2026-06-22): cambio **107** (detalle en v16 §4). P-ORG — reorganización del directorio del proyecto bajo protocolo 4.2 (migración de estructura, DRY_RUN) vía encargo autónomo a Claude Code: **107** los 16 `encargo_*.md` movidos de la raíz de `50_documentacion/activa/` a `activa/encargos/` (renames git, historial preservado), 8 scripts de andamio (`verificar_*.R` ×7 + `reorganizar_universo_idps.R`) archivados de la raíz del repo a `_archivo/20260622/`, 12 referencias full-path reescritas en `.md` vivos (DRY_RUN==real, 0 refs rotas, 6 invariantes 🔒 PASA); desplegado tras gate pre-push (`681783d..50c3dd4`, local==origin `50c3dd4`); motor, parquet, `20_insumos/`, `40_salidas/` y `docs/` NO tocados.
 
 ---
 
@@ -166,3 +168,28 @@ distinguibles que el titular pidió, no como cada commit técnico.
   (15 → 16); #106 en "Documentación de proyecto (suite/política)" (1 → 2).
 - **"Documentación de proyecto (suite/política)" alcanza el 2%** (2 entradas): sale
   del umbral de absorción <2% en el que quedó en observación en v14.
+
+---
+
+## Delta del backlog (consolidación v16)
+
+- **+1 entrada** (107): P-ORG (#107). Total 106 → **107**. Verificado contra el
+  detalle cronológico (último #106 a v15), no contra la tabla heredada (A22).
+- **Sin categorías nuevas:** #107 entra en "Limpieza / deuda técnica" (11 → 12).
+  Ninguna categoría cruza el 25% ni cae bajo el 2% con este cambio; sin subdivisión
+  ni absorción.
+- **Cierre de la deuda de cierre de s16:** el traspaso v16 §9 declaraba el total en
+  107, pero la entrada no se había integrado al archivo (quedó descrita en v16 §4
+  sin numerar aquí). Esta consolidación la integra, manteniendo A22 (no diferir el
+  conteo).
+- **⚠️ Deuda de integridad detectada (heredada de la reconciliación v14/v15, NO de
+  P-ORG):** la suma de la tabla de clasificación temática da **106** (105 a v15 + 1
+  de P-ORG), mientras el correlativo global —la fuente de verdad por A22— da **107**.
+  El descuadre de 1 nació en la reconciliación v14: una de las entradas 84–106 nunca
+  se asignó a una categoría al recalcular la distribución. El conteo correlativo
+  (1–107) es correcto y es la cifra válida; la clasificación es una vista derivada
+  con un faltante de 1 por localizar. **No se corrige reasignando entradas
+  históricas a ciegas** (violaría la regla de no reescribir entradas previas);
+  queda como pendiente menor para una sesión de higiene del backlog: identificar la
+  entrada huérfana entre 84–106 contra el detalle de cada traspaso v10–v14 y
+  declarar su categoría con una nota, sin renumerar.
