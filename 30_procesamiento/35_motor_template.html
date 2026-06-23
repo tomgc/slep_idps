@@ -139,7 +139,8 @@ __FONTS_CSS__
   .defn-box{margin-top:6px;}
   .defn-toggle{border:0;background:none;color:var(--foco);cursor:pointer;font-size:11px;padding:0;font-family:inherit;display:inline-flex;align-items:center;gap:3px;}
   .defn-toggle:hover{text-decoration:underline;}
-  .defn-text{font-size:11.5px;color:#5a5142;line-height:1.45;margin-top:5px;max-width:70ch;}
+  /* Item 3 (s19): definicion legible y a ancho completo (sin max-width angosto). */
+  .defn-text{font-size:var(--fs-base);color:#5a5142;line-height:1.55;margin-top:5px;}
   .defn-ctx{background:#f4f1e8;border-radius:7px;padding:9px 12px;margin:0 0 14px;}
   .defn-ctx .defn-text{color:#4a4536;}
   .nota{font-size:11px;color:var(--gris);background:#f4f1e8;border-radius:6px;padding:9px 11px;margin-top:10px;}
@@ -312,15 +313,21 @@ __FONTS_CSS__
   @media(max-width:900px){.hist-dims{grid-template-columns:1fr;}}
   /* Vista historica: barras verticales por año (portado de .ybars del diseño,
      traducido a tokens del motor). Eje fijo 0-100 (altura = porcentaje del valor),
-     preliminar atenuado + contorno discontinuo, hueco = columna sin barra. Reemplaza
-     las lineas de PanelEvolucion en el historico (indicador y dimension; la
-     subdimension NO entra, invariante 7-3). */
+     envolvente 0-100 tenue (Item 5, s19) para ver cuanto falta para 100, hueco =
+     columna sin barra. Reemplaza las lineas de PanelEvolucion en el historico
+     (indicador y dimension; la subdimension NO entra, invariante 7-3). */
   .ybars{display:flex;gap:14px;align-items:stretch;}
   .ybar-col{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0;}
   .ybar-plot{position:relative;height:var(--yh,130px);border-bottom:1.5px solid var(--linea);}
-  .ybar-plot::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px dashed var(--linea);}
-  .ybar-fill{position:absolute;bottom:0;left:16%;right:16%;min-height:3px;border-radius:5px 5px 0 0;}
-  .ybar-fill.is-prelim{opacity:.62;outline:2px dashed rgba(46,34,48,.35);outline-offset:-2px;}
+  .ybar-plot::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px dashed var(--linea);z-index:1;}
+  /* Item 5 (s19): envolvente 0-100 (track) tenue con borde sutil; la barra de dato
+     la cubre desde abajo, y el faltante hasta 100 queda como relleno tenue. */
+  .ybar-track{position:absolute;top:0;bottom:0;left:16%;right:16%;background:rgba(46,34,48,.045);border:1px solid var(--linea);border-radius:5px 5px 0 0;}
+  .ybar-fill{position:absolute;bottom:0;left:16%;right:16%;min-height:3px;border-radius:5px 5px 0 0;box-sizing:border-box;border:1px solid rgba(46,34,48,.16);z-index:2;}
+  /* Item 6 (s19): el preliminar ya NO se atenua (basta el sufijo *); el año mas
+     reciente CON DATO del EE se resalta con un anillo del color del indicador
+     (outline inline en BarrasAnio). */
+  .ybar-fill.is-latest{z-index:3;}
   .ybar-val{position:absolute;top:-19px;left:50%;transform:translateX(-50%);font-size:12.5px;font-weight:var(--fw-heavy);color:var(--tinta);font-variant-numeric:tabular-nums;}
   .ybar-yr{text-align:center;font-size:11px;color:var(--gris);font-weight:var(--fw-bold);}
   .ybar-empty{align-self:center;margin:auto auto;font-size:10px;color:var(--gris);font-style:italic;}
@@ -563,7 +570,7 @@ __FONTS_CSS__
   // ===== Definicion metodologica contextual (colapsable; del catalogo embebido) =====
   // Degrada con elegancia: sin texto -> no renderiza bloque (no "undefined"/vacio).
   function Definicion({texto, etiqueta, contexto}){
-    const [open,setOpen]=useState(false);
+    const [open,setOpen]=useState(true);   // Item 3 (s19): abierta por defecto (sigue colapsable)
     if(!texto) return null;
     return (
       <div className={contexto?"defn-box defn-ctx":"defn-box"}>
@@ -685,7 +692,7 @@ __FONTS_CSS__
     const r = ramp || {bajo:"var(--bajo)",medio:"var(--medio)",alto:"var(--alto)"};
     const segs=[["bajo",r.bajo],["medio",r.medio],["alto",r.alto]];
     return <div className="bar">{segs.map(([k,c])=>{const val=v[k];if(val==null||val===0)return null;
-      return <span key={k} style={{width:val+"%",background:c,color:_txtOn(c)}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val):""}</span>;})}</div>;
+      return <span key={k} style={{width:val+"%",background:c,color:_txtOn(c)}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val)+"%":""}</span>;})}</div>;
   }
 
   // ===== Reparto de estado vs GSE (Fase 3 — CONTEO de EE, NO promedio) =====
@@ -826,15 +833,23 @@ __FONTS_CSS__
   // Reemplaza las lineas de PanelEvolucion en el historico. Una columna por año:
   // barra de altura = puntaje del PROPIO EE sobre eje FIJO 0-100 (CSS puro, como el
   // diseño, no D3), valor encima, año debajo. Hueco (v==null) = columna sin barra
-  // (no interpola: invariante 5). Preliminar = barra atenuada/discontinua + sufijo
-  // *. Es el promedio del propio EE (invariante 1); NO grafica la linea del GSE
+  // (no interpola: invariante 5). Item 5 (s19): track tenue 0-100 detras de la barra
+  // (cuanto falta para 100). Item 6 (s19): el preliminar NO se atenua (solo el sufijo
+  // *); el ULTIMO año con dato del EE se resalta con anillo del color del indicador.
+  // Es el promedio del propio EE (invariante 1); NO grafica la linea del GSE
   // (invariante 2). La subdimension NO entra al historico (invariante 3).
   function BarrasAnio({nombre,color,pts}){
+    // ultimo año CON DATO del EE (no necesariamente 2025): recorre de atras hacia
+    // adelante y toma el primer punto con barra real (no off, v presente).
+    let latest=-1;
+    for(let i=pts.length-1;i>=0;i--){const q=pts[i];
+      if(q.estado!=="pandemia"&&q.estado!=="no_eval"&&q.v!=null&&!isNaN(q.v)){latest=i;break;}}
     return (
       <div className="ybars">
-        {pts.map(p=>{const prelim=PRELIM.has(String(p.a));
+        {pts.map((p,i)=>{const prelim=PRELIM.has(String(p.a));
           const off=(p.estado==="pandemia"||p.estado==="no_eval");
           const hueco=!off && (p.v==null||isNaN(p.v));
+          const isLatest=(i===latest);
           const offTip=p.estado==="pandemia"?"Sin evaluación (pandemia)":"Este grado no se evaluó este año";
           return (
             <div className={"ybar-col"+(off?" is-off":"")} key={p.a}>
@@ -844,9 +859,14 @@ __FONTS_CSS__
                       onMouseMove={e=>showTT("<b>"+p.a+"</b><br>"+offTip,e)} onMouseLeave={hideTT}></div>
                   : hueco
                   ? <span className="ybar-empty">sin dato</span>
-                  : <div className={"ybar-fill"+(prelim?" is-prelim":"")} style={{height:Math.max(0,Math.min(100,p.v))+"%",background:color}}
-                      onMouseMove={e=>showTT("<b>"+nombre+"</b><br>"+p.a+(prelim?"*":"")+": "+fmt(p.v)+" (0–100)",e)} onMouseLeave={hideTT}>
-                      <span className="ybar-val">{fmt(p.v)}</span></div>}
+                  : <React.Fragment>
+                      <div className="ybar-track"></div>
+                      <div className={"ybar-fill"+(isLatest?" is-latest":"")}
+                        style={{height:Math.max(0,Math.min(100,p.v))+"%",background:color,
+                          outline:isLatest?("2px solid "+color):undefined,outlineOffset:isLatest?"1px":undefined}}
+                        onMouseMove={e=>showTT("<b>"+nombre+"</b><br>"+p.a+(prelim?"*":"")+": "+fmt(p.v)+" (0–100)"+(isLatest?"<br><i>año más reciente con dato</i>":""),e)} onMouseLeave={hideTT}>
+                        <span className="ybar-val">{fmt(p.v)}</span></div>
+                    </React.Fragment>}
               </div>
               <div className="ybar-yr">{p.a}{prelim?"*":""}</div>
             </div>);})}
