@@ -29,7 +29,9 @@ __FONTS_CSS__
        tipografia densa, radios ajustados, "overline". La identidad IDPS (azul gobCL +
        cream) y la PALETA de 4 indicadores quedan INTACTAS (FASE 4 = piel). --- */
     --paper:#ffffff; --cream-200:#f4e9cc;
-    --fs-display:30px; --fs-h1:22px; --fs-h2:17px; --fs-base:13px; --fs-sm:12px; --fs-xs:11px;
+    /* Escala tipografica de 7 peldanos (P-TIPOGRAFIA, Ítem 4, s20). Piso minimo
+       legible 11px. Los 3 clamp() del hero son fluidos por diseño y NO usan token. */
+    --fs-2xs:11px; --fs-xs:12px; --fs-sm:13px; --fs-base:14px; --fs-md:16px; --fs-lg:18px; --fs-h1:22px;
     --fw-regular:400; --fw-medium:500; --fw-bold:700; --fw-heavy:800;
     --radius-1:3px; --radius-2:5px; --radius-3:9px;
     --tracking-overline:.12em;
@@ -176,7 +178,7 @@ __FONTS_CSS__
   .modal-backdrop{position:fixed;inset:0;background:rgba(28,18,18,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:modalFade 140ms ease-out;}
   .modal{background:var(--paper);border-radius:var(--radius-3);width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 14px 44px rgba(10,58,92,.28);overflow:hidden;animation:modalLift 180ms cubic-bezier(.2,.7,.2,1);}
   .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--linea);}
-  .modal-title{margin:0;font-family:var(--font-display);font-size:var(--fs-h2);font-weight:var(--fw-heavy);letter-spacing:-.005em;color:var(--azul);}
+  .modal-title{margin:0;font-family:var(--font-display);font-size:var(--fs-lg);font-weight:var(--fw-heavy);letter-spacing:-.005em;color:var(--azul);}
   .modal-tabs{display:flex;padding:0 22px;border-bottom:1px solid var(--linea);flex-wrap:wrap;}
   .modal-tab{appearance:none;background:none;border:none;padding:12px 0;margin-right:24px;font-family:var(--font-body);font-weight:var(--fw-medium);font-size:var(--fs-base);color:var(--gris);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
   .modal-tab:hover{color:var(--tinta);}
