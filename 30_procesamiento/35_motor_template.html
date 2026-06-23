@@ -422,8 +422,12 @@ __FONTS_CSS__
   .cmp-cm{font-size:11.5px;color:var(--gris);margin-top:1px;}
   .cmp-x{background:none;border:0;cursor:pointer;color:var(--gris);font-size:13px;padding:0 0 0 2px;line-height:1;}
   .cmp-x:hover{color:var(--alerta);}
-  .cmp-add{border:1px dashed var(--linea);background:transparent;border-radius:var(--radius-2);color:var(--foco);font-weight:var(--fw-medium);font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;}
-  .cmp-add:hover{border-color:var(--foco);background:var(--cream-200);}
+  /* Item 10 (s19): boton agregar azul solido (forma del patron hermano, tokens IDPS)
+     + reset (outline) al lado, visible solo con >=1 territorio. */
+  .cmp-add{border:1px solid var(--azul);background:var(--azul);border-radius:var(--radius-2);color:#fff;font-weight:var(--fw-bold);font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+  .cmp-add:hover{background:var(--foco);border-color:var(--foco);}
+  .cmp-reset{border:1px solid var(--linea);background:var(--paper);color:var(--gris);border-radius:var(--radius-2);font-size:15px;line-height:1;padding:8px 12px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;}
+  .cmp-reset:hover{border-color:var(--foco);color:var(--foco);background:var(--cream-200);}
   .cmp-invite{font-size:12px;color:var(--gris);font-style:italic;margin-top:10px;}
   .cmp-gse-ctl{margin:6px 0 12px;}
   .cmp-table{width:100%;border-collapse:collapse;table-layout:fixed;}
@@ -1333,7 +1337,7 @@ __FONTS_CSS__
   //       Sin selector de año: agnoCmp = año mas reciente del grado a nivel del
   //       dato (D-s8-1), igual para los 4 territorios; territorio sin EE ese año
   //       => N=0 ("sin dato"), nunca se desliza a un año anterior. =====
-  function Comparador({cmpTerr,cmpGrado,agnoCmp,cmpGseVis,grados,onNivel,onToggleGse,onRemove,onAdd}){
+  function Comparador({cmpTerr,cmpGrado,agnoCmp,cmpGseVis,grados,onNivel,onToggleGse,onRemove,onAdd,onReset}){
     const agno=agnoCmp;
     // roster por territorio (todos los GSE) en (cmpGrado, agnoCmp); cada celda
     // re-filtra por su GSE. Memoizado: solo recomputa al cambiar territorios/nivel.
@@ -1365,6 +1369,7 @@ __FONTS_CSS__
                 <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
               </div>))}
             {cmpTerr.length<4 && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
+            {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar territorios" title="Limpiar territorios">↺</button>}
           </div>
           {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?"Agrega territorios (botón “+ agregar territorio”) para comparar, hasta 4.":"Agrega al menos un territorio más para comparar (hasta 4)."}</div>}
         </div>
@@ -1524,7 +1529,7 @@ __FONTS_CSS__
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
-            onNivel={setCmpGrado} onToggleGse={toggleCmpGse} onRemove={removeTerr} onAdd={()=>setCmpModalOpen(true)}/>}
+            onNivel={setCmpGrado} onToggleGse={toggleCmpGse} onRemove={removeTerr} onAdd={()=>setCmpModalOpen(true)} onReset={()=>setCmpTerr([])}/>}
 
           {/* PANORAMA TERRITORIAL (revision P3): banner oscuro (meta + Nivel) ->
               picker de Territorio -> filtro GSE multi-select -> secciones por GSE. */}
