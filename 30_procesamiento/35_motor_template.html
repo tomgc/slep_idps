@@ -529,6 +529,10 @@ __FONTS_CSS__
   const est={}; DATA.establecimientos.forEach(e=>est[e.rbd]=e);
   const GSE=DATA.meta.gse_labels, DEPE=DATA.meta.depe2_labels;
   const FOCO=new Set(DATA.meta.comunas_foco);
+  // Media movil de la vista historica (Item 7, s19; D-s19-MMOVIL): ventana centrada
+  // de 3 puntos CON DATO consecutivos en el eje (saltando huecos estructurales); solo
+  // se dibuja si la serie tiene al menos 4 puntos con dato. Constantes nombradas.
+  const MMOVIL_VENTANA=3, MMOVIL_MIN_PUNTOS=4;
   // Foco de apertura: SLEP Costa Central (cod del SLEP en el dato; sus
   // establecimientos tienen cod_slep === SLEP_FOCO). Es el ESTADO inicial de
   // navegacion, no un filtro fijo: el usuario lo cambia con EntityModal.
@@ -838,13 +842,59 @@ __FONTS_CSS__
   // *); el ULTIMO año con dato del EE se resalta con anillo del color del indicador.
   // Es el promedio del propio EE (invariante 1); NO grafica la linea del GSE
   // (invariante 2). La subdimension NO entra al historico (invariante 3).
+  // Media movil centrada (Item 7, s19; D-s19-MMOVIL): funcion PURA sobre la serie que
+  // serieEje ya devolvio. Filtra a puntos con_dato y v!=null EN ORDEN DE EJE (no de
+  // calendario: salta huecos pandemia/no_eval/sin-dato). Si hay < MMOVIL_MIN_PUNTOS,
+  // no hay media ([]). Para cada punto INTERIOR de la secuencia filtrada, promedia
+  // {v[i-1],v[i],v[i+1]} y ancla el resultado al AÑO del punto central (para alinear
+  // con su columna). Los extremos no producen media (no media parcial; D-s19-MMOVIL).
+  // NO interpola ni inventa puntos donde el EE no tiene dato (invariante).
+  function mediaMovil(serie){
+    const cd=serie.filter(p=>p.estado==="con_dato" && p.v!=null && !isNaN(p.v));
+    if(cd.length<MMOVIL_MIN_PUNTOS) return [];
+    const out=[];
+    for(let i=1;i<cd.length-1;i++) out.push({a:cd[i].a, m:(cd[i-1].v+cd[i].v+cd[i+1].v)/MMOVIL_VENTANA});
+    return out;
+  }
+
   function BarrasAnio({nombre,color,pts}){
     // ultimo año CON DATO del EE (no necesariamente 2025): recorre de atras hacia
     // adelante y toma el primer punto con barra real (no off, v presente).
     let latest=-1;
     for(let i=pts.length-1;i>=0;i--){const q=pts[i];
       if(q.estado!=="pandemia"&&q.estado!=="no_eval"&&q.v!=null&&!isNaN(q.v)){latest=i;break;}}
+    // Overlay de media movil: se mide la posicion REAL de cada columna en layout
+    // (el gap fijo impide derivar el centro como fraccion del ancho), y se recalcula
+    // con ResizeObserver. La linea va en la MISMA escala 0-100 del plot (y=(100-m)%).
+    const wrapRef=useRef(null);
+    const [mmLine,setMmLine]=useState(null);
+    useEffect(()=>{
+      const wrap=wrapRef.current; if(!wrap) return;
+      const mm=mediaMovil(pts);
+      if(!mm.length){setMmLine(null);return;}
+      const idxByYear={}; pts.forEach((p,i)=>{idxByYear[p.a]=i;});
+      const recompute=()=>{
+        const cols=wrap.querySelectorAll(".ybar-col");
+        const plot=wrap.querySelector(".ybar-plot");
+        if(!plot||!cols.length){setMmLine(null);return;}
+        const plotH=plot.getBoundingClientRect().height;
+        const wr=wrap.getBoundingClientRect();
+        const pts2=mm.map(s=>{const i=idxByYear[s.a]; const cr=cols[i].getBoundingClientRect();
+          const cx=cr.left-wr.left+cr.width/2; const cy=plotH*(100-Math.max(0,Math.min(100,s.m)))/100;
+          return cx.toFixed(1)+","+cy.toFixed(1);});
+        setMmLine({points:pts2.join(" "), h:plotH});
+      };
+      recompute();
+      const ro=new ResizeObserver(recompute); ro.observe(wrap);
+      return ()=>ro.disconnect();
+    },[pts]);
     return (
+      <div className="ybars-wrap" ref={wrapRef} style={{position:"relative"}}>
+        {mmLine && <svg className="ybar-mm" width="100%" height={mmLine.h} aria-hidden="true"
+          style={{position:"absolute",top:0,left:0,height:mmLine.h,pointerEvents:"none",overflow:"visible"}}>
+          <polyline points={mmLine.points} fill="none" stroke={color} strokeWidth="1.6"
+            strokeOpacity="0.5" strokeLinejoin="round" strokeLinecap="round"/>
+        </svg>}
       <div className="ybars">
         {pts.map((p,i)=>{const prelim=PRELIM.has(String(p.a));
           const off=(p.estado==="pandemia"||p.estado==="no_eval");
@@ -870,6 +920,7 @@ __FONTS_CSS__
               </div>
               <div className="ybar-yr">{p.a}{prelim?"*":""}</div>
             </div>);})}
+      </div>
       </div>);
   }
 
@@ -1036,7 +1087,7 @@ __FONTS_CSS__
           {isHist
             ? (
             <div className="hist-wrap">
-              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares. Los años en <b>gris</b> no tuvieron evaluación del sistema (2020–2021 por pandemia; 2019 el grado no se evaluó); un año con dato donde <i>este</i> establecimiento no fue medido aparece como columna “sin dato” (no se interpola).</div>
+              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares. Los años en <b>gris</b> no tuvieron evaluación del sistema (2020–2021 por pandemia; 2019 el grado no se evaluó); un año con dato donde <i>este</i> establecimiento no fue medido aparece como columna “sin dato” (no se interpola). La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b> (ventana centrada de 3 evaluaciones con dato); resalta la tendencia y hace ver qué año se despega. Solo se dibuja con 4 o más años con dato.</div>
               {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,ejeFam('indicador'));
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
