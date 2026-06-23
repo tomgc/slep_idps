@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v16 (2026-06-22). **Total reconciliado: 107 cambios.**
+> **Versión:** consolidado a v17 (2026-06-22). **Total reconciliado: 110 cambios.**
 
 ---
 
@@ -64,7 +64,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 14 | v14 | 4 | 101–104 | Opus 4.8 | Paleta folleto + auditoría decimales + suite suitedoc + ajustes de motor |
 | 15 | v15 | 2 | 105–106 | Opus 4.8 | P-PALETA-v2 rampa+separador + P-DOC-RENDER suite |
 | 16 | v16 | 1 | 107 | Opus 4.8 | P-ORG: reorganización del directorio (encargos + scripts) |
-| **Total** | | **107** | **1–107** | | |
+| 17 | v17 | 3 | 108–110 | Opus 4.8 | Consolidación backlog + suitedoc inline/saneamiento + suite standalone offline |
+| **Total** | | **110** | **1–110** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -78,7 +79,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (recalculada a v16, sobre 107 cambios)
+## Clasificación temática (recalculada a v17, sobre 110 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -92,14 +93,14 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Visualización / diseño — motor base/datos | 14 | 13% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
 | Visualización / diseño — rediseño UI | 16 | 15% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2) |
 | Perfilado / exploración de datos | 4 | 4% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
-| Limpieza / deuda técnica | 12 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG) |
+| Limpieza / deuda técnica | 13 | 12% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108) |
 | Documentación conceptual / contenido | 9 | 9% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
 | Pipeline / motor (código productivo) | 7 | 7% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
 | Saneamiento / calidad de datos de presentación | 14 | 13% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres |
 | Deploy / publicación | 9 | 9% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
 | Verificación / auditoría (independiente) | 6 | 6% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
 | Decisión / gobernanza de producto | 3 | 3% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
-| Documentación de proyecto (suite/política) | 2 | 2% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) |
+| Documentación de proyecto (suite/política) | 4 | 4% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) + saneamiento del paquete `suitedoc` con inlining offline integrado (#109, v17) + regeneración de la suite como 4 standalone offline y retiro de `inline_suite.R` (#110, v17) |
 
 **Refinamientos de taxonomía aplicados en la consolidación v14:**
 - **Categoría nueva "Verificación / auditoría (independiente)"** (6%): las
@@ -139,6 +140,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 - **Sesión 14** (2026-06-22): cambios **101–104** (detalle en v14 §4). Paleta, auditoría, documentación y motor: **101** P-PALETA — adopción de la identidad cromática del folleto de la Agencia en los 4 indicadores (desplegada, `1d41c17`); **102** auditoría de decimales en `prom` (solo lectura: veredicto nativos de la Agencia, leídos verbatim por `34`); **103** suite de documentación `suitedoc` (4 HTML generados; P-DOC, entrega sustantiva con verificación de render pendiente); **104** ajustes de presentación del motor (una solicitud, 4 fases: decimales→entero, recorte de eje por familia, borde por dimensión, espaciado — fases 1/2/4 aprobadas, fase 3 rechazada en revisión visual → reabre en P-PALETA-v2; build local sin push por decisión del titular, camino A).
 - **Sesión 15** (2026-06-22): cambios **105–106** (detalle en v15 §4). P-PALETA-v2 y documentación de la suite: **105** P-PALETA-v2 — rampa de niveles monocromática por indicador (reemplaza el semáforo en `DistBar`, derivada del color del indicador padre; Bajo claro→Alto oscuro) + separador de dimensión como contenedor a escala (rehace la fase 3 rechazada de s14); presentación pura (fidelidad censal mismatch 0, panel adversarial 3/3), desplegado `ed240a6`; **106** P-DOC-RENDER — render autocontenido de la suite (4 HTML `*_standalone` con CSS/fuentes/logos en base64) + 2 bugfixes de `inline_suite.R` (href con `regexec`; saltos del base64) + versionado del tema (css/fonts/assets) para reproducir la suite desde el repo.
 - **Sesión 16** (2026-06-22): cambio **107** (detalle en v16 §4). P-ORG — reorganización del directorio del proyecto bajo protocolo 4.2 (migración de estructura, DRY_RUN) vía encargo autónomo a Claude Code: **107** los 16 `encargo_*.md` movidos de la raíz de `50_documentacion/activa/` a `activa/encargos/` (renames git, historial preservado), 8 scripts de andamio (`verificar_*.R` ×7 + `reorganizar_universo_idps.R`) archivados de la raíz del repo a `_archivo/20260622/`, 12 referencias full-path reescritas en `.md` vivos (DRY_RUN==real, 0 refs rotas, 6 invariantes 🔒 PASA); desplegado tras gate pre-push (`681783d..50c3dd4`, local==origin `50c3dd4`); motor, parquet, `20_insumos/`, `40_salidas/` y `docs/` NO tocados.
+- **Sesión 17** (2026-06-22): cambios **108–110** (detalle en v17 §4). Consolidación del backlog, saneamiento del paquete `suitedoc` y regeneración de la suite: **108** consolidación del backlog a v16/107 (integración de la entrada 107/P-ORG que v16 declaró sin escribir; encabezado a v16/107, fila s16 en el resumen, clasificación "Limpieza/deuda técnica" 11→12, entrada cronológica s16, delta v16; entradas 1–106 verificadas idénticas por diff; commit `faefc93`); **109** P-SUITEDOC-INLINE + P-SUITEDOC-SANEAMIENTO (una solicitud —documentación compartible offline— ejecutada en dos encargos autónomos a Claude Code sobre el repo del paquete `herramientas_dev`/`suitedoc`): función `inlinar_suite()` exportada como post-proceso de responsabilidad única + flag `standalone` en `generar_suite()`, embebido de CSS/fuentes/logos como data: URIs e iconos lucide como `<svg>` desde `lucide-static` (sin `<script>` de red, 100% offline verificado por grep), más saneamiento (fix del warning de install por `%` sin escapar en `@title` de roxygen → A17-1; `.gitignore` del paquete; versionado completo; `limpiar_enlazados=TRUE` en standalone; validación temprana de iconos; `.SD_LUCIDE_VERSION="1.21.0"` fijada); 9 commits pusheados (`8ef4b2a..c8b3bd7`), paquete instalable desde cero; **110** regeneración de la suite de `slep_idps` con el paquete saneado (`documentar.R`: `standalone=TRUE`, barrido "colegio→establecimiento educacional" 11 usos, icono `sitemap`→`network` por inexistencia en lucide → A17-2) y retiro de `inline_suite.R` (obsoleto; el inlining lo hace ahora el paquete); 4 `*_standalone.html` regenerados offline (gitignorados, reproducibles con `documentar.R`); commit `055cbac`. (No-cambio de producto registrado por trazabilidad en v17 §4: barreras anti-error operativas `DISCIPLINA_OPERATIVA.md`/R1-R9 — gobernanza del asistente, no del producto; no entra al backlog de producto.)
 
 ---
 
@@ -193,3 +195,33 @@ distinguibles que el titular pidió, no como cada commit técnico.
   queda como pendiente menor para una sesión de higiene del backlog: identificar la
   entrada huérfana entre 84–106 contra el detalle de cada traspaso v10–v14 y
   declarar su categoría con una nota, sin renumerar.
+
+---
+
+## Delta del backlog (consolidación v17)
+
+- **+3 entradas** (108–110): consolidación del backlog a v16/107 (#108),
+  P-SUITEDOC-INLINE + P-SUITEDOC-SANEAMIENTO (#109) y regeneración de la suite de
+  `slep_idps` como standalone offline + retiro de `inline_suite.R` (#110). Total
+  107 → **110**. Verificado contra el detalle cronológico (último #107 a v16), no
+  contra la tabla heredada (A22).
+- **Sin categorías nuevas:** #108 entra en "Limpieza / deuda técnica" (12 → 13);
+  #109 y #110 en "Documentación de proyecto (suite/política)" (2 → 4). Ninguna
+  categoría cruza el 25% ni cae bajo el 2% con estos cambios; sin subdivisión ni
+  absorción.
+- **#109 es trabajo sobre repo distinto (`herramientas_dev`/`suitedoc`)**, no sobre
+  `slep_idps`. Se contabiliza aquí porque la solicitud del titular (documentación
+  compartible offline de este proyecto) lo originó y su intención primaria es la
+  herramienta de documentación de `slep_idps`; el detalle de ejecución del paquete
+  vive en `suitedoc/dev_logs/` (no en este repo).
+- **Cierre de la deuda de cierre de s17:** el traspaso v17 §5 declaró el total en
+  110 con las entradas 108–110 descritas pero pendientes de escribir en este
+  archivo (A22: no diferir el conteo). Esta consolidación las integra.
+- **⚠️ Deuda de integridad heredada (sin cambios respecto a v16):** la suma de la
+  tabla de clasificación temática sigue arrastrando el descuadre de 1 nacido en la
+  reconciliación v14/v15 (una entrada de 84–106 sin categoría asignada). Con el
+  delta v17 la tabla suma **109** (106 a v16 + 3 de v17) frente al correlativo
+  **110**; el faltante de 1 es el mismo de v16, no uno nuevo (los 3 cambios de v17
+  sí se clasificaron). El correlativo (1–110) es la cifra válida (A22); la
+  clasificación es vista derivada con el faltante heredado por localizar
+  (pendiente P-BACKLOG-INTEGRIDAD, sin renumerar entradas históricas).
