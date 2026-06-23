@@ -7059,6 +7059,15 @@ AAABrwBBAPMAAA==) format('opentype');}
   .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--linea);background:var(--panel);}
   .estab-popup-btn{appearance:none;border:1px solid var(--border-2);background:var(--paper);padding:8px 14px;border-radius:var(--radius-2);font-family:var(--font-body);font-size:var(--fs-base);cursor:pointer;color:var(--ink);}
   .estab-popup-btn:hover{background:#f3f0e8;}
+  /* Modal multiseleccion (Item 9, s19): casilla, fila marcada/deshabilitada, conteo, boton primario */
+  .check-box{flex:0 0 auto;width:18px;height:18px;border:1.5px solid var(--linea);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1;color:#fff;}
+  .check-row.is-checked{background:var(--cream-200);}
+  .check-row.is-checked .check-box{background:var(--foco);border-color:var(--foco);}
+  .check-row.is-disabled{opacity:.45;cursor:not-allowed;}
+  .check-row.is-disabled:hover{background:transparent;}
+  .modal-count{font-size:var(--fs-sm);color:var(--gris);font-weight:var(--fw-bold);margin-right:auto;}
+  .estab-popup-btn.is-primary{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:var(--fw-bold);}
+  .estab-popup-btn.is-primary:hover{background:var(--foco);}
   .axis-lab{font-size:9px;fill:var(--gris);} .axis-lab.b{font-size:10px;}
   .ring{fill:none;stroke:var(--linea);}
   .tt{position:fixed;background:#23303a;color:#fff;font-size:11px;padding:5px 8px;border-radius:5px;pointer-events:none;display:none;z-index:80;max-width:260px;}
@@ -7280,8 +7289,12 @@ AAABrwBBAPMAAA==) format('opentype');}
   .cmp-cm{font-size:11.5px;color:var(--gris);margin-top:1px;}
   .cmp-x{background:none;border:0;cursor:pointer;color:var(--gris);font-size:13px;padding:0 0 0 2px;line-height:1;}
   .cmp-x:hover{color:var(--alerta);}
-  .cmp-add{border:1px dashed var(--linea);background:transparent;border-radius:var(--radius-2);color:var(--foco);font-weight:var(--fw-medium);font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;}
-  .cmp-add:hover{border-color:var(--foco);background:var(--cream-200);}
+  /* Item 10 (s19): boton agregar azul solido (forma del patron hermano, tokens IDPS)
+     + reset (outline) al lado, visible solo con >=1 territorio. */
+  .cmp-add{border:1px solid var(--azul);background:var(--azul);border-radius:var(--radius-2);color:#fff;font-weight:var(--fw-bold);font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+  .cmp-add:hover{background:var(--foco);border-color:var(--foco);}
+  .cmp-reset{border:1px solid var(--linea);background:var(--paper);color:var(--gris);border-radius:var(--radius-2);font-size:15px;line-height:1;padding:8px 12px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;}
+  .cmp-reset:hover{border-color:var(--foco);color:var(--foco);background:var(--cream-200);}
   .cmp-invite{font-size:12px;color:var(--gris);font-style:italic;margin-top:10px;}
   .cmp-gse-ctl{margin:6px 0 12px;}
   .cmp-table{width:100%;border-collapse:collapse;table-layout:fixed;}
@@ -8044,11 +8057,18 @@ AAABrwBBAPMAAA==) format('opentype');}
   // Replica de 50_documentacion/andamios/diseno/entity_modal/EntityModal.jsx
   // (andamio congelado). Se anade a11y en ESTA copia: role=dialog, aria-modal,
   // cierre con Escape. Modo simple (multiple=false): clic en fila => onSelect.
-  function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia"}){
+  // Item 9 (s19): props OPT-IN para multiseleccion (default = modo simple intacto):
+  //   multiple=true -> clic en fila TOGGLEA via onSelect sin cerrar; filas marcadas
+  //   con casilla; al llegar al tope (maxSel) las no marcadas se deshabilitan; footer
+  //   con boton primario "Listo" (onDone||onCancel) y conteo "N de maxSel".
+  function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia",
+                        multiple=false,seleccionados=[],maxSel=null,onDone=null}){
     const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
     const [tab,setTab]=useState(tabInicial);
     const [q,setQ]=useState("");
     const ql=q.trim().toLowerCase();
+    const selSet=new Set(seleccionados);
+    const topeAlcanzado=multiple&&maxSel!=null&&seleccionados.length>=maxSel;
     useEffect(()=>{const h=e=>{if(e.key==="Escape")onCancel();};
       window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h);},[onCancel]);
     const list=buildList(tab,ql)||[];
@@ -8067,14 +8087,27 @@ AAABrwBBAPMAAA==) format('opentype');}
               style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-base)"}}/>
             <div className="comuna-checklist" style={{maxHeight:340}}>
               {list.length===0 && <div className="empty-state">{emptyText}</div>}
-              {list.map(item=>(
-                <div key={item.kind+"|"+item.cod} className="check-row" onClick={()=>onSelect(item)}>
+              {list.map(item=>{const key=item.kind+"|"+item.cod;
+                const checked=multiple&&selSet.has(key);
+                const dis=multiple&&!checked&&topeAlcanzado;
+                return (
+                <div key={key} className={"check-row"+(checked?" is-checked":"")+(dis?" is-disabled":"")}
+                  role={multiple?"checkbox":undefined} aria-checked={multiple?checked:undefined}
+                  onClick={()=>{if(dis)return; onSelect(item);}}>
+                  {multiple && <span className="check-box" aria-hidden="true">{checked?"✓":""}</span>}
                   <span className="check-name">{item.nom}</span>
                   <span className="check-region">{item.sub}</span>
-                </div>))}
+                </div>);})}
             </div>
           </div>
-          <div className="modal-footer"><button className="estab-popup-btn" onClick={onCancel}>Cancelar</button></div>
+          <div className="modal-footer">
+            {multiple
+              ? <>
+                  {maxSel!=null && <span className="modal-count">{seleccionados.length} de {maxSel}</span>}
+                  <button className="estab-popup-btn is-primary" onClick={onDone||onCancel}>Listo</button>
+                </>
+              : <button className="estab-popup-btn" onClick={onCancel}>Cancelar</button>}
+          </div>
         </div>
       </div>);
   }
@@ -8173,7 +8206,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   //       Sin selector de año: agnoCmp = año mas reciente del grado a nivel del
   //       dato (D-s8-1), igual para los 4 territorios; territorio sin EE ese año
   //       => N=0 ("sin dato"), nunca se desliza a un año anterior. =====
-  function Comparador({cmpTerr,cmpGrado,agnoCmp,cmpGseVis,grados,onNivel,onToggleGse,onRemove,onAdd}){
+  function Comparador({cmpTerr,cmpGrado,agnoCmp,cmpGseVis,grados,onNivel,onToggleGse,onRemove,onAdd,onReset}){
     const agno=agnoCmp;
     // roster por territorio (todos los GSE) en (cmpGrado, agnoCmp); cada celda
     // re-filtra por su GSE. Memoizado: solo recomputa al cambiar territorios/nivel.
@@ -8205,6 +8238,7 @@ AAABrwBBAPMAAA==) format('opentype');}
                 <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
               </div>))}
             {cmpTerr.length<4 && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
+            {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar territorios" title="Limpiar territorios">↺</button>}
           </div>
           {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?"Agrega territorios (botón “+ agregar territorio”) para comparar, hasta 4.":"Agrega al menos un territorio más para comparar (hasta 4)."}</div>}
         </div>
@@ -8307,11 +8341,13 @@ AAABrwBBAPMAAA==) format('opentype');}
     // Comparador: el modal AGREGA un territorio a la lista (no acota como onPick).
     // Valida max 4 y no-duplicado por kind+cod (D-s8-3); guarda el nombre de
     // presentacion ya resuelto por buildListCmp (sin la ★ del marcador de foco).
-    const addTerr=item=>{setCmpModalOpen(false);
+    // Item 9 (s19): TOGGLE sin cerrar el modal (el cierre es explicito: "Listo"/Escape/
+    // backdrop). Si ya esta -> quita; si no esta y hay cupo (<4) -> agrega; si tope -> no-op.
+    const addTerr=item=>{
       setCmpTerr(prev=>{
+        const k=t=>t.kind+"|"+t.cod; const ki=k(item);
+        if(prev.some(t=>k(t)===ki)) return prev.filter(t=>k(t)!==ki);
         if(prev.length>=4) return prev;
-        const k=t=>t.kind+"|"+t.cod;
-        if(prev.some(t=>k(t)===k(item))) return prev;
         return [...prev,{kind:item.kind,cod:item.cod,nom:(item.nom||"").replace(" ★","")}];
       });};
     const removeTerr=(kind,cod)=>setCmpTerr(prev=>prev.filter(t=>!(t.kind===kind&&t.cod===cod)));
@@ -8357,11 +8393,12 @@ AAABrwBBAPMAAA==) format('opentype');}
 
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
-          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={buildListCmp} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar territorio a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}/>}
+          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={buildListCmp} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar territorio a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
+            multiple={true} seleccionados={cmpTerr.map(t=>t.kind+"|"+t.cod)} maxSel={4} onDone={()=>setCmpModalOpen(false)}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
-            onNivel={setCmpGrado} onToggleGse={toggleCmpGse} onRemove={removeTerr} onAdd={()=>setCmpModalOpen(true)}/>}
+            onNivel={setCmpGrado} onToggleGse={toggleCmpGse} onRemove={removeTerr} onAdd={()=>setCmpModalOpen(true)} onReset={()=>setCmpTerr([])}/>}
 
           {/* PANORAMA TERRITORIAL (revision P3): banner oscuro (meta + Nivel) ->
               picker de Territorio -> filtro GSE multi-select -> secciones por GSE. */}
