@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-23 07:47:21
-- **Totales:** 31 carpetas, 249 archivos
+- **Fecha:** 2026-06-23 07:53:04
+- **Totales:** 31 carpetas, 250 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -232,12 +232,12 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260622_200734_estructura.md  (15.4K)
-│   │   ├── 20260622_200734_estructura.txt  (15.5K)
 │   │   ├── 20260622_212833_estructura.md  (15.5K)
 │   │   ├── 20260622_212833_estructura.txt  (15.6K)
-│   │   ├── estructura_actual.md  (15.5K)
-│   │   └── estructura_actual.txt  (15.6K)
+│   │   ├── 20260623_074721_estructura.md  (15.9K)
+│   │   ├── 20260623_074721_estructura.txt  (16K)
+│   │   ├── estructura_actual.md  (15.9K)
+│   │   └── estructura_actual.txt  (16K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -276,7 +276,8 @@ slep_idps/
 │   │   ├── traspaso_cierre_v15.md  (27.6K)
 │   │   ├── traspaso_cierre_v16.md  (25.6K)
 │   │   ├── traspaso_cierre_v17.md  (20.2K)
-│   │   └── traspaso_cierre_v18.md  (17.6K)
+│   │   ├── traspaso_cierre_v18.md  (17.6K)
+│   │   └── traspaso_cierre_v19.md  (15K)
 │   └── .DS_Store  (16K)
 ├── docs/
 │   └── index.html  (5.08M)
@@ -295,7 +296,7 @@ slep_idps/
 
 | Extension | Archivos |
 |---|---|
-| md | 83 |
+| md | 84 |
 | xlsx | 54 |
 | (sin extension) | 19 |
 | otf | 13 |
