@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-22 20:07:34
-- **Totales:** 31 carpetas, 242 archivos
+- **Fecha:** 2026-06-22 21:28:33
+- **Totales:** 31 carpetas, 243 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -158,7 +158,7 @@ slep_idps/
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
 │   │   ├── .DS_Store  (8K)
-│   │   ├── backlog_historico.md  (16.6K)
+│   │   ├── backlog_historico.md  (20.7K)
 │   │   ├── backlog_volcado_crudo.md  (40.9K)
 │   │   ├── censo_universo_idps.md  (117K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
@@ -226,10 +226,10 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260622_171015_estructura.md  (15.6K)
-│   │   ├── 20260622_171015_estructura.txt  (15.7K)
 │   │   ├── 20260622_193311_estructura.md  (15.4K)
 │   │   ├── 20260622_193311_estructura.txt  (15.5K)
+│   │   ├── 20260622_200734_estructura.md  (15.4K)
+│   │   ├── 20260622_200734_estructura.txt  (15.5K)
 │   │   ├── estructura_actual.md  (15.4K)
 │   │   └── estructura_actual.txt  (15.5K)
 │   ├── suite/
@@ -269,7 +269,8 @@ slep_idps/
 │   │   ├── traspaso_cierre_v14.md  (32.4K)
 │   │   ├── traspaso_cierre_v15.md  (27.6K)
 │   │   ├── traspaso_cierre_v16.md  (25.6K)
-│   │   └── traspaso_cierre_v17.md  (20.2K)
+│   │   ├── traspaso_cierre_v17.md  (20.2K)
+│   │   └── traspaso_cierre_v18.md  (17.6K)
 │   └── .DS_Store  (14K)
 ├── docs/
 │   └── index.html  (5.04M)
@@ -288,7 +289,7 @@ slep_idps/
 
 | Extension | Archivos |
 |---|---|
-| md | 76 |
+| md | 77 |
 | xlsx | 54 |
 | (sin extension) | 19 |
 | otf | 13 |
