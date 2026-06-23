@@ -934,7 +934,10 @@ __FONTS_CSS__
         </header>
         {d&&d.prom!=null &&
           <div className="indp-anc">
-            <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>
+            {/* Item 1 (s19): "vs su GSE" PRIMARIA y solo si hay desvio (difgru!=null).
+                Sin difgru NO se pinta el slot (antes degradaba a "sin dato" muerto).
+                "vs año anterior" se mantiene siempre (su propia degradacion intacta). */}
+            {d.difgru!=null && <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>}
             <Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/>
           </div>}
         {ind.definicion && <div className="indp-def"><Definicion texto={ind.definicion} etiqueta="¿Qué mide este indicador?"/></div>}
@@ -950,7 +953,7 @@ __FONTS_CSS__
   //       drill-down secuencial; reusa la lectura de datos (indOf/dimOf/nivOf,
   //       Radar, Ancla, ScoreBar, DistBar, serieFull, PanelEvolucion, Definicion).
   //       grado/agno/vista los gobierna App; aqui solo se leen y se cambian.  =====
-  function Ficha({rbd,grado,agno,grados,anios,onGrado,vista,onVista,onPickEE}){
+  function Ficha({rbd,grado,agno,grados,gradosEE,anios,onGrado,vista,onVista,onPickEE}){
     const [cmpA,setCmpA]=useState(null);          // anio de comparacion del radar (-1 = ninguno)
     useEffect(()=>{setCmpA(null);},[rbd,grado,agno]);
     const e=est[rbd];
@@ -999,7 +1002,12 @@ __FONTS_CSS__
                 <button className={"lvl-b"+(isHist?" on":"")+(serie?"":" is-off")} onClick={()=>serie&&onVista("historica")} disabled={!serie} title={serie?"Evolución por año":"Sin serie suficiente"}>Vista histórica</button>
               </div></div>
             <div className="nivelsel"><span className="nivelsel-lab">Nivel</span>
-              <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===grado?" on":"")} onClick={()=>onGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
+              {/* Item 8b (s19): grados sin dato del EE -> desactivados (is-off, sin handler).
+                  gradosEE viene de meta.grados_ee[rbd]; reusa el estilo greyed de .lvl-b.is-off. */}
+              <div className="seg-lvl big">{grados.map(g=>{const off=!(gradosEE&&gradosEE.includes(g));
+                return <button key={g} className={"lvl-b"+(g===grado?" on":"")+(off?" is-off":"")} disabled={off}
+                  title={off?"Este establecimiento no tiene datos en "+DATA.meta.grados[g]:DATA.meta.grados[g]}
+                  onClick={()=>!off&&onGrado(g)}>{DATA.meta.grados[g]}</button>;})}</div></div>
           </div>
         </div>
         <EstabSearch onPick={onPickEE}/>
@@ -1311,6 +1319,12 @@ __FONTS_CSS__
   // ===== Navegacion territorial via EntityModal: region/comuna/dependencia/EE =====
   function App(){
     const grados=Object.keys(DATA.meta.grados);
+    // Item 8 (s19): disponibilidad de grados por EE (indice server-side, meta.grados_ee).
+    // gradosDe -> grados con dato del RBD (orden canonico 4b->6b->2m->8b ya viene de R);
+    // gradoValido -> conserva el grado activo si el EE lo tiene, si no cae al primero
+    // con dato. Fallback al universo global si el indice faltara (robustez).
+    const gradosDe=rbd=>{const g=DATA.meta.grados_ee&&DATA.meta.grados_ee[rbd];return(g&&g.length)?g:grados;};
+    const gradoValido=(rbd,g)=>{const av=gradosDe(rbd);return av.includes(g)?g:av[0];};
     const [terr,setTerr]=useState(FOCO_INICIAL);   // apertura: foco SLEP Costa Central (estado, no filtro fijo)
     const [dep,setDep]=useState("");   // cod_depe2 (dependencia; combinable con el territorio)
     const [modalOpen,setModalOpen]=useState(false);
@@ -1336,7 +1350,7 @@ __FONTS_CSS__
     const agnoCmp=(DATA.meta.grado_anios[cmpGrado]||[]).at(-1);
     // Abrir la ficha de un EE desde la grilla territorial; sincroniza el nivel de la
     // ficha con el de la grilla en ese instante (luego son independientes).
-    const irFicha=r=>{setRbdSel(r);setFichaGrado(panGrado);setPantalla("ficha");};
+    const irFicha=r=>{setRbdSel(r);setFichaGrado(gradoValido(r,panGrado));setPantalla("ficha");};
     const toggleGse=g=>setGseVis(prev=>{const n=new Set(prev);n.has(g)?n.delete(g):n.add(g);return n;});
 
     // Vista historica solo con serie (>1 anio del nivel de la ficha); si no, "actual".
@@ -1348,7 +1362,7 @@ __FONTS_CSS__
       else if(item.kind==="slep") setTerr({kind:"slep",cod:item.cod});   // agrupa toda la serie por cod_slep (sin filtro de anio_traspaso)
       else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod});
       else if(item.kind==="dependencia") setDep(item.cod);
-      else if(item.kind==="establecimiento"){setRbdSel(item.cod);setPantalla("ficha");}};
+      else if(item.kind==="establecimiento"){setRbdSel(item.cod);setFichaGrado(gradoValido(item.cod,fichaGrado));setPantalla("ficha");}};
 
     // Comparador: el modal AGREGA un territorio a la lista (no acota como onPick).
     // Valida max 4 y no-duplicado por kind+cod (D-s8-3); guarda el nombre de
@@ -1477,10 +1491,10 @@ __FONTS_CSS__
           {/* Pantalla ficha (#19): EE seleccionado (con buscador embebido) o el
               buscador + invitacion cuando no hay EE elegido. */}
           {pantalla==="ficha" && (rbdSel
-            ? <Ficha rbd={rbdSel} grado={fichaGrado} agno={fichaAgno} grados={grados} anios={fichaAnios}
-                     onGrado={setFichaGrado} vista={vistaFicha} onVista={setVistaFicha} onPickEE={r=>setRbdSel(r)}/>
+            ? <Ficha rbd={rbdSel} grado={fichaGrado} agno={fichaAgno} grados={grados} gradosEE={gradosDe(rbdSel)} anios={fichaAnios}
+                     onGrado={setFichaGrado} vista={vistaFicha} onVista={setVistaFicha} onPickEE={r=>{setRbdSel(r);setFichaGrado(gradoValido(r,fichaGrado));}}/>
             : <div>
-                <EstabSearch onPick={r=>setRbdSel(r)}/>
+                <EstabSearch onPick={r=>{setRbdSel(r);setFichaGrado(gradoValido(r,fichaGrado));}}/>
                 <div className="screen-stub">
                   <div className="screen-stub-title">Panorama IDPS por establecimiento</div>
                   <div className="screen-stub-msg">Busca un establecimiento arriba (por nombre o RBD), o elígelo en <b>Panorama territorial</b> (clic en una tarjeta).</div>

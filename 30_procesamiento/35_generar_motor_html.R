@@ -415,13 +415,31 @@ primer_anio_familia <- list(
 message(sprintf("[s14] primer_anio_familia: ind=%d dim=%d niv=%d",
                 primer_anio_familia$indicador, primer_anio_familia$dimension, primer_anio_familia$niveles))
 
+# Disponibilidad de grados por RBD (Item 8, s19): por establecimiento, el conjunto
+# de grados con dato DISPLAYABLE (>=1 fila con medida no-NA en cualquier familia:
+# prom de indicador/dimension o niv_bajo_por de niveles, alineado con lo que la
+# ficha puede pintar). Es un INDICE de disponibilidad, no una cifra de medicion: el
+# template lo usa para desactivar en el selector los grados que el EE no tiene y
+# para corregir el cruce territorio->EE (cae al primer grado con dato). as.list()
+# fuerza array JSON aun con un solo grado (evita el unbox de auto_unbox=TRUE).
+ORDEN_GRADOS <- c("4b", "6b", "2m", "8b")
+grados_ee_df <- P |>
+  dplyr::filter((.data$familia == "indicador" & !is.na(.data$prom)) |
+                (.data$familia == "dimension" & !is.na(.data$prom)) |
+                (.data$familia == "niveles"   & !is.na(.data$niv_bajo_por))) |>
+  dplyr::distinct(rbd, grado)
+grados_ee <- lapply(split(grados_ee_df$grado, grados_ee_df$rbd),
+                    function(gs) as.list(ORDEN_GRADOS[ORDEN_GRADOS %in% gs]))
+message(sprintf("[s19] grados_ee: indice de disponibilidad para %d establecimientos",
+                length(grados_ee)))
+
 meta <- list(
   fecha_generacion = format(Sys.Date()),
   cobertura = "Todo Chile",
   region_foco = REGION_FOCO, slep_foco = if (length(slep_foco)) slep_foco else NULL,
   grados = as.list(grados_lbl), grado_anios = grado_anios, anios_preliminar = I(anios_prelim),
   eje_historico = eje_historico, cobertura_anios = cobertura_anios,
-  primer_anio_familia = primer_anio_familia,
+  primer_anio_familia = primer_anio_familia, grados_ee = grados_ee,
   gse = names(GSE_LABELS), gse_labels = as.list(GSE_LABELS),
   depe2 = names(DEPENDENCIAS), depe2_labels = as.list(DEPENDENCIAS),
   comunas_foco = comunas_foco,
