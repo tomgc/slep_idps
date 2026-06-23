@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v17 (2026-06-22). **Total reconciliado: 110 cambios.**
+> **Versión:** consolidado a v19 (2026-06-23). **Total reconciliado: 119 cambios.**
 
 ---
 
@@ -65,7 +65,9 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 15 | v15 | 2 | 105–106 | Opus 4.8 | P-PALETA-v2 rampa+separador + P-DOC-RENDER suite |
 | 16 | v16 | 1 | 107 | Opus 4.8 | P-ORG: reorganización del directorio (encargos + scripts) |
 | 17 | v17 | 3 | 108–110 | Opus 4.8 | Consolidación backlog + suitedoc inline/saneamiento + suite standalone offline |
-| **Total** | | **110** | **1–110** | | |
+| 18 | v18 | 0 | — | Opus 4.8 | Cierre documental: backlog v17, traspasos s16/s17, escáner |
+| 19 | v19 | 9 | 111–119 | Opus 4.8 | 9 ítems UI/UX del motor + cierre P-BACKLOG-INTEGRIDAD |
+| **Total** | | **119** | **1–119** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -79,7 +81,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (recalculada a v17, sobre 110 cambios)
+## Clasificación temática (actualizada a v19, sobre 119 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -88,19 +90,19 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 | Categoría | N° | % | Descripción |
 |---|---|---|---|
-| Infraestructura y scaffold | 5 | 5% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
-| Gobernanza de datos | 5 | 5% | Verificación sensibilidad, decisión Rama A, depuración directorio, ignore, gitignore inventarios scratch |
-| Visualización / diseño — motor base/datos | 14 | 13% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
-| Visualización / diseño — rediseño UI | 16 | 15% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2) |
-| Perfilado / exploración de datos | 4 | 4% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
-| Limpieza / deuda técnica | 13 | 12% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108) |
-| Documentación conceptual / contenido | 9 | 9% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
-| Pipeline / motor (código productivo) | 7 | 7% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
-| Saneamiento / calidad de datos de presentación | 15 | 14% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
-| Deploy / publicación | 9 | 9% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
-| Verificación / auditoría (independiente) | 6 | 6% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
+| Infraestructura y scaffold | 5 | 4% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
+| Gobernanza de datos | 5 | 4% | Verificación sensibilidad, decisión Rama A, depuración directorio, ignore, gitignore inventarios scratch |
+| Visualización / diseño — motor base/datos | 14 | 12% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
+| Visualización / diseño — rediseño UI | 25 | 21% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador) |
+| Perfilado / exploración de datos | 4 | 3% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
+| Limpieza / deuda técnica | 13 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108) |
+| Documentación conceptual / contenido | 9 | 8% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
+| Pipeline / motor (código productivo) | 7 | 6% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
+| Saneamiento / calidad de datos de presentación | 15 | 13% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
+| Deploy / publicación | 9 | 8% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
+| Verificación / auditoría (independiente) | 6 | 5% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
 | Decisión / gobernanza de producto | 3 | 3% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
-| Documentación de proyecto (suite/política) | 4 | 4% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) + saneamiento del paquete `suitedoc` con inlining offline integrado (#109, v17) + regeneración de la suite como 4 standalone offline y retiro de `inline_suite.R` (#110, v17) |
+| Documentación de proyecto (suite/política) | 4 | 3% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) + saneamiento del paquete `suitedoc` con inlining offline integrado (#109, v17) + regeneración de la suite como 4 standalone offline y retiro de `inline_suite.R` (#110, v17) |
 
 > **Cierre P-BACKLOG-INTEGRIDAD (s19):** el faltante de 1 (tabla 109 vs correlativo 110) heredado de la reconciliación v14/v15 era el #93 (bugfix dedup de establecimientos por RBD, sesión 12), que quedó sin categoría al recalcular la distribución. Asignado a Saneamiento / calidad de datos de presentación (14→15). La tabla suma ahora 110 = correlativo global. Sin renumerar ni reasignar entradas históricas.
 
@@ -143,6 +145,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 - **Sesión 15** (2026-06-22): cambios **105–106** (detalle en v15 §4). P-PALETA-v2 y documentación de la suite: **105** P-PALETA-v2 — rampa de niveles monocromática por indicador (reemplaza el semáforo en `DistBar`, derivada del color del indicador padre; Bajo claro→Alto oscuro) + separador de dimensión como contenedor a escala (rehace la fase 3 rechazada de s14); presentación pura (fidelidad censal mismatch 0, panel adversarial 3/3), desplegado `ed240a6`; **106** P-DOC-RENDER — render autocontenido de la suite (4 HTML `*_standalone` con CSS/fuentes/logos en base64) + 2 bugfixes de `inline_suite.R` (href con `regexec`; saltos del base64) + versionado del tema (css/fonts/assets) para reproducir la suite desde el repo.
 - **Sesión 16** (2026-06-22): cambio **107** (detalle en v16 §4). P-ORG — reorganización del directorio del proyecto bajo protocolo 4.2 (migración de estructura, DRY_RUN) vía encargo autónomo a Claude Code: **107** los 16 `encargo_*.md` movidos de la raíz de `50_documentacion/activa/` a `activa/encargos/` (renames git, historial preservado), 8 scripts de andamio (`verificar_*.R` ×7 + `reorganizar_universo_idps.R`) archivados de la raíz del repo a `_archivo/20260622/`, 12 referencias full-path reescritas en `.md` vivos (DRY_RUN==real, 0 refs rotas, 6 invariantes 🔒 PASA); desplegado tras gate pre-push (`681783d..50c3dd4`, local==origin `50c3dd4`); motor, parquet, `20_insumos/`, `40_salidas/` y `docs/` NO tocados.
 - **Sesión 17** (2026-06-22): cambios **108–110** (detalle en v17 §4). Consolidación del backlog, saneamiento del paquete `suitedoc` y regeneración de la suite: **108** consolidación del backlog a v16/107 (integración de la entrada 107/P-ORG que v16 declaró sin escribir; encabezado a v16/107, fila s16 en el resumen, clasificación "Limpieza/deuda técnica" 11→12, entrada cronológica s16, delta v16; entradas 1–106 verificadas idénticas por diff; commit `faefc93`); **109** P-SUITEDOC-INLINE + P-SUITEDOC-SANEAMIENTO (una solicitud —documentación compartible offline— ejecutada en dos encargos autónomos a Claude Code sobre el repo del paquete `herramientas_dev`/`suitedoc`): función `inlinar_suite()` exportada como post-proceso de responsabilidad única + flag `standalone` en `generar_suite()`, embebido de CSS/fuentes/logos como data: URIs e iconos lucide como `<svg>` desde `lucide-static` (sin `<script>` de red, 100% offline verificado por grep), más saneamiento (fix del warning de install por `%` sin escapar en `@title` de roxygen → A17-1; `.gitignore` del paquete; versionado completo; `limpiar_enlazados=TRUE` en standalone; validación temprana de iconos; `.SD_LUCIDE_VERSION="1.21.0"` fijada); 9 commits pusheados (`8ef4b2a..c8b3bd7`), paquete instalable desde cero; **110** regeneración de la suite de `slep_idps` con el paquete saneado (`documentar.R`: `standalone=TRUE`, barrido "colegio→establecimiento educacional" 11 usos, icono `sitemap`→`network` por inexistencia en lucide → A17-2) y retiro de `inline_suite.R` (obsoleto; el inlining lo hace ahora el paquete); 4 `*_standalone.html` regenerados offline (gitignorados, reproducibles con `documentar.R`); commit `055cbac`. (No-cambio de producto registrado por trazabilidad en v17 §4: barreras anti-error operativas `DISCIPLINA_OPERATIVA.md`/R1-R9 — gobernanza del asistente, no del producto; no entra al backlog de producto.)
+- **Sesión 18** (2026-06-22): **sin avance del correlativo** (cierre documental; detalle en v18 §4–§5). Se escribieron en este archivo las entradas **108–110** (solicitudes de s17, ya contadas), se versionaron los traspasos s16/s17 (deuda A38, estaban untracked), se rotó el escáner (retención 2) y se eliminó un stray cruzado del proyecto hermano. Por la nota metodológica (consolidar el backlog es recursivo; el saneamiento documental no es producto nuevo), s18 **no agrega cambios al correlativo**: el total se mantiene en **110**. (El foco mayor propuesto por v17, P-DOC-SIMCE, se derivó a una sesión propia de `slep_simce_adecuado`; no es trabajo de idps.)
+- **Sesión 19** (2026-06-23): cambios **111–119** (detalle en v19 §4 y en los logs `20260622_uiux_s19_fase123_log.md`, `20260623_mmovil_s19_log.md`, `20260623_comparador_s19_log.md`). Tanda de **9 ítems UI/UX del motor** desplegada en 3 encargos autónomos a Claude Code (fidelidad censal mismatch 0 verificada por panel adversarial independiente en cada encargo; parquet intacto `4c764d8c…`): **111** Ítem 1 — ancla "vs su GSE" primaria, sin slot muerto (no se renderiza cuando `difgru` es NA, antes degradaba a "sin dato"); **112** Ítem 2 — signo `%` en el número visible de las barras de niveles (`DistBar`); **113** Ítem 3 — definición "¿Qué mide…?" abierta por defecto, ancho completo y fuente 11.5→13px (`Definicion`); **114** Ítem 5 — envolvente 0–100 (`.ybar-track`) en la vista histórica para ver el faltante a 100; **115** Ítem 6 — preliminar sin atenuar (solo el sufijo `*`) + realce del último año con dato (`.is-latest`, outline del color del indicador); **116** Ítem 7 — media móvil centrada de 3 puntos como overlay (cómputo en cliente, función pura; ≥4 puntos, omite extremos, salta huecos estructurales; `MMOVIL_VENTANA=3`, `MMOVIL_MIN_PUNTOS=4`; D-s19-MMOVIL); **117** Ítem 8 — índice server-side `meta.grados_ee` (rbd→grados con dato, unión ind/dim/niv) + grados sin dato del EE desactivados en la ficha + cruce territorio→EE que cae al primer grado con dato (bugfix 8b reportado por el titular; D-s19-GRADOS-EE); **118** Ítem 9 — modo multiselección opt-in de `EntityModal` (clic togglea sin cerrar, tope 4 deshabilita el resto, "Listo"/Escape cierran; modo simple de navegación de ficha intacto; D-s19-MODAL-MULTI); **119** Ítem 10 — botón "+ agregar territorio" azul sólido (`--azul`) + botón reset (↺) que vacía territorios, visible solo con ≥1 (D-s19-BOTON-B). **Actos no correlativos de s19** (registrados por trazabilidad, no suman al global, como en s18): cierre **P-BACKLOG-INTEGRIDAD** (entrada huérfana #93 reasignada a Saneamiento 14→15; reconciliación de la vista derivada con el correlativo, ya reflejada en la tabla — no es entrada nueva) y versionado de la **deuda A38 de s18** (traspaso v18 + escáner que s18 dejó sin pushear; operativo). Ítems 4 (auditoría tipográfica) y 11 (lista de EE por segmento) diferidos a s20.
 
 ---
 
@@ -227,3 +231,41 @@ distinguibles que el titular pidió, no como cada commit técnico.
   sí se clasificaron). El correlativo (1–110) es la cifra válida (A22); la
   clasificación es vista derivada con el faltante heredado por localizar
   (pendiente P-BACKLOG-INTEGRIDAD, sin renumerar entradas históricas).
+
+---
+
+## Delta del backlog (consolidación v19)
+
+- **s18: +0 entradas.** Cierre puramente documental (escritura de 108–110 —ya
+  contadas en s17—, versionado de traspasos s16/s17, rotación del escáner,
+  eliminación de un stray cruzado). Por la nota metodológica y el criterio explícito
+  del propio v18 (§4: "la numeración global del backlog NO avanza"; §5: "Delta v18:
+  0 entradas nuevas"), s18 no aporta cambios al correlativo. Total a v18 = **110**.
+- **s19: +9 entradas** (111–119): los 9 ítems UI/UX del motor (Ítems 1, 2, 3, 5, 6,
+  7, 8, 9, 10). Total 110 → **119**. Verificado contra el detalle cronológico (último
+  #110 a v17), no contra la tabla heredada (A22). Cada ítem es una solicitud
+  distinguible que el titular enumeró (4 y 11 quedaron diferidos a s20); aunque se
+  ejecutaron en 3 encargos autónomos y ~13 commits técnicos, se cuenta por solicitud,
+  no por commit (nota metodológica). El bugfix 8b (cruce territorio→EE) iba dentro del
+  Ítem 8 reportado por el titular, no se cuenta aparte.
+- **Clasificación:** los 9 ítems entran en "Visualización / diseño — rediseño UI"
+  (16 → 25): todos son presentación/UX del motor (ancla, barras, definición, media
+  móvil, selector de grado, modal, botón). Ninguna categoría cruza el 25% (25/119 =
+  21%) ni cae bajo el 2%; sin subdivisión ni absorción. (Los porcentajes de la tabla
+  son indicativos —nota de la sección—; la fuente de verdad del cuadre es la columna
+  N° contra el correlativo.)
+- **Cierre de P-BACKLOG-INTEGRIDAD (integrado en s19, NO es entrada nueva):** la deuda
+  de integridad heredada de v14/v15 (la tabla sumaba 109 vs correlativo 110) se cerró
+  reasignando la entrada huérfana **#93** (bugfix dedup de establecimientos por RBD,
+  s12) a "Saneamiento / calidad de datos de presentación" (14 → 15), dejando la tabla
+  en 110 = correlativo ANTES de integrar los 9 ítems. Es una reconciliación de la
+  vista derivada con el correlativo, no un cambio correlativo nuevo (no añade un #111
+  propio). Tras integrar los 9 ítems, tabla y correlativo avanzan juntos a **119**. La
+  deuda de integridad queda **CERRADA**: la suma de la tabla vuelve a cuadrar con el
+  correlativo.
+- **Deuda A38 de s18 versionada en s19:** acto operativo (versionar el traspaso v18 y
+  el escáner que s18 dejó sin pushear); no entra al correlativo, igual que en s18.
+- **Verificación de cuadre (cuatro totales):** suma de la columna N° de la tabla
+  temática = **119**; correlativo global (detalle cronológico, último #119) = **119**;
+  fila Total del resumen estadístico = **119**; encabezado del archivo = v19/**119**.
+  Los cuatro cuadran.
