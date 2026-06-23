@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-22 16:01:54
-- **Totales:** 30 carpetas, 251 archivos
+- **Fecha:** 2026-06-22 20:07:34
+- **Totales:** 31 carpetas, 242 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -136,29 +136,31 @@ slep_idps/
 │   │   │   ├── 20260611_decision_gobernanza_insumos_publicos.md  (3.23K)
 │   │   │   ├── 20260612_decision_ponderacion_idps.md  (7.21K)
 │   │   │   ├── 20260622_decision_etiqueta_dependencia.md  (3.33K)
-│   │   │   └── 20260622_decision_paleta_indicadores.md  (3.94K)
+│   │   │   └── 20260622_decision_paleta_indicadores.md  (3.95K)
+│   │   ├── encargos/
+│   │   │   ├── .DS_Store  (6K)
+│   │   │   ├── encargo_ajustes_motor_s14.md  (15.4K)
+│   │   │   ├── encargo_claude_code_idps_censo_universo.md  (22.3K)
+│   │   │   ├── encargo_claude_code_idps_cierre_v05.md  (6.72K)
+│   │   │   ├── encargo_claude_code_idps_diagnostico_historico.md  (23K)
+│   │   │   ├── encargo_claude_code_idps_display_fidelity.md  (7.66K)
+│   │   │   ├── encargo_claude_code_idps_fix_fantasma.md  (6.32K)
+│   │   │   ├── encargo_claude_code_idps_integracion_historico.md  (25.9K)
+│   │   │   ├── encargo_claude_code_idps_motor_historico.md  (15.8K)
+│   │   │   ├── encargo_claude_code_idps_organizacion.md  (21.2K)
+│   │   │   ├── encargo_claude_code_idps_paleta.md  (12.8K)
+│   │   │   ├── encargo_claude_code_idps_pestana_slep_selector.md  (14.5K)
+│   │   │   ├── encargo_claude_code_idps_producto_deploy.md  (14K)
+│   │   │   ├── encargo_claude_code_idps_verificacion_integracion_historico.md  (16.4K)
+│   │   │   ├── encargo_claude_code_idps_verificacion_valores_historico.md  (12.3K)
+│   │   │   ├── encargo_claude_code_idps_vista_historica_barras.md  (16.2K)
+│   │   │   └── encargo_paleta_v2_s15.md  (20.6K)
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
-│   │   ├── .DS_Store  (6K)
-│   │   ├── backlog_historico.md  (12.8K)
+│   │   ├── .DS_Store  (8K)
+│   │   ├── backlog_historico.md  (16.6K)
 │   │   ├── backlog_volcado_crudo.md  (40.9K)
 │   │   ├── censo_universo_idps.md  (117K)
-│   │   ├── encargo_ajustes_motor_s14.md  (15.4K)
-│   │   ├── encargo_claude_code_idps_censo_universo.md  (22.3K)
-│   │   ├── encargo_claude_code_idps_cierre_v05.md  (6.72K)
-│   │   ├── encargo_claude_code_idps_diagnostico_historico.md  (23K)
-│   │   ├── encargo_claude_code_idps_display_fidelity.md  (7.66K)
-│   │   ├── encargo_claude_code_idps_fix_fantasma.md  (6.32K)
-│   │   ├── encargo_claude_code_idps_integracion_historico.md  (25.9K)
-│   │   ├── encargo_claude_code_idps_motor_historico.md  (15.8K)
-│   │   ├── encargo_claude_code_idps_organizacion.md  (21.2K)
-│   │   ├── encargo_claude_code_idps_paleta.md  (12.8K)
-│   │   ├── encargo_claude_code_idps_pestana_slep_selector.md  (14.5K)
-│   │   ├── encargo_claude_code_idps_producto_deploy.md  (14K)
-│   │   ├── encargo_claude_code_idps_verificacion_integracion_historico.md  (16.4K)
-│   │   ├── encargo_claude_code_idps_verificacion_valores_historico.md  (12.3K)
-│   │   ├── encargo_claude_code_idps_vista_historica_barras.md  (16.2K)
-│   │   ├── encargo_paleta_v2_s15.md  (20.6K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
 │   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (32.9K)
@@ -206,29 +208,30 @@ slep_idps/
 │   │   │   ├── 20260620_rediseno_fase4_log.md  (5.47K)
 │   │   │   ├── 20260621_censo_universo_idps_log.md  (7.9K)
 │   │   │   ├── 20260621_diagnostico_historico_idps_log.md  (8.95K)
-│   │   │   ├── 20260621_display_fidelity_log.md  (13.9K)
-│   │   │   ├── 20260621_fix_fantasma_rbdNA_log.md  (3.39K)
+│   │   │   ├── 20260621_display_fidelity_log.md  (14K)
+│   │   │   ├── 20260621_fix_fantasma_rbdNA_log.md  (3.4K)
 │   │   │   ├── 20260621_integracion_historico_idps_log.md  (9.64K)
-│   │   │   ├── 20260621_motor_historico_log.md  (9.66K)
+│   │   │   ├── 20260621_motor_historico_log.md  (9.67K)
 │   │   │   ├── 20260621_pestana_slep_selector_log.md  (7.08K)
-│   │   │   ├── 20260621_reorganizacion_universo_idps_log.md  (9.96K)
-│   │   │   ├── 20260621_verificacion_integracion_historico_log.md  (7.73K)
-│   │   │   ├── 20260621_verificacion_valores_historico_log.md  (7.3K)
+│   │   │   ├── 20260621_reorganizacion_universo_idps_log.md  (9.97K)
+│   │   │   ├── 20260621_verificacion_integracion_historico_log.md  (7.74K)
+│   │   │   ├── 20260621_verificacion_valores_historico_log.md  (7.31K)
 │   │   │   ├── 20260621_vista_historica_barras_log.md  (8.07K)
-│   │   │   ├── 20260622_ajustes_motor_s14_log.md  (8.05K)
+│   │   │   ├── 20260622_ajustes_motor_s14_log.md  (8.06K)
 │   │   │   ├── 20260622_auditoria_decimales_prom_log.md  (4.04K)
+│   │   │   ├── 20260622_org_s16_log.md  (6.09K)
 │   │   │   ├── 20260622_paleta_indicadores_log.md  (8.47K)
-│   │   │   └── 20260622_paleta_v2_s15_log.md  (9.1K)
+│   │   │   └── 20260622_paleta_v2_s15_log.md  (9.11K)
 │   │   ├── .DS_Store  (10K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260622_123136_estructura.md  (15.3K)
-│   │   ├── 20260622_123136_estructura.txt  (15.4K)
-│   │   ├── 20260622_141236_estructura.md  (15.7K)
-│   │   ├── 20260622_141236_estructura.txt  (15.8K)
-│   │   ├── estructura_actual.md  (15.7K)
-│   │   └── estructura_actual.txt  (15.8K)
+│   │   ├── 20260622_171015_estructura.md  (15.6K)
+│   │   ├── 20260622_171015_estructura.txt  (15.7K)
+│   │   ├── 20260622_193311_estructura.md  (15.4K)
+│   │   ├── 20260622_193311_estructura.txt  (15.5K)
+│   │   ├── estructura_actual.md  (15.4K)
+│   │   └── estructura_actual.txt  (15.5K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -242,16 +245,11 @@ slep_idps/
 │   │   │   ├── MuseoSans_700.otf  (62.1K)
 │   │   │   └── MuseoSans-300.otf  (61.5K)
 │   │   ├── .DS_Store  (6K)
-│   │   ├── arquitectura_general_slep_idps_standalone.html  (432K)
-│   │   ├── arquitectura_general_slep_idps.html  (8.89K)
+│   │   ├── arquitectura_general_slep_idps_standalone.html  (440K)
 │   │   ├── arquitectura_slep_idps_standalone.html  (442K)
-│   │   ├── arquitectura_slep_idps.html  (18.9K)
-│   │   ├── documentacion_general_slep_idps_standalone.html  (431K)
-│   │   ├── documentacion_general_slep_idps.html  (7.52K)
+│   │   ├── documentacion_general_slep_idps_standalone.html  (433K)
 │   │   ├── documentacion_proyecto_slep_idps_standalone.html  (435K)
-│   │   ├── documentacion_proyecto_slep_idps.html  (11.8K)
-│   │   ├── documentar.R  (40.6K)
-│   │   ├── inline_suite.R  (6.83K)
+│   │   ├── documentar.R  (40.9K)
 │   │   └── suite_estilos.css  (21.7K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
@@ -265,11 +263,13 @@ slep_idps/
 │   │   ├── traspaso_cierre_v08.md  (24.9K)
 │   │   ├── traspaso_cierre_v09.md  (27.3K)
 │   │   ├── traspaso_cierre_v10.md  (25.9K)
-│   │   ├── traspaso_cierre_v11.md  (20.3K)
+│   │   ├── traspaso_cierre_v11.md  (20.4K)
 │   │   ├── traspaso_cierre_v12.md  (26K)
 │   │   ├── traspaso_cierre_v13.md  (19.6K)
 │   │   ├── traspaso_cierre_v14.md  (32.4K)
-│   │   └── traspaso_cierre_v15.md  (27.6K)
+│   │   ├── traspaso_cierre_v15.md  (27.6K)
+│   │   ├── traspaso_cierre_v16.md  (25.6K)
+│   │   └── traspaso_cierre_v17.md  (20.2K)
 │   └── .DS_Store  (14K)
 ├── docs/
 │   └── index.html  (5.04M)
@@ -281,29 +281,21 @@ slep_idps/
 ├── 00_escanear_proyecto.R  (8.99K)
 ├── CLAUDE.md  (7.99K)
 ├── README.md  (1.74K)
-├── reorganizar_universo_idps.R  (17.7K)
-├── slep_idps.Rproj  (195)
-├── verificar_auditoria_historico_s11.R  (6.9K)
-├── verificar_censo_universo.R  (18.8K)
-├── verificar_censo_valores_historico_s11.R  (6.5K)
-├── verificar_checkpoint_historico.R  (6.39K)
-├── verificar_descomposicion_historico.R  (4.53K)
-├── verificar_historico_idps.R  (23.1K)
-└── verificar_integracion_historico.R  (7.4K)
+└── slep_idps.Rproj  (195)
 ```
 
 ## Conteo por extension
 
 | Extension | Archivos |
 |---|---|
-| md | 73 |
+| md | 76 |
 | xlsx | 54 |
-| r | 19 |
-| (sin extension) | 18 |
-| html | 14 |
+| (sin extension) | 19 |
 | otf | 13 |
 | pdf | 13 |
 | xls | 11 |
+| html | 10 |
+| r | 10 |
 | parquet | 8 |
 | png | 8 |
 | jsx | 5 |
