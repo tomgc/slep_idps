@@ -96,11 +96,13 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Limpieza / deuda técnica | 13 | 12% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108) |
 | Documentación conceptual / contenido | 9 | 9% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
 | Pipeline / motor (código productivo) | 7 | 7% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
-| Saneamiento / calidad de datos de presentación | 14 | 13% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres |
+| Saneamiento / calidad de datos de presentación | 15 | 14% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
 | Deploy / publicación | 9 | 9% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
 | Verificación / auditoría (independiente) | 6 | 6% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
 | Decisión / gobernanza de producto | 3 | 3% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
 | Documentación de proyecto (suite/política) | 4 | 4% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) + saneamiento del paquete `suitedoc` con inlining offline integrado (#109, v17) + regeneración de la suite como 4 standalone offline y retiro de `inline_suite.R` (#110, v17) |
+
+> **Cierre P-BACKLOG-INTEGRIDAD (s19):** el faltante de 1 (tabla 109 vs correlativo 110) heredado de la reconciliación v14/v15 era el #93 (bugfix dedup de establecimientos por RBD, sesión 12), que quedó sin categoría al recalcular la distribución. Asignado a Saneamiento / calidad de datos de presentación (14→15). La tabla suma ahora 110 = correlativo global. Sin renumerar ni reasignar entradas históricas.
 
 **Refinamientos de taxonomía aplicados en la consolidación v14:**
 - **Categoría nueva "Verificación / auditoría (independiente)"** (6%): las
