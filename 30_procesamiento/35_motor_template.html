@@ -139,8 +139,7 @@ __FONTS_CSS__
   .defn{font-size:var(--fs-xs);color:#6a6253;font-style:italic;margin:2px 0 6px;}
   /* P-meta: definicion metodologica contextual (colapsable, discreta) */
   .defn-box{margin-top:6px;}
-  .defn-toggle{border:0;background:none;color:var(--foco);cursor:pointer;font-size:var(--fs-xs);padding:0;font-family:inherit;display:inline-flex;align-items:center;gap:3px;}
-  .defn-toggle:hover{text-decoration:underline;}
+  .defn-title{font-weight:var(--fw-bold);font-size:var(--fs-sm);margin-bottom:2px;color:var(--tinta);}
   /* Item 3 (s19): definicion legible y a ancho completo (sin max-width angosto). */
   .defn-text{font-size:var(--fs-base);color:#5a5142;line-height:1.55;margin-top:5px;}
   .defn-ctx{background:#f4f1e8;border-radius:7px;padding:9px 12px;margin:0 0 14px;}
@@ -589,16 +588,15 @@ __FONTS_CSS__
     t.style.left=Math.max(8,Math.min(r.left,window.innerWidth-272))+"px";t.style.top=(r.bottom+6)+"px";};
   const hideTT=()=>{tt().style.display="none";};
 
-  // ===== Definicion metodologica contextual (colapsable; del catalogo embebido) =====
-  // Degrada con elegancia: sin texto -> no renderiza bloque (no "undefined"/vacio).
-  function Definicion({texto, etiqueta, contexto}){
-    const [open,setOpen]=useState(true);   // Item 3 (s19): abierta por defecto (sigue colapsable)
+  // ===== Definicion metodologica contextual (ESTATICA, s21 #10; del catalogo embebido).
+  // Titulo fijo en NEGRITA, en el color del indicador (prop color), sin toggle ni icono;
+  // la definicion queda SIEMPRE visible. Degrada: sin texto -> no renderiza bloque. =====
+  function Definicion({texto, etiqueta, contexto, color}){
     if(!texto) return null;
     return (
       <div className={contexto?"defn-box defn-ctx":"defn-box"}>
-        <button className="defn-toggle" onClick={(e)=>{e.stopPropagation();setOpen(o=>!o);}}>
-          {open?"▾":"ⓘ"} {etiqueta||"¿Qué mide?"}</button>
-        {open && <div className="defn-text">{texto}</div>}
+        <div className="defn-title" style={color?{color}:undefined}>{etiqueta||"¿Qué mide?"}</div>
+        <div className="defn-text">{texto}</div>
       </div>);
   }
 
@@ -1029,7 +1027,7 @@ __FONTS_CSS__
             {d.difgru!=null && <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>}
             <Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/>
           </div>}
-        {ind.definicion && <div className="indp-def"><Definicion texto={ind.definicion} etiqueta="¿Qué mide este indicador?"/></div>}
+        {ind.definicion && <div className="indp-def"><Definicion texto={ind.definicion} etiqueta="¿Qué mide este indicador?" color={ind.color}/></div>}
         <div className="indp-body">
           {dims.map((dimo,di)=><DimBlock key={dimo.id} dimo={dimo} dimTone={dimColor(ind.color,di,dims.length)} dm={dm} nm={nm} ciclo={ciclo} ramp={ramp}/>)}
         </div>
