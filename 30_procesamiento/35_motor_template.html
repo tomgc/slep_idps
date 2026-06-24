@@ -1564,15 +1564,6 @@ __FONTS_CSS__
             </div>
 
             <div className="help"><b>Panorama del territorio sin agregar.</b> El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia) y la grilla para abrir el Panorama IDPS de cada uno. Las barras son <b>% (n) de establecimientos, nunca un promedio</b>.</div>
-            <div className="leyenda">{DATA.indicadores.map(i=>(
-              i.definicion
-                ? <button key={i.id} type="button" className="leg-item"
-                    aria-label={i.nombre+". ¿Qué mide? "+i.definicion}
-                    onMouseMove={e=>showTT("<b>"+i.nombre+"</b><br>"+i.definicion,e)} onMouseLeave={hideTT}
-                    onFocus={e=>showTTEl("<b>"+i.nombre+"</b><br>"+i.definicion,e.currentTarget)} onBlur={hideTT}>
-                    <i style={{background:i.color}}></i>{i.nombre}<span className="leg-info" aria-hidden="true">ⓘ</span></button>
-                : <span key={i.id}><i style={{background:i.color}}></i>{i.nombre}</span>
-            ))}<span>· ★ Costa Central</span></div>
             <div className="leyenda pan-state-leg">
               <span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span>
               <span><i style={{background:"var(--st-neutro)"}}></i>= sin diferencia</span>
