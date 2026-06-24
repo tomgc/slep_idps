@@ -15,13 +15,15 @@ __FONTS_CSS__
     --ind1:#3858A3; --ind2:#61BDC6; --ind3:#4BA560; --ind4:#AACB58;
     --bajo:#E88663; --medio:#FFC92E; --alto:#75924E;
     --coral:#E88663;
-    /* Colores de ESTADO vs GSE (revision P3 C3): igualados al handout
-       (bajo #EE2D49, neutro #8C8A86, sobre #2A8FD9). Eje semantico PROPIO,
-       independiente de la paleta de INDICADOR. Tras P-PALETA (folleto Agencia) la
-       antigua coincidencia sobre/bajo con los indicadores 4/1 ya NO existe, y es
-       correcto: estado e indicador son ejes distintos. Estos tokens NO se tocan. */
+    /* Colores de ESTADO vs GSE (revision P3 C3): bajo/sobre igualados al handout
+       (bajo #EE2D49, sobre #2A8FD9); neutro retunado a #7E8A99 en #23 (s22): gris-
+       azulado, punto medio del eje rojo->neutro->azul, separado del --gris de UI
+       (#6b7780) y de los grises "off". Eje semantico PROPIO, independiente de la
+       paleta de INDICADOR. Tras P-PALETA (folleto Agencia) la antigua coincidencia
+       sobre/bajo con los indicadores 4/1 ya NO existe, y es correcto: estado e
+       indicador son ejes distintos. alerta/destaca NO se tocan. */
     --alerta:#EE2D49; --alerta-bg:#FBE3E6; --destaca:#2A8FD9; --destaca-bg:#E2F0FB;
-    --st-neutro:#8C8A86;
+    --st-neutro:#7E8A99;
     --sombra:0 2px 8px rgba(74,39,70,.10);
     --shadow-1:0 1px 0 rgba(28,18,18,.05);
     /* --- Escala de presentacion alineada a la referencia (slep_categoria_desempeno):
