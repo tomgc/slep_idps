@@ -456,6 +456,7 @@ __FONTS_CSS__
   .pan-id{flex:1;min-width:0;}
   .pan-name{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-h1);line-height:1.1;color:var(--cream);}
   .pan-meta{font-size:var(--fs-sm);opacity:.82;margin-top:3px;color:var(--cream);}
+  .pan-comunas{font-size:var(--fs-sm);color:var(--cream);opacity:.9;margin-top:4px;line-height:1.35;}
   .pan-nivel{display:flex;align-items:center;gap:10px;}
   .pan-nivel .nivelsel-lab{color:rgba(255,246,224,.74);}
   /* Picker de Territorio (#9) — control tipo select que abre el modal todo-Chile */
@@ -1504,6 +1505,15 @@ __FONTS_CSS__
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
     const panComunas=useMemo(()=>{const s=new Set();unidades.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});return s.size;},[unidades]);
+    // #3 (s21): para SLEP, lista de NOMBRES de comuna del territorio (orden alfabetico
+    // es-CL, formato "A, B y C"). Solo SLEP (foco/slep); comuna/region/dependencia no la muestran.
+    const esSlep = terr.kind==="foco" || terr.kind==="slep";
+    const panComunasNoms=useMemo(()=>{
+      if(!esSlep) return "";
+      const s=new Set();unidades.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});
+      const noms=[...s].map(c=>comNom(c)).filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'));
+      return noms.length<=1 ? noms.join("") : noms.slice(0,-1).join(", ")+" y "+noms[noms.length-1];
+    },[unidades,esSlep]);
 
     const depNom = dep ? (DEPE[dep]||dep) : null;
     const terrTxt = terr.kind==="foco" ? "SLEP "+SLEP_FOCO_NOM
@@ -1540,7 +1550,8 @@ __FONTS_CSS__
             <div className="pan-bar">
               <div className="pan-id">
                 <div className="pan-name">{terrTxt}</div>
-                <div className="pan-meta">{panComunas} {panComunas===1?"comuna":"comunas"} · {unidades.length} establecimientos · {DATA.meta.grados[panGrado]} · {gseVis.size} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}{depNom?" · dependencia: "+depNom:""}</div>
+                {esSlep && panComunasNoms && <div className="pan-comunas">{panComunasNoms}</div>}
+                <div className="pan-meta">{!esSlep && <>{panComunas} {panComunas===1?"comuna":"comunas"} · </>}{unidades.length} establecimientos en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {gseVis.size} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}{depNom?" · dependencia: "+depNom:""}</div>
               </div>
               <div className="pan-nivel"><div className="nivelsel"><span className="nivelsel-lab">Nivel</span>
                 <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===panGrado?" on":"")} onClick={()=>setPanGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div></div>
