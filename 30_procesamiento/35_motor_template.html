@@ -1184,7 +1184,7 @@ __FONTS_CSS__
               </div>
 
               {/* Sobrevive la nota del invariante "lee, no deriva" (antes en Detalle). */}
-              <div className="nota nota-inv">Cada cifra se interpreta por su <b>desvío</b>, no por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); <b>no reconstruye el puntaje del GSE</b>. Por eso las barras muestran solo el promedio del establecimiento y el desvío vs GSE se comunica con las anclas.</div>
+              <div className="nota nota-inv">Cada cifra se interpreta por su <b>desvío</b>, no solo por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); la significancia no se recalcula. El <b>radar</b> sí representa el puntaje del GSE (reconstruido desde el desvío informado por la Agencia, solo a nivel indicador). Las <b>barras</b> de dimensión y subdimensión muestran solo el promedio del establecimiento, porque a ese nivel no hay dato de GSE; ahí el desvío vs GSE se comunica con las anclas.</div>
 
               <div className="ficha-panels-head">
                 <div className="leyenda"><span><i style={{background:"#c9ced1"}}></i>Bajo</span><span><i style={{background:"#838b90"}}></i>Medio</span><span><i style={{background:"#3c454b"}}></i>Alto</span><span>· el tono lo da cada indicador.</span></div>
