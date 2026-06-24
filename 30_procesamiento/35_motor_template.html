@@ -404,6 +404,8 @@ __FONTS_CSS__
   .s100-seg span{font-size:var(--fs-xs);font-weight:var(--fw-bold);color:#fff;white-space:nowrap;padding:0 4px;}
   .s100-empty{align-items:center;justify-content:center;}
   .s100-nd{font-size:var(--fs-xs);color:var(--gris);font-style:italic;}
+  .s100-ext{display:flex;gap:8px;flex-wrap:wrap;margin-top:3px;font-size:var(--fs-2xs);line-height:1.2;}
+  .s100-ext-it{font-weight:var(--fw-bold);white-space:nowrap;}
 
   /* ============================================================
      Fase 4 — Comparación entre territorios (banner del comparador + banda
@@ -762,10 +764,18 @@ __FONTS_CSS__
     // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
     // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
     const aria="Distribución de "+rep.N+" establecimientos con dato: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ");
-    return <div className="s100" role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con dato"}>{parts.map(s=>{if(s.p===0)return null;
-      const lab=s.p>=16?(s.p+"% ("+s.count+")"):(s.p>=9?s.p+"%":"");
-      return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
-        title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{lab&&<span>{lab}</span>}</div>;})}</div>;
+    return (<>
+      <div className="s100" role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con dato"}>{parts.map(s=>{if(s.p===0)return null;
+        const lab=s.p>=16?(s.p+"% ("+s.count+")"):(s.p>=9?s.p+"%":"");
+        return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
+          title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{lab&&<span>{lab}</span>}</div>;})}</div>
+      {/* #18 (s22): tira externa para segmentos finos (<9%) que no caben dentro de la
+          barra; cada % con su glifo de estado y color (el neutro usa --st-neutro de #23). */}
+      {(()=>{const fin=parts.filter(s=>s.p>0&&s.p<9); if(!fin.length) return null;
+        const gl={bajo:"▼",neutro:"=",sobre:"▲"};
+        return <div className="s100-ext">{fin.map(s=>
+          <span key={s.k} className="s100-ext-it" style={{color:s.c}} title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}%</span>)}</div>;})()}
+    </>);
   }
 
   // ===== Tonos derivados del color del indicador (para dimensiones) =====
