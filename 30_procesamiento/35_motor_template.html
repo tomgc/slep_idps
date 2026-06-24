@@ -118,6 +118,12 @@ __FONTS_CSS__
   /* Muestras de leyenda que REPLICAN el trazo del radar: solido (EE) vs punteado gris (GSE) */
   .radar-cmp .sw-line{display:inline-block;width:18px;height:0;margin-right:5px;vertical-align:3px;border-top:2.5px solid var(--azul);}
   .radar-cmp .sw-line.gse{border-top-style:dotted;border-top-color:var(--gris);}
+  /* Fase 3 (#12): muestra de leyenda de la media movil en el historico. Autocontenida
+     (la .sw-line base esta scopeada a .radar-cmp): replica geometria width/height/
+     vertical-align y evoca la LINEA TENUE del trazo real (gris, fina, opacidad .6).
+     Solo leyenda: no toca mediaMovil() ni el polyline. */
+  .sw-line.mm{display:inline-block;width:18px;height:0;margin-right:5px;vertical-align:3px;border-top:1.6px solid var(--gris);opacity:.6;}
+  .hist-leg{justify-content:flex-start;margin:0 0 4px;padding:0 2px;}
 
   /* Fase 3: CSS muerto eliminado (.detail/.back/.dmeta/.dcrumb/.row2/.blk del
      antiguo Detalle; .anchor-row/.ar-N/.anclas del antiguo AnchorRow). Se
@@ -1103,6 +1109,9 @@ __FONTS_CSS__
             ? (
             <div className="hist-wrap">
               <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La significancia estadística es calculada e informada por la Agencia. El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia. Los años en <b>gris</b> no tuvieron evaluación del sistema (2020–2021 por pandemia; 2019 el grado no se evaluó); un año con dato donde <i>este</i> establecimiento no fue medido aparece como columna “sin dato” (no se interpola). La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b> (ventana centrada de 3 evaluaciones con dato); resalta la tendencia y hace ver qué año se despega. Solo se dibuja con 4 o más años con dato.</div>
+              <div className="leyenda hist-leg">
+                <span><span className="sw-line mm"></span>Promedio móvil (tendencia)</span>
+              </div>
               {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,ejeFam('indicador'));
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
