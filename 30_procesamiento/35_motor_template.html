@@ -436,6 +436,7 @@ __FONTS_CSS__
   .cmp-table{width:100%;border-collapse:collapse;table-layout:fixed;}
   .cmp-table th{text-align:center;font-size:var(--fs-xs);font-weight:var(--fw-bold);color:var(--gris);letter-spacing:.01em;padding:10px 12px;border-bottom:1px solid var(--linea);white-space:nowrap;}
   .cmp-table th.th-terr{text-align:left;width:210px;}
+  .cmp-table th.th-ind{white-space:normal;}  /* #20 s21: nombre completo del indicador puede envolver (table-layout fixed reparte el ancho) */
   .th-sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle;}
   .cmp-table td{padding:11px 12px;border-bottom:1px solid var(--linea);vertical-align:middle;}
   .cmp-table tr:last-child td{border-bottom:0;}
@@ -1142,7 +1143,7 @@ __FONTS_CSS__
                         <div className="rcard-top">
                           <span className="rcard-dot" style={{background:ind.color}}></span>
                           <div className="rcard-tt">
-                            <span className="rcard-name">{ind.corto}</span>
+                            <span className="rcard-name">{ind.nombre}</span>
                             <span className="rcard-vals">{d&&d.prom!=null?<b>{fmt(d.prom)}</b>:<b className="sup">sin dato</b>}{d&&d.prom!=null&&<span className="u">/100</span>}</span>
                           </div>
                         </div>
@@ -1401,7 +1402,7 @@ __FONTS_CSS__
                 <div className="gse-sec-h"><span className="gse-sec-name">{GSE[g]||"sin clasificar"}</span><span className="gse-sec-sub">Grupo socioeconómico</span></div>
                 <div className="cmp-tscroll">
                   <table className="cmp-table">
-                    <thead><tr><th className="th-terr">Territorio</th>{DATA.indicadores.map(i=><th key={i.id}><span className="th-sw" style={{background:i.color}}></span>{i.corto}</th>)}</tr></thead>
+                    <thead><tr><th className="th-terr">Territorio</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
                     <tbody>
                       {cmpTerr.map((t,ti)=>(
                         <tr key={t.kind+"|"+t.cod}>
