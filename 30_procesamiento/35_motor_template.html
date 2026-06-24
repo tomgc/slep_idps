@@ -198,8 +198,8 @@ __FONTS_CSS__
   .modal-count{font-size:var(--fs-sm);color:var(--gris);font-weight:var(--fw-bold);margin-right:auto;}
   .estab-popup-btn.is-primary{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:var(--fw-bold);}
   .estab-popup-btn.is-primary:hover{background:var(--foco);}
-  /* REVISAR jerarquia: .axis-lab.b era 10px vs .axis-lab 9px; ahora ambos var(--fs-2xs) (11px), la variante .b pierde su distincion de tamano */
-  .axis-lab{font-size:var(--fs-2xs);fill:var(--gris);} .axis-lab.b{font-size:var(--fs-2xs);}
+  /* Jerarquia .axis-lab restaurada por PESO (no por pixel ad-hoc): ambas en var(--fs-2xs) (11px); la variante .b va en negrita (var(--fw-bold)) para distinguirse de la base, conservando la escala tipografica de 7 tokens (cierra el pendiente tipografico de s20) */
+  .axis-lab{font-size:var(--fs-2xs);fill:var(--gris);} .axis-lab.b{font-size:var(--fs-2xs);font-weight:var(--fw-bold);}
   .ring{fill:none;stroke:var(--linea);}
   .tt{position:fixed;background:#23303a;color:#fff;font-size:var(--fs-xs);padding:5px 8px;border-radius:5px;pointer-events:none;display:none;z-index:80;max-width:260px;}
   code{background:#eee5cf;padding:0 4px;border-radius:3px;font-size:var(--fs-xs);}
