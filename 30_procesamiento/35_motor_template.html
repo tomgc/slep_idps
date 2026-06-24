@@ -343,7 +343,11 @@ __FONTS_CSS__
      reciente CON DATO del EE se resalta con un anillo del color del indicador
      (outline inline en BarrasAnio). */
   .ybar-fill.is-latest{z-index:3;}
-  .ybar-val{position:absolute;top:-19px;left:50%;transform:translateX(-50%);font-size:var(--fs-sm);font-weight:var(--fw-heavy);color:var(--tinta);font-variant-numeric:tabular-nums;}
+  .ybar-val{position:absolute;top:-19px;left:50%;transform:translateX(-50%);font-size:var(--fs-sm);font-weight:var(--fw-heavy);color:var(--tinta);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  /* #13 (s22): glifo de significancia TEMPORAL (vs evaluacion anterior) junto al
+     puntaje; direccion por signo de dif, color por sig (reusa clases de/al/nt). */
+  .ybar-val .ybar-sig{font-size:var(--fs-2xs);margin-left:3px;font-weight:var(--fw-bold);}
+  .ybar-sig.de{color:var(--destaca);} .ybar-sig.al{color:var(--alerta);} .ybar-sig.nt{color:var(--st-neutro);}
   .ybar-yr{text-align:center;font-size:var(--fs-xs);color:var(--gris);font-weight:var(--fw-bold);}
   .ybar-empty{align-self:center;margin:auto auto;font-size:var(--fs-2xs);color:var(--gris);font-style:italic;}
   /* Año desactivado del eje contiguo (pandemia / no_eval): columna gris de ESTADO,
@@ -943,7 +947,11 @@ __FONTS_CSS__
                         style={{height:Math.max(0,Math.min(100,p.v))+"%",background:color,
                           outline:isLatest?("2px solid "+color):undefined,outlineOffset:isLatest?"1px":undefined}}
                         onMouseMove={e=>showTT("<b>"+nombre+"</b><br>"+p.a+(prelim?"*":"")+": "+fmt(p.v)+" (0–100)"+(isLatest?"<br><i>año más reciente con dato</i>":""),e)} onMouseLeave={hideTT}>
-                        <span className="ybar-val">{fmt(p.v)}</span></div>
+                        <span className="ybar-val">{fmt(p.v)}
+                          {p.dif!=null && (()=>{const g=p.dif>0?"▲":(p.dif<0?"▼":"=");
+                            const cls=(p.sig===1||p.sig===-1)?(p.dif>0?"de":(p.dif<0?"al":"nt")):"nt";
+                            return <span className={"ybar-sig "+cls} title={"vs evaluación anterior: "+(p.dif>0?"+":"")+p.dif+" pts"+((p.sig===1||p.sig===-1)?" (significativo)":" (solo aritmético)")}>{g}</span>;})()}
+                        </span></div>
                     </React.Fragment>}
               </div>
               <div className="ybar-yr">{p.a}{prelim?"*":""}</div>
