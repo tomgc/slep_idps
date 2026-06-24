@@ -8,8 +8,11 @@
 #            pako inline; React por CDN con SRI; fuentes de marca embebidas),
 #            sobre el MODELO NUEVO (sin agregacion territorial): el dato viaja por
 #            establecimiento-grado; territorio y GSE son navegacion/etiqueta,
-#            nunca cifra agregada; la comparacion es difgru/sigdifgru y dif/sigdif
-#            (se LEEN, no se derivan; no se dibuja la linea absoluta del GSE).
+#            nunca cifra agregada; la comparacion (difgru/sigdifgru y dif/sigdif) se
+#            LEE, no se recalcula la significancia. El radar SI dibuja el poligono GSE
+#            de referencia, reconstruido como prom - difgru (decision
+#            20260624_decision_poligono_gse_radar), solo a nivel indicador y solo donde
+#            hay difgru/cod_grupo (en la practica 2024-2025).
 #
 # ALCANCE: TODO CHILE (decision titular, encargo 2). El universo embebido es
 # nacional; la navegacion territorial (region -> SLEP/comuna -> establecimiento)
