@@ -1103,7 +1103,7 @@ __FONTS_CSS__
           {isHist
             ? (
             <div className="hist-wrap">
-              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La diferencia vs la evaluación anterior y su significancia se <b>leen</b> de la Agencia (no se calculan). Los años con * son preliminares. Los años en <b>gris</b> no tuvieron evaluación del sistema (2020–2021 por pandemia; 2019 el grado no se evaluó); un año con dato donde <i>este</i> establecimiento no fue medido aparece como columna “sin dato” (no se interpola). La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b> (ventana centrada de 3 evaluaciones con dato); resalta la tendencia y hace ver qué año se despega. Solo se dibuja con 4 o más años con dato.</div>
+              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, en eje fijo 0–100. La significancia estadística es calculada e informada por la Agencia. El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia. Los años en <b>gris</b> no tuvieron evaluación del sistema (2020–2021 por pandemia; 2019 el grado no se evaluó); un año con dato donde <i>este</i> establecimiento no fue medido aparece como columna “sin dato” (no se interpola). La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b> (ventana centrada de 3 evaluaciones con dato); resalta la tendencia y hace ver qué año se despega. Solo se dibuja con 4 o más años con dato.</div>
               {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,ejeFam('indicador'));
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
@@ -1120,7 +1120,7 @@ __FONTS_CSS__
                           </div>);})}
                     </div></>}
                 </section>);})}
-              <div className="nota nota-inv">Cada panel usa barras por año sobre un eje fijo 0–100 (escala común, comparable); la <b>marca de tendencia</b> en cada cabecera muestra la diferencia (dif) del último año con dato vs la evaluación anterior y su significancia (▲/▼/= + texto), <b>leídas de la Agencia</b>. La subdimensión no aparece aquí: es <b>distribución de niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"Los años con * son preliminares.":""}</div>
+              <div className="nota nota-inv">Cada panel usa barras por año sobre un eje fijo 0–100 (escala común, comparable); la <b>marca de tendencia</b> en cada cabecera muestra la diferencia (dif) del último año con dato vs la evaluación anterior y su significancia (▲/▼/= + texto). La significancia estadística es calculada e informada por la Agencia. La subdimensión no aparece aquí: es <b>distribución de niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia.":""}</div>
             </div>)
             : (
             <div>
@@ -1172,7 +1172,7 @@ __FONTS_CSS__
               <div className="nota nota-inv">Cada cifra se interpreta por su <b>desvío</b>, no por su nivel absoluto. El motor lee <code>difgru</code>/<code>sigdifgru</code> (vs GSE) y <code>dif</code>/<code>sigdif</code> (vs evaluación anterior); <b>no reconstruye el puntaje del GSE</b>. Por eso las barras muestran solo el promedio del establecimiento y el desvío vs GSE se comunica con las anclas.</div>
 
               <div className="ficha-panels-head">
-                <div className="leyenda"><span><i style={{background:"#c9ced1"}}></i>Bajo</span><span><i style={{background:"#838b90"}}></i>Medio</span><span><i style={{background:"#3c454b"}}></i>Alto</span><span>· distribución de subdimensiones · el tono lo da cada indicador (leyenda en gris neutro: rampa Bajo→Alto) · solo respuestas de estudiantes (EST)</span></div>
+                <div className="leyenda"><span><i style={{background:"#c9ced1"}}></i>Bajo</span><span><i style={{background:"#838b90"}}></i>Medio</span><span><i style={{background:"#3c454b"}}></i>Alto</span><span>· el tono lo da cada indicador.</span></div>
               </div>
               <div className="ficha-panels">
                 {DATA.indicadores.map(ind=><IndPanel key={ind.id} ind={ind} im={im} dm={dm} nm={nm} ciclo={ciclo}/>)}
