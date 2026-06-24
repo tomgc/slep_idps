@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v19 (2026-06-23). **Total reconciliado: 119 cambios.**
+> **Versión:** consolidado a v21 (2026-06-24). **Total reconciliado: 133 cambios.**
 
 ---
 
@@ -67,7 +67,9 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 17 | v17 | 3 | 108–110 | Opus 4.8 | Consolidación backlog + suitedoc inline/saneamiento + suite standalone offline |
 | 18 | v18 | 0 | — | Opus 4.8 | Cierre documental: backlog v17, traspasos s16/s17, escáner |
 | 19 | v19 | 9 | 111–119 | Opus 4.8 | 9 ítems UI/UX del motor + cierre P-BACKLOG-INTEGRIDAD |
-| **Total** | | **119** | **1–119** | | |
+| 20 | v20 | 11 | 120–130 | Opus 4.8 | Tipografía (7 tokens) + lote UI directo (10 ítems) |
+| 21 | v21 | 3 | 131–133 | Opus 4.8 | Polígono GSE en el radar + textos bloque azul/leyenda |
+| **Total** | | **133** | **1–133** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -81,7 +83,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (actualizada a v19, sobre 119 cambios)
+## Clasificación temática (actualizada a v21, sobre 133 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -92,16 +94,16 @@ distinguibles que el titular pidió, no como cada commit técnico.
 |---|---|---|---|
 | Infraestructura y scaffold | 5 | 4% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
 | Gobernanza de datos | 5 | 4% | Verificación sensibilidad, decisión Rama A, depuración directorio, ignore, gitignore inventarios scratch |
-| Visualización / diseño — motor base/datos | 14 | 12% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
-| Visualización / diseño — rediseño UI | 25 | 21% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador) |
+| Visualización / diseño — motor base/datos | 14 | 11% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
+| Visualización / diseño — rediseño UI | 38 | 29% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador), lote UI directo s20 (#121–130: leyenda redundante, comunas por SLEP, nivel seleccionado, nombre completo rcard, definición estática, leyenda subdim, preliminar/significancia, comparador nombre/Territorio) y s21 (#131–133: polígono GSE en el radar, texto del bloque azul, leyenda duplicada) |
 | Perfilado / exploración de datos | 4 | 3% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
-| Limpieza / deuda técnica | 13 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108) |
-| Documentación conceptual / contenido | 9 | 8% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
-| Pipeline / motor (código productivo) | 7 | 6% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
-| Saneamiento / calidad de datos de presentación | 15 | 13% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
-| Deploy / publicación | 9 | 8% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
+| Limpieza / deuda técnica | 14 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108), tokenización tipográfica a 7 tokens --fs-* (P-TIPOGRAFIA, #120, s20) |
+| Documentación conceptual / contenido | 9 | 7% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta |
+| Pipeline / motor (código productivo) | 7 | 5% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
+| Saneamiento / calidad de datos de presentación | 15 | 11% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
+| Deploy / publicación | 9 | 7% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
 | Verificación / auditoría (independiente) | 6 | 5% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
-| Decisión / gobernanza de producto | 3 | 3% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
+| Decisión / gobernanza de producto | 3 | 2% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
 | Documentación de proyecto (suite/política) | 4 | 3% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) + saneamiento del paquete `suitedoc` con inlining offline integrado (#109, v17) + regeneración de la suite como 4 standalone offline y retiro de `inline_suite.R` (#110, v17) |
 
 > **Cierre P-BACKLOG-INTEGRIDAD (s19):** el faltante de 1 (tabla 109 vs correlativo 110) heredado de la reconciliación v14/v15 era el #93 (bugfix dedup de establecimientos por RBD, sesión 12), que quedó sin categoría al recalcular la distribución. Asignado a Saneamiento / calidad de datos de presentación (14→15). La tabla suma ahora 110 = correlativo global. Sin renumerar ni reasignar entradas históricas.
@@ -147,6 +149,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 - **Sesión 17** (2026-06-22): cambios **108–110** (detalle en v17 §4). Consolidación del backlog, saneamiento del paquete `suitedoc` y regeneración de la suite: **108** consolidación del backlog a v16/107 (integración de la entrada 107/P-ORG que v16 declaró sin escribir; encabezado a v16/107, fila s16 en el resumen, clasificación "Limpieza/deuda técnica" 11→12, entrada cronológica s16, delta v16; entradas 1–106 verificadas idénticas por diff; commit `faefc93`); **109** P-SUITEDOC-INLINE + P-SUITEDOC-SANEAMIENTO (una solicitud —documentación compartible offline— ejecutada en dos encargos autónomos a Claude Code sobre el repo del paquete `herramientas_dev`/`suitedoc`): función `inlinar_suite()` exportada como post-proceso de responsabilidad única + flag `standalone` en `generar_suite()`, embebido de CSS/fuentes/logos como data: URIs e iconos lucide como `<svg>` desde `lucide-static` (sin `<script>` de red, 100% offline verificado por grep), más saneamiento (fix del warning de install por `%` sin escapar en `@title` de roxygen → A17-1; `.gitignore` del paquete; versionado completo; `limpiar_enlazados=TRUE` en standalone; validación temprana de iconos; `.SD_LUCIDE_VERSION="1.21.0"` fijada); 9 commits pusheados (`8ef4b2a..c8b3bd7`), paquete instalable desde cero; **110** regeneración de la suite de `slep_idps` con el paquete saneado (`documentar.R`: `standalone=TRUE`, barrido "colegio→establecimiento educacional" 11 usos, icono `sitemap`→`network` por inexistencia en lucide → A17-2) y retiro de `inline_suite.R` (obsoleto; el inlining lo hace ahora el paquete); 4 `*_standalone.html` regenerados offline (gitignorados, reproducibles con `documentar.R`); commit `055cbac`. (No-cambio de producto registrado por trazabilidad en v17 §4: barreras anti-error operativas `DISCIPLINA_OPERATIVA.md`/R1-R9 — gobernanza del asistente, no del producto; no entra al backlog de producto.)
 - **Sesión 18** (2026-06-22): **sin avance del correlativo** (cierre documental; detalle en v18 §4–§5). Se escribieron en este archivo las entradas **108–110** (solicitudes de s17, ya contadas), se versionaron los traspasos s16/s17 (deuda A38, estaban untracked), se rotó el escáner (retención 2) y se eliminó un stray cruzado del proyecto hermano. Por la nota metodológica (consolidar el backlog es recursivo; el saneamiento documental no es producto nuevo), s18 **no agrega cambios al correlativo**: el total se mantiene en **110**. (El foco mayor propuesto por v17, P-DOC-SIMCE, se derivó a una sesión propia de `slep_simce_adecuado`; no es trabajo de idps.)
 - **Sesión 19** (2026-06-23): cambios **111–119** (detalle en v19 §4 y en los logs `20260622_uiux_s19_fase123_log.md`, `20260623_mmovil_s19_log.md`, `20260623_comparador_s19_log.md`). Tanda de **9 ítems UI/UX del motor** desplegada en 3 encargos autónomos a Claude Code (fidelidad censal mismatch 0 verificada por panel adversarial independiente en cada encargo; parquet intacto `4c764d8c…`): **111** Ítem 1 — ancla "vs su GSE" primaria, sin slot muerto (no se renderiza cuando `difgru` es NA, antes degradaba a "sin dato"); **112** Ítem 2 — signo `%` en el número visible de las barras de niveles (`DistBar`); **113** Ítem 3 — definición "¿Qué mide…?" abierta por defecto, ancho completo y fuente 11.5→13px (`Definicion`); **114** Ítem 5 — envolvente 0–100 (`.ybar-track`) en la vista histórica para ver el faltante a 100; **115** Ítem 6 — preliminar sin atenuar (solo el sufijo `*`) + realce del último año con dato (`.is-latest`, outline del color del indicador); **116** Ítem 7 — media móvil centrada de 3 puntos como overlay (cómputo en cliente, función pura; ≥4 puntos, omite extremos, salta huecos estructurales; `MMOVIL_VENTANA=3`, `MMOVIL_MIN_PUNTOS=4`; D-s19-MMOVIL); **117** Ítem 8 — índice server-side `meta.grados_ee` (rbd→grados con dato, unión ind/dim/niv) + grados sin dato del EE desactivados en la ficha + cruce territorio→EE que cae al primer grado con dato (bugfix 8b reportado por el titular; D-s19-GRADOS-EE); **118** Ítem 9 — modo multiselección opt-in de `EntityModal` (clic togglea sin cerrar, tope 4 deshabilita el resto, "Listo"/Escape cierran; modo simple de navegación de ficha intacto; D-s19-MODAL-MULTI); **119** Ítem 10 — botón "+ agregar territorio" azul sólido (`--azul`) + botón reset (↺) que vacía territorios, visible solo con ≥1 (D-s19-BOTON-B). **Actos no correlativos de s19** (registrados por trazabilidad, no suman al global, como en s18): cierre **P-BACKLOG-INTEGRIDAD** (entrada huérfana #93 reasignada a Saneamiento 14→15; reconciliación de la vista derivada con el correlativo, ya reflejada en la tabla — no es entrada nueva) y versionado de la **deuda A38 de s18** (traspaso v18 + escáner que s18 dejó sin pushear; operativo). Ítems 4 (auditoría tipográfica) y 11 (lista de EE por segmento) diferidos a s20.
+- **Sesión 20** (2026-06-23/24): cambios **120–130** (delta razonado en v20 §5; logs `20260623_tipografia_escala_log.md`, `20260623_fix_ancla_s7_1_log.md`, `20260624_s21_lote_directo_log.md` —pese a su nombre, su contenido es de s20, v20 §1). Tipografía + lote UI directo, desplegado: **120** P-TIPOGRAFIA (Ítem 4) — reemplazo de la escala de facto (19 valores de font-size) por **7 tokens `--fs-*`** (piso 11px, cuerpo 14px), ~88 declaraciones tokenizadas; el fix del **Bug s7-1 en `.ancla`** (comentario CSS con `*/` prematuro que descartaba la regla del CSSOM desde `00e567d`) fue bugfix hallado por Claude Code, NO reportado por el titular → no suma aparte (nota metodológica; va dentro de #120). **Lote UI directo, 10 ítems de presentación:** **121** elimina la leyenda redundante de indicadores (Panorama territorial); **122** comunas por SLEP en tercera línea (alfabético "A, B, C y D", solo SLEP); **123** "establecimientos en el nivel seleccionado" en la meta; **124** nombre completo del indicador en tarjetas rcard; **125** definición estática (negrita, color del indicador, sin toggle); **126** recorte de la leyenda de subdimensiones a "el tono lo da cada indicador"; **127** texto del `*` preliminar unificado; **128** texto de significancia unificado; **129** nombre completo del indicador en los th del comparador (wrap); **130** columna "Territorio" alineada a la derecha en el comparador. (No suman: el ítem #19 del lote fue solo diagnóstico —umbral de ancho del `StackedBar`, no de datos—, el fix .ancla es bugfix no-titular, y la consolidación del cronológico s18/s19 ejecutada también en s20 es trabajo recursivo.)
+- **Sesión 21** (2026-06-24): cambios **131–133** (detalle en v21 y logs `20260624_poligono_gse_texto_leyenda_log.md`, `20260624_afinacion_textos_gse_log.md`, `20260624_diagnostico_gse_reconstruccion_log.md`, `20260624_deploy_push_s21_log.md`). Polígono GSE de referencia en el radar y textos asociados (fidelidad censal mismatch 0, panel adversarial independiente 0 mismatch en 366.384 filas; parquet intacto `4c764d8c…`; reabre la decisión de ponderación, `20260624_decision_poligono_gse_radar.md`): **131** polígono GSE de referencia en el radar (resuelve "captura 2") — campo server-side `prom_gse = round(prom_crudo − difgru, 0)` (reconstrucción EXACTA, signo fijado por `sign(difgru)==sign(sigdifgru)`, sd intra-grupo 0; solo 2024-2025, solo nivel indicador, solo donde hay difgru/cod_grupo); trazo punteado gris distinto del overlay temporal, leyenda "Promedio del mismo GSE"; se dibuja solo si los 4 indicadores tienen `prom_gse` (NA = supresión, nunca 0); **132** reescritura del texto del bloque azul de la ficha (describe el polígono GSE y la significancia; resuelve el pendiente "texto 3b" de v20); **133** eliminación de la leyenda de significancia duplicada de la ficha (conserva la del bloque azul; resuelve "3a"). **Actos no correlativos de s21** (registrados por trazabilidad, no suman): la **afinación de textos** (condicionar la frase de la línea punteada a la existencia de GSE + corregir 2 textos que negaban la representación del GSE) es refinamiento/coherencia del propio #132; los **diagnósticos read-only** (radar vs GSE; reconstrucción `prom_gse`) son análisis, no producto; la **decisión versionada** (reapertura ponderación) es la justificación del #131, no un cambio aparte; el **deploy + push** del día es operativo.
 
 ---
 
@@ -269,3 +273,33 @@ distinguibles que el titular pidió, no como cada commit técnico.
   temática = **119**; correlativo global (detalle cronológico, último #119) = **119**;
   fila Total del resumen estadístico = **119**; encabezado del archivo = v19/**119**.
   Los cuatro cuadran.
+
+---
+
+## Delta del backlog (consolidación v21)
+
+- **s20: +11 entradas** (120–130): P-TIPOGRAFIA (#120) + 10 ítems del lote UI directo
+  (#121–130). Total 119 → **130**. Razonado en v20 §5; verificado contra el detalle
+  cronológico (último #119 a v19), no contra la tabla heredada (A22). NO suman: el fix
+  del Bug s7-1 en `.ancla` (bugfix hallado por Claude Code, no reportado por el titular),
+  el ítem #19 del lote (solo diagnóstico) y la consolidación recursiva del cronológico
+  s18/s19 (criterio v18).
+- **s21: +3 entradas** (131–133): polígono GSE de referencia en el radar (#131), texto
+  del bloque azul (#132) y eliminación de la leyenda duplicada (#133). Total 130 →
+  **133**. NO suman: la afinación de textos (refinamiento de #132), los diagnósticos
+  read-only (análisis), la decisión versionada (justificación de #131) y el deploy/push
+  (operativo).
+- **Clasificación:** #120 (tipografía) → "Limpieza / deuda técnica" (13 → 14:
+  tokenización/refactor de la escala tipográfica a 7 tokens). #121–133 (10 del lote s20
+  + 3 de s21) → "Visualización / diseño — rediseño UI" (25 → 38). Recalculada la columna
+  % sobre 133.
+- **⚠️ Observación de umbral:** "Visualización / diseño — rediseño UI" llega a **38/133
+  = 29%**, cruzando el umbral del 25% que en deltas previos se vigilaba para subdivisión.
+  NO se subdivide aquí: exigiría reclasificar entradas históricas (contra la regla
+  append-only / A37). Queda **EN OBSERVACIÓN** para una sesión de higiene del backlog
+  (mismo criterio con que v14 puso categorías en observación), p. ej. separar "tweaks de
+  presentación" de "features de visualización" sin renumerar.
+- **Verificación de cuadre (cuatro totales):** suma de la columna N° de la tabla temática
+  = **133**; correlativo global (detalle cronológico, último #133) = **133**; fila Total
+  del resumen estadístico = **133**; encabezado del archivo = v21/**133**. Los cuatro
+  cuadran.
