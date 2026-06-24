@@ -552,6 +552,10 @@ __FONTS_CSS__
   // de 3 puntos CON DATO consecutivos en el eje (saltando huecos estructurales); solo
   // se dibuja si la serie tiene al menos 4 puntos con dato. Constantes nombradas.
   const MMOVIL_VENTANA=3, MMOVIL_MIN_PUNTOS=4;
+  // Tope de territorios comparables en el comparador (#16/#17, s22): fuente unica,
+  // referenciada en los 5 lugares (maxSel, contador, guard del boton, guard de addTerr
+  // y textos cmp-invite) para que una proxima subida no vuelva a desincronizarse.
+  const CMP_MAX_TERR=10;
   // Foco de apertura: SLEP Costa Central (cod del SLEP en el dato; sus
   // establecimientos tienen cod_slep === SLEP_FOCO). Es el ESTADO inicial de
   // navegacion, no un filtro fijo: el usuario lo cambia con EntityModal.
@@ -1357,7 +1361,7 @@ __FONTS_CSS__
         <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda reparte el <b>100% de los establecimientos</b> del territorio (en ese GSE e indicador) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes.</div>
 
         <div className="cmp-controls">
-          <span className="cmp-cl">Territorios a comparar · {cmpTerr.length} de 4</span>
+          <span className="cmp-cl">Territorios a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
           <div className="cmp-chips">
             {cmpTerr.map((t,i)=>(
               <div className="cmp-chip" key={t.kind+"|"+t.cod}>
@@ -1365,10 +1369,10 @@ __FONTS_CSS__
                   <span className="cmp-cm">{metas[i]?metas[i].ncom:0} {metas[i]&&metas[i].ncom===1?"comuna":"comunas"} · {metas[i]?metas[i].nee:0} {metas[i]&&metas[i].nee===1?"establecimiento":"establecimientos"}</span></span>
                 <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
               </div>))}
-            {cmpTerr.length<4 && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
+            {cmpTerr.length<CMP_MAX_TERR && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
             {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar territorios" title="Limpiar territorios">↺</button>}
           </div>
-          {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?"Agrega territorios (botón “+ agregar territorio”) para comparar, hasta 4.":"Agrega al menos un territorio más para comparar (hasta 4)."}</div>}
+          {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?`Agrega territorios (botón “+ agregar territorio”) para comparar, hasta ${CMP_MAX_TERR}.`:`Agrega al menos un territorio más para comparar (hasta ${CMP_MAX_TERR}).`}</div>}
         </div>
 
         <div className="gse-filter-wrap">
@@ -1475,7 +1479,7 @@ __FONTS_CSS__
       setCmpTerr(prev=>{
         const k=t=>t.kind+"|"+t.cod; const ki=k(item);
         if(prev.some(t=>k(t)===ki)) return prev.filter(t=>k(t)!==ki);
-        if(prev.length>=4) return prev;
+        if(prev.length>=CMP_MAX_TERR) return prev;
         return [...prev,{kind:item.kind,cod:item.cod,nom:(item.nom||"").replace(" ★","")}];
       });};
     const removeTerr=(kind,cod)=>setCmpTerr(prev=>prev.filter(t=>!(t.kind===kind&&t.cod===cod)));
@@ -1531,7 +1535,7 @@ __FONTS_CSS__
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
           {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={buildListCmp} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar territorio a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
-            multiple={true} seleccionados={cmpTerr.map(t=>t.kind+"|"+t.cod)} maxSel={4} onDone={()=>setCmpModalOpen(false)}/>}
+            multiple={true} seleccionados={cmpTerr.map(t=>t.kind+"|"+t.cod)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
