@@ -22,7 +22,6 @@ __FONTS_CSS__
        correcto: estado e indicador son ejes distintos. Estos tokens NO se tocan. */
     --alerta:#EE2D49; --alerta-bg:#FBE3E6; --destaca:#2A8FD9; --destaca-bg:#E2F0FB;
     --st-neutro:#8C8A86;
-    --cmp-year:#C77D3A;
     --sombra:0 2px 8px rgba(74,39,70,.10);
     --shadow-1:0 1px 0 rgba(28,18,18,.05);
     /* --- Escala de presentacion alineada a la referencia (slep_categoria_desempeno):
@@ -116,13 +115,9 @@ __FONTS_CSS__
   /* II.6 — control de comparacion de dos anios en el radar */
   .radar-cmp{display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:8px;}
   .radar-cmp .leyenda{margin:0;justify-content:center;}
-  .radar-cmp .cmp-label{font-size:var(--fs-xs);color:var(--gris);}
-  .radar-cmp select{padding:3px 7px;font-size:var(--fs-sm);min-width:auto;border:1px solid var(--linea);border-radius:6px;background:#fff;font-family:inherit;}
-  /* Muestras de leyenda que REPLICAN el trazo del radar: solido (actual) vs discontinuo (comparacion) */
+  /* Muestras de leyenda que REPLICAN el trazo del radar: solido (EE) vs punteado gris (GSE) */
   .radar-cmp .sw-line{display:inline-block;width:18px;height:0;margin-right:5px;vertical-align:3px;border-top:2.5px solid var(--azul);}
-  .radar-cmp .sw-line.cmp{border-top-style:dashed;border-top-color:var(--cmp-year);}
   .radar-cmp .sw-line.gse{border-top-style:dotted;border-top-color:var(--gris);}
-  .radar-cmp .cmp-hint{font-size:var(--fs-2xs);color:var(--gris);font-style:italic;text-align:center;max-width:34ch;}
 
   /* Fase 3: CSS muerto eliminado (.detail/.back/.dmeta/.dcrumb/.row2/.blk del
      antiguo Detalle; .anchor-row/.ar-N/.anclas del antiguo AnchorRow). Se
@@ -602,14 +597,14 @@ __FONTS_CSS__
   }
 
   // ===== Radar D3 (rompe en NA: honesto con la supresion) =====
-  // axes  = serie principal [{label,value,color}]
-  // axesB = serie de comparacion opcional (mismo orden de ejes; II.6 dos anios)
+  // axes  = serie principal [{label,value,color}] (trazo del EE, solido)
+  // axesG = poligono GSE de referencia opcional (mismo orden de ejes; trazo punteado gris)
   // showLabels = nombre corto del eje; showValues = puntaje (prom) en el vertice
-  // colB/labelB = color y tooltip de la serie de comparacion.
-  function Radar({axes,axesB,axesG,size,showLabels,showValues,colB,labelB,colG,labelG}){
+  // colG/labelG = color y tooltip del trazo GSE.
+  function Radar({axes,axesG,size,showLabels,showValues,colG,labelG}){
     const ref=useRef(null);
     useEffect(()=>{const el=ref.current;el.innerHTML="";
-      const small=size<210, COLB=colB||"var(--cmp-year)", COLG=colG||"var(--gris)";
+      const small=size<210, COLG=colG||"var(--gris)";
       const margen=(showLabels||showValues)?(small?28:42):12;
       const R=size/2,cx=R,cy=R,rad=R-margen,n=axes.length;
       // overflow visible: las etiquetas laterales (Convivencia/Habitos) pueden
@@ -632,16 +627,11 @@ __FONTS_CSS__
         }});
       const mkpts=ax=>ax.map((a,i)=>({a,x:cx+Math.cos(ang(i))*rsc(a.value||0),y:cy+Math.sin(ang(i))*rsc(a.value||0)}));
       const lineGen=d3.line().defined(d=>d.a.value!=null).x(d=>d.x).y(d=>d.y).curve(d3.curveLinearClosed);
-      // Serie de comparacion (debajo): linea discontinua de otro color.
-      if(axesB){const ptsB=mkpts(axesB);
-        svg.append("path").datum(ptsB).attr("d",lineGen).attr("fill","none").attr("stroke",COLB)
-          .attr("stroke-width",1.7).attr("stroke-dasharray","4 3").attr("opacity",.95);
-        ptsB.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",small?2.3:3).attr("fill",COLB)
-          .on("mousemove",e=>showTT("<b>"+p.a.label+"</b>"+(labelB?" · "+labelB:"")+"<br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});}
-      // Poligono GSE de referencia (s21): linea PUNTEADA neutra (gris), patron de guion
-      // DISTINTO del overlay temporal (2 4 vs 4 3) + rotulo en leyenda -> canal no cromatico.
-      // El rotulo completo de la Agencia va en el tooltip. NA por eje rompe el trazo (mismo
-      // manejo que axesB via lineGen.defined). El trazo del EE se dibuja DESPUES (queda encima).
+      // Poligono GSE de referencia (s21): linea PUNTEADA neutra (gris, guion 2 4) + rotulo
+      // en leyenda -> canal no cromatico. El rotulo completo de la Agencia va en el tooltip.
+      // NA por eje rompe el trazo (lineGen.defined). El trazo del EE se dibuja DESPUES (queda
+      // encima). (Overlay temporal del radar retirado en s21: la comparacion entre anios vive
+      // en la Vista historica, no en el radar de la ficha.)
       if(axesG){const ptsG=mkpts(axesG);
         svg.append("path").datum(ptsG).attr("d",lineGen).attr("fill","none").attr("stroke",COLG)
           .attr("stroke-width",1.6).attr("stroke-dasharray","2 4").attr("opacity",.9);
@@ -651,7 +641,7 @@ __FONTS_CSS__
       svg.append("path").datum(pts).attr("d",lineGen).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.8);
       pts.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",(showLabels||showValues)?4:2.6).attr("fill",p.a.color||"var(--azul)")
         .on("mousemove",e=>showTT("<b>"+p.a.label+"</b><br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});
-    },[axes,axesB,axesG,size,showLabels,showValues,colB,labelB,colG,labelG]);
+    },[axes,axesG,size,showLabels,showValues,colG,labelG]);
     return <div ref={ref}></div>;
   }
 
@@ -1051,8 +1041,6 @@ __FONTS_CSS__
   //       Radar, Ancla, ScoreBar, DistBar, serieFull, PanelEvolucion, Definicion).
   //       grado/agno/vista los gobierna App; aqui solo se leen y se cambian.  =====
   function Ficha({rbd,grado,agno,grados,gradosEE,anios,onGrado,vista,onVista,onPickEE}){
-    const [cmpA,setCmpA]=useState(null);          // anio de comparacion del radar (-1 = ninguno)
-    useEffect(()=>{setCmpA(null);},[rbd,grado,agno]);
     const e=est[rbd];
     const im=indOf(rbd,grado,agno),dm=dimOf(rbd,grado,agno),nm=nivOf(rbd,grado,agno);
     const ciclo=CICLO[grado];
@@ -1060,16 +1048,10 @@ __FONTS_CSS__
     const isHist = vista==="historica" && serie;
     const axInd=DATA.indicadores.map(ind=>({label:ind.corto,value:im[ind.id]?im[ind.id].prom:null,color:ind.color}));
 
-    // Comparacion de DOS anios del MISMO rbd/grado en el radar (cada anio se LEE;
-    // NA no se grafica). El segundo trazo es el dato del PROPIO establecimiento en
-    // otro anio, NO una referencia de GSE.
-    const aniosCD=anios.filter(a=>{const o=indOf(rbd,grado,a);return DATA.indicadores.some(ind=>o[ind.id]&&o[ind.id].prom!=null);});
-    const cmpPrev=aniosCD.filter(a=>a<agno);
-    const cmpDef=cmpPrev.length?Math.max.apply(null,cmpPrev):null;
-    const cmpAgno = cmpA===-1 ? null
-                  : (cmpA!=null && aniosCD.indexOf(cmpA)>=0 && cmpA!==agno) ? cmpA : cmpDef;
-    const imB = cmpAgno!=null?indOf(rbd,grado,cmpAgno):{};
-    const axIndB = DATA.indicadores.map(ind=>({label:ind.corto,value:imB[ind.id]?imB[ind.id].prom:null}));
+    // (s21) El overlay temporal del radar —comparar contra otro año— se RETIRO: la
+    // comparacion entre años vive en la Vista historica, no en el radar de la ficha. Las
+    // anclas "vs evaluación anterior" (d.dif/d.sigdif) y "vs su GSE" (d.difgru/d.sigdifgru)
+    // siguen intactas: leen el dato del año actual, no dependian de este overlay.
     // Poligono GSE de referencia del año mostrado (s21): prom_gse leido del payload
     // (reconstruccion prom-difgru server-side). NA = supresion (no se dibuja, NUNCA 0).
     // Solo existe 2024-2025 y solo si el EE tiene cod_grupo; si NO hay ninguno, sin trazo.
@@ -1078,7 +1060,6 @@ __FONTS_CSS__
     // encargo: omitir si algun eje es NA, en vez de un poligono parcial engañoso; ~87%
     // de los EE-año 2024-2025 con GSE son completos, ~1.3% parciales se omiten).
     const hasGse = axIndG.every(a=>a.value!=null);
-    const cmpOpts = aniosCD.filter(a=>a!==agno);
     // Eje contiguo del grado (D-s12-EJE): incluye los años desactivados
     // (pandemia/no_eval). Fallback a los años con dato si el build no trae eje_historico.
     const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[grado])||anios.map(a=>({agno:a,estado:"con_dato"}));
@@ -1147,7 +1128,7 @@ __FONTS_CSS__
               <div className="ficha-radar">
                 <div className="fr-head">Mirada integral · 4 indicadores</div>
                 <div className="rquad">
-                  <div className="rquad-svg"><Radar axes={axInd} axesB={cmpAgno!=null?axIndB:undefined} colB="var(--cmp-year)" labelB={cmpAgno!=null?String(cmpAgno):null} axesG={hasGse?axIndG:undefined} colG="var(--gris)" labelG="Puntaje promedio nacional del mismo GSE" size={300} showLabels={true} showValues={true}/></div>
+                  <div className="rquad-svg"><Radar axes={axInd} axesG={hasGse?axIndG:undefined} colG="var(--gris)" labelG="Puntaje promedio nacional del mismo GSE" size={300} showLabels={true} showValues={true}/></div>
                   {DATA.indicadores.map((ind,k)=>{const d=im[ind.id];
                     return (
                       <div className={"rcard "+pos[k]} key={ind.id}>
@@ -1163,23 +1144,12 @@ __FONTS_CSS__
                         {ind.definicion && <div className="rcard-def">{ind.definicion}</div>}
                       </div>);})}
                 </div>
-                {(cmpOpts.length>0 || hasGse) &&
-                  <div className="radar-cmp">
-                    <div className="leyenda">
-                      <span><span className="sw-line"></span>{agno}{PRELIM.has(String(agno))?"*":""} · actual</span>
-                      {cmpAgno!=null && <span><span className="sw-line cmp"></span>{cmpAgno}{PRELIM.has(String(cmpAgno))?"*":""} · comparación</span>}
-                      {hasGse && <span><span className="sw-line gse"></span>Promedio del mismo GSE</span>}
-                    </div>
-                    {cmpOpts.length>0 &&
-                    <label className="cmp-label">Comparar radar con:{" "}
-                      <select value={cmpAgno!=null?cmpAgno:""} onChange={ev=>setCmpA(ev.target.value===""?-1:Number(ev.target.value))}>
-                        {cmpOpts.map(a=><option key={a} value={a}>{a}{PRELIM.has(String(a))?"*":""}</option>)}
-                        <option value="">— sin comparación</option>
-                      </select>
-                    </label>}
-                    {cmpAgno!=null &&
-                      <div className="cmp-hint">El puntaje en cada vértice es del año actual; el del año comparado, al pasar el mouse sobre sus puntos. Ambos trazos son del propio establecimiento.</div>}
-                  </div>}
+                <div className="radar-cmp">
+                  <div className="leyenda">
+                    <span><span className="sw-line"></span>Resultado del establecimiento</span>
+                    {hasGse && <span><span className="sw-line gse"></span>Promedio del mismo GSE</span>}
+                  </div>
+                </div>
                 <p className="fr-note">El radar es solo para los <b>4 indicadores</b>. Las dimensiones y subdimensiones se leen en los paneles de abajo (barras 0–100 en tonos del color de su indicador).</p>
               </div>
 
