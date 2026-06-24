@@ -121,6 +121,7 @@ __FONTS_CSS__
   /* Muestras de leyenda que REPLICAN el trazo del radar: solido (actual) vs discontinuo (comparacion) */
   .radar-cmp .sw-line{display:inline-block;width:18px;height:0;margin-right:5px;vertical-align:3px;border-top:2.5px solid var(--azul);}
   .radar-cmp .sw-line.cmp{border-top-style:dashed;border-top-color:var(--cmp-year);}
+  .radar-cmp .sw-line.gse{border-top-style:dotted;border-top-color:var(--gris);}
   .radar-cmp .cmp-hint{font-size:var(--fs-2xs);color:var(--gris);font-style:italic;text-align:center;max-width:34ch;}
 
   /* Fase 3: CSS muerto eliminado (.detail/.back/.dmeta/.dcrumb/.row2/.blk del
@@ -574,7 +575,7 @@ __FONTS_CSS__
   };
 
   // lectura de medidas para (rbd, grado, agno)
-  function indOf(rbd,grado,agno){const b=DATA.ind,r=RIX.ind[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.ind[i]]={prom:b.prom[i],dif:b.dif[i],sigdif:b.sigdif[i],difgru:b.difgru[i],sigdifgru:b.sigdifgru[i]};return o;}
+  function indOf(rbd,grado,agno){const b=DATA.ind,r=RIX.ind[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.ind[i]]={prom:b.prom[i],dif:b.dif[i],sigdif:b.sigdif[i],difgru:b.difgru[i],sigdifgru:b.sigdifgru[i],prom_gse:b.prom_gse[i]};return o;}
   function dimOf(rbd,grado,agno){const b=DATA.dim,r=RIX.dim[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.dim[i]]={prom:b.prom[i],dif:b.dif[i],sigdif:b.sigdif[i]};return o;}
   function nivOf(rbd,grado,agno){const b=DATA.niv,r=RIX.niv[rbd],o={};if(!r)return o;for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)o[b.sub[i]]={bajo:b.bajo[i],medio:b.medio[i],alto:b.alto[i]};return o;}
   // serie de un indicador/dimension a lo largo de los anios
@@ -605,10 +606,10 @@ __FONTS_CSS__
   // axesB = serie de comparacion opcional (mismo orden de ejes; II.6 dos anios)
   // showLabels = nombre corto del eje; showValues = puntaje (prom) en el vertice
   // colB/labelB = color y tooltip de la serie de comparacion.
-  function Radar({axes,axesB,size,showLabels,showValues,colB,labelB}){
+  function Radar({axes,axesB,axesG,size,showLabels,showValues,colB,labelB,colG,labelG}){
     const ref=useRef(null);
     useEffect(()=>{const el=ref.current;el.innerHTML="";
-      const small=size<210, COLB=colB||"var(--cmp-year)";
+      const small=size<210, COLB=colB||"var(--cmp-year)", COLG=colG||"var(--gris)";
       const margen=(showLabels||showValues)?(small?28:42):12;
       const R=size/2,cx=R,cy=R,rad=R-margen,n=axes.length;
       // overflow visible: las etiquetas laterales (Convivencia/Habitos) pueden
@@ -637,11 +638,20 @@ __FONTS_CSS__
           .attr("stroke-width",1.7).attr("stroke-dasharray","4 3").attr("opacity",.95);
         ptsB.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",small?2.3:3).attr("fill",COLB)
           .on("mousemove",e=>showTT("<b>"+p.a.label+"</b>"+(labelB?" · "+labelB:"")+"<br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});}
+      // Poligono GSE de referencia (s21): linea PUNTEADA neutra (gris), patron de guion
+      // DISTINTO del overlay temporal (2 4 vs 4 3) + rotulo en leyenda -> canal no cromatico.
+      // El rotulo completo de la Agencia va en el tooltip. NA por eje rompe el trazo (mismo
+      // manejo que axesB via lineGen.defined). El trazo del EE se dibuja DESPUES (queda encima).
+      if(axesG){const ptsG=mkpts(axesG);
+        svg.append("path").datum(ptsG).attr("d",lineGen).attr("fill","none").attr("stroke",COLG)
+          .attr("stroke-width",1.6).attr("stroke-dasharray","2 4").attr("opacity",.9);
+        ptsG.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",small?2.2:2.8).attr("fill",COLG)
+          .on("mousemove",e=>showTT("<b>"+(labelG||"Promedio del mismo GSE")+"</b><br>"+p.a.label+": "+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});}
       const pts=mkpts(axes);
       svg.append("path").datum(pts).attr("d",lineGen).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.8);
       pts.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",(showLabels||showValues)?4:2.6).attr("fill",p.a.color||"var(--azul)")
         .on("mousemove",e=>showTT("<b>"+p.a.label+"</b><br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});
-    },[axes,axesB,size,showLabels,showValues,colB,labelB]);
+    },[axes,axesB,axesG,size,showLabels,showValues,colB,labelB,colG,labelG]);
     return <div ref={ref}></div>;
   }
 
@@ -1060,6 +1070,14 @@ __FONTS_CSS__
                   : (cmpA!=null && aniosCD.indexOf(cmpA)>=0 && cmpA!==agno) ? cmpA : cmpDef;
     const imB = cmpAgno!=null?indOf(rbd,grado,cmpAgno):{};
     const axIndB = DATA.indicadores.map(ind=>({label:ind.corto,value:imB[ind.id]?imB[ind.id].prom:null}));
+    // Poligono GSE de referencia del año mostrado (s21): prom_gse leido del payload
+    // (reconstruccion prom-difgru server-side). NA = supresion (no se dibuja, NUNCA 0).
+    // Solo existe 2024-2025 y solo si el EE tiene cod_grupo; si NO hay ninguno, sin trazo.
+    const axIndG = DATA.indicadores.map(ind=>({label:ind.corto,value:(im[ind.id]&&im[ind.id].prom_gse!=null)?im[ind.id].prom_gse:null,color:ind.color}));
+    // El poligono GSE se dibuja SOLO si los 4 indicadores tienen prom_gse (default del
+    // encargo: omitir si algun eje es NA, en vez de un poligono parcial engañoso; ~87%
+    // de los EE-año 2024-2025 con GSE son completos, ~1.3% parciales se omiten).
+    const hasGse = axIndG.every(a=>a.value!=null);
     const cmpOpts = aniosCD.filter(a=>a!==agno);
     // Eje contiguo del grado (D-s12-EJE): incluye los años desactivados
     // (pandemia/no_eval). Fallback a los años con dato si el build no trae eje_historico.
@@ -1134,7 +1152,7 @@ __FONTS_CSS__
               <div className="ficha-radar">
                 <div className="fr-head">Mirada integral · 4 indicadores</div>
                 <div className="rquad">
-                  <div className="rquad-svg"><Radar axes={axInd} axesB={cmpAgno!=null?axIndB:undefined} colB="var(--cmp-year)" labelB={cmpAgno!=null?String(cmpAgno):null} size={300} showLabels={true} showValues={true}/></div>
+                  <div className="rquad-svg"><Radar axes={axInd} axesB={cmpAgno!=null?axIndB:undefined} colB="var(--cmp-year)" labelB={cmpAgno!=null?String(cmpAgno):null} axesG={hasGse?axIndG:undefined} colG="var(--gris)" labelG="Puntaje promedio nacional del mismo GSE" size={300} showLabels={true} showValues={true}/></div>
                   {DATA.indicadores.map((ind,k)=>{const d=im[ind.id];
                     return (
                       <div className={"rcard "+pos[k]} key={ind.id}>
@@ -1150,18 +1168,20 @@ __FONTS_CSS__
                         {ind.definicion && <div className="rcard-def">{ind.definicion}</div>}
                       </div>);})}
                 </div>
-                {cmpOpts.length>0 &&
+                {(cmpOpts.length>0 || hasGse) &&
                   <div className="radar-cmp">
                     <div className="leyenda">
                       <span><span className="sw-line"></span>{agno}{PRELIM.has(String(agno))?"*":""} · actual</span>
                       {cmpAgno!=null && <span><span className="sw-line cmp"></span>{cmpAgno}{PRELIM.has(String(cmpAgno))?"*":""} · comparación</span>}
+                      {hasGse && <span><span className="sw-line gse"></span>Promedio del mismo GSE</span>}
                     </div>
+                    {cmpOpts.length>0 &&
                     <label className="cmp-label">Comparar radar con:{" "}
                       <select value={cmpAgno!=null?cmpAgno:""} onChange={ev=>setCmpA(ev.target.value===""?-1:Number(ev.target.value))}>
                         {cmpOpts.map(a=><option key={a} value={a}>{a}{PRELIM.has(String(a))?"*":""}</option>)}
                         <option value="">— sin comparación</option>
                       </select>
-                    </label>
+                    </label>}
                     {cmpAgno!=null &&
                       <div className="cmp-hint">El puntaje en cada vértice es del año actual; el del año comparado, al pasar el mouse sobre sus puntos. Ambos trazos son del propio establecimiento.</div>}
                   </div>}

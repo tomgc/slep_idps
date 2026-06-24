@@ -355,9 +355,22 @@ roster_lst <- list(rows = nrow(roster), rbd = roster$rbd, grado = roster$grado,
                    agno = as.integer(roster$agno), gse = roster$cod_grupo, depe2 = roster$cod_depe2)
 
 ind <- P |> dplyr::filter(.data$familia == "indicador") |> dplyr::arrange(rbd, grado, agno, id_indicador)
+# prom_GSE de referencia (s21, decision 20260624_decision_poligono_gse_radar): el
+# "Puntaje promedio nacional del mismo GSE" se RECONSTRUYE EXACTO desde prom CRUDO menos
+# difgru (signo fijado por sign(difgru)==sign(sigdifgru); sd intra-grupo 0; diagnostico
+# 20260624). Solo donde difgru y cod_grupo no son NA (en la practica 2024-2025); NA =
+# supresion, NUNCA 0. Redondeo de presentacion a entero (mismo criterio que prom). Fuera
+# de 0-100 -> NA (no se emite) y se reporta.
+ind_prom_gse <- ifelse(!is.na(ind$difgru) & !is.na(ind$cod_grupo),
+                       round(ind$prom - ind$difgru, 0), NA_real_)
+fuera_rango  <- !is.na(ind_prom_gse) & (ind_prom_gse < 0 | ind_prom_gse > 100)
+ind_prom_gse[fuera_rango] <- NA_real_
+message(sprintf("[s21] prom_gse: %d con valor, %d NA (sin difgru/cod_grupo), %d fuera de 0-100 -> NA",
+                sum(!is.na(ind_prom_gse)), sum(is.na(ind_prom_gse)), sum(fuera_rango)))
 ind_lst <- list(rows = nrow(ind), rbd = ind$rbd, grado = ind$grado, agno = as.integer(ind$agno),
                 ind = as.integer(ind$id_indicador), prom = round(ind$prom, 0),  # entero presentacion (s14)
-                dif = ind$dif, sigdif = ind$sigdif, difgru = ind$difgru, sigdifgru = ind$sigdifgru)
+                dif = ind$dif, sigdif = ind$sigdif, difgru = ind$difgru, sigdifgru = ind$sigdifgru,
+                prom_gse = ind_prom_gse)
 
 dim <- P |> dplyr::filter(.data$familia == "dimension") |> dplyr::arrange(rbd, grado, agno, id_dimension)
 dim_lst <- list(rows = nrow(dim), rbd = dim$rbd, grado = dim$grado, agno = as.integer(dim$agno),
