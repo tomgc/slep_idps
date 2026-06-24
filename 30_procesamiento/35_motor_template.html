@@ -290,6 +290,14 @@ __FONTS_CSS__
   .indp-score .u{font-size:var(--fs-sm);color:var(--gris);font-weight:var(--fw-regular);}
   .indp-anc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 16px 12px;}
   .indp-def{padding:0 16px 12px;border-bottom:1px solid var(--linea);}
+  /* #7 (s22): colapsable discreto "que refleja un puntaje alto" bajo la definicion;
+     nivel INDICADOR (no dimension/subdimension). details/summary nativo, accesible. */
+  .indp-alto{margin-top:7px;}
+  .indp-alto summary{cursor:pointer;font-size:var(--fs-xs);font-weight:var(--fw-bold);color:var(--gris);list-style:none;}
+  .indp-alto summary::-webkit-details-marker{display:none;}
+  .indp-alto summary::before{content:"+ ";font-weight:var(--fw-bold);}
+  .indp-alto[open] summary::before{content:"– ";}
+  .indp-alto-txt{font-size:var(--fs-base);color:#5a5142;line-height:1.55;margin-top:5px;}
   .indp-body{padding:4px 16px 10px;}
   .dimb{padding:14px 0;border-bottom:1px solid var(--linea);}
   .dimb:last-child{border-bottom:0;}
@@ -1057,7 +1065,14 @@ __FONTS_CSS__
             {d.difgru!=null && <Ancla tipo="vs su GSE" dif={d.difgru} sig={d.sigdifgru}/>}
             <Ancla tipo="vs año anterior" dif={d.dif} sig={d.sigdif}/>
           </div>}
-        {ind.definicion && <div className="indp-def"><Definicion texto={ind.definicion} etiqueta="¿Qué mide este indicador?" color={ind.color}/></div>}
+        {ind.definicion && <div className="indp-def"><Definicion texto={ind.definicion} etiqueta="¿Qué mide este indicador?" color={ind.color}/>
+          {ind.nivel_alto && (
+            <details className="indp-alto">
+              <summary>Qué refleja un puntaje alto</summary>
+              <div className="indp-alto-txt">{ind.nivel_alto}</div>
+            </details>
+          )}
+        </div>}
         <div className="indp-body">
           {dims.map((dimo,di)=><DimBlock key={dimo.id} dimo={dimo} dimTone={dimColor(ind.color,di,dims.length)} dm={dm} nm={nm} ciclo={ciclo} ramp={ramp}/>)}
         </div>

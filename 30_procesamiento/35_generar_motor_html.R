@@ -49,6 +49,15 @@ source(here::here("10_utils", "10_configuracion.R"))
 INDICADOR_COLORS <- c("1" = "#3858A3", "2" = "#61BDC6", "3" = "#4BA560", "4" = "#AACB58")
 INDICADOR_CORTO  <- c("1" = "Autoestima", "2" = "Convivencia",
                       "3" = "Participación", "4" = "Hábitos")
+# Texto editorial "que refleja un puntaje alto" por indicador (nivel INDICADOR, no
+# subdimension; derivado de idps_corpus_conceptual.md, secciones "Por que importa" +
+# caracterizacion de nivel alto). Prosa de comunidad, no dato medido de la Agencia.
+INDICADOR_NIVEL_ALTO <- c(
+  "1" = "Un puntaje alto refleja estudiantes que se perciben capaces de aprender y de lograr buenos resultados, con interes y disposicion frente al estudio. Suele acompanar a establecimientos que comunican confianza en las capacidades de sus estudiantes, reconocen sus avances y tratan el error como parte normal del aprendizaje.",
+  "2" = "Un puntaje alto refleja un ambiente percibido como respetuoso, organizado y seguro por estudiantes, docentes y apoderados. Suele acompanar a establecimientos con normas claras y conocidas, mecanismos formativos de resolucion de conflictos y resguardo de la integridad fisica y psicologica de la comunidad.",
+  "3" = "Un puntaje alto refleja estudiantes y apoderados que se involucran en la vida del establecimiento y un espacio que promueve la expresion de opiniones, la deliberacion y la representacion democratica. Suele acompanar a establecimientos con canales efectivos de comunicacion, organizaciones representativas activas y una identidad institucional positiva.",
+  "4" = "Un puntaje alto refleja actitudes favorables hacia la alimentacion, la actividad fisica y el autocuidado, y la percepcion de que el establecimiento promueve esos habitos. Suele acompanar a establecimientos que educan sobre vida saludable, ofrecen oportunidades de actividad fisica y abordan tempranamente los riesgos de tabaco, alcohol y drogas."
+)
 REGION_FOCO <- "5"  # Valparaiso (default de navegacion; foco Costa Central)
 # Anios sin evaluacion del sistema por pandemia (eje historico contiguo, D-s12-EJE).
 ANIOS_PANDEMIA <- c(2020L, 2021L)
@@ -121,7 +130,8 @@ indicadores_lst <- lapply(as.character(1:4), function(id) {
   d <- ind_def$indicador_definicion[ind_def$id_indicador == as.integer(id)][1]
   list(id = as.integer(id), nombre = unname(INDICADOR_LABELS[id]),
        corto = unname(INDICADOR_CORTO[id]), color = unname(INDICADOR_COLORS[id]),
-       definicion = if (length(d) == 0 || is.na(d)) NULL else d)
+       definicion = if (length(d) == 0 || is.na(d)) NULL else d,
+       nivel_alto = unname(INDICADOR_NIVEL_ALTO[id]))
 })
 
 # Nombre de dimension: etiqueta acentuada de presentacion (DIMENSION_LABELS),
