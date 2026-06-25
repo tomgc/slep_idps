@@ -7123,11 +7123,18 @@ AAABrwBBAPMAAA==) format('opentype');}
   .ficha-radar{padding:18px 22px 18px;border-bottom:1px solid var(--linea);background:var(--panel);}
   .fr-head{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-sm);letter-spacing:.01em;color:var(--gris);text-align:center;}
   .fr-note{font-size:var(--fs-xs);color:var(--gris);text-align:center;max-width:640px;margin:10px auto 0;line-height:1.5;}
-  .rquad{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto auto;
-    align-items:center;justify-items:center;gap:10px 16px;max-width:880px;margin:12px auto 0;}
+  /* #5/#8 (s23): zona central ensanchada. Las columnas laterales llevan un ANCHO MINIMO
+     (320px = contenido de las 2 anclas ~296px + padding 22px + holgura) para que NO
+     encojan por debajo del umbral en viewports medianos: ahi estaba la causa de que las
+     anclas de las tarjetas laterales se apilaran en 2 filas (#5). El column-gap amplio
+     reserva margen horizontal para las etiquetas de eje del radar (no chocan con las
+     tarjetas laterales, #8). Por debajo del breakpoint el grid colapsa a 1 columna
+     (apilado), antes de que el 3-col no quepa. row-gap 10px. */
+  .rquad{display:grid;grid-template-columns:minmax(320px,1fr) auto minmax(320px,1fr);grid-template-rows:auto auto auto;
+    align-items:center;justify-items:center;gap:10px 50px;max-width:1100px;margin:12px auto 0;}
   .rquad-svg{grid-column:2;grid-row:2;width:300px;height:300px;display:flex;align-items:center;justify-content:center;}
   .rcard{display:flex;flex-direction:column;gap:7px;background:var(--paper);border:1px solid var(--linea);
-    border-radius:var(--radius-2);padding:9px 11px;box-shadow:var(--shadow-1);max-width:280px;width:100%;}
+    border-radius:var(--radius-2);padding:9px 11px;box-shadow:var(--shadow-1);max-width:330px;width:100%;}
   .rcard.pos-top{grid-column:2;grid-row:1;} .rcard.pos-bottom{grid-column:2;grid-row:3;}
   .rcard.pos-left{grid-column:1;grid-row:2;justify-self:end;} .rcard.pos-right{grid-column:3;grid-row:2;justify-self:start;}
   .rcard-top{display:flex;gap:8px;align-items:flex-start;}
@@ -7138,7 +7145,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   .rcard-vals b{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-lg);color:var(--tinta);}
   .rcard-vals .u{font-size:var(--fs-2xs);margin-left:1px;}
   .rcard-anc{display:flex;flex-wrap:wrap;gap:6px;}
-  @media(max-width:760px){
+  @media(max-width:1180px){
     .rquad{grid-template-columns:1fr;}
     .rquad-svg{grid-column:1;grid-row:auto;}
     .rcard,.rcard.pos-top,.rcard.pos-right,.rcard.pos-bottom,.rcard.pos-left{grid-column:1;grid-row:auto;justify-self:stretch;max-width:none;}
@@ -7185,8 +7192,9 @@ AAABrwBBAPMAAA==) format('opentype');}
      del motor va en --tinta sobre fondos claros, nunca sobre el fill de indicador,
      por lo que NO hay fallback de color de texto que aplicar. */
   .indp-dot,.rcard-dot,.th-sw,.sw,.evol-sw{box-shadow:inset 0 0 0 1px rgba(35,48,58,.22);}
-  /* Barra de puntaje 0-100 (SOLO el prom del establecimiento; SIN marca de GSE,
-     invariante "lee, no deriva" — ver ScoreBar en el script) */
+  /* Barra de puntaje 0-100 (SOLO el prom del establecimiento; SIN marca de GSE por
+     eleccion de diseno de esta barra, no por prohibicion: la cifra GSE es publica y
+     reconstruida desde D7 — ver ScoreBar en el script) */
   .sbar{position:relative;}
   .sbar-track{position:relative;height:22px;background:var(--cream-200);border:1px solid var(--linea);border-radius:var(--radius-2);overflow:hidden;}
   .sbar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:4px 0 0 4px;min-width:2px;}
@@ -7204,7 +7212,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   /* Vista historica: barras verticales por año (portado de .ybars del diseño,
      traducido a tokens del motor). Eje fijo 0-100 (altura = porcentaje del valor),
      envolvente 0-100 tenue (Item 5, s19) para ver cuanto falta para 100, hueco =
-     columna sin barra. Reemplaza las lineas de PanelEvolucion en el historico
+     columna sin barra. Reemplaza el antiguo panel de evolucion (lineas) en el historico
      (indicador y dimension; la subdimension NO entra, invariante 7-3). */
   .ybars{display:flex;gap:14px;align-items:stretch;}
   .ybar-col{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0;}
@@ -7685,11 +7693,12 @@ AAABrwBBAPMAAA==) format('opentype');}
     return (0.299*a[0]+0.587*a[1]+0.114*a[2])/255 < 0.55 ? '#fff' : '#2e2710'; };
 
   // ===== Barra de puntaje 0-100 (SOLO el prom del establecimiento) =====
-  // Adaptada de bar0100() del prototipo (idps-demo.js ~133) ELIMINANDO el
-  // parametro gseRef y la marca .bar-gse: el promedio ABSOLUTO del GSE no existe
-  // en el dato de la Agencia (solo difgru/sigdifgru, el DESVIO). Dibujar
-  // "GSE N puntos" exigiria derivar prom - difgru, lo que viola el invariante
-  // "lee, no deriva". El desvio vs GSE se comunica con las anclas textuales.
+  // Adaptada de bar0100() del prototipo (idps-demo.js ~133) SIN el parametro gseRef
+  // ni la marca .bar-gse. Desde D7 (s21) la cifra ABSOLUTA del GSE SI es publica y
+  // reconstruible (prom - difgru, el desvio que la Agencia informa por fila), y el
+  // radar dibuja el poligono GSE reconstruido. ScoreBar omite la marca de GSE por
+  // ELECCION DE DISENO de esta barra (muestra solo el prom del EE), NO por una
+  // prohibicion: el desvio vs GSE se comunica aqui con las anclas textuales.
   function ScoreBar({value,color}){
     if(value==null||isNaN(value)) return <div className="sup" style={{fontSize:"var(--fs-xs)"}}>sin dato</div>;
     return (
@@ -7713,47 +7722,8 @@ AAABrwBBAPMAAA==) format('opentype');}
     const d=ofFn(rbd,grado,y.agno)[id]||{};
     return {a:y.agno, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null), estado:"con_dato"};});}
 
-  // ===== Panel de evolucion de UNA metrica: linea eje FIJO 0-100 (sin autoescala,
-  //       sin interpolar huecos) + marcas inter-anuales (dif absoluto + sigdif). =====
-  // HUERFANO desde P3-s9: la vista historica ahora usa BarrasAnio (barras por año).
-  // Se conserva definido (sin uso) por si se revierte la decision de barras.
-  function PanelEvolucion({nombre,color,pts,hideHead}){
-    const ref=useRef(null);
-    useEffect(()=>{const el=ref.current;el.innerHTML="";
-      const anios=pts.map(p=>String(p.a));
-      const W=Math.max(220,anios.length*64),H=118,m={l:24,r:10,t:8,b:18};
-      const svg=d3.select(el).append("svg").attr("width","100%").attr("viewBox","0 0 "+W+" "+H).attr("preserveAspectRatio","xMidYMid meet");
-      const x=d3.scalePoint().domain(anios).range([m.l,W-m.r]).padding(.5);
-      const y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);   // FIJO 0-100, nunca autoescala
-      [0,50,100].forEach(t=>{svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke","var(--linea)");
-        svg.append("text").attr("x",2).attr("y",y(t)+3).attr("class","axis-lab").text(t);});
-      anios.forEach(a=>svg.append("text").attr("x",x(a)).attr("y",H-4).attr("text-anchor","middle").attr("class","axis-lab b").text(a+(PRELIM.has(a)?"*":"")));
-      const dd=pts.map(p=>({a:String(p.a),v:p.v}));
-      const line=d3.line().defined(d=>d.v!=null).x(d=>x(d.a)).y(d=>y(d.v));
-      svg.append("path").datum(dd).attr("d",line).attr("fill","none").attr("stroke",color).attr("stroke-width",2.2);
-      dd.forEach(p=>{if(p.v==null)return;svg.append("circle").attr("cx",x(p.a)).attr("cy",y(p.v)).attr("r",3.4).attr("fill",color)
-        .on("mousemove",e=>showTT("<b>"+nombre+"</b><br>"+p.a+": "+fmt(p.v)+" (0–100)",e)).on("mouseleave",hideTT);});
-    },[pts,color,nombre]);
-    const marcas=pts.filter(p=>p.dif!=null);   // anios con cambio vs evaluacion anterior
-    return (
-      <div className="evol-panel">
-        {!hideHead && <div className="evol-h"><span className="evol-sw" style={{background:color}}></span>{nombre}</div>}
-        <div ref={ref}></div>
-        <div className="evol-marks">
-          {marcas.length===0
-            ? <span className="evol-mark nt">sin cambios medibles entre años</span>
-            : marcas.map(p=>{const cls=p.sig===1?"de":(p.sig===-1?"al":"nt");
-                const g=p.sig===1?"▲":(p.sig===-1?"▼":"=");
-                const txt=p.sig===0?"sin dif. significativa":"significativo";
-                return <span className={"evol-mark "+cls} key={p.a}
-                  title={p.a+": "+fmtSigned(p.dif)+" pts vs evaluación anterior · "+txt}>
-                  <b>{p.a}</b> <span className="arr">{g}</span> {fmtSigned(p.dif)} <span className="evol-sig">{txt}</span></span>;})}
-        </div>
-      </div>);
-  }
-
   // ===== Vista historica: barras verticales por año (revision P3-s9) =====
-  // Reemplaza las lineas de PanelEvolucion en el historico. Una columna por año:
+  // Reemplaza el antiguo panel de evolucion (lineas) en el historico. Una columna por año:
   // barra de altura = puntaje del PROPIO EE sobre eje FIJO 0-100 (CSS puro, como el
   // diseño, no D3), valor encima, año debajo. Hueco (v==null) = columna sin barra
   // (no interpola: invariante 5). Item 5 (s19): track tenue 0-100 detras de la barra
@@ -7952,7 +7922,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   //       4 indicadores + 4 paneles (indicador->dimension->subdimension visibles
   //       de una vez) con toggle Vista actual / Vista historica. Reemplaza el
   //       drill-down secuencial; reusa la lectura de datos (indOf/dimOf/nivOf,
-  //       Radar, Ancla, ScoreBar, DistBar, serieFull, PanelEvolucion, Definicion).
+  //       Radar, Ancla, ScoreBar, DistBar, serieFull, BarrasAnio, Definicion).
   //       grado/agno/vista los gobierna App; aqui solo se leen y se cambian.  =====
   function Ficha({rbd,grado,agno,grados,gradosEE,anios,onGrado,vista,onVista,onPickEE}){
     const e=est[rbd];
@@ -8043,7 +8013,6 @@ AAABrwBBAPMAAA==) format('opentype');}
               <div className="ficha-explain">El <b>radar de los 4 indicadores</b> contiene la foto actual del establecimiento en materia de IDPS. Cuando el establecimiento cuenta con un grupo de comparación (GSE), la <b>línea punteada</b> indica los resultados de su GSE de referencia. En la siguiente sección encontrará los resultados por dimensión y subdimensión de cada indicador. Los resultados de los indicadores y dimensiones son presentados con su diferencia en relación a la evaluación anterior y el GSE al que pertenece el establecimiento, especificando si se trata de una <b>diferencia significativa (sig.)</b> o <b>sólo aritmética</b> (<span style={{color:"var(--alerta)"}}>▼ rojo</span> = resultado es significativamente inferior al de su referencia; <span style={{color:"var(--destaca)"}}>▲ azul</span> = resultado es significativamente superior al de su referencia).</div>
 
               <div className="ficha-radar">
-                <div className="fr-head">Mirada integral · 4 indicadores</div>
                 <div className="rquad">
                   <div className="rquad-svg"><Radar axes={axInd} axesG={hasGse?axIndG:undefined} colG="var(--gris)" labelG="Puntaje promedio nacional del mismo GSE" size={300} showLabels={true} showValues={true}/></div>
                   {DATA.indicadores.map((ind,k)=>{const d=im[ind.id];
