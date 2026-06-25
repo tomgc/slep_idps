@@ -948,9 +948,10 @@ __FONTS_CSS__
                           return h;
                         })(),e)} onMouseLeave={hideTT}>
                         <span className="ybar-val">{fmt(p.v)}
-                          {p.dif!=null && (()=>{const g=p.dif>0?"▲":(p.dif<0?"▼":"=");
+                          {p.dif!=null ? (()=>{const g=p.dif>0?"▲":(p.dif<0?"▼":"=");
                             const cls=(p.sig===1||p.sig===-1)?(p.dif>0?"de":(p.dif<0?"al":"nt")):"nt";
-                            return <span className={"ybar-sig "+cls} title={"vs evaluación anterior: "+(p.dif>0?"+":"")+p.dif+" pts"+((p.sig===1||p.sig===-1)?" (significativo)":" (solo aritmético)")}>{g}</span>;})()}
+                            return <span className={"ybar-sig "+cls} title={"vs evaluación anterior: "+(p.dif>0?"+":"")+p.dif+" pts"+((p.sig===1||p.sig===-1)?" (significativo)":" (solo aritmético)")}>{g}</span>;})()
+                            : <span className="ybar-sig nt" title="La Agencia no publica la comparación con la evaluación anterior para este año">·</span>}
                         </span></div>
                     </React.Fragment>}
               </div>
@@ -1146,7 +1147,7 @@ __FONTS_CSS__
                           </div>);})}
                     </div></>}
                 </section>);})}
-              <div className="nota nota-inv">Cada panel usa barras por año sobre un eje fijo 0–100 (escala común, comparable); la <b>marca de tendencia</b> en cada cabecera muestra la diferencia (dif) del último año con dato vs la evaluación anterior y su significancia (▲/▼/= + texto). La significancia estadística es calculada e informada por la Agencia. La subdimensión no aparece aquí: es <b>distribución de niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia.":""}</div>
+              <div className="nota nota-inv">Cada panel usa barras por año sobre un eje fijo 0–100 (escala común, comparable). Junto al puntaje de cada año, una marca indica el cambio respecto de la evaluación anterior: <b>▲</b> subió, <b>▼</b> bajó, <b>=</b> sin cambio. El <b>color</b> señala la significancia estadística (calculada e informada por la Agencia): azul o rojo cuando la diferencia es significativa, <b>gris</b> cuando no es estadísticamente significativa. El signo <b>·</b> indica que la Agencia no publica esa comparación para ese año. La subdimensión no aparece aquí: es <b>distribución en niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia.":""}</div>
             </div>)
             : (
             <div>
