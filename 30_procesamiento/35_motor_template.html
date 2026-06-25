@@ -337,7 +337,7 @@ __FONTS_CSS__
   /* Vista historica: barras verticales por año (portado de .ybars del diseño,
      traducido a tokens del motor). Eje fijo 0-100 (altura = porcentaje del valor),
      envolvente 0-100 tenue (Item 5, s19) para ver cuanto falta para 100, hueco =
-     columna sin barra. Reemplaza las lineas de PanelEvolucion en el historico
+     columna sin barra. Reemplaza el antiguo panel de evolucion (lineas) en el historico
      (indicador y dimension; la subdimension NO entra, invariante 7-3). */
   .ybars{display:flex;gap:14px;align-items:stretch;}
   .ybar-col{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0;}
@@ -844,47 +844,8 @@ __FONTS_CSS__
     const d=ofFn(rbd,grado,y.agno)[id]||{};
     return {a:y.agno, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null), estado:"con_dato"};});}
 
-  // ===== Panel de evolucion de UNA metrica: linea eje FIJO 0-100 (sin autoescala,
-  //       sin interpolar huecos) + marcas inter-anuales (dif absoluto + sigdif). =====
-  // HUERFANO desde P3-s9: la vista historica ahora usa BarrasAnio (barras por año).
-  // Se conserva definido (sin uso) por si se revierte la decision de barras.
-  function PanelEvolucion({nombre,color,pts,hideHead}){
-    const ref=useRef(null);
-    useEffect(()=>{const el=ref.current;el.innerHTML="";
-      const anios=pts.map(p=>String(p.a));
-      const W=Math.max(220,anios.length*64),H=118,m={l:24,r:10,t:8,b:18};
-      const svg=d3.select(el).append("svg").attr("width","100%").attr("viewBox","0 0 "+W+" "+H).attr("preserveAspectRatio","xMidYMid meet");
-      const x=d3.scalePoint().domain(anios).range([m.l,W-m.r]).padding(.5);
-      const y=d3.scaleLinear().domain([0,100]).range([H-m.b,m.t]);   // FIJO 0-100, nunca autoescala
-      [0,50,100].forEach(t=>{svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke","var(--linea)");
-        svg.append("text").attr("x",2).attr("y",y(t)+3).attr("class","axis-lab").text(t);});
-      anios.forEach(a=>svg.append("text").attr("x",x(a)).attr("y",H-4).attr("text-anchor","middle").attr("class","axis-lab b").text(a+(PRELIM.has(a)?"*":"")));
-      const dd=pts.map(p=>({a:String(p.a),v:p.v}));
-      const line=d3.line().defined(d=>d.v!=null).x(d=>x(d.a)).y(d=>y(d.v));
-      svg.append("path").datum(dd).attr("d",line).attr("fill","none").attr("stroke",color).attr("stroke-width",2.2);
-      dd.forEach(p=>{if(p.v==null)return;svg.append("circle").attr("cx",x(p.a)).attr("cy",y(p.v)).attr("r",3.4).attr("fill",color)
-        .on("mousemove",e=>showTT("<b>"+nombre+"</b><br>"+p.a+": "+fmt(p.v)+" (0–100)",e)).on("mouseleave",hideTT);});
-    },[pts,color,nombre]);
-    const marcas=pts.filter(p=>p.dif!=null);   // anios con cambio vs evaluacion anterior
-    return (
-      <div className="evol-panel">
-        {!hideHead && <div className="evol-h"><span className="evol-sw" style={{background:color}}></span>{nombre}</div>}
-        <div ref={ref}></div>
-        <div className="evol-marks">
-          {marcas.length===0
-            ? <span className="evol-mark nt">sin cambios medibles entre años</span>
-            : marcas.map(p=>{const cls=p.sig===1?"de":(p.sig===-1?"al":"nt");
-                const g=p.sig===1?"▲":(p.sig===-1?"▼":"=");
-                const txt=p.sig===0?"sin dif. significativa":"significativo";
-                return <span className={"evol-mark "+cls} key={p.a}
-                  title={p.a+": "+fmtSigned(p.dif)+" pts vs evaluación anterior · "+txt}>
-                  <b>{p.a}</b> <span className="arr">{g}</span> {fmtSigned(p.dif)} <span className="evol-sig">{txt}</span></span>;})}
-        </div>
-      </div>);
-  }
-
   // ===== Vista historica: barras verticales por año (revision P3-s9) =====
-  // Reemplaza las lineas de PanelEvolucion en el historico. Una columna por año:
+  // Reemplaza el antiguo panel de evolucion (lineas) en el historico. Una columna por año:
   // barra de altura = puntaje del PROPIO EE sobre eje FIJO 0-100 (CSS puro, como el
   // diseño, no D3), valor encima, año debajo. Hueco (v==null) = columna sin barra
   // (no interpola: invariante 5). Item 5 (s19): track tenue 0-100 detras de la barra
@@ -1083,7 +1044,7 @@ __FONTS_CSS__
   //       4 indicadores + 4 paneles (indicador->dimension->subdimension visibles
   //       de una vez) con toggle Vista actual / Vista historica. Reemplaza el
   //       drill-down secuencial; reusa la lectura de datos (indOf/dimOf/nivOf,
-  //       Radar, Ancla, ScoreBar, DistBar, serieFull, PanelEvolucion, Definicion).
+  //       Radar, Ancla, ScoreBar, DistBar, serieFull, BarrasAnio, Definicion).
   //       grado/agno/vista los gobierna App; aqui solo se leen y se cambian.  =====
   function Ficha({rbd,grado,agno,grados,gradosEE,anios,onGrado,vista,onVista,onPickEE}){
     const e=est[rbd];
