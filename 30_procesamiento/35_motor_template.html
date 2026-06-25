@@ -149,19 +149,6 @@ __FONTS_CSS__
   .defn-ctx{background:#f4f1e8;border-radius:7px;padding:9px 12px;margin:0 0 14px;}
   .defn-ctx .defn-text{color:#4a4536;}
   .nota{font-size:var(--fs-xs);color:var(--gris);background:#f4f1e8;border-radius:6px;padding:9px 11px;margin-top:10px;}
-  /* Evolucion: small-multiples 2x2 (un panel por indicador/dimension) */
-  .evol-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  @media(max-width:680px){.evol-grid{grid-template-columns:1fr;}}
-  .evol-panel{border:1px solid var(--linea);border-radius:8px;padding:10px 12px;background:#fff;}
-  .evol-h{font-size:var(--fs-sm);font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:2px;}
-  .evol-sw{width:11px;height:11px;border-radius:3px;flex:none;}
-  .evol-marks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
-  .evol-mark{font-size:var(--fs-xs);padding:2px 8px;border-radius:11px;background:#eee5cf;color:#6a5a2f;display:inline-flex;gap:4px;align-items:center;}
-  .evol-mark.al{background:var(--alerta-bg);color:var(--alerta);}
-  .evol-mark.de{background:var(--destaca-bg);color:var(--destaca);}
-  .evol-mark.nt{background:#eef0ee;color:var(--gris);}
-  .evol-mark .arr{font-weight:800;}
-  .evol-sig{font-size:var(--fs-2xs);opacity:.8;}
   /* --- Disparador de navegacion + chips de seleccion (alineados a la referencia) --- */
   .nav-trigger{appearance:none;border:1px solid var(--border-2);background:var(--paper);color:var(--azul);
     padding:7px 13px;border-radius:var(--radius-2);font-size:var(--fs-base);font-weight:var(--fw-medium);cursor:pointer;font-family:inherit;
@@ -254,7 +241,6 @@ __FONTS_CSS__
   .ficha-explain b{color:var(--azul);}
   /* Radar (solo 4 indicadores) + 4 tarjetas por vertice */
   .ficha-radar{padding:18px 22px 18px;border-bottom:1px solid var(--linea);background:var(--panel);}
-  .fr-head{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-sm);letter-spacing:.01em;color:var(--gris);text-align:center;}
   .fr-note{font-size:var(--fs-xs);color:var(--gris);text-align:center;max-width:640px;margin:10px auto 0;line-height:1.5;}
   /* #5/#8 (s23): zona central ensanchada. Las columnas laterales llevan un ANCHO MINIMO
      (320px = contenido de las 2 anclas ~296px + padding 22px + holgura) para que NO
@@ -324,7 +310,7 @@ __FONTS_CSS__
      3:1. NO altera el hex de marca (solo el borde del swatch/dot). El texto legible
      del motor va en --tinta sobre fondos claros, nunca sobre el fill de indicador,
      por lo que NO hay fallback de color de texto que aplicar. */
-  .indp-dot,.rcard-dot,.th-sw,.sw,.evol-sw{box-shadow:inset 0 0 0 1px rgba(35,48,58,.22);}
+  .indp-dot,.rcard-dot,.th-sw,.sw{box-shadow:inset 0 0 0 1px rgba(35,48,58,.22);}
   /* Barra de puntaje 0-100 (SOLO el prom del establecimiento; SIN marca de GSE por
      eleccion de diseno de esta barra, no por prohibicion: la cifra GSE es publica y
      reconstruida desde D7 — ver ScoreBar en el script) */
@@ -338,7 +324,6 @@ __FONTS_CSS__
   .hist-ind-h{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--linea);}
   .hist-ind-name{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-lg);color:var(--tinta);}
   .hist-main{padding:22px 16px 4px;}
-  .hist-main .evol-panel{border:0;padding:0;}
   .hist-dims-lab{font-size:var(--fs-xs);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);padding:4px 16px 0;}
   .hist-dims{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:10px 16px 16px;}
   @media(max-width:900px){.hist-dims{grid-template-columns:1fr;}}
