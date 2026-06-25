@@ -1,6 +1,6 @@
 # SETTINGS_Y_PROMPTS_OPERACIONALES.md
 
-> **Versión 3 (consolidada).** Vive permanentemente en la knowledge base
+> **Versión 4 (consolidada).** Vive permanentemente en la knowledge base
 > del Project (y se copia a `50_documentacion/activa/` de cada proyecto).
 > Absorbe y reemplaza a: `prompt-apertura-sesion.md` (v3),
 > `prompt-cierre-sesion.md` (v4), `prompt_orquestador.md`,
@@ -8,6 +8,13 @@
 > `prompt_portabilidad_cross_os.md`. La arquitectura que esos prompts
 > implementaban vive ahora en `POLITICA_PROYECTO.md` v5; aquí viven los
 > PROTOCOLOS de sesión y de operación.
+>
+> **Cambios respecto a v3:** nueva subsección 4.6.4 (suite standalone
+> offline: activar `generar_suite(standalone=TRUE)` para embeber CSS,
+> fuentes, logos e iconos en cada HTML; precondición de `npm` + red para
+> descargar lucide-static, validación de iconos, ajuste de versionado del
+> tema). Procedimiento estándar para propagar el modo offline a cualquier
+> proyecto con suite.
 >
 > **Cambios respecto a v2:** nueva regla 4.6.3.6 (terminología
 > institucional del SLEP: "establecimiento educacional" como término
@@ -679,3 +686,80 @@ violando B.1 (sin supuestos implícitos).
    ejemplifica el universo que el término genérico engloba; (c) nombres
    propios de productos externos se conservan literalmente (p. ej.
    "Localiza tu colegio" de la Agencia de Calidad).
+
+#### 4.6.4 Suite standalone offline (propagar a cualquier proyecto)
+
+Genera la suite en formato **standalone offline**: embebe CSS, fuentes,
+logos e iconos dentro de cada HTML, de modo que los 4 documentos no
+dependan del tema en disco ni de CDN para los iconos. Es el formato
+canónico para archivar o compartir la documentación como unidad
+autónoma, alineado con el principio de HTML autocontenido del proyecto
+(igual que el motor). La capacidad vive en `suitedoc` (HEAD `c8b3bd7` en
+adelante); **no** requiere tocar el paquete, solo invocarlo bien.
+
+**Cuándo aplica:** cualquier proyecto con suite (`documentar.R` +
+`generar_suite()`) que aún produzca los HTML en modo enlazado. Activar
+standalone es un cambio acotado en el `documentar.R` del proyecto, no en
+`suitedoc`.
+
+**Procedimiento (por proyecto):**
+
+1. **Verificar la versión del paquete.** Confirmar que el `suitedoc`
+   instalado expone `generar_suite(..., standalone=)`. Firma real:
+   `generar_suite(cfg, salida_dir = ".", copiar_tema = TRUE,
+   verificar = TRUE, standalone = FALSE, verbose = TRUE)`. Si la versión
+   instalada no la expone, reinstalar desde el repo local:
+   `devtools::install("/Users/tomgc/Projects/herramientas_dev/suitedoc")`.
+2. **API real (no asumir otra).** `standalone = TRUE` hace que
+   `generar_suite` llame **internamente** a
+   `inlinar_suite(salida_dir, limpiar_enlazados = TRUE)`: escribe los 4
+   `*_standalone.html` y borra los enlazados intermedios. **Nunca** se
+   llama `inlinar_suite()` por separado en el flujo normal.
+3. **Cambiar la llamada del `documentar.R`** del proyecto: añadir
+   `standalone = TRUE`. Mantener el `verificar` que ese proyecto ya use
+   (no cambiarlo sin razón declarada).
+4. **Precondición de entorno (🔴).** `inlinar_suite()` descarga
+   lucide-static (versión fijada, p. ej. 1.21.0) vía `npm pack`. Requiere
+   `npm` en el PATH y red al registro npm **en tiempo de generación** (la
+   suite resultante sí es 100% offline; generarla no). Verificar
+   `npm --version` antes de regenerar; si falla, detenerse y reportarlo
+   (el titular instala npm), no improvisar.
+5. **Validación de iconos (A17-2 / R3).** `inlinar_suite()` valida todos
+   los `data-lucide` de la cfg y **aborta sin escribir nada** si alguno
+   no existe en la versión fijada de lucide-static, listando los
+   faltantes. Si un icono no resuelve (caso vivido: `sitemap`→`network`),
+   sustituirlo en la cfg por el equivalente lucide más cercano y
+   registrarlo; si no hay equivalente obvio, detenerse y reportar.
+6. **Verificación empírica sobre los `*_standalone.html` reales** (no
+   sobre supuestos, R1): `grep` de referencias de red por archivo = 0
+   (`http://`, `https://`, `src=`/`href=` a CDN, `<link rel="stylesheet"
+   href="http`); iconos como `<svg>` embebido (no `<i data-lucide>` ni
+   `<script>` de lucide); fuentes como `data:` URIs. Reportar el conteo
+   de red por archivo.
+7. **Ajuste de versionado.** Con standalone, el tema (`fonts/`,
+   `assets/`) ya viaja embebido en el HTML y **no** se versiona. Cada
+   proyecto versiona los 4 `*_standalone.html` + `documentar.R` + el CSS;
+   `fonts/` y `assets/` al `.gitignore`. `git status` antes de
+   `git add`; nunca `git add .`; confirmar con `git ls-files` (no con el
+   escáner, A20) que el tema no entra.
+
+**Separación de responsabilidades (importante).** Activar standalone es
+**solo** lo anterior. Si la `cfg` de un proyecto además necesita
+actualizaciones de contenido (decisiones formales, gobernanza), eso es
+trabajo aparte que se decide explícitamente; no se mezcla con la
+activación del modo offline (un cambio conceptual por intervención).
+
+**Llamada canónica:**
+
+```r
+# setwd("<raiz_proyecto>") si se corre por Rscript (here::i_am lo exige).
+suitedoc::generar_suite(
+  cfg,
+  salida_dir  = here::here("50_documentacion", "suite"),
+  copiar_tema = TRUE,
+  verificar   = FALSE,   # o TRUE si ese proyecto no dispara falsos positivos
+  standalone  = TRUE,    # produce *_standalone.html offline; limpia los enlazados
+  verbose     = TRUE
+)
+# Requiere npm + red en tiempo de generación (descarga lucide-static fijado).
+```
