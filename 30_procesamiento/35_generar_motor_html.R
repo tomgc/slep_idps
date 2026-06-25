@@ -421,10 +421,10 @@ anios_prelim <- sort(unique(as.integer(P$agno[P$preliminar %in% TRUE])))
 # Motivo CONTEXTUAL del vacio por anio/grado (plan B: el motivo viaja en el payload;
 # el template solo lo pinta). Constantes nombradas (C.10), no-ASCII via \uXXXX. Solo
 # 4b/2m (los grados que el motor expone): separacion de capas s25, sin logica de 6b/8b.
-MOTIVO_PANDEMIA <- "La pandemia del COVID-19 interrumpio la evaluacion a nivel nacional."
-MOTIVO_2019_4B  <- "Tras los incidentes del 18 de octubre de 2019, la Agencia informa que la aplicacion de 4\u00b0 b\u00e1sico se vio alterada en varios establecimientos."
-MOTIVO_2019_2M  <- "Tras los incidentes del 18 de octubre de 2019, la Agencia informa que la aplicacion de 2\u00b0 medio no pudo realizarse."
-MOTIVO_NO_EVAL  <- "Este grado no se evaluo este a\u00f1o."
+MOTIVO_PANDEMIA <- "La pandemia del COVID-19 interrumpi\u00f3 la evaluaci\u00f3n a nivel nacional."
+MOTIVO_2019_4B  <- "Tras los incidentes del 18 de octubre de 2019, la Agencia informa que la aplicaci\u00f3n de 4\u00b0 b\u00e1sico se vio alterada en varios establecimientos."
+MOTIVO_2019_2M  <- "Tras los incidentes del 18 de octubre de 2019, la Agencia informa que la aplicaci\u00f3n de 2\u00b0 medio no pudo realizarse."
+MOTIVO_NO_EVAL  <- "Este grado no se evalu\u00f3 este a\u00f1o."
 
 eje_historico <- lapply(names(grado_anios), function(g) {
   ad  <- grado_anios[[g]]
