@@ -180,7 +180,7 @@ cfg$decisiones <- list(
        por_que='<strong>Por qué.</strong> Ninguna familia IDPS publica el número de respondentes ni la matrícula del grado evaluado. Sin ponderador válido, cualquier agregación mezclaría universos distintos y daría una cifra indefendible ante la Agencia. La inmutabilidad de la fuente prevalece sobre la conveniencia de tener una línea territorial.'),
   list(id='D2', titulo='Comparar = poner radares lado a lado + leer el desvío oficial',
        cuerpo='<p>Comparar significa dos cosas, ninguna de las cuales construye un agregado propio: (a) poner los panoramas (radares) de varios establecimientos <strong>lado a lado</strong> dentro de la grilla por GSE; y (b) mostrar el desvío de cada establecimiento respecto de su GSE usando <span class="inl">difgru/sigdifgru</span>, que la Agencia ya calculó.</p>',
-       por_que='<strong>Por qué.</strong> El nivel absoluto del GSE la Agencia no lo publica; derivarlo (<code class="inl">prom − difgru</code>) reconstruiría el consolidado prohibido y sería inexacto por redondeo. Se usa el desvío oficial como marca (sobre / bajo / igual a su GSE), no como una línea de puntaje.'),
+       por_que='<strong>Por qué.</strong> El desvío oficial (<span class="inl">difgru/sigdifgru</span>) es la marca primaria de sobre / bajo / igual a su GSE: la Agencia ya lo calculó, no se recalcula. El puntaje absoluto del mismo GSE, además, sí se dibuja como polígono de referencia en el radar (ver D7): es una cifra pública que se reconstruye sin pérdida, no un consolidado territorial propio.'),
   list(id='D3', titulo='GSE inviolable, como segmentador',
        cuerpo='<p>Ningún resultado se muestra sin su GSE. En IDPS el GSE es <strong>atributo</strong> visible de cada establecimiento, <strong>segmentador</strong> que define qué establecimientos entran a la grilla, y el <strong>referente</strong> que la Agencia usó para <span class="inl">difgru/sigdifgru</span>.</p>',
        por_que='<strong>Por qué.</strong> A diferencia de las pruebas estandarizadas de aprendizaje, en IDPS el GSE no es dimensión de agregación (no se promedia por grupo). Es legítimo como filtro y etiqueta; ilegítimo como cifra: "el promedio del GSE 3 en el SLEP" es justo el consolidado que D1 prohíbe.'),
@@ -192,7 +192,10 @@ cfg$decisiones <- list(
        por_que='<strong>Por qué.</strong> Verificación de cabeceras de las 34 tablas: ninguna contiene columnas personales (rut/run/mrun/nombre/id_alumno). La unidad de observación es el establecimiento. Si entrara una base por estudiante, el proyecto pasa a Rama B (datos fuera de Git) sin excepción.'),
   list(id='D6', titulo='Paleta de indicador = identidad oficial de la Agencia',
        cuerpo='<p>Los 4 indicadores se codifican con la paleta del folleto oficial de la Agencia: Autoestima azul, Convivencia turquesa, Participación verde, Hábitos verde-lima. Los colores de estado y la identidad gobCL no se tocan.</p>',
-       por_que='<strong>Por qué.</strong> Coherencia institucional y validación externa: el motor replica la identidad con que la Agencia presenta los indicadores. Cambio 100% presentación, verificado por panel adversarial (cifras byte-idénticas, parquet intocado).')
+       por_que='<strong>Por qué.</strong> Coherencia institucional y validación externa: el motor replica la identidad con que la Agencia presenta los indicadores. Cambio 100% presentación, verificado por panel adversarial (cifras byte-idénticas, parquet intocado).'),
+  list(id='D7', titulo='Polígono GSE de referencia en el radar (cifra pública, reconstruida sin pérdida)',
+       cuerpo='<p>El radar de la ficha dibuja, además del trazo del establecimiento, un <strong>polígono GSE de referencia</strong> (línea punteada): el "Puntaje promedio nacional del mismo GSE" que la Agencia publica en su ficha. Se reconstruye como <span class="inl">prom_GSE = prom − difgru</span> (con <span class="inl">prom</span> crudo del parquet), solo a <strong>nivel indicador</strong>, solo en <strong>2024–2025</strong>, y se <strong>omite</strong> cuando falta algún dato (nunca se dibuja parcial). Reabre, en este punto, la regla de D2/«lee, no deriva».</p>',
+       por_que='<strong>Por qué.</strong> El fundamento original de no dibujarlo era que la Agencia no publicaba esa cifra; sí la publica (escala 0–100, junto al puntaje del establecimiento y la diferencia). Un diagnóstico read-only confirmó que <span class="inl">prom − difgru</span> la reconstruye de forma exacta (signo fijado por <span class="inl">sign(difgru)×sigdifgru</span>, consistencia intra-grupo <span class="inl">sd=0</span>, sin pérdida por redondeo: cifras enteras). Sigue siendo una derivación honesta de una cifra pública, rotulada como tal; el resto de «lee, no deriva» (sin agregación territorial, sin ponderación entre establecimientos, significancia leída) sigue vigente. El radar NO lleva comparación temporal: los años viven en la vista histórica.')
 )
 
 # ---- 1.6 Anomalías de origen -----------------------------------------------
@@ -215,8 +218,9 @@ cfg$anomalias <- list(
 cfg$glosario_tec <- c(
   '<strong>RBD</strong> — Rol Base de Datos. Identificador único de cada establecimiento. Siempre character.',
   '<strong>IDPS</strong> — Indicadores de Desarrollo Personal y Social. Cuatro de cuestionario (los de este motor) y cuatro administrativos.',
-  '<strong>GSE / cod_grupo</strong> — Grupo socioeconómico. En IDPS: atributo y segmentador, nunca cifra agregada.',
+  '<strong>GSE / cod_grupo</strong> — Grupo socioeconómico. En IDPS: atributo y segmentador, nunca cifra agregada propia. El puntaje del mismo GSE que publica la Agencia sí se grafica como referencia (ver prom_gse).',
   '<strong>prom</strong> — Puntaje 0–100 del establecimiento en un indicador/dimensión. Se lee, no se deriva.',
+  '<strong>prom_gse</strong> — Puntaje del mismo GSE, reconstruido prom−difgru a nivel indicador (cifra pública de la Agencia). Polígono de referencia en el radar; solo 2024–2025.',
   '<strong>difgru / sigdifgru</strong> — Desvío respecto del mismo GSE y su significancia, calculados por la Agencia.',
   '<strong>dif / sigdif</strong> — Desvío respecto de la evaluación anterior y su significancia.',
   '<strong>cod_depe2</strong> — Dependencia en 4 categorías (Municipal, Part. subvencionado, Part. pagado, SLEP).',
@@ -240,6 +244,7 @@ cfg$entidades_tec <- list(
   list(ct='Establecimiento', cd='Un RBD individual: la unidad de dato del motor.'),
   list(ct='Grilla por GSE', cd='Todos los establecimientos de un GSE, un radar cada uno (sin promediar).'),
   list(ct='Desvío vs GSE', cd='difgru/sigdifgru: cada establecimiento contra su mismo GSE (cifra oficial).'),
+  list(ct='Polígono GSE de referencia', cd='Puntaje del mismo GSE reconstruido prom−difgru, trazo punteado en el radar (solo indicador, 2024–2025).'),
   list(ct='Filtro territorial', cd='Comuna / SLEP / región: acotan qué establecimientos se listan, no agregan.'),
   list(ct='Serie por establecimiento', cd='Evolución 2014→2025 del establecimiento, con años sin evaluación marcados.')
 )
@@ -353,7 +358,7 @@ cfg$reglas_calculo <- list(
   list(titulo='Sin agregación territorial',
        cuerpo='<p>No existe ponderador (las fuentes IDPS no publican respondentes). El dato se muestra al nivel del establecimiento; territorio y GSE son filtros y etiquetas, jamás cifra agregada.</p>'),
   list(titulo='Comparación contra el mismo GSE',
-       cuerpo='<p>Se usa <span class="inl">difgru/sigdifgru</span> (desvío vs el mismo GSE, calculado por la Agencia) como marca de sobre/bajo/igual. No se dibuja el puntaje absoluto del GSE: derivarlo reconstruiría un consolidado prohibido.</p>'),
+       cuerpo='<p>Se usa <span class="inl">difgru/sigdifgru</span> (desvío vs el mismo GSE, calculado por la Agencia) como marca de sobre/bajo/igual. El puntaje absoluto del mismo GSE se dibuja como <strong>polígono de referencia</strong> en el radar, reconstruido <span class="inl">prom − difgru</span> a nivel indicador (cifra pública de la Agencia), solo donde hay dato; nunca como agregado territorial propio.</p>'),
   list(titulo='NA = resguardo, nunca cero',
        cuerpo='<p>Un NA en la medida es supresión estadística de la Agencia, no ausencia ni cero. No se imputa.</p>')
 )
@@ -376,7 +381,7 @@ cfg$textos <- list(
   anom_titulo      = 'Casos de origen resueltos H1–H4 (detalle)',
   anom_intro       = 'Particularidades de los datos crudos que el pipeline resuelve de forma trazable <strong>antes</strong> de mostrar nada. No son errores del proyecto.',
   doc_s2_intro     = 'El motor permite explorar el panorama IDPS de distintos <strong>establecimientos</strong>:',
-  doc_s2_cierre    = 'Para cada establecimiento se muestra el panorama de los <strong>cuatro indicadores</strong>, su <strong>desglose</strong> por dimensión y subdimensión, su <strong>evolución</strong> desde 2014 y su <strong>desvío respecto del mismo GSE</strong>. La comparación entre establecimientos se hace poniendo sus radares lado a lado, sin promediar.',
+  doc_s2_cierre    = 'Para cada establecimiento se muestra el panorama de los <strong>cuatro indicadores</strong>, su <strong>desglose</strong> por dimensión y subdimensión, su <strong>evolución</strong> desde 2014 y su <strong>desvío respecto del mismo GSE</strong>. El radar incluye además el <strong>polígono del mismo GSE</strong> como referencia (cifra pública, solo a nivel indicador y donde hay dato). La comparación entre establecimientos se hace poniendo sus radares lado a lado, sin promediar.',
   doc_dec_intro    = 'Reglas que gobiernan todo el motor. Cada una corrige una forma específica de leer mal los datos IDPS.',
   doc_s5_intro     = 'Todos los datos provienen de la <strong>Agencia de Calidad de la Educación</strong> y son <strong>públicos</strong>. Las planillas crudas traen particularidades de origen que el pipeline resuelve antes de mostrar nada:',
   gen_hero         = 'Piensa en este proyecto como una <strong>pequeña fábrica de datos</strong>. Llegan materias primas —las planillas IDPS de la Agencia—, pasan por una línea que las limpia, las ordena y las ensambla, y al final sale un <strong>producto terminado</strong>: una herramienta para mirar el panorama de cada establecimiento de forma justa.',
