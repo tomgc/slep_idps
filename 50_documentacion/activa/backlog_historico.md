@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v23 (2026-06-24). **Total reconciliado: 144 cambios.**
+> **Versión:** consolidado a v25 (2026-06-25). **Total reconciliado: 147 cambios.**
 
 ---
 
@@ -71,7 +71,9 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 21 | v21 | 3 | 131–133 | Opus 4.8 | Polígono GSE en el radar + textos bloque azul/leyenda |
 | 22 | v22 | 8 | 134–141 | Opus 4.8 | Refresco doc GSE + Batch A (lote directo) + Batch B (señalética/textos motor) |
 | 23 | v23 | 3 | 142–144 | Opus 4.8 | Publicación lote s22 + higiene template + Batch C (#5/#8) + eliminación de rótulo |
-| **Total** | | **144** | **1–144** | | |
+| 24 | v24 | 0 | — | Opus 4.8 | Administrativa: consolida backlog (v23/144), P-CSS-MUERTO, deploy (DEC-s24-1) |
+| 25 | v25 | 3 | 145–147 | Opus 4.8 | Datos + UI: cobertura histórica, valor media móvil, vs GSE en tooltip, señalética `·` |
+| **Total** | | **147** | **1–147** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -85,7 +87,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (actualizada a v23, sobre 144 cambios)
+## Clasificación temática (actualizada a v25, sobre 147 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -97,7 +99,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Infraestructura y scaffold | 5 | 3% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
 | Gobernanza de datos | 5 | 3% | Verificación sensibilidad, decisión Rama A, depuración directorio, ignore, gitignore inventarios scratch |
 | Visualización / diseño — motor base/datos | 14 | 10% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
-| Visualización / diseño — rediseño UI | 47 | 33% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador), lote UI directo s20 (#121–130: leyenda redundante, comunas por SLEP, nivel seleccionado, nombre completo rcard, definición estática, leyenda subdim, preliminar/significancia, comparador nombre/Territorio), s21 (#131–133: polígono GSE en el radar, texto del bloque azul, leyenda duplicada), s22 (#135–140: alto de barras, leyenda media móvil, tope comparador 4→10, color sin-diferencia, señalética sigdif temporal, etiqueta externa segmentos finos) y s23 (#142–144: anclas del indicador en una fila, etiquetas del radar sin colisión, eliminación del rótulo "Mirada integral") |
+| Visualización / diseño — rediseño UI | 50 | 34% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador), lote UI directo s20 (#121–130: leyenda redundante, comunas por SLEP, nivel seleccionado, nombre completo rcard, definición estática, leyenda subdim, preliminar/significancia, comparador nombre/Territorio), s21 (#131–133: polígono GSE en el radar, texto del bloque azul, leyenda duplicada), s22 (#135–140: alto de barras, leyenda media móvil, tope comparador 4→10, color sin-diferencia, señalética sigdif temporal, etiqueta externa segmentos finos) y s23 (#142–144: anclas del indicador en una fila, etiquetas del radar sin colisión, eliminación del rótulo "Mirada integral") y s25 (#145–147: valor de la media móvil en la vista histórica, distancia vs GSE en el tooltip de indicador, señalética «·» para años históricos sin comparación publicada) |
 | Perfilado / exploración de datos | 4 | 3% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
 | Limpieza / deuda técnica | 15 | 10% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108), tokenización tipográfica a 7 tokens --fs-* (P-TIPOGRAFIA, #120, s20), jerarquía `.axis-lab.b` por peso (#134, s22, cierra REVISAR s20) |
 | Documentación conceptual / contenido | 10 | 7% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta, texto "qué refleja un puntaje alto" por indicador (#141, s22, nivel indicador desde el corpus) |
@@ -107,6 +109,30 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Verificación / auditoría (independiente) | 6 | 4% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
 | Decisión / gobernanza de producto | 3 | 2% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
 | Documentación de proyecto (suite/política) | 4 | 3% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) + saneamiento del paquete `suitedoc` con inlining offline integrado (#109, v17) + regeneración de la suite como 4 standalone offline y retiro de `inline_suite.R` (#110, v17) |
+
+> **Vista analítica de 'Rediseño UI' (no-correlativa).** La categoría supera el 25%
+> desde v21 (observación de umbral, deltas v21/v23). Esta sub-tabla desglosa sus 50
+> entradas por sub-tema para lectura; NO reclasifica, NO renumera y NO altera el
+> correlativo global ni la tabla temática (append-only / A37). Es un lente, no una
+> taxonomía nueva.
+
+| Sub-tema (zona del motor) | N° | Entradas |
+|---|---|---|
+| Ficha / radar (panorama del establecimiento, polígono GSE, anclas, etiquetas) | 12 | #111, #112, #117, #124, #131, #142, #143, #144 + 4 del rediseño temprano (s6–s9) |
+| Vista histórica (barras, media móvil, señalética temporal, vs GSE en tooltip) | 12 | #114, #115, #116, #135, #136, #139, #145, #146, #147 + 3 del rediseño temprano (s6–s9) |
+| Comparador (modal multiselección, tope 4→10, nombre/territorio) | 10 | #118, #119, #129, #130, #137, #140 + 4 del rediseño temprano (Fase 4, lote de corrección) |
+| Tipografía / escala / paleta de presentación | 3 | #105 (rampa de niveles + separador), #138 (color sin-diferencia) + 1 del rediseño temprano (chrome/estética) |
+| Texto / leyenda / definiciones visibles | 13 | #113, #121, #122, #123, #125, #126, #127, #128, #132, #133 + 3 del rediseño temprano (s6–s9) |
+| **Total** | **50** | |
+
+> **Reparto (lente, no taxonomía):** las 35 entradas desde #105 (s15→s25) se asignan
+> individualmente por zona del motor según el detalle cronológico (exacto). Las 15
+> entradas de rediseño tempranas (s6–s9, anteriores a #105: rediseño de 3 pantallas,
+> Fase 4 del comparador, lote de corrección de fidelidad, barras de la vista histórica,
+> pestaña SLEP, chrome) se reparten por su intención documentada, pues preceden al
+> seguimiento por-# de la taxonomía (aproximado para ese bloque; ninguna entrada inventada,
+> las 50 salen del correlativo real). La suma interna 50 cuadra con la categoría temática;
+> la sub-tabla NO entra al cuadre correlativo global (es lectura, no conteo).
 
 > **Cierre P-BACKLOG-INTEGRIDAD (s19):** el faltante de 1 (tabla 109 vs correlativo 110) heredado de la reconciliación v14/v15 era el #93 (bugfix dedup de establecimientos por RBD, sesión 12), que quedó sin categoría al recalcular la distribución. Asignado a Saneamiento / calidad de datos de presentación (14→15). La tabla suma ahora 110 = correlativo global. Sin renumerar ni reasignar entradas históricas.
 
@@ -155,6 +181,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 - **Sesión 21** (2026-06-24): cambios **131–133** (detalle en v21 y logs `20260624_poligono_gse_texto_leyenda_log.md`, `20260624_afinacion_textos_gse_log.md`, `20260624_diagnostico_gse_reconstruccion_log.md`, `20260624_deploy_push_s21_log.md`). Polígono GSE de referencia en el radar y textos asociados (fidelidad censal mismatch 0, panel adversarial independiente 0 mismatch en 366.384 filas; parquet intacto `4c764d8c…`; reabre la decisión de ponderación, `20260624_decision_poligono_gse_radar.md`): **131** polígono GSE de referencia en el radar (resuelve "captura 2") — campo server-side `prom_gse = round(prom_crudo − difgru, 0)` (reconstrucción EXACTA, signo fijado por `sign(difgru)==sign(sigdifgru)`, sd intra-grupo 0; solo 2024-2025, solo nivel indicador, solo donde hay difgru/cod_grupo); trazo punteado gris distinto del overlay temporal, leyenda "Promedio del mismo GSE"; se dibuja solo si los 4 indicadores tienen `prom_gse` (NA = supresión, nunca 0); **132** reescritura del texto del bloque azul de la ficha (describe el polígono GSE y la significancia; resuelve el pendiente "texto 3b" de v20); **133** eliminación de la leyenda de significancia duplicada de la ficha (conserva la del bloque azul; resuelve "3a"). **Actos no correlativos de s21** (registrados por trazabilidad, no suman): la **afinación de textos** (condicionar la frase de la línea punteada a la existencia de GSE + corregir 2 textos que negaban la representación del GSE) es refinamiento/coherencia del propio #132; los **diagnósticos read-only** (radar vs GSE; reconstrucción `prom_gse`) son análisis, no producto; la **decisión versionada** (reapertura ponderación) es la justificación del #131, no un cambio aparte; el **deploy + push** del día es operativo.
 - **Sesión 22** (2026-06-24): cambios **134–141** (detalle en v22 §4 y en los logs `20260624_batch_a_s22_log.md`, `20260624_batch_b1_s22_log.md`, `20260624_batch_b2_s22_log.md`). Mejoras de presentación del motor en 3 encargos autónomos a Claude Code, **todas sin tocar datos** (parquet intacto `4c764d8c…`; Batch A y B1 con payload byte-idéntico; B2 con delta de payload acotado a solo `nivel_alto`, verificado estructuralmente, ninguna cifra cambió): **134** `.axis-lab.b` por peso (cierra REVISAR s20); **135** alto de barras `--yh` (152→168 / 118→130); **136** leyenda media móvil; **137** tope comparador 4→10 vía `CMP_MAX_TERR`; **138** color "sin diferencia" gris-azulado (`--st-neutro` `#8C8A86`→`#7E8A99`); **139** señalética sigdif temporal en `BarrasAnio` (lee `sigdif`, no `sigdifgru`); **140** etiqueta externa segmentos finos del comparador (`.s100-ext`, `<9%`); **141** texto "qué refleja un puntaje alto" por indicador (campo `nivel_alto`, nivel indicador, desde el corpus). **Actos no correlativos de s22** (no suman): #9 cerrado como no-implementado (decisión DS22-1, sin código); refresco de `documentar.R` (mantención de doc; expuso el contenido cruzado de SIMCE → P-DOC-CFG-CRUZADA); diagnósticos de zona previos a cada encargo. **Estado especial: nada commiteado al cierre de s22** (Batch A en 4 commits locales; B1/B2 en working tree); el commit y el deploy quedaron como pendiente del titular, ejecutado en s23.
 - **Sesión 23** (2026-06-24): cambios **142–144** (detalle en v23 §4 y en los logs `20260624_commit_deploy_s22_log.md`, `20260624_higiene_batchc_s23_log.md`). Publicación del lote s22, higiene del template y Batch C (parquet intacto `4c764d8c…`; payload byte-idéntico en cada regeneración salvo el `nivel_alto` ya contado en s22; 0 errores de consola): **142** #5 — anclas del indicador (`.rcard-anc`) en una sola fila vía ensanche de la tarjeta (`.rcard max-width` 280→330, columnas laterales `minmax(320px,1fr)`, `.rquad` `gap:10px 50px` `max-width:1100`, breakpoint de colapso 760→1180; DEC-s23-2); **143** #8 — etiquetas de eje del radar sin colisión con las tarjetas laterales (sube `.rquad` column-gap 16→50px; SVG 300×300 intacto); **144** eliminación del rótulo "Mirada integral · 4 indicadores" (`<div className="fr-head">`, a pedido del titular; deja `.fr-head` huérfana → P-CSS-MUERTO). **Actos no correlativos de s23** (registrados por trazabilidad, no suman): **publicación del lote s22 #138–141** (ordenamiento por hunks con `git add -p` + build + deploy; `origin/main 41a3406→d35027a`; son ítems ya numerados en s22, no entradas nuevas); eliminación de **`PanelEvolucion`** (componente muerto desde P3-s9, higiene hallada por Claude Code, no solicitud del titular → no suma, como el fix `.ancla` en s20); corrección del **comentario obsoleto de `ScoreBar`** (coherencia con D7, solo comentarios, no producto); **P-DOC-REGEN** (regeneración de la suite, mantención de doc); el **deploy + push** de s23 (`d35027a→33ea07a`, operativo).
+- **Sesión 24** (2026-06-24): **administrativa, 0 entradas al correlativo** (DEC-s24-1). Consolidación del backlog a v23/144 (el delta v23 de este archivo, ya escrito), eliminación de CSS muerto `.evol-*`/`.fr-head` (P-CSS-MUERTO) y deploy del lote; trabajo recursivo/higiene, sin solicitudes de producto nuevas. Total a v24 = **144**.
+- **Sesión 25** (2026-06-25): cambios **145–147** (detalle en v25 §3/§5 y en los logs `20260625_cobertura_historica_s25_log.md`, `20260625_media_movil_valor_s25_log.md`; parquet intacto `4c764d8c…`; payload byte-idéntico en cada regeneración —todo es render). Cobertura histórica documentada y mejoras de la vista histórica: **145** valor de la media móvil en la vista histórica — la línea tenue tenía trazo pero no valor; ahora la media móvil vigente (penúltimo año con dato, etiquetada con su año) aparece en la cabecera de indicador y dimensión, y la media móvil del año en el tooltip por barra; **146** distancia vs GSE en el tooltip de indicador — `difgru`/`sigdifgru` con simbología ▲/▼/= y significancia, solo donde el dato existe (2024–2025) y solo a nivel indicador (a nivel dimensión no hay dato vs GSE, la Agencia no lo publica); **147** señalética de significancia por barra completada con `·` — los años históricos con dato pero sin comparación publicada muestran `·` gris (sin afirmar significancia; el histórico no trae `dif` y no se recalcula), con nota de la vista histórica ampliada a la convención glifo=dirección / color=significancia. **Actos no correlativos de s25** (registrados por trazabilidad, no suman, criterio DEC-s24-1): la verificación y cierre del pendiente histórico obsoleto; la documentación de cobertura histórica (decisión `20260625_decision_cobertura_historico_idps.md` + comentarios de constancia en `34`/`35` + nota visible del 2019/estallido + COVID); las correcciones de texto de la vista histórica; la reubicación de la leyenda de media móvil al `.ficha-explain` (P-LEYENDA-MMOVIL-UBICACION, mejora de higiene visual) y la eliminación de la regla CSS muerta `.hist-leg` (P-CSS-HIST-LEG); el deploy/push del cierre (operativo).
 
 ---
 
@@ -341,3 +369,36 @@ distinguibles que el titular pidió, no como cada commit técnico.
   = **144** (5+5+14+47+4+15+10+7+15+9+6+3+4); correlativo global (detalle cronológico,
   último #144) = **144**; fila Total del resumen estadístico = **144**; encabezado del
   archivo = v23/**144**. Los cuatro cuadran.
+
+---
+
+## Delta del backlog (consolidación v25)
+
+> Integra **s24** (administrativa, 0 al correlativo) y **s25** (+3). Verificado contra el
+> detalle cronológico (último #144 a v23), no contra la tabla heredada (A22).
+
+- **s24: +0 entradas.** Sesión administrativa (DEC-s24-1): consolidación del backlog a
+  v23/144 (el delta v23 de este archivo), eliminación de CSS muerto `.evol-*`/`.fr-head`
+  (P-CSS-MUERTO) y deploy del lote. Trabajo recursivo/higiene; por la nota metodológica no
+  aporta cambios al correlativo. Total a v24 = **144**.
+- **s25: +3 entradas** (145–147): valor de la media móvil en la vista histórica (#145),
+  distancia vs GSE en el tooltip de indicador (#146) y señalética `·` para años históricos
+  sin comparación publicada (#147). Total 144 → **147**. NO suman: la documentación de
+  cobertura histórica (decisión + constancia en pipeline `34`/`35` + nota visible 2019), las
+  correcciones de texto de la vista histórica, la reubicación de la leyenda de media móvil
+  (P-LEYENDA-MMOVIL-UBICACION) y la eliminación de la regla CSS `.hist-leg` (P-CSS-HIST-LEG)
+  —higiene—, ni el deploy/push (operativo).
+- **Clasificación:** #145–147 (3) → "Visualización / diseño — rediseño UI" (47 → 50).
+  Recalculada la columna % sobre 147; por ser un cambio de denominador pequeño (144→147),
+  solo "Rediseño UI" varía su redondeo (33% → 34%); las demás filas conservan su % redondeado.
+- **⚠️ Observación de umbral (continúa de v21/v23/v24) — ATENDIDA:** "Visualización / diseño —
+  rediseño UI" pasa de 47/144 (33%) a **50/147 (34%)**, sigue sobre el 25%. Esta consolidación
+  **atiende** la observación con una **vista analítica no-correlativa** (opción 2): una
+  sub-tabla bajo la tabla temática que desglosa las 50 entradas por zona del motor para
+  lectura, SIN reclasificar, renumerar ni alterar el correlativo ni la tabla temática
+  (append-only / A37). La categoría temática se conserva intacta; la sub-tabla es un lente.
+- **Verificación de cuadre (cuatro totales):** suma de la columna N° de la tabla temática =
+  **147** (5+5+14+50+4+15+10+7+15+9+6+3+4); correlativo global (detalle cronológico, último
+  #147) = **147**; fila Total del resumen estadístico = **147**; encabezado del archivo =
+  v25/**147**. Los cuatro cuadran. La sub-tabla analítica suma **50** internamente (no entra al
+  cuadre correlativo).
