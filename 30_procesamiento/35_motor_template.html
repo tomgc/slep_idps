@@ -256,11 +256,18 @@ __FONTS_CSS__
   .ficha-radar{padding:18px 22px 18px;border-bottom:1px solid var(--linea);background:var(--panel);}
   .fr-head{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-sm);letter-spacing:.01em;color:var(--gris);text-align:center;}
   .fr-note{font-size:var(--fs-xs);color:var(--gris);text-align:center;max-width:640px;margin:10px auto 0;line-height:1.5;}
-  .rquad{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto auto;
-    align-items:center;justify-items:center;gap:10px 16px;max-width:880px;margin:12px auto 0;}
+  /* #5/#8 (s23): zona central ensanchada. Las columnas laterales llevan un ANCHO MINIMO
+     (320px = contenido de las 2 anclas ~296px + padding 22px + holgura) para que NO
+     encojan por debajo del umbral en viewports medianos: ahi estaba la causa de que las
+     anclas de las tarjetas laterales se apilaran en 2 filas (#5). El column-gap amplio
+     reserva margen horizontal para las etiquetas de eje del radar (no chocan con las
+     tarjetas laterales, #8). Por debajo del breakpoint el grid colapsa a 1 columna
+     (apilado), antes de que el 3-col no quepa. row-gap 10px. */
+  .rquad{display:grid;grid-template-columns:minmax(320px,1fr) auto minmax(320px,1fr);grid-template-rows:auto auto auto;
+    align-items:center;justify-items:center;gap:10px 50px;max-width:1100px;margin:12px auto 0;}
   .rquad-svg{grid-column:2;grid-row:2;width:300px;height:300px;display:flex;align-items:center;justify-content:center;}
   .rcard{display:flex;flex-direction:column;gap:7px;background:var(--paper);border:1px solid var(--linea);
-    border-radius:var(--radius-2);padding:9px 11px;box-shadow:var(--shadow-1);max-width:280px;width:100%;}
+    border-radius:var(--radius-2);padding:9px 11px;box-shadow:var(--shadow-1);max-width:330px;width:100%;}
   .rcard.pos-top{grid-column:2;grid-row:1;} .rcard.pos-bottom{grid-column:2;grid-row:3;}
   .rcard.pos-left{grid-column:1;grid-row:2;justify-self:end;} .rcard.pos-right{grid-column:3;grid-row:2;justify-self:start;}
   .rcard-top{display:flex;gap:8px;align-items:flex-start;}
@@ -271,7 +278,7 @@ __FONTS_CSS__
   .rcard-vals b{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-lg);color:var(--tinta);}
   .rcard-vals .u{font-size:var(--fs-2xs);margin-left:1px;}
   .rcard-anc{display:flex;flex-wrap:wrap;gap:6px;}
-  @media(max-width:760px){
+  @media(max-width:1180px){
     .rquad{grid-template-columns:1fr;}
     .rquad-svg{grid-column:1;grid-row:auto;}
     .rcard,.rcard.pos-top,.rcard.pos-right,.rcard.pos-bottom,.rcard.pos-left{grid-column:1;grid-row:auto;justify-self:stretch;max-width:none;}
@@ -1137,7 +1144,6 @@ __FONTS_CSS__
               <div className="ficha-explain">El <b>radar de los 4 indicadores</b> contiene la foto actual del establecimiento en materia de IDPS. Cuando el establecimiento cuenta con un grupo de comparación (GSE), la <b>línea punteada</b> indica los resultados de su GSE de referencia. En la siguiente sección encontrará los resultados por dimensión y subdimensión de cada indicador. Los resultados de los indicadores y dimensiones son presentados con su diferencia en relación a la evaluación anterior y el GSE al que pertenece el establecimiento, especificando si se trata de una <b>diferencia significativa (sig.)</b> o <b>sólo aritmética</b> (<span style={{color:"var(--alerta)"}}>▼ rojo</span> = resultado es significativamente inferior al de su referencia; <span style={{color:"var(--destaca)"}}>▲ azul</span> = resultado es significativamente superior al de su referencia).</div>
 
               <div className="ficha-radar">
-                <div className="fr-head">Mirada integral · 4 indicadores</div>
                 <div className="rquad">
                   <div className="rquad-svg"><Radar axes={axInd} axesG={hasGse?axIndG:undefined} colG="var(--gris)" labelG="Puntaje promedio nacional del mismo GSE" size={300} showLabels={true} showValues={true}/></div>
                   {DATA.indicadores.map((ind,k)=>{const d=im[ind.id];
