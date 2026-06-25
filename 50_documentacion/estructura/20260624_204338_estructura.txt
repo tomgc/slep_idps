@@ -1,7 +1,7 @@
 ESCANEO DE ESTRUCTURA — slep_idps
 Raiz   : /Users/tomgc/Projects/slep_idps
-Fecha  : 2026-06-23 07:53:04
-Totales: 31 carpetas, 250 archivos
+Fecha  : 2026-06-24 20:43:38
+Totales: 31 carpetas, 273 archivos
 Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 slep_idps/
@@ -28,6 +28,7 @@ slep_idps/
 │   │   │   ├── otros_indicadores_calidad_2014.pdf  (909K)
 │   │   │   ├── otros_indicadores_calidad_2019.pdf  (357K)
 │   │   │   └── subdimensiones_idps.pdf  (2.8M)
+│   │   ├── .DS_Store  (6K)
 │   │   ├── caracterizacion_establecimientos.xlsx  (16.5K)
 │   │   ├── diccionario_territorios.xlsx  (16.8K)
 │   │   ├── directorio_oficial_ee_publico.csv  (3.42M)
@@ -70,7 +71,7 @@ slep_idps/
 │   │   ├── idps8b2015_rbd_historico.xls  (576K)
 │   │   ├── idps8b2017_rbd_historico.xlsx  (703K)
 │   │   └── idps8b2019_rbd_historico.xlsx  (626K)
-│   ├── .DS_Store  (10K)
+│   ├── .DS_Store  (8K)
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
@@ -108,8 +109,8 @@ slep_idps/
 │   ├── 32_censo_insumos.R  (9.37K)
 │   ├── 33_construir_catalogos.R  (15.2K)
 │   ├── 34_leer_normalizar_idps.R  (26.1K)
-│   ├── 35_generar_motor_html.R  (29.3K)
-│   └── 35_motor_template.html  (120K)
+│   ├── 35_generar_motor_html.R  (32.1K)
+│   └── 35_motor_template.html  (122K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
@@ -124,7 +125,7 @@ slep_idps/
 │   │   ├── inventario_universo_idps.parquet  (6.57K)
 │   │   └── sleps_chile.parquet  (58.7K)
 │   ├── .DS_Store  (6K)
-│   └── motor_idps.html  (5.08M)
+│   └── motor_idps.html  (5.11M)
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
@@ -132,10 +133,14 @@ slep_idps/
 │   │   │   ├── 20260611_decision_gobernanza_insumos_publicos.md  (3.23K)
 │   │   │   ├── 20260612_decision_ponderacion_idps.md  (7.21K)
 │   │   │   ├── 20260622_decision_etiqueta_dependencia.md  (3.33K)
-│   │   │   └── 20260622_decision_paleta_indicadores.md  (3.95K)
+│   │   │   ├── 20260622_decision_paleta_indicadores.md  (3.95K)
+│   │   │   └── 20260624_decision_poligono_gse_radar.md  (7.55K)
 │   │   ├── encargos/
 │   │   │   ├── .DS_Store  (6K)
 │   │   │   ├── encargo_ajustes_motor_s14.md  (15.4K)
+│   │   │   ├── encargo_claude_code_idps_batch_a_s22.md  (11.5K)
+│   │   │   ├── encargo_claude_code_idps_batch_b1_s22.md  (11K)
+│   │   │   ├── encargo_claude_code_idps_batch_b2_s22.md  (11.1K)
 │   │   │   ├── encargo_claude_code_idps_censo_universo.md  (22.3K)
 │   │   │   ├── encargo_claude_code_idps_cierre_v05.md  (6.72K)
 │   │   │   ├── encargo_claude_code_idps_comparador_s19.md  (11.5K)
@@ -156,13 +161,14 @@ slep_idps/
 │   │   │   └── encargo_paleta_v2_s15.md  (20.6K)
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
-│   │   ├── .DS_Store  (8K)
-│   │   ├── backlog_historico.md  (21.2K)
+│   │   ├── .DS_Store  (10K)
+│   │   ├── backlog_historico.md  (33K)
 │   │   ├── backlog_volcado_crudo.md  (40.9K)
 │   │   ├── censo_universo_idps.md  (117K)
 │   │   ├── POLITICA_PROYECTO.md  (29.7K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
-│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (32.9K)
+│   │   ├── resena_slep_idps.md  (9.94K)
+│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (37.3K)
 │   ├── andamios/
 │   │   ├── diseno/
 │   │   │   ├── entity_modal/
@@ -223,17 +229,31 @@ slep_idps/
 │   │   │   ├── 20260622_paleta_v2_s15_log.md  (9.11K)
 │   │   │   ├── 20260622_uiux_s19_fase123_log.md  (11.2K)
 │   │   │   ├── 20260623_comparador_s19_log.md  (8.18K)
-│   │   │   └── 20260623_mmovil_s19_log.md  (8.21K)
+│   │   │   ├── 20260623_consolidacion_backlog_s18_s19_log.md  (6.4K)
+│   │   │   ├── 20260623_fix_ancla_s7_1_log.md  (3.69K)
+│   │   │   ├── 20260623_mmovil_s19_log.md  (8.21K)
+│   │   │   ├── 20260623_tipografia_escala_log.md  (7.86K)
+│   │   │   ├── 20260624_afinacion_textos_gse_log.md  (3.87K)
+│   │   │   ├── 20260624_batch_a_s22_log.md  (7.86K)
+│   │   │   ├── 20260624_batch_b1_s22_log.md  (6.86K)
+│   │   │   ├── 20260624_batch_b2_s22_log.md  (7.19K)
+│   │   │   ├── 20260624_commit_deploy_s22_log.md  (5.86K)
+│   │   │   ├── 20260624_deploy_push_s21_log.md  (3.04K)
+│   │   │   ├── 20260624_diagnostico_gse_reconstruccion_log.md  (5.51K)
+│   │   │   ├── 20260624_higiene_batchc_s23_log.md  (10.4K)
+│   │   │   ├── 20260624_poligono_gse_texto_leyenda_log.md  (7.76K)
+│   │   │   ├── 20260624_quita_overlay_temporal_radar_log.md  (4.99K)
+│   │   │   └── 20260624_s21_lote_directo_log.md  (7.72K)
 │   │   ├── .DS_Store  (10K)
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260622_212833_estructura.md  (15.5K)
-│   │   ├── 20260622_212833_estructura.txt  (15.6K)
-│   │   ├── 20260623_074721_estructura.md  (15.9K)
-│   │   ├── 20260623_074721_estructura.txt  (16K)
-│   │   ├── estructura_actual.md  (15.9K)
-│   │   └── estructura_actual.txt  (16K)
+│   │   ├── 20260624_192104_estructura.md  (17.3K)
+│   │   ├── 20260624_192104_estructura.txt  (17.4K)
+│   │   ├── 20260624_192645_estructura.md  (17.4K)
+│   │   ├── 20260624_192645_estructura.txt  (17.4K)
+│   │   ├── estructura_actual.md  (17.4K)
+│   │   └── estructura_actual.txt  (17.4K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -250,8 +270,8 @@ slep_idps/
 │   │   ├── arquitectura_general_slep_idps_standalone.html  (440K)
 │   │   ├── arquitectura_slep_idps_standalone.html  (442K)
 │   │   ├── documentacion_general_slep_idps_standalone.html  (433K)
-│   │   ├── documentacion_proyecto_slep_idps_standalone.html  (435K)
-│   │   ├── documentar.R  (40.9K)
+│   │   ├── documentacion_proyecto_slep_idps_standalone.html  (437K)
+│   │   ├── documentar.R  (43.2K)
 │   │   └── suite_estilos.css  (21.7K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
@@ -273,10 +293,13 @@ slep_idps/
 │   │   ├── traspaso_cierre_v16.md  (25.6K)
 │   │   ├── traspaso_cierre_v17.md  (20.2K)
 │   │   ├── traspaso_cierre_v18.md  (17.6K)
-│   │   └── traspaso_cierre_v19.md  (15K)
+│   │   ├── traspaso_cierre_v19.md  (15K)
+│   │   ├── traspaso_cierre_v20.md  (20.2K)
+│   │   ├── traspaso_cierre_v21.md  (21.5K)
+│   │   └── traspaso_cierre_v22.md  (30.3K)
 │   └── .DS_Store  (16K)
 ├── docs/
-│   └── index.html  (5.08M)
+│   └── index.html  (5.11M)
 ├── tests/
 │   └── .gitkeep  (0)
 ├── .DS_Store  (16K)
@@ -288,9 +311,9 @@ slep_idps/
 └── slep_idps.Rproj  (195)
 
 Conteo por extension:
-  md                 84
+  md                 106
   xlsx               54
-  (sin extension)    19
+  (sin extension)    20
   otf                13
   pdf                13
   xls                11
