@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockups — valor del promedio móvil</title>
+<style>
+  /* Tokens aproximados del motor (solo los necesarios para el mockup). */
+  :root{
+    --tinta:#2e2230; --gris:#6b6470; --linea:#d9d2c4; --cream-200:#ece6d8;
+    --azul:#2f6f8f; --destaca:#2f6f8f; --alerta:#b3452f; --st-neutro:#7E8A99;
+    --foco:#b3452f;
+    --fs-2xs:11px; --fs-xs:12px; --fs-sm:13px; --fs-base:14px; --fs-lg:18px;
+    --fw-bold:600; --fw-heavy:700; --radius-3:10px;
+    --font-display:Georgia,serif;
+    --ic-am:#3c6f9c; --ic-cc:#c08a2d; --ic-pf:#5a8a5a; --ic-hv:#a4506b;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--tinta);
+    background:#faf7f0;margin:0;padding:28px;line-height:1.5;}
+  h1{font-family:var(--font-display);font-size:22px;margin:0 0 4px;}
+  .sub{color:var(--gris);font-size:var(--fs-sm);margin:0 0 24px;max-width:760px;}
+  h2{font-size:var(--fs-base);text-transform:uppercase;letter-spacing:.08em;color:var(--gris);
+    margin:30px 0 6px;border-bottom:1px solid var(--linea);padding-bottom:5px;}
+  .note{font-size:var(--fs-xs);color:var(--gris);margin:2px 0 14px;max-width:760px;}
+  .variant-lab{display:inline-block;font-size:var(--fs-2xs);font-weight:var(--fw-heavy);
+    text-transform:uppercase;letter-spacing:.06em;color:#fff;background:var(--tinta);
+    border-radius:4px;padding:2px 7px;margin-bottom:8px;}
+  .panel{border:1px solid var(--linea);border-top:3px solid var(--ic,var(--azul));
+    border-radius:var(--radius-3);margin:0 0 18px;background:#fff;max-width:560px;}
+
+  /* Cabecera del indicador (clase real: hist-ind-h) */
+  .hist-ind-h{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--linea);flex-wrap:wrap;}
+  .indp-dot{width:11px;height:11px;border-radius:50%;display:inline-block;flex-shrink:0;}
+  .hist-ind-name{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-lg);color:var(--tinta);}
+
+  /* HistTrend real */
+  .hist-trend{margin-left:auto;font-size:var(--fs-sm);font-weight:var(--fw-heavy);
+    font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+  .hist-trend.al{color:var(--alerta);} .hist-trend.de{color:var(--destaca);}
+  .ht-ic{font-weight:var(--fw-heavy);}
+
+  /* ---- Marcas de promedio móvil: variantes ---- */
+  /* A1: chip inline junto a HistTrend */
+  .mm-chip{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-sm);
+    font-weight:var(--fw-bold);font-variant-numeric:tabular-nums;color:var(--gris);
+    background:var(--cream-200);border-radius:5px;padding:2px 8px;white-space:nowrap;}
+  .mm-chip .mm-line{width:16px;height:0;border-top:2px solid var(--ic,var(--azul));
+    opacity:.7;display:inline-block;}
+  .mm-chip b{color:var(--tinta);font-weight:var(--fw-heavy);}
+
+  /* A2: texto suelto con muestra de línea, sin caja */
+  .mm-plain{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-sm);
+    color:var(--gris);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .mm-plain .mm-line{width:18px;height:0;border-top:2px solid var(--ic,var(--azul));opacity:.6;display:inline-block;}
+  .mm-plain b{color:var(--tinta);font-weight:var(--fw-heavy);}
+
+  /* A3: segunda línea bajo el HistTrend (cabecera en dos filas) */
+  .head-stack{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+  .mm-sub{font-size:var(--fs-xs);color:var(--gris);font-variant-numeric:tabular-nums;
+    display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+  .mm-sub .mm-line{width:14px;height:0;border-top:2px solid var(--ic,var(--azul));opacity:.6;display:inline-block;}
+  .mm-sub b{color:var(--tinta);font-weight:var(--fw-bold);}
+
+  .panel-body{padding:14px 16px;color:var(--gris);font-size:var(--fs-sm);}
+
+  /* Cabecera de dimensión (real: hist-dim-h, tiny) */
+  .dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:12px 16px 16px;}
+  @media(max-width:620px){.dimgrid{grid-template-columns:1fr;}}
+  .hist-dim{border:1px solid var(--cream-200);border-top:2px solid var(--ic,var(--azul));
+    border-radius:7px;padding:10px 12px;}
+  .hist-dim-h{display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap;}
+  .sw.sm{width:9px;height:9px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .hist-dim-name{font-weight:var(--fw-bold);font-size:var(--fs-base);color:var(--tinta);min-width:0;}
+  .hist-trend.tiny{font-size:var(--fs-xs);font-weight:var(--fw-bold);margin-left:auto;}
+  .mm-chip.tiny{font-size:var(--fs-xs);padding:1px 6px;gap:4px;}
+  .mm-chip.tiny .mm-line{width:12px;}
+  .dim-fake-bars{height:46px;background:repeating-linear-gradient(90deg,var(--cream-200) 0 14px,transparent 14px 28px);
+    border-bottom:1.5px solid var(--linea);border-radius:3px;opacity:.5;}
+
+  /* Tooltip mock */
+  .tt-demo{display:inline-block;background:var(--tinta);color:#fff;font-size:var(--fs-xs);
+    border-radius:7px;padding:9px 11px;line-height:1.5;max-width:230px;box-shadow:0 4px 14px rgba(0,0,0,.18);}
+  .tt-demo b{font-weight:var(--fw-heavy);}
+  .tt-demo .tt-mm{color:#cdd6dd;display:flex;align-items:center;gap:6px;margin-top:5px;
+    padding-top:5px;border-top:1px solid rgba(255,255,255,.18);}
+  .tt-demo .tt-mm .mm-line{width:16px;height:0;border-top:2px solid #9fc0d4;display:inline-block;}
+  .tt-cols{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
+  .tt-cols figure{margin:0;}
+  .tt-cols figcaption{font-size:var(--fs-2xs);color:var(--gris);margin-top:6px;text-align:center;}
+
+  .reco{background:#eef4ee;border-left:3px solid var(--ic-pf);border-radius:0 8px 8px 0;
+    padding:12px 14px;font-size:var(--fs-sm);margin:8px 0 0;max-width:760px;}
+  .reco b{color:var(--ic-pf);}
+  .warn{color:var(--alerta);}
+  code{background:#efeadd;padding:1px 5px;border-radius:3px;font-size:.92em;}
+</style>
+</head>
+<body>
+
+<h1>Valor del promedio móvil — variantes</h1>
+<p class="sub">Cabecera (móvil vigente) + tooltip por año, en indicadores y dimensiones. Clases reales del motor.
+Datos de ejemplo: indicador Autoestima, móvil vigente = <b>67,3</b> (año 2024, porque la ventana centrada de 3 no alcanza el último año con dato).</p>
+
+<div class="reco">
+<b>Nota metodológica que toda variante respeta:</b> la ventana centrada de 3 no produce valor para el último año de la serie (no tiene vecino derecho). El "móvil vigente" es el del <b>penúltimo año con dato</b>. Por eso la etiqueta lleva el año (<code>móvil 2024</code>), no se presenta como "el móvil de hoy". Mostrarlo sin año sugeriría que es el valor actual y sería engañoso.
+</div>
+
+<h2>Cabecera de indicador — móvil vigente</h2>
+<p class="note">El <code>HistTrend</code> ("vs 2024: ▼ -14 · sig.") ya ocupa la derecha de la cabecera. Las variantes resuelven cómo añadir el móvil sin saturar.</p>
+
+<div class="variant-lab">A1 · chip con caja</div>
+<div class="panel" style="--ic:var(--ic-am)">
+  <div class="hist-ind-h">
+    <span class="indp-dot" style="background:var(--ic-am)"></span>
+    <span class="hist-ind-name">Autoestima Académica y Motivación Escolar</span>
+    <span class="mm-chip" style="--ic:var(--ic-am)"><span class="mm-line"></span>móvil 2024 <b>67,3</b></span>
+    <span class="hist-trend al" style="margin-left:8px">vs 2024: <span class="ht-ic">▼</span> -14 · sig.</span>
+  </div>
+  <div class="panel-body">(barras por año irían aquí)</div>
+</div>
+
+<div class="variant-lab">A2 · texto suelto, sin caja</div>
+<div class="panel" style="--ic:var(--ic-am)">
+  <div class="hist-ind-h">
+    <span class="indp-dot" style="background:var(--ic-am)"></span>
+    <span class="hist-ind-name">Autoestima Académica y Motivación Escolar</span>
+    <span class="mm-plain" style="--ic:var(--ic-am);margin-left:auto"><span class="mm-line"></span>móvil 2024 <b>67,3</b></span>
+    <span class="hist-trend al" style="margin-left:14px">vs 2024: <span class="ht-ic">▼</span> -14 · sig.</span>
+  </div>
+  <div class="panel-body">(barras por año irían aquí)</div>
+</div>
+
+<div class="variant-lab">A3 · pila a la derecha (HistTrend arriba, móvil abajo)</div>
+<div class="panel" style="--ic:var(--ic-am)">
+  <div class="hist-ind-h">
+    <span class="indp-dot" style="background:var(--ic-am)"></span>
+    <span class="hist-ind-name">Autoestima Académica y Motivación Escolar</span>
+    <span class="head-stack">
+      <span class="hist-trend al">vs 2024: <span class="ht-ic">▼</span> -14 · sig.</span>
+      <span class="mm-sub" style="--ic:var(--ic-am)"><span class="mm-line"></span>móvil 2024: <b>67,3</b></span>
+    </span>
+  </div>
+  <div class="panel-body">(barras por año irían aquí)</div>
+</div>
+
+<h2>Cabecera de dimensión — el caso restringido</h2>
+<p class="note">Las dimensiones van dos por fila (grid), con <code>HistTrend tiny</code>. Espacio horizontal escaso: aquí el chip con caja puede no caber. Se muestran dos opciones.</p>
+
+<div class="panel" style="--ic:var(--ic-am)">
+  <div class="dimgrid">
+    <div class="hist-dim" style="--ic:var(--ic-am)">
+      <div class="variant-lab" style="margin-bottom:6px">D1 · chip tiny</div>
+      <div class="hist-dim-h">
+        <span class="sw sm" style="background:var(--ic-am)"></span>
+        <span class="hist-dim-name">Autopercepción</span>
+        <span class="mm-chip tiny" style="--ic:var(--ic-am);margin-left:auto"><span class="mm-line"></span>m. <b>71</b></span>
+      </div>
+      <div class="dim-fake-bars"></div>
+      <div class="hist-trend tiny al" style="margin-top:6px">vs 2024: ▼ -8 · sig.</div>
+    </div>
+    <div class="hist-dim" style="--ic:var(--ic-am)">
+      <div class="variant-lab" style="margin-bottom:6px">D2 · móvil bajo el nombre</div>
+      <div class="hist-dim-h">
+        <span class="sw sm" style="background:var(--ic-am)"></span>
+        <span class="hist-dim-name">Motivación escolar</span>
+        <span class="hist-trend tiny al" style="margin-left:auto">vs 2024: ▼ -8 · sig.</span>
+      </div>
+      <div class="mm-sub" style="--ic:var(--ic-am);margin:0 0 8px"><span class="mm-line"></span>móvil 2024: <b>64,1</b></div>
+      <div class="dim-fake-bars"></div>
+    </div>
+  </div>
+</div>
+
+<h2>Tooltip por año (al pasar el cursor sobre una barra)</h2>
+<p class="note">Hoy el tooltip muestra nombre + año + valor. Se enriquece con el móvil <i>de ese año</i> (si existe; los extremos no tienen móvil). Reusa <code>showTT</code> existente.</p>
+<div class="tt-cols">
+  <figure>
+    <div class="tt-demo">
+      <b>Autoestima Académica</b><br>
+      2023: 68,5 (0–100)
+      <div class="tt-mm"><span class="mm-line"></span>promedio móvil: 67,3</div>
+    </div>
+    <figcaption>T1 · móvil como línea separada, con muestra de trazo</figcaption>
+  </figure>
+  <figure>
+    <div class="tt-demo">
+      <b>Autoestima Académica</b><br>
+      2023: 68,5 (0–100)<br>
+      <span style="color:#cdd6dd">Promedio móvil del año: 67,3</span>
+    </div>
+    <figcaption>T2 · móvil como texto simple</figcaption>
+  </figure>
+  <figure>
+    <div class="tt-demo">
+      <b>Autoestima Académica</b><br>
+      2025: 70,1 (0–100)<br>
+      <i style="color:#cdd6dd">año más reciente con dato</i>
+      <div class="tt-mm" style="color:#9aa0a6"><span class="mm-line" style="border-top-color:#9aa0a6"></span>sin móvil (extremo de la serie)</div>
+    </div>
+    <figcaption>T3 · caso extremo: año sin móvil, declarado</figcaption>
+  </figure>
+</div>
+
+<div class="reco" style="margin-top:24px">
+<b>Recomendación:</b> cabecera de indicador <b>A2</b> (texto suelto), cabecera de dimensión <b>D2</b> (móvil bajo el nombre), tooltip <b>T1</b> + <b>T3</b>.
+Razón: A2 evita una caja más en una cabecera ya densa y mantiene la jerarquía (el HistTrend sigue siendo la marca dominante); en dimensiones el chip tiny (D1) compite con el HistTrend tiny en muy poco ancho y se rompe en pantallas medias, mientras D2 le da su propio renglón; T1 hace legible el móvil en el tooltip con su muestra de trazo, y T3 es obligatorio para no mentir en los extremos sin móvil.
+</div>
+
+</body>
+</html>
