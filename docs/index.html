@@ -7188,7 +7188,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   .hist-ind{border:1px solid var(--linea);border-top:3px solid var(--ic,var(--azul));border-radius:var(--radius-3);
     background:var(--paper);margin:0 22px 16px;box-shadow:var(--shadow-1);}
   .hist-ind:first-of-type{margin-top:16px;}
-  .hist-ind-h{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--linea);}
+  .hist-ind-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px 11px;padding:14px 16px;border-bottom:1px solid var(--linea);}
   .hist-ind-name{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-lg);color:var(--tinta);}
   .hist-main{padding:22px 16px 4px;}
   .hist-dims-lab{font-size:var(--fs-xs);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);padding:4px 16px 0;}
@@ -7233,13 +7233,21 @@ AAABrwBBAPMAAA==) format('opentype');}
     border-radius:var(--radius-2);padding:10px 11px;background:var(--paper);}
   .hist-dim .ybars{--yh:130px;}
   /* Cabecera de cada dimension en el historico: nombre + marca de tendencia */
-  .hist-dim-h{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+  .hist-dim-h{display:flex;align-items:center;flex-wrap:wrap;gap:6px 9px;margin-bottom:10px;}
   .hist-dim-name{font-weight:var(--fw-bold);font-size:var(--fs-base);color:var(--tinta);min-width:0;}
   /* Marca de tendencia del ultimo año con dato vs la evaluacion anterior (leida) */
   .hist-trend{margin-left:auto;font-size:var(--fs-sm);font-weight:var(--fw-heavy);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
   .hist-trend.tiny{font-size:var(--fs-xs);font-weight:var(--fw-bold);}
   .hist-trend.de{color:var(--destaca);} .hist-trend.al{color:var(--alerta);} .hist-trend.nt{color:var(--st-neutro);}
   .hist-trend .ht-ic{font-weight:var(--fw-heavy);}
+  /* Valor de la media movil VIGENTE en la cabecera (texto suelto, no caja). El
+     HistTrend ya lleva margin-left:auto y empuja el grupo a la derecha; la media
+     movil va despues y, por flex-wrap, baja sola al renglon siguiente en ancho
+     estrecho. .mm-line = muestra del trazo (color del indicador, --ic heredado). */
+  .mm-head{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-sm);color:var(--gris);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .mm-head b{color:var(--tinta);font-weight:var(--fw-heavy);}
+  .hist-dim-h .mm-head{font-size:var(--fs-xs);}
+  .mm-line{display:inline-block;width:16px;height:0;border-top:2px solid var(--ic,var(--gris));opacity:.6;}
   .nota-inv{margin:14px 22px;}
 
   /* ============================================================
@@ -7703,9 +7711,11 @@ AAABrwBBAPMAAA==) format('opentype');}
   // propio EE (igual que serieFull); el hueco "sin dato" (EE sin fila ese año con_dato)
   // se conserva. El motivo del vacio (pandemia vs no_eval) viene del dato, no del JS.
   function serieEje(ofFn,rbd,grado,id,eje){return eje.map(y=>{
-    if(y.estado!=="con_dato") return {a:y.agno, v:null, dif:null, sig:null, estado:y.estado};
+    if(y.estado!=="con_dato") return {a:y.agno, v:null, dif:null, sig:null, difgru:null, sigdifgru:null, estado:y.estado};
     const d=ofFn(rbd,grado,y.agno)[id]||{};
-    return {a:y.agno, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null), estado:"con_dato"};});}
+    // difgru/sigdifgru solo existen a nivel INDICADOR (indOf los trae; dimOf no -> null).
+    // No se ramifica por grano: la condicionalidad por presencia de campo basta.
+    return {a:y.agno, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null), difgru:(d.difgru!=null?d.difgru:null), sigdifgru:(d.sigdifgru!=null?d.sigdifgru:null), estado:"con_dato"};});}
 
   // ===== Vista historica: barras verticales por año (revision P3-s9) =====
   // Reemplaza el antiguo panel de evolucion (lineas) en el historico. Una columna por año:
@@ -7731,7 +7741,11 @@ AAABrwBBAPMAAA==) format('opentype');}
     return out;
   }
 
-  function BarrasAnio({nombre,color,pts}){
+  function BarrasAnio({nombre,color,pts,gse}){
+    // Media movil por año para el tooltip (misma funcion pura que alimenta mmLine).
+    // Solo los puntos INTERIORES de la secuencia con_dato tienen media; los extremos
+    // no (mmByYear no los incluye -> el tooltip lo declara como extremo de la serie).
+    const mmByYear={}; mediaMovil(pts).forEach(s=>{mmByYear[s.a]=s.m;});
     // ultimo año CON DATO del EE (no necesariamente 2025): recorre de atras hacia
     // adelante y toma el primer punto con barra real (no off, v presente).
     let latest=-1;
@@ -7788,11 +7802,25 @@ AAABrwBBAPMAAA==) format('opentype');}
                       <div className={"ybar-fill"+(isLatest?" is-latest":"")}
                         style={{height:Math.max(0,Math.min(100,p.v))+"%",background:color,
                           outline:isLatest?("2px solid "+color):undefined,outlineOffset:isLatest?"1px":undefined}}
-                        onMouseMove={e=>showTT("<b>"+nombre+"</b><br>"+p.a+(prelim?"*":"")+": "+fmt(p.v)+" (0–100)"+(isLatest?"<br><i>año más reciente con dato</i>":""),e)} onMouseLeave={hideTT}>
+                        onMouseMove={e=>showTT((()=>{
+                          let h="<b>"+nombre+"</b><br>"+p.a+(prelim?"*":"")+": "+fmt(p.v)+" (0–100)"+(isLatest?"<br><i>año más reciente con dato</i>":"");
+                          const sw="<span style='display:inline-block;width:14px;height:0;border-top:2px solid "+color+";opacity:.6;vertical-align:middle;margin-right:5px;'></span>";
+                          h += (mmByYear[p.a]!=null)
+                            ? "<br>"+sw+"media móvil: "+fmt(mmByYear[p.a])
+                            : "<br><span style='opacity:.6'>sin media móvil (extremo de la serie)</span>";
+                          if(gse && p.difgru!=null){
+                            const gl=p.difgru>0?"▲":(p.difgru<0?"▼":"=");
+                            const col=p.sigdifgru===1?"var(--destaca)":(p.sigdifgru===-1?"var(--alerta)":"var(--st-neutro)");
+                            const sg=(p.sigdifgru===1||p.sigdifgru===-1)?"· sig.":"· n.s.";
+                            h += "<br><span style='color:"+col+"'>vs GSE: "+gl+" "+fmtSigned(p.difgru)+" "+sg+"</span>";
+                          }
+                          return h;
+                        })(),e)} onMouseLeave={hideTT}>
                         <span className="ybar-val">{fmt(p.v)}
-                          {p.dif!=null && (()=>{const g=p.dif>0?"▲":(p.dif<0?"▼":"=");
+                          {p.dif!=null ? (()=>{const g=p.dif>0?"▲":(p.dif<0?"▼":"=");
                             const cls=(p.sig===1||p.sig===-1)?(p.dif>0?"de":(p.dif<0?"al":"nt")):"nt";
-                            return <span className={"ybar-sig "+cls} title={"vs evaluación anterior: "+(p.dif>0?"+":"")+p.dif+" pts"+((p.sig===1||p.sig===-1)?" (significativo)":" (solo aritmético)")}>{g}</span>;})()}
+                            return <span className={"ybar-sig "+cls} title={"vs evaluación anterior: "+(p.dif>0?"+":"")+p.dif+" pts"+((p.sig===1||p.sig===-1)?" (significativo)":" (solo aritmético)")}>{g}</span>;})()
+                            : <span className="ybar-sig nt" title="La Agencia no publica la comparación con la evaluación anterior para este año">·</span>}
                         </span></div>
                     </React.Fragment>}
               </div>
@@ -7971,27 +7999,24 @@ AAABrwBBAPMAAA==) format('opentype');}
           {isHist
             ? (
             <div className="hist-wrap">
-              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, siguiendo una escala que va desde 0 (puntaje mínimo) hasta 100 (puntaje máximo). La significancia estadística es calculada e informada por la Agencia. El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia. Un año sin resultados no significa un resultado bajo sino que indica que no hubo medición o que esta no fue válida según los estándares fijados por la Agencia. En 2019, donde como cada año correspondía aplicar la medición en 4° básico y 2° medio, la Agencia informa que, debido a los incidentes en el país tras el 18 de octubre, la aplicación de 4° básico enfrentó alteraciones en varios establecimientos y la de 2° medio no pudo realizarse. En 2020 y 2021, la interrupción se debió a la pandemia del COVID-19. Si en un año se realizó la evaluación a nivel nacional pero el establecimiento seleccionado no contó con resultados válidos, aparecerá sin datos. La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b>, calculado según los datos de las últimas tres aplicaciones con resultados válidos.</div>
-              <div className="leyenda hist-leg">
-                <span><span className="sw-line mm"></span>Promedio móvil (tendencia)</span>
-              </div>
+              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, siguiendo una escala que va desde 0 (puntaje mínimo) hasta 100 (puntaje máximo). La significancia estadística es calculada e informada por la Agencia. El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia. Un año sin resultados no significa un resultado bajo sino que indica que no hubo medición o que esta no fue válida según los estándares fijados por la Agencia. En 2019, donde como cada año correspondía aplicar la medición en 4° básico y 2° medio, la Agencia informa que, debido a los incidentes en el país tras el 18 de octubre, la aplicación de 4° básico enfrentó alteraciones en varios establecimientos y la de 2° medio no pudo realizarse. En 2020 y 2021, la interrupción se debió a la pandemia del COVID-19. Si en un año se realizó la evaluación a nivel nacional pero el establecimiento seleccionado no contó con resultados válidos, aparecerá sin datos.<br/><span className="sw-line mm"></span> La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b>, calculado según los datos de las últimas tres aplicaciones con resultados válidos.</div>
               {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,ejeFam('indicador'));
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
-                  <div className="hist-ind-h"><span className="indp-dot" style={{background:ind.color}}></span><span className="hist-ind-name">{ind.nombre}</span><HistTrend pts={ipts}/></div>
-                  <div className="hist-main"><BarrasAnio nombre={ind.nombre} color={ind.color} pts={ipts}/></div>
+                  <div className="hist-ind-h"><span className="indp-dot" style={{background:ind.color}}></span><span className="hist-ind-name">{ind.nombre}</span><HistTrend pts={ipts}/>{(()=>{const mm=mediaMovil(ipts); if(!mm.length)return null; const v=mm[mm.length-1]; return <span className="mm-head"><span className="mm-line"></span> media móvil {v.a}: <b>{fmt(v.m)}</b></span>;})()}</div>
+                  <div className="hist-main"><BarrasAnio nombre={ind.nombre} color={ind.color} pts={ipts} gse={true}/></div>
                   {idims.length>0 && <>
                     <div className="hist-dims-lab">Dimensiones</div>
                     <div className="hist-dims">
                       {idims.map((dimo,di)=>{const dpts=serieEje(dimOf,rbd,grado,dimo.id,ejeFam('dimension')); const dcol=dimColor(ind.color,di,idims.length);
                         return (
                           <div className="hist-dim" key={dimo.id}>
-                            <div className="hist-dim-h"><span className="sw sm" style={{background:dcol}}></span><span className="hist-dim-name">{dimo.nombre}</span><HistTrend pts={dpts} tiny/></div>
+                            <div className="hist-dim-h"><span className="sw sm" style={{background:dcol}}></span><span className="hist-dim-name">{dimo.nombre}</span><HistTrend pts={dpts} tiny/>{(()=>{const mm=mediaMovil(dpts); if(!mm.length)return null; const v=mm[mm.length-1]; return <span className="mm-head"><span className="mm-line"></span> media móvil {v.a}: <b>{fmt(v.m)}</b></span>;})()}</div>
                             <BarrasAnio nombre={dimo.nombre} color={dcol} pts={dpts}/>
                           </div>);})}
                     </div></>}
                 </section>);})}
-              <div className="nota nota-inv">Cada panel usa barras por año sobre un eje fijo 0–100 (escala común, comparable); la <b>marca de tendencia</b> en cada cabecera muestra la diferencia (dif) del último año con dato vs la evaluación anterior y su significancia (▲/▼/= + texto). La significancia estadística es calculada e informada por la Agencia. La subdimensión no aparece aquí: es <b>distribución de niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia.":""}</div>
+              <div className="nota nota-inv">Cada panel usa barras por año sobre un eje fijo 0–100 (escala común, comparable). Junto al puntaje de cada año, una marca indica el cambio respecto de la evaluación anterior: <b>▲</b> subió, <b>▼</b> bajó, <b>=</b> sin cambio. El <b>color</b> señala la significancia estadística (calculada e informada por la Agencia): azul o rojo cuando la diferencia es significativa, <b>gris</b> cuando no es estadísticamente significativa. El signo <b>·</b> indica que la Agencia no publica esa comparación para ese año. La subdimensión no aparece aquí: es <b>distribución en niveles</b>, no un puntaje, y se ve en la Vista actual. {anios.some(a=>PRELIM.has(String(a)))?"El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia.":""}</div>
             </div>)
             : (
             <div>
