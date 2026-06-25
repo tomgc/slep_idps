@@ -67,6 +67,12 @@ PATRON_DATOS <- "^idps(2m|4b|6b|8b)(\\d{4})_(.+)_(final|preliminar)$"
 # Historico 2014-2019 (P5 fase 3): nomenclatura canonica fijada en la fase 2,
 # idps{grado}{anio}_rbd_historico.{xls,xlsx} en 20_insumos/historico/. Es formato
 # ANCHO (indicador/dimension como columnas), se lee con su propia rama (Bloque 3b).
+# COBERTURA (constancia, no logica): la serie historica tiene huecos por AUSENCIA DE
+# APLICACION del instrumento en origen, no por datos pendientes. 6b y 8b se aplican de
+# forma intermitente (no anual); 2m/4b no se aplicaron en 2019 (estallido social tras
+# el 18 de octubre; 4b con alteraciones, 2m sin realizar) ni en 2020-2021 (pandemia).
+# Esto se LEE tal cual viene de la fuente; el patron no se extiende. Detalle y razon en
+# 50_documentacion/activa/decisiones/20260625_decision_cobertura_historico_idps.md.
 PATRON_HISTORICO <- "^idps(2m|4b|6b|8b)(\\d{4})_rbd_historico$"
 
 # Fragmento intermedio del nombre -> familia logica. La de niveles cambia de
