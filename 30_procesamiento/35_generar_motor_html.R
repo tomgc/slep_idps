@@ -412,6 +412,12 @@ anios_prelim <- sort(unique(as.integer(P$agno[P$preliminar %in% TRUE])))
 # dato; cada anio se clasifica con_dato / pandemia (2020-2021) / no_eval (anio del
 # rango sin dato que NO es pandemia, p.ej. 2019). El motivo del vacio se decide AQUI
 # (server-side, con constante nombrada), no en el JS; el template solo lo pinta.
+# CONSTANCIA (no logica): los estados "no_eval" corresponden a AUSENCIA DE APLICACION
+# documentada del instrumento, no a datos pendientes: 6b/8b se aplican de forma
+# intermitente (no anual) y 2m/4b no se aplicaron en 2019 (estallido social tras el 18
+# de octubre). La clasificacion no se altera; la nota VISIBLE del motor (template) se
+# limita a 2019/4b/2m, los unicos grados que el motor expone. Razon completa (4 grados)
+# en 50_documentacion/activa/decisiones/20260625_decision_cobertura_historico_idps.md.
 eje_historico <- lapply(names(grado_anios), function(g) {
   ad  <- grado_anios[[g]]
   eje <- seq.int(min(ad), max(ad))
