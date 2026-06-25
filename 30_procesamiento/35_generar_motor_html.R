@@ -418,6 +418,14 @@ anios_prelim <- sort(unique(as.integer(P$agno[P$preliminar %in% TRUE])))
 # de octubre). La clasificacion no se altera; la nota VISIBLE del motor (template) se
 # limita a 2019/4b/2m, los unicos grados que el motor expone. Razon completa (4 grados)
 # en 50_documentacion/activa/decisiones/20260625_decision_cobertura_historico_idps.md.
+# Motivo CONTEXTUAL del vacio por anio/grado (plan B: el motivo viaja en el payload;
+# el template solo lo pinta). Constantes nombradas (C.10), no-ASCII via \uXXXX. Solo
+# 4b/2m (los grados que el motor expone): separacion de capas s25, sin logica de 6b/8b.
+MOTIVO_PANDEMIA <- "La pandemia del COVID-19 interrumpio la evaluacion a nivel nacional."
+MOTIVO_2019_4B  <- "Tras los incidentes del 18 de octubre de 2019, la Agencia informa que la aplicacion de 4\u00b0 b\u00e1sico se vio alterada en varios establecimientos."
+MOTIVO_2019_2M  <- "Tras los incidentes del 18 de octubre de 2019, la Agencia informa que la aplicacion de 2\u00b0 medio no pudo realizarse."
+MOTIVO_NO_EVAL  <- "Este grado no se evaluo este a\u00f1o."
+
 eje_historico <- lapply(names(grado_anios), function(g) {
   ad  <- grado_anios[[g]]
   eje <- seq.int(min(ad), max(ad))
@@ -425,7 +433,15 @@ eje_historico <- lapply(names(grado_anios), function(g) {
     estado <- if (y %in% ANIOS_PANDEMIA) "pandemia"
               else if (y %in% ad)        "con_dato"
               else                       "no_eval"
-    list(agno = as.integer(y), estado = estado, preliminar = y %in% anios_prelim)
+    # Motivo del vacio (NA si con_dato): pandemia generico; 2019 fino por grado (4b/2m);
+    # resto de no_eval, texto generico de no aplicacion. Solo metadata, cero cifra.
+    motivo <- if (estado == "con_dato")           NA_character_
+              else if (estado == "pandemia")      MOTIVO_PANDEMIA
+              else if (y == 2019 && g == "4b")    MOTIVO_2019_4B
+              else if (y == 2019 && g == "2m")    MOTIVO_2019_2M
+              else                                MOTIVO_NO_EVAL
+    list(agno = as.integer(y), estado = estado, preliminar = y %in% anios_prelim,
+         motivo = motivo)
   })
 })
 names(eje_historico) <- names(grado_anios)

@@ -841,11 +841,11 @@ __FONTS_CSS__
   // propio EE (igual que serieFull); el hueco "sin dato" (EE sin fila ese año con_dato)
   // se conserva. El motivo del vacio (pandemia vs no_eval) viene del dato, no del JS.
   function serieEje(ofFn,rbd,grado,id,eje){return eje.map(y=>{
-    if(y.estado!=="con_dato") return {a:y.agno, v:null, dif:null, sig:null, difgru:null, sigdifgru:null, estado:y.estado};
+    if(y.estado!=="con_dato") return {a:y.agno, v:null, dif:null, sig:null, difgru:null, sigdifgru:null, motivo:y.motivo, estado:y.estado};
     const d=ofFn(rbd,grado,y.agno)[id]||{};
     // difgru/sigdifgru solo existen a nivel INDICADOR (indOf los trae; dimOf no -> null).
     // No se ramifica por grano: la condicionalidad por presencia de campo basta.
-    return {a:y.agno, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null), difgru:(d.difgru!=null?d.difgru:null), sigdifgru:(d.sigdifgru!=null?d.sigdifgru:null), estado:"con_dato"};});}
+    return {a:y.agno, v:(d.prom!=null?d.prom:null), dif:(d.dif!=null?d.dif:null), sig:(d.sigdif!=null?d.sigdif:null), difgru:(d.difgru!=null?d.difgru:null), sigdifgru:(d.sigdifgru!=null?d.sigdifgru:null), motivo:null, estado:"con_dato"};});}
 
   // ===== Vista historica: barras verticales por año (revision P3-s9) =====
   // Reemplaza el antiguo panel de evolucion (lineas) en el historico. Una columna por año:
@@ -918,7 +918,9 @@ __FONTS_CSS__
           const off=(p.estado==="pandemia"||p.estado==="no_eval");
           const hueco=!off && (p.v==null||isNaN(p.v));
           const isLatest=(i===latest);
-          const offTip=p.estado==="pandemia"?"Sin evaluación (pandemia)":"Este grado no se evaluó este año";
+          const offTip = p.motivo || (p.estado==="pandemia"
+            ? "Sin evaluación (pandemia)"
+            : "Este grado no se evaluó este año.");
           return (
             <div className={"ybar-col"+(off?" is-off":"")} key={p.a}>
               <div className="ybar-plot">
