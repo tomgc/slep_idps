@@ -313,7 +313,6 @@ cfg$faq <- list(
 )
 
 # ---- 1.13 Prosa de los documentos de lectura -------------------------------
-# REVISAR (voz): afinar el tono; el dato es correcto y la terminologia ya cumple 4.6.3.6 (establecimiento educacional).
 cfg$prosa <- list(
   doc_que = c(
     '<code class="inl">slep_idps</code> es una herramienta para <strong>explorar los Indicadores de Desarrollo Personal y Social (IDPS) de cada establecimiento</strong>, tal como los publica la Agencia de Calidad de la Educación. Muestra el panorama de un establecimiento en los cuatro indicadores de cuestionario, su desglose por dimensión y subdimensión, su evolución desde 2014, y cómo se sitúa respecto de establecimientos de su mismo grupo socioeconómico.',
@@ -372,7 +371,6 @@ cfg$pie_extra <- list(
 )
 
 # ---- 1.19 Textos de sección y hero-notes -----------------------------------
-# REVISAR (voz): títulos e intros de sección; ajustar tono si hace falta.
 cfg$textos <- list(
   ref_intro        = 'El diagrama de arriba muestra <strong>cómo fluyen los datos</strong>. Las secciones siguientes documentan el proyecto al detalle, de modo que cualquier persona técnica (o una sesión de IA) pueda reconstruir el contexto completo sin material adicional.',
   dic_crudos_titulo= 'Datos crudos (planillas IDPS y directorio)',
