@@ -7,6 +7,10 @@
 .Renviron
 *credentials*
 *secret*
+# Bloquea cualquier nombre con "token" (no solo credenciales). Si un
+# archivo legitimo (ej. tokens de diseno tipografico) colisiona,
+# renombrarlo para evitar el patron; no usar git add -f (P-GITIGNORE-TOKEN,
+# precedente s20).
 *token*
 *password*
 
