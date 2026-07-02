@@ -1,8 +1,8 @@
 # Estructura actual — slep_idps
 
 - **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-06-25 12:55:00
-- **Totales:** 32 carpetas, 283 archivos
+- **Fecha:** 2026-07-02 12:35:21
+- **Totales:** 32 carpetas, 284 archivos
 - **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 ## Arbol
@@ -113,7 +113,7 @@ slep_idps/
 │   ├── 32_censo_insumos.R  (9.37K)
 │   ├── 33_construir_catalogos.R  (15.2K)
 │   ├── 34_leer_normalizar_idps.R  (26.6K)
-│   ├── 35_generar_motor_html.R  (32.6K)
+│   ├── 35_generar_motor_html.R  (33.9K)
 │   └── 35_motor_template.html  (125K)
 ├── 40_salidas/
 │   ├── intermedios/
@@ -168,13 +168,13 @@ slep_idps/
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
 │   │   ├── .DS_Store  (10K)
-│   │   ├── backlog_historico.md  (39K)
-│   │   ├── backlog_volcado_crudo.md  (40.9K)
+│   │   ├── backlog_acumulativo.md  (45.8K)
 │   │   ├── censo_universo_idps.md  (117K)
-│   │   ├── POLITICA_PROYECTO.md  (29.7K)
+│   │   ├── ESTADO.md  (1.04K)
+│   │   ├── POLITICA_PROYECTO.md  (34.6K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
 │   │   ├── resena_slep_idps.md  (9.94K)
-│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (37.3K)
+│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (57.3K)
 │   ├── andamios/
 │   │   ├── diseno/
 │   │   │   ├── detalles/
@@ -260,12 +260,12 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260625_073755_estructura.md  (17.7K)
-│   │   ├── 20260625_073755_estructura.txt  (17.8K)
-│   │   ├── 20260625_123632_estructura.md  (18.2K)
-│   │   ├── 20260625_123632_estructura.txt  (18.2K)
+│   │   ├── 20260702_123020_estructura.md  (18.2K)
+│   │   ├── 20260702_123020_estructura.txt  (18.3K)
+│   │   ├── 20260702_123204_estructura.md  (18.2K)
+│   │   ├── 20260702_123204_estructura.txt  (18.3K)
 │   │   ├── estructura_actual.md  (18.2K)
-│   │   └── estructura_actual.txt  (18.2K)
+│   │   └── estructura_actual.txt  (18.3K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -282,8 +282,8 @@ slep_idps/
 │   │   ├── arquitectura_general_slep_idps_standalone.html  (440K)
 │   │   ├── arquitectura_slep_idps_standalone.html  (442K)
 │   │   ├── documentacion_general_slep_idps_standalone.html  (433K)
-│   │   ├── documentacion_proyecto_slep_idps_standalone.html  (437K)
-│   │   ├── documentar.R  (43.2K)
+│   │   ├── documentacion_proyecto_slep_idps_standalone.html  (438K)
+│   │   ├── documentar.R  (44.7K)
 │   │   └── suite_estilos.css  (21.7K)
 │   ├── traspasos/
 │   │   ├── .gitkeep  (0)
@@ -311,13 +311,14 @@ slep_idps/
 │   │   ├── traspaso_cierre_v22.md  (30.3K)
 │   │   ├── traspaso_cierre_v23.md  (21.3K)
 │   │   ├── traspaso_cierre_v24.md  (19.6K)
-│   │   └── traspaso_cierre_v25.md  (22.6K)
+│   │   ├── traspaso_cierre_v25.md  (22.6K)
+│   │   └── traspaso_cierre_v26.md  (26.9K)
 │   └── .DS_Store  (16K)
 ├── docs/
-│   └── index.html  (5.11M)
+│   └── index.html  (5.12M)
 ├── tests/
 │   └── .gitkeep  (0)
-├── .DS_Store  (16K)
+├── .DS_Store  (14K)
 ├── .gitignore  (1.55K)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
@@ -330,7 +331,7 @@ slep_idps/
 
 | Extension | Archivos |
 |---|---|
-| md | 115 |
+| md | 116 |
 | xlsx | 54 |
 | (sin extension) | 20 |
 | otf | 13 |
