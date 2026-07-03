@@ -667,8 +667,8 @@ __FONTS_CSS__
         ptsG.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",small?2.2:2.8).attr("fill",COLG)
           .on("mousemove",e=>showTT("<b>"+(labelG||"Promedio del mismo GSE")+"</b><br>"+p.a.label+": "+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});}
       const pts=mkpts(axes);
-      svg.append("path").datum(pts).attr("d",lineGen).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.8);
-      pts.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",(showLabels||showValues)?4:2.6).attr("fill",p.a.color||"var(--azul)")
+      svg.append("path").datum(pts).attr("d",lineGen).attr("fill","rgba(10,58,92,.10)").attr("stroke","var(--azul)").attr("stroke-width",1.2);
+      pts.forEach(p=>{if(p.a.value==null)return;svg.append("circle").attr("cx",p.x).attr("cy",p.y).attr("r",(showLabels||showValues)?7:5).attr("fill",p.a.color||"var(--azul)").attr("stroke",d3.color(p.a.color||"#0A3A5C").darker(2.5)).attr("stroke-width",0.6)
         .on("mousemove",e=>showTT("<b>"+p.a.label+"</b><br>"+fmt(p.a.value)+" pts (0–100)",e)).on("mouseleave",hideTT);});
     },[axes,axesG,size,showLabels,showValues,colG,labelG]);
     return <div ref={ref}></div>;
