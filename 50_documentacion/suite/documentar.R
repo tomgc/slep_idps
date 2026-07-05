@@ -56,7 +56,7 @@ cfg$cab <- list(
     metas   = list(
       list(c="var(--ocean)", k="Lenguaje", v="R"),
       list(c="var(--coral)", k="Salida",   v="HTML autocontenido"),
-      list(c="var(--olive)", k="Cobertura",v="2014–2025"),
+      list(c="var(--olive)", k="Cobertura",v="2014–2019, 2022–2025"),
       list(c="var(--sand)",  k="Niveles",  v="4° básico · II medio")
     )
   ),

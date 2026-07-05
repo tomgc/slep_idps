@@ -54,4 +54,7 @@ diagnostico_*.md
 # inline_suite.R, para reproducir la suite desde el repo sin depender del paquete
 # suitedoc (copiar_tema) para el tema. Solo los HTML generados (base + *_standalone)
 # quedan gitignorados: son reproducibles con documentar.R / inline_suite.R.
-50_documentacion/suite/*.html
+50_documentacion/suite/arquitectura_slep_idps.html
+50_documentacion/suite/arquitectura_general_slep_idps.html
+50_documentacion/suite/documentacion_proyecto_slep_idps.html
+50_documentacion/suite/documentacion_general_slep_idps.html
