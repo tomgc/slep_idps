@@ -8,6 +8,7 @@
 #   34. 34_leer_normalizar_idps.R        3 familias -> homologacion -> join ->
 #                                        idps_largo.parquet (SIN agregacion)
 #   35. 35_generar_motor_html.R          motor HTML autocontenido (P9, pendiente)
+#   36. 36_exponer_contrato_contexto.R   contrato de contexto v1 (parquet publico)
 #
 # Solo orquesta: cero logica de negocio, sin cache por timestamp. Los ids de
 # paso coinciden con el prefijo del script, asi run_all(only = 35) regenera
@@ -57,7 +58,9 @@ PASOS <- list(
   list(id = 34L, etiqueta = "Leer y normalizar IDPS (3 familias -> parquet largo)",
        ruta = file.path("30_procesamiento", "34_leer_normalizar_idps.R")),
   list(id = 35L, etiqueta = "Generar motor HTML autocontenido (todo Chile)",
-       ruta = file.path("30_procesamiento", "35_generar_motor_html.R"))
+       ruta = file.path("30_procesamiento", "35_generar_motor_html.R")),
+  list(id = 36L, etiqueta = "Exponer contrato de contexto v1 (parquet publico)",
+       ruta = file.path("30_procesamiento", "36_exponer_contrato_contexto.R"))
 )
 
 
