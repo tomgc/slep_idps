@@ -14,6 +14,11 @@
 # punto entrara data por estudiante, el proyecto pasa a RAMA B (dos raices).
 # =============================================================================
 
+# Guarda de locale UTF-8 (POLITICA 5.2bis): primera linea ejecutable, antes de
+# cualquier lectura o escritura.
+source(here::here("10_utils", "10_locale.R"))
+asegurar_locale_utf8("10_configuracion.R")
+
 # --- Identificador del proyecto ---------------------------------------------
 PROYECTO_ID <- "slep_idps"
 
