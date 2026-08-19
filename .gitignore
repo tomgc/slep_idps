@@ -58,3 +58,8 @@ diagnostico_*.md
 50_documentacion/suite/arquitectura_general_slep_idps.html
 50_documentacion/suite/documentacion_proyecto_slep_idps.html
 50_documentacion/suite/documentacion_general_slep_idps.html
+
+# Gobernanza: viven en la knowledge base del Project, no en el repositorio.
+POLITICA_PROYECTO.md
+SETTINGS_Y_PROMPTS_OPERACIONALES.md
+CLAUDE.md
