@@ -1,6 +1,6 @@
 ESCANEO DE ESTRUCTURA — slep_idps
 Raiz   : /Users/tomgc/Projects/slep_idps
-Fecha  : 2026-07-03 14:20:07
+Fecha  : 2026-07-04 22:20:11
 Totales: 32 carpetas, 286 archivos
 Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
@@ -256,11 +256,11 @@ slep_idps/
 │   │   └── .gitkeep  (0)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260702_123204_estructura.md  (18.2K)
-│   │   ├── 20260702_123204_estructura.txt  (18.3K)
 │   │   ├── 20260702_123521_estructura.md  (18.2K)
 │   │   ├── 20260702_123521_estructura.txt  (18.4K)
-│   │   ├── estructura_actual.md  (18.2K)
+│   │   ├── 20260703_142007_estructura.md  (18.3K)
+│   │   ├── 20260703_142007_estructura.txt  (18.4K)
+│   │   ├── estructura_actual.md  (18.3K)
 │   │   └── estructura_actual.txt  (18.4K)
 │   ├── suite/
 │   │   ├── assets/
@@ -317,7 +317,7 @@ slep_idps/
 ├── tests/
 │   └── .gitkeep  (0)
 ├── .DS_Store  (16K)
-├── .gitignore  (1.78K)
+├── .gitignore  (1.97K)
 ├── 00_build.R  (6.91K)
 ├── 00_escanear_proyecto.R  (8.99K)
 ├── CLAUDE.md  (7.99K)
