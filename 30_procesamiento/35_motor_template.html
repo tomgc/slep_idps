@@ -415,8 +415,15 @@ __FONTS_CSS__
   .s100-seg span{font-size:var(--fs-caption);font-weight:var(--fw-bold);color:#fff;white-space:nowrap;padding:0 4px;}
   .s100-empty{align-items:center;justify-content:center;}
   .s100-nd{font-size:var(--fs-caption);color:var(--gris);font-style:italic;}
-  .s100-ext{display:flex;gap:8px;flex-wrap:wrap;margin-top:3px;font-size:var(--fs-overline);line-height:1.2;}
+  /* s29: la tira externa se alinea a los SECTORES de la barra — "bajo" a la
+     izquierda (donde empieza su segmento), "sobre" a la derecha (donde termina el
+     suyo) y el neutro al centro. Grid de 3 posiciones fijas: el estado ausente NO
+     desplaza a los otros dos. */
+  .s100-ext{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:3px;font-size:var(--fs-overline);line-height:1.2;align-items:baseline;}
   .s100-ext-it{font-weight:var(--fw-bold);white-space:nowrap;}
+  .s100-ext-it.ext-bajo{grid-column:1;justify-self:start;}
+  .s100-ext-it.ext-neutro{grid-column:2;justify-self:center;}
+  .s100-ext-it.ext-sobre{grid-column:3;justify-self:end;}
 
   /* ============================================================
      Fase 4 — Comparación entre territorios (banner del comparador + banda
@@ -550,7 +557,7 @@ __FONTS_CSS__
 
   <script type="text/babel" data-presets="env,react">
   "use strict";
-  const {useState, useMemo, useRef, useEffect} = React;
+  const {useState, useMemo, useRef, useEffect, useLayoutEffect} = React;
 
   // ===== Indice de rangos por rbd (columnas ORDENADAS por rbd; sin materializar
   //       1,5M de objetos: solo [inicio,fin) por establecimiento) =====
@@ -763,11 +770,62 @@ __FONTS_CSS__
     const order=[...out].sort((a,b)=>(b.raw-b.p)-(a.raw-a.p)); for(let i=0;i<rem;i++) order[i%order.length].p++;
     return out;
   }
+  // ===== Medicion real del espacio de la etiqueta (s29) =====
+  // El umbral de etiquetado deja de ser un % del total (16/9, calibrado con
+  // territorios de dos digitos de EE) y pasa a ser el espacio REAL del segmento:
+  // se mide en pixeles el ancho del texto completo "p% (n)" contra los pixeles que
+  // ese segmento ocupa. Con el nivel nacional "18% (1.108)" no cabe en el 18% de
+  // una columna repartida entre cuatro indicadores y el texto se cortaba a media
+  // cifra (invariante: nunca un numero truncado). La fuente NO se escribe a mano:
+  // se DERIVA del CSS efectivo de ".s100-seg span" y se vuelve a derivar en
+  // document.fonts.ready (las OTF de marca van embebidas y cambian el ancho del
+  // texto una vez cargadas).
+  const HOLGURA_FULL=12;   // px de aire minimo para dar por buena la etiqueta interna
+  const _cvsMed=document.createElement("canvas"), _ctxMed=_cvsMed.getContext("2d");
+  function _fuenteBarra(){
+    const host=document.createElement("div"); host.className="s100";
+    host.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;";
+    const seg=document.createElement("div"); seg.className="s100-seg";
+    const sp=document.createElement("span"); sp.textContent="0";
+    seg.appendChild(sp); host.appendChild(seg); document.body.appendChild(host);
+    const cs=getComputedStyle(sp);
+    const f=(cs.fontWeight||"700")+" "+(cs.fontSize||"14px")+" "+(cs.fontFamily||"system-ui");
+    document.body.removeChild(host); return f;
+  }
+  let _fuenteMed=null;
+  const _fuenteSubs=new Set();
+  function medirTexto(txt){ if(_fuenteMed===null)_fuenteMed=_fuenteBarra();
+    _ctxMed.font=_fuenteMed; return _ctxMed.measureText(txt).width; }
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
+    _fuenteMed=_fuenteBarra(); _fuenteSubs.forEach(fn=>fn()); });
+  // ResizeObserver COMPARTIDO: uno por celda es inaceptable (la matriz del
+  // comparador llega a ~200 celdas). Un solo observer a nivel de modulo con un Map
+  // elemento -> callback; cada barra se da de alta y de baja en su efecto de layout.
+  const _obsBarra=new Map();
+  const _roBarra=(typeof ResizeObserver!=="undefined")
+    ? new ResizeObserver(es=>es.forEach(e=>{const cb=_obsBarra.get(e.target); if(cb)cb(e.target.clientWidth);}))
+    : null;
+  function observar(el,cb){ if(!el)return; _obsBarra.set(el,cb); if(_roBarra)_roBarra.observe(el); }
+  function desobservar(el){ if(!el)return; _obsBarra.delete(el); if(_roBarra)_roBarra.unobserve(el); }
+
   // Barra apilada 100% por estado vs GSE. Colores de ESTADO del motor
   // (alerta/gris/destaca), DISTINTOS de la paleta de 4 indicadores (invariante).
   // Significancia comunicada por texto (en el title de cada segmento).
   function StackedBar({rep}){
-    if(rep.N===0) return <div className="s100 s100-empty"><span className="s100-nd">sin dato</span></div>;
+    // s29: el ancho REAL de la barra vive en estado; el ResizeObserver compartido lo
+    // actualiza cuando cambia el ancho de la columna (ventana, scroll horizontal,
+    // alta/baja de entidades). Los hooks van antes del retorno de "sin dato".
+    const barRef=useRef(null);
+    const [ancho,setAncho]=useState(0);
+    const [,setFuenteVer]=useState(0);
+    const vacia=rep.N===0;
+    useLayoutEffect(()=>{ if(vacia) return; const el=barRef.current; if(!el) return;
+      setAncho(el.clientWidth); observar(el,w=>setAncho(w));
+      return ()=>desobservar(el); },[vacia]);
+    // Repintado cuando las OTF embebidas terminan de cargar (cambia el ancho del texto).
+    useEffect(()=>{const fn=()=>setFuenteVer(v=>v+1); _fuenteSubs.add(fn);
+      return ()=>{_fuenteSubs.delete(fn);};},[]);
+    if(vacia) return <div className="s100 s100-empty"><span className="s100-nd">sin dato</span></div>;
     const parts=pctRound([
       {k:"bajo",c:"var(--alerta)",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
       {k:"neutro",c:"var(--st-neutro)",count:rep.neutro,lbl:"= sin diferencia significativa"},
@@ -775,17 +833,27 @@ __FONTS_CSS__
     // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
     // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
     const aria="Distribución de "+rep.N+" establecimientos con dato: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ");
+    // REGLA UNICA de etiquetado (s29): dentro del segmento va SOLO el dato completo
+    // "p% (n)", y solo si cabe entero con holgura. Lo que no cabe no se recorta ni se
+    // degrada a "p%" a secas: baja ENTERO a la tira externa. Asi nunca se lee un
+    // numero a medias (invariante 4) ni el mismo porcentaje dentro y fuera (inv. 5).
+    const gl={bajo:"▼",neutro:"=",sobre:"▲"};
+    const fuera=[];
+    const segs=parts.map(s=>{ if(s.p===0) return null;
+      const full=s.p+"% ("+fmt(s.count)+")";
+      const cabe=medirTexto(full)+HOLGURA_FULL<=ancho*s.p/100;
+      if(!cabe) fuera.push(s);
+      return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
+        title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{cabe&&<span>{full}</span>}</div>;});
     return (<>
-      <div className="s100" role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con dato"}>{parts.map(s=>{if(s.p===0)return null;
-        const lab=s.p>=16?(s.p+"% ("+s.count+")"):(s.p>=9?s.p+"%":"");
-        return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
-          title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{lab&&<span>{lab}</span>}</div>;})}</div>
-      {/* #18 (s22): tira externa para segmentos finos (<9%) que no caben dentro de la
-          barra; cada % con su glifo de estado y color (el neutro usa --st-neutro de #23). */}
-      {(()=>{const fin=parts.filter(s=>s.p>0&&s.p<9); if(!fin.length) return null;
-        const gl={bajo:"▼",neutro:"=",sobre:"▲"};
-        return <div className="s100-ext">{fin.map(s=>
-          <span key={s.k} className="s100-ext-it" style={{color:s.c}} title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}%</span>)}</div>;})()}
+      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con dato"}>{segs}</div>
+      {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
+          completo no cupo dentro de la barra; cada uno con su glifo de estado, su
+          color y su "p% (n)" entero (el neutro usa --st-neutro de #23). El grid la
+          alinea al sector correspondiente: bajo | neutro | sobre. */}
+      {fuera.length>0 && <div className="s100-ext">{fuera.map(s=>
+        <span key={s.k} className={"s100-ext-it ext-"+s.k} style={{color:s.c}}
+          title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}% ({fmt(s.count)})</span>)}</div>}
     </>);
   }
 
