@@ -192,6 +192,10 @@ __FONTS_CSS__
   .check-row.is-checked .check-box{background:var(--foco);border-color:var(--foco);}
   .check-row.is-disabled{opacity:.45;cursor:not-allowed;}
   .check-row.is-disabled:hover{background:transparent;}
+  /* s29: fila fija de la entidad NACIONAL en el modal del comparador (arriba de la
+     lista, en todos los tabs). Se distingue con borde punteado de foco, no con un
+     color de estado (la paleta de estado no se toca). */
+  .check-row.is-nac{background:var(--panel);border:1px dashed var(--foco);}
   .modal-count{font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-bold);margin-right:auto;}
   .estab-popup-btn.is-primary{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:var(--fw-bold);}
   .estab-popup-btn.is-primary:hover{background:var(--foco);}
@@ -450,6 +454,10 @@ __FONTS_CSS__
   .cmp-ct{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
   .cmp-cn{font-weight:var(--fw-bold);font-size:var(--fs-body);color:var(--tinta);}
   .cmp-cm{font-size:var(--fs-caption);color:var(--gris);margin-top:1px;}
+  /* s29: chips diferenciados por TIPO de entidad — rotulo (cmp-ck) y banda de color
+     a la izquierda. La banda identifica el tipo de entidad; no codifica dato. */
+  .cmp-ck{font-size:var(--fs-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);margin-bottom:2px;}
+  .cmp-chip.is-nac{border-left:4px solid var(--azul);}
   .cmp-x{background:none;border:0;cursor:pointer;color:var(--gris);font-size:var(--fs-body);padding:0 0 0 2px;line-height:1;}
   .cmp-x:hover{color:var(--alerta);}
   /* Item 10 (s19): boton agregar azul solido (forma del patron hermano, tokens IDPS)
@@ -469,6 +477,10 @@ __FONTS_CSS__
   .cmp-table tr:last-child td{border-bottom:0;}
   .td-terr{white-space:normal;text-align:right;}
   .td-terr .td-tn{font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--tinta);}
+  /* s29: fila de la entidad NACIONAL (referencia fija, siempre la primera). */
+  .row-nac td{background:#FCFAF2;}
+  .row-nac{border-bottom:2px solid var(--linea);}
+  .td-ee-rbd{display:block;font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-regular);margin-top:2px;}
   .cmp-empty{padding:40px;text-align:center;color:var(--gris);border:1px dashed var(--linea);border-radius:var(--radius-3);background:var(--panel);}
   .cmp-tscroll{overflow-x:auto;}
 
@@ -1309,7 +1321,7 @@ __FONTS_CSS__
                 const checked=multiple&&selSet.has(key);
                 const dis=multiple&&!checked&&topeAlcanzado;
                 return (
-                <div key={key} className={"check-row"+(checked?" is-checked":"")+(dis?" is-disabled":"")}
+                <div key={key} className={"check-row"+(item.kind==="nacional"?" is-nac":"")+(checked?" is-checked":"")+(dis?" is-disabled":"")}
                   role={multiple?"checkbox":undefined} aria-checked={multiple?checked:undefined}
                   onClick={()=>{if(dis)return; onSelect(item);}}>
                   {multiple && <span className="check-box" aria-hidden="true">{checked?"✓":""}</span>}
@@ -1390,8 +1402,22 @@ __FONTS_CSS__
   const SLEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_slep!=null){const k=e.cod_slep;(m[k]=m[k]||{ee:0,coms:new Set()});m[k].ee++;if(e.cod_com!=null)m[k].coms.add(e.cod_com);}});
     return (DATA.sleps||[]).map(s=>({cod:s.cod_slep,nom:s.nombre_slep,anio:s.anio_traspaso,ee:(m[s.cod_slep]?m[s.cod_slep].ee:0),ncom:(m[s.cod_slep]?m[s.cod_slep].coms.size:0)}))
       .filter(s=>s.ee>0).sort((a,b)=>String(a.nom).localeCompare(String(b.nom)));})();
+  // ===== Entidad NACIONAL (s29) =====
+  // El dato del motor YA es nacional (DATA.roster y DATA.establecimientos son todo
+  // Chile; el territorio solo ACOTA con continue), asi que agregar Chile no pide
+  // dato nuevo: pide una rama que no filtre. Los conteos de la etiqueta del picker
+  // salen del directorio (mismo patron que SLEPS_OPTS); la meta del chip se calcula
+  // del roster real por grado/año (D-s8-4), como en las demas entidades.
+  const NACIONAL_OPT=(()=>{const coms=new Set();let ee=0;
+    DATA.establecimientos.forEach(e=>{ee++;if(e.cod_com!=null)coms.add(e.cod_com);});
+    return {kind:"nacional",cod:"CL",nom:"Chile",
+            sub:"Nivel nacional · "+fmt(coms.size)+" comunas · "+fmt(ee)+" establecimientos"};})();
   const TABS_CMP=[["slep","SLEP"],["comuna","Comuna"],["region","Región"]];
-  function buildListCmp(tab,ql){
+  // La entidad nacional es una fila FIJA arriba de la lista en TODOS los tabs (no un
+  // tab propio) y no depende del texto buscado: Chile es la referencia, no un
+  // resultado de busqueda.
+  function buildListCmp(tab,ql){ return [NACIONAL_OPT].concat(_listaCmpTerr(tab,ql)); }
+  function _listaCmpTerr(tab,ql){
     if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
       .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:s.ncom+" comunas · "+s.ee+" establecimientos"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
@@ -1411,7 +1437,10 @@ __FONTS_CSS__
   function rosterTerr(t,grado,agno){const b=DATA.roster,out=[];
     for(let i=0;i<b.rows;i++){if(b.grado[i]!==grado||b.agno[i]!==agno)continue;
       const e=est[b.rbd[i]]; if(!e)continue;
-      if(t.kind==="slep"){ if(String(e.cod_slep)!==String(t.cod))continue; }
+      // s29: "nacional" es la entidad que NO filtra. Va PRIMERO en la cadena para no
+      // caer por descarte en el else final (que captura region).
+      if(t.kind==="nacional"){ /* sin filtro territorial: todo Chile */ }
+      else if(t.kind==="slep"){ if(String(e.cod_slep)!==String(t.cod))continue; }
       else if(t.kind==="comuna"){ if(e.cod_com!==t.cod)continue; }
       else { if(e.cod_reg!==t.cod)continue; }
       out.push({rbd:b.rbd[i],gse:b.gse[i]});}
@@ -1426,9 +1455,13 @@ __FONTS_CSS__
   //       => N=0 ("sin dato"), nunca se desliza a un año anterior. =====
   function Comparador({cmpTerr,cmpGrado,agnoCmp,cmpGseVis,grados,onNivel,onToggleGse,onRemove,onAdd,onReset}){
     const agno=agnoCmp;
-    // roster por territorio (todos los GSE) en (cmpGrado, agnoCmp); cada celda
-    // re-filtra por su GSE. Memoizado: solo recomputa al cambiar territorios/nivel.
-    const rosters=useMemo(()=>cmpTerr.map(t=>rosterTerr(t,cmpGrado,agno)),[cmpTerr,cmpGrado,agno]);
+    // s29: ORDEN DE RENDER — la entidad nacional va SIEMPRE primero. Se ordena una
+    // COPIA (sort estable: el resto conserva su orden de seleccion); el estado
+    // cmpTerr no se muta. Todo lo que se dibuja (chips y filas) recorre cmpOrden.
+    const cmpOrden=useMemo(()=>[...cmpTerr].sort((a,b)=>(a.kind==="nacional"?0:1)-(b.kind==="nacional"?0:1)),[cmpTerr]);
+    // roster por entidad (todos los GSE) en (cmpGrado, agnoCmp); cada celda
+    // re-filtra por su GSE. Memoizado: solo recomputa al cambiar entidades/nivel.
+    const rosters=useMemo(()=>cmpOrden.map(t=>rosterTerr(t,cmpGrado,agno)),[cmpOrden,cmpGrado,agno]);
     const metas=useMemo(()=>rosters.map(r=>{const coms=new Set();r.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)coms.add(e.cod_com);});return {ncom:coms.size,nee:r.length};}),[rosters]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
     const prelim=PRELIM.has(String(agno));
@@ -1449,10 +1482,10 @@ __FONTS_CSS__
         <div className="cmp-controls">
           <span className="cmp-cl">Territorios a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
           <div className="cmp-chips">
-            {cmpTerr.map((t,i)=>(
-              <div className="cmp-chip" key={t.kind+"|"+t.cod}>
-                <span className="cmp-ct"><span className="cmp-cn">{t.nom}</span>
-                  <span className="cmp-cm">{metas[i]?metas[i].ncom:0} {metas[i]&&metas[i].ncom===1?"comuna":"comunas"} · {metas[i]?metas[i].nee:0} {metas[i]&&metas[i].nee===1?"establecimiento":"establecimientos"}</span></span>
+            {cmpOrden.map((t,i)=>(
+              <div className={"cmp-chip"+(t.kind==="nacional"?" is-nac":"")} key={t.kind+"|"+t.cod}>
+                <span className="cmp-ct">{t.kind==="nacional" && <span className="cmp-ck">Nacional · fijo</span>}<span className="cmp-cn">{t.nom}</span>
+                  <span className="cmp-cm">{metas[i]?fmt(metas[i].ncom):0} {metas[i]&&metas[i].ncom===1?"comuna":"comunas"} · {metas[i]?fmt(metas[i].nee):0} {metas[i]&&metas[i].nee===1?"establecimiento":"establecimientos"}</span></span>
                 <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
               </div>))}
             {cmpTerr.length<CMP_MAX_TERR && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
@@ -1486,9 +1519,10 @@ __FONTS_CSS__
                   <table className="cmp-table">
                     <thead><tr><th className="th-terr">Territorio</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
                     <tbody>
-                      {cmpTerr.map((t,ti)=>(
-                        <tr key={t.kind+"|"+t.cod}>
-                          <td className="td-terr"><span className="td-tn">{t.nom}</span></td>
+                      {cmpOrden.map((t,ti)=>(
+                        <tr key={t.kind+"|"+t.cod} className={t.kind==="nacional"?"row-nac":undefined}>
+                          <td className="td-terr"><span className="td-tn">{t.nom}</span>
+                            {t.kind==="nacional" && <span className="td-ee-rbd">referencia nacional</span>}</td>
                           {DATA.indicadores.map(ind=>{const items=rosters[ti].filter(u=>u.gse===g);
                             return <td key={ind.id}><StackedBar rep={repartoInd(items,ind.id,cmpGrado,agno)}/></td>;})}
                         </tr>))}
