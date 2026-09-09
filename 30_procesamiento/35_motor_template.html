@@ -458,6 +458,7 @@ __FONTS_CSS__
      a la izquierda. La banda identifica el tipo de entidad; no codifica dato. */
   .cmp-ck{font-size:var(--fs-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);margin-bottom:2px;}
   .cmp-chip.is-nac{border-left:4px solid var(--azul);}
+  .cmp-chip.is-ee{border-left:4px solid var(--foco);background:#F7FBFE;}
   .cmp-x{background:none;border:0;cursor:pointer;color:var(--gris);font-size:var(--fs-body);padding:0 0 0 2px;line-height:1;}
   .cmp-x:hover{color:var(--alerta);}
   /* Item 10 (s19): boton agregar azul solido (forma del patron hermano, tokens IDPS)
@@ -481,6 +482,24 @@ __FONTS_CSS__
   .row-nac td{background:#FCFAF2;}
   .row-nac{border-bottom:2px solid var(--linea);}
   .td-ee-rbd{display:block;font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-regular);margin-top:2px;}
+  /* s29: fila de ESTABLECIMIENTO (caso individual, N=1). No usa barra apilada: un
+     caso no se reparte. Glifo de estado + puntaje del propio EE, sobre un fondo que
+     la separa de las filas de territorio sin romper la grilla. Los colores son los
+     de ESTADO (alerta/st-neutro/destaca), los mismos de la barra. */
+  .cmp-table tr.row-ee td{background:#F7FBFE;}
+  .cmp-table tr.row-ee-first td{border-top:2px solid var(--foco);}
+  .row-ee .td-terr .td-tn{color:var(--foco);}
+  .td-ee-k{display:block;font-size:var(--fs-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);margin-bottom:2px;}
+  .ee-cell{display:flex;align-items:center;justify-content:center;gap:9px;}
+  .ee-gl{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-body);font-weight:var(--fw-bold);flex:none;line-height:1;}
+  .ee-gl.bajo{background:var(--alerta-bg);color:var(--alerta);border:1.5px solid var(--alerta);}
+  .ee-gl.neutro{background:#EDF0F3;color:var(--st-neutro);border:1.5px solid var(--st-neutro);}
+  .ee-gl.sobre{background:var(--destaca-bg);color:var(--destaca);border:1.5px solid var(--destaca);}
+  .ee-val{display:flex;flex-direction:column;line-height:1.15;text-align:left;}
+  .ee-pt{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-body-lg);color:var(--tinta);}
+  .ee-st{font-size:var(--fs-overline);color:var(--gris);white-space:nowrap;}
+  .ee-nd{font-size:var(--fs-caption);color:var(--gris);font-style:italic;text-align:center;display:block;}
+  .gse-sec-foot{padding:10px 18px;border-top:1px solid var(--linea);background:var(--paper);font-size:var(--fs-caption);color:var(--gris);line-height:1.5;}
   .cmp-empty{padding:40px;text-align:center;color:var(--gris);border:1px dashed var(--linea);border-radius:var(--radius-3);background:var(--panel);}
   .cmp-tscroll{overflow-x:auto;}
 
@@ -1278,8 +1297,12 @@ __FONTS_CSS__
       </div>);
   }
 
-  function gseLbl(rbd,grado,agno){const b=DATA.roster,r=RIX.roster[rbd];if(!r)return "—";
-    for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno){const g=b.gse[i];return g?(GSE[g]||g):"—";}return "—";}
+  // s29: gseCod devuelve el CODIGO de GSE del EE en (grado, agno) — el comparador lo
+  // necesita para ubicar al establecimiento en la tabla de su propio GSE (las
+  // secciones se indexan por codigo). gseLbl queda como su capa de presentacion.
+  function gseCod(rbd,grado,agno){const b=DATA.roster,r=RIX.roster[rbd];if(!r)return null;
+    for(let i=r[0];i<r[1];i++)if(b.grado[i]===grado&&b.agno[i]===agno)return b.gse[i]||null;return null;}
+  function gseLbl(rbd,grado,agno){const g=gseCod(rbd,grado,agno);return g?(GSE[g]||g):"—";}
   // (SubdimView eliminado en Fase 2: su distribucion por subdimension se reusa en
   //  SubDist, embebida dentro de cada DimBlock del panel "todo desplegado".)
 
@@ -1412,12 +1435,17 @@ __FONTS_CSS__
     DATA.establecimientos.forEach(e=>{ee++;if(e.cod_com!=null)coms.add(e.cod_com);});
     return {kind:"nacional",cod:"CL",nom:"Chile",
             sub:"Nivel nacional · "+fmt(coms.size)+" comunas · "+fmt(ee)+" establecimientos"};})();
-  const TABS_CMP=[["slep","SLEP"],["comuna","Comuna"],["region","Región"]];
+  const TABS_CMP=[["slep","SLEP"],["comuna","Comuna"],["region","Región"],["establecimiento","Establecimiento"]];
   // La entidad nacional es una fila FIJA arriba de la lista en TODOS los tabs (no un
   // tab propio) y no depende del texto buscado: Chile es la referencia, no un
   // resultado de busqueda.
-  function buildListCmp(tab,ql){ return [NACIONAL_OPT].concat(_listaCmpTerr(tab,ql)); }
-  function _listaCmpTerr(tab,ql){
+  function buildListCmp(tab,ql,grado,agno){ return [NACIONAL_OPT].concat(_listaCmpEnt(tab,ql,grado,agno)); }
+  function _listaCmpEnt(tab,ql,grado,agno){
+    // s29: el tab de establecimiento REUSA la rama de buildList (nombre o RBD, tope
+    // 60) y solo le agrega el GSE del EE en (cmpGrado, agnoCmp) — el mismo par con el
+    // que se dibujara su fila. Sin buscador propio ni segundo indice.
+    if(tab==="establecimiento") return buildList("establecimiento",ql)
+      .map(it=>({...it,sub:it.sub+" · GSE "+gseLbl(it.cod,grado,agno)}));
     if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
       .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:s.ncom+" comunas · "+s.ee+" establecimientos"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
@@ -1426,7 +1454,7 @@ __FONTS_CSS__
     return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
       .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
   }
-  const cmpPlaceholderFor=tab=>tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":"Buscar una región…";
+  const cmpPlaceholderFor=tab=>tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar una región…";
 
   // ===== Roster de un territorio para (grado, agno), TODOS los GSE. =====
   // Espejo de App.unidades pero parametrizado por territorio y SIN filtro de
@@ -1453,16 +1481,51 @@ __FONTS_CSS__
   //       Sin selector de año: agnoCmp = año mas reciente del grado a nivel del
   //       dato (D-s8-1), igual para los 4 territorios; territorio sin EE ese año
   //       => N=0 ("sin dato"), nunca se desliza a un año anterior. =====
+  // ===== Celda de ESTABLECIMIENTO en el comparador (s29) =====
+  // Un caso individual NO se reparte: la barra apilada queda fuera (una barra que
+  // dice "100% sobre su GSE" con n=1 es correcta y engañosa al leerla junto a una
+  // fila de 6.717 EE). La celda muestra el ESTADO vs su GSE — leido de sigdifgru,
+  // jamas reconstruido — como glifo Y como texto (a11y: no solo color), y el
+  // puntaje del propio EE tal cual (cero agregacion, no es una media).
+  const EST_EE={bajo:{g:"▼",txt:"bajo su GSE",lbl:"Bajo su GSE (diferencia significativa)"},
+                neutro:{g:"=",txt:"sin diferencia",lbl:"Sin diferencia significativa con su GSE"},
+                sobre:{g:"▲",txt:"sobre su GSE",lbl:"Sobre su GSE (diferencia significativa)"}};
+  function CeldaEE({d}){
+    // prom nulo => "sin dato" en cursiva; jamas un cero ni un guion.
+    if(!d||d.prom==null) return <span className="ee-nd">sin dato</span>;
+    const k=d.sigdifgru===-1?"bajo":d.sigdifgru===1?"sobre":"neutro", st=EST_EE[k];
+    return (
+      <div className="ee-cell">
+        <span className={"ee-gl "+k} title={st.lbl} aria-hidden="true">{st.g}</span>
+        <span className="ee-val"><span className="ee-pt">{fmt(d.prom)}</span>
+          <span className="ee-st">{st.txt}</span></span>
+      </div>);
+  }
+
   function Comparador({cmpTerr,cmpGrado,agnoCmp,cmpGseVis,grados,onNivel,onToggleGse,onRemove,onAdd,onReset}){
     const agno=agnoCmp;
     // s29: ORDEN DE RENDER — la entidad nacional va SIEMPRE primero. Se ordena una
     // COPIA (sort estable: el resto conserva su orden de seleccion); el estado
     // cmpTerr no se muta. Todo lo que se dibuja (chips y filas) recorre cmpOrden.
     const cmpOrden=useMemo(()=>[...cmpTerr].sort((a,b)=>(a.kind==="nacional"?0:1)-(b.kind==="nacional"?0:1)),[cmpTerr]);
-    // roster por entidad (todos los GSE) en (cmpGrado, agnoCmp); cada celda
+    // s29: la comparacion mezcla dos naturalezas. Los TERRITORIOS (incluida la
+    // entidad nacional) reparten sus EE en una barra; los ESTABLECIMIENTOS son un
+    // caso unico y se dibujan como ultima fila de la tabla de SU propio GSE.
+    const cmpTerrs=useMemo(()=>cmpOrden.filter(t=>t.kind!=="establecimiento"),[cmpOrden]);
+    const cmpEEs=useMemo(()=>cmpOrden.filter(t=>t.kind==="establecimiento"),[cmpOrden]);
+    // roster por territorio (todos los GSE) en (cmpGrado, agnoCmp); cada celda
     // re-filtra por su GSE. Memoizado: solo recomputa al cambiar entidades/nivel.
-    const rosters=useMemo(()=>cmpOrden.map(t=>rosterTerr(t,cmpGrado,agno)),[cmpOrden,cmpGrado,agno]);
+    const rosters=useMemo(()=>cmpTerrs.map(t=>rosterTerr(t,cmpGrado,agno)),[cmpTerrs,cmpGrado,agno]);
     const metas=useMemo(()=>rosters.map(r=>{const coms=new Set();r.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)coms.add(e.cod_com);});return {ncom:coms.size,nee:r.length};}),[rosters]);
+    // GSE de cada EE seleccionado en (cmpGrado, agnoCmp): decide en que tabla entra.
+    const eeGse=useMemo(()=>cmpEEs.map(t=>gseCod(t.cod,cmpGrado,agno)),[cmpEEs,cmpGrado,agno]);
+    // Meta del chip por entidad: territorio => comunas · EE del roster real (D-s8-4);
+    // establecimiento => RBD y su GSE en el mismo (grado, año).
+    const metaChip=useMemo(()=>{const m={};
+      cmpTerrs.forEach((t,i)=>{const q=metas[i]||{ncom:0,nee:0};
+        m[t.kind+"|"+t.cod]=fmt(q.ncom)+(q.ncom===1?" comuna":" comunas")+" · "+fmt(q.nee)+(q.nee===1?" establecimiento":" establecimientos");});
+      cmpEEs.forEach((t,i)=>{m[t.kind+"|"+t.cod]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
+      return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
     const prelim=PRELIM.has(String(agno));
     return (
@@ -1482,12 +1545,16 @@ __FONTS_CSS__
         <div className="cmp-controls">
           <span className="cmp-cl">Territorios a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
           <div className="cmp-chips">
-            {cmpOrden.map((t,i)=>(
-              <div className={"cmp-chip"+(t.kind==="nacional"?" is-nac":"")} key={t.kind+"|"+t.cod}>
-                <span className="cmp-ct">{t.kind==="nacional" && <span className="cmp-ck">Nacional · fijo</span>}<span className="cmp-cn">{t.nom}</span>
-                  <span className="cmp-cm">{metas[i]?fmt(metas[i].ncom):0} {metas[i]&&metas[i].ncom===1?"comuna":"comunas"} · {metas[i]?fmt(metas[i].nee):0} {metas[i]&&metas[i].nee===1?"establecimiento":"establecimientos"}</span></span>
+            {cmpOrden.map(t=>{const key=t.kind+"|"+t.cod, esEE=t.kind==="establecimiento";
+              return (
+              <div className={"cmp-chip"+(t.kind==="nacional"?" is-nac":"")+(esEE?" is-ee":"")} key={key}>
+                <span className="cmp-ct">
+                  {t.kind==="nacional" && <span className="cmp-ck">Nacional · fijo</span>}
+                  {esEE && <span className="cmp-ck">Establecimiento</span>}
+                  <span className="cmp-cn">{t.nom}</span>
+                  <span className="cmp-cm">{metaChip[key]}</span></span>
                 <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
-              </div>))}
+              </div>);})}
             {cmpTerr.length<CMP_MAX_TERR && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
             {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar territorios" title="Limpiar territorios">↺</button>}
           </div>
@@ -1512,24 +1579,43 @@ __FONTS_CSS__
           ? <div className="cmp-empty">Agrega al menos un territorio (botón “+ agregar territorio”) para comenzar la comparación.</div>
           : visGse.length===0
           ? <div className="cmp-empty">Selecciona al menos un grupo socioeconómico (GSE).</div>
-          : visGse.map(g=>(
+          : visGse.map((g,gi)=>{
+              // s29: los EE seleccionados de ESTE GSE cierran la tabla; los de otro GSE
+              // se nombran en el pie para que su ausencia no se lea como "sin dato".
+              const eeAqui=cmpEEs.filter((t,i)=>eeGse[i]===g);
+              const eeOtros=cmpEEs.map((t,i)=>({t,gse:eeGse[i]})).filter(x=>x.gse!==g);
+              const ubic=x=>{if(!x.gse) return "no aparece: no tiene GSE en este nivel y año";
+                const i=visGse.indexOf(x.gse);
+                return i<0?"no aparece: su GSE está oculto en el segmentador":(i>gi?"se muestra más abajo":"se muestra más arriba");};
+              return (
               <section className="gse-sec" key={g}>
                 <div className="gse-sec-h"><span className="gse-sec-name">{GSE[g]||"sin clasificar"}</span><span className="gse-sec-sub">Grupo socioeconómico</span></div>
                 <div className="cmp-tscroll">
                   <table className="cmp-table">
                     <thead><tr><th className="th-terr">Territorio</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
                     <tbody>
-                      {cmpOrden.map((t,ti)=>(
+                      {cmpTerrs.map((t,ti)=>(
                         <tr key={t.kind+"|"+t.cod} className={t.kind==="nacional"?"row-nac":undefined}>
                           <td className="td-terr"><span className="td-tn">{t.nom}</span>
                             {t.kind==="nacional" && <span className="td-ee-rbd">referencia nacional</span>}</td>
                           {DATA.indicadores.map(ind=>{const items=rosters[ti].filter(u=>u.gse===g);
                             return <td key={ind.id}><StackedBar rep={repartoInd(items,ind.id,cmpGrado,agno)}/></td>;})}
                         </tr>))}
+                      {eeAqui.map((t,k)=>{const dind=indOf(t.cod,cmpGrado,agno), e=est[t.cod];
+                        return (
+                        <tr key={t.kind+"|"+t.cod} className={"row-ee"+(k===0?" row-ee-first":"")}>
+                          <td className="td-terr">
+                            <span className="td-ee-k">Establecimiento</span>
+                            <span className="td-tn">{t.nom}</span>
+                            <span className="td-ee-rbd">RBD {t.cod}{e&&e.cod_com!=null?" · "+comNom(e.cod_com):""}</span></td>
+                          {DATA.indicadores.map(ind=><td key={ind.id}><CeldaEE d={dind[ind.id]}/></td>)}
+                        </tr>);})}
                     </tbody>
                   </table>
                 </div>
-              </section>))}
+                {eeOtros.length>0 && <div className="gse-sec-foot">Los establecimientos seleccionados aparecen únicamente en la sección de su propio grupo socioeconómico. {eeOtros.map((x,k)=>(
+                  <React.Fragment key={x.t.kind+"|"+x.t.cod}>{k>0?"; ":""}<b>{x.t.nom}</b>{x.gse?" (GSE "+(GSE[x.gse]||x.gse)+")":""} {ubic(x)}</React.Fragment>))}.</div>}
+              </section>);})}
       </div>);
   }
 
@@ -1654,7 +1740,7 @@ __FONTS_CSS__
 
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
-          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={buildListCmp} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar territorio a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
+          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar territorio a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
             multiple={true} seleccionados={cmpTerr.map(t=>t.kind+"|"+t.cod)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
