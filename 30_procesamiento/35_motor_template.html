@@ -467,6 +467,12 @@ __FONTS_CSS__
   .cmp-add:hover{background:var(--foco);border-color:var(--foco);}
   .cmp-reset{border:1px solid var(--linea);background:var(--paper);color:var(--gris);border-radius:var(--radius-2);font-size:var(--fs-body-lg);line-height:1;padding:8px 12px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;}
   .cmp-reset:hover{border-color:var(--foco);color:var(--foco);background:var(--cream-200);}
+  /* s29b: aviso de EE que no se dibujan en NINGUNA seccion (sin GSE en el nivel/anio,
+     o GSE oculto por el segmentador). Es propiedad de la SELECCION, no de una seccion
+     de GSE: va una sola vez junto a los chips, no repetido en cada pie. */
+  .cmp-nota-ee{font-size:var(--fs-caption);color:var(--gris);line-height:1.5;margin-top:10px;
+    padding:9px 12px;background:var(--panel);border:1px solid var(--linea);
+    border-left:3px solid var(--foco);border-radius:var(--radius-2);}
   .cmp-invite{font-size:var(--fs-caption);color:var(--gris);font-style:italic;margin-top:10px;}
   .cmp-gse-ctl{margin:6px 0 12px;}
   .cmp-table{width:100%;border-collapse:collapse;table-layout:fixed;}
@@ -1528,6 +1534,9 @@ __FONTS_CSS__
       cmpEEs.forEach((t,i)=>{m[t.kind+"|"+t.cod]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
+    // s29b: EE que no caen en ninguna seccion visible. Se avisa UNA vez arriba;
+    // el pie de cada seccion queda solo con los que si estan en otra seccion.
+    const eeSinUbicar=cmpEEs.map((t,i)=>({t,gse:eeGse[i]})).filter(x=>!x.gse||visGse.indexOf(x.gse)<0);
     const prelim=PRELIM.has(String(agno));
     return (
       <div>
@@ -1560,6 +1569,10 @@ __FONTS_CSS__
             {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar entidades" title="Limpiar entidades">↺</button>}
           </div>
           {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?`Agrega entidades (botón “+ agregar entidad”) para comparar, hasta ${CMP_MAX_TERR}.`:`Agrega al menos una entidad más para comparar (hasta ${CMP_MAX_TERR}).`}</div>}
+          {eeSinUbicar.length>0 && <div className="cmp-nota-ee">{eeSinUbicar.map((x,k)=>(
+            <React.Fragment key={x.t.kind+"|"+x.t.cod}>{k>0?" ":""}<b>{x.t.nom}</b>{x.gse
+              ? " no aparece en la comparación: su GSE ("+(GSE[x.gse]||x.gse)+") está oculto en el segmentador."
+              : " no aparece en la comparación: no tiene GSE en este nivel y año."}</React.Fragment>))}</div>}
         </div>
 
         <div className="gse-filter-wrap">
@@ -1584,10 +1597,9 @@ __FONTS_CSS__
               // s29: los EE seleccionados de ESTE GSE cierran la tabla; los de otro GSE
               // se nombran en el pie para que su ausencia no se lea como "sin dato".
               const eeAqui=cmpEEs.filter((t,i)=>eeGse[i]===g);
-              const eeOtros=cmpEEs.map((t,i)=>({t,gse:eeGse[i]})).filter(x=>x.gse!==g);
-              const ubic=x=>{if(!x.gse) return "no aparece: no tiene GSE en este nivel y año";
-                const i=visGse.indexOf(x.gse);
-                return i<0?"no aparece: su GSE está oculto en el segmentador":(i>gi?"se muestra más abajo":"se muestra más arriba");};
+              const eeOtros=cmpEEs.map((t,i)=>({t,gse:eeGse[i]}))
+                .filter(x=>x.gse!==g && x.gse && visGse.indexOf(x.gse)>=0);
+              const ubic=x=>visGse.indexOf(x.gse)>gi?"se muestra más abajo":"se muestra más arriba";
               return (
               <section className="gse-sec" key={g}>
                 <div className="gse-sec-h"><span className="gse-sec-name">{GSE[g]||"sin clasificar"}</span><span className="gse-sec-sub">Grupo socioeconómico</span></div>
