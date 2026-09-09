@@ -1416,6 +1416,7 @@ __FONTS_CSS__
       </div>);
   }
 
+  // s29: "territorio" en el codigo del comparador (cmpTerr/rosterTerr/addTerr/removeTerr y las clases cmp-*) significa "entidad comparable": territorio, nivel nacional o establecimiento; la interfaz dice "entidad" y los identificadores no se renombran.
   // ===== Comparador (Fase 4): catalogos de seleccion via EntityModal =====
   // El comparador compara TERRITORIOS arbitrarios (SLEP/comuna/region), no
   // dependencias ni un EE: por eso usa SUS PROPIOS tabs y buildList (kind ∈
@@ -1540,10 +1541,10 @@ __FONTS_CSS__
               <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===cmpGrado?" on":"")} onClick={()=>onNivel(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
           </div>
         </div>
-        <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda reparte el <b>100% de los establecimientos</b> del territorio (en ese GSE e indicador) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes.</div>
+        <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda de territorio reparte el <b>100% de los establecimientos</b> del territorio (en ese GSE e indicador) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes. Las filas de <b>establecimiento</b> son un caso único: muestran su estado, no un reparto.</div>
 
         <div className="cmp-controls">
-          <span className="cmp-cl">Territorios a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
+          <span className="cmp-cl">Entidades a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
           <div className="cmp-chips">
             {cmpOrden.map(t=>{const key=t.kind+"|"+t.cod, esEE=t.kind==="establecimiento";
               return (
@@ -1555,10 +1556,10 @@ __FONTS_CSS__
                   <span className="cmp-cm">{metaChip[key]}</span></span>
                 <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
               </div>);})}
-            {cmpTerr.length<CMP_MAX_TERR && <button className="cmp-add" onClick={onAdd}>+ agregar territorio</button>}
-            {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar territorios" title="Limpiar territorios">↺</button>}
+            {cmpTerr.length<CMP_MAX_TERR && <button className="cmp-add" onClick={onAdd}>+ agregar entidad</button>}
+            {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar entidades" title="Limpiar entidades">↺</button>}
           </div>
-          {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?`Agrega territorios (botón “+ agregar territorio”) para comparar, hasta ${CMP_MAX_TERR}.`:`Agrega al menos un territorio más para comparar (hasta ${CMP_MAX_TERR}).`}</div>}
+          {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?`Agrega entidades (botón “+ agregar entidad”) para comparar, hasta ${CMP_MAX_TERR}.`:`Agrega al menos una entidad más para comparar (hasta ${CMP_MAX_TERR}).`}</div>}
         </div>
 
         <div className="gse-filter-wrap">
@@ -1576,7 +1577,7 @@ __FONTS_CSS__
         </div>
 
         {cmpTerr.length===0
-          ? <div className="cmp-empty">Agrega al menos un territorio (botón “+ agregar territorio”) para comenzar la comparación.</div>
+          ? <div className="cmp-empty">Agrega al menos una entidad (botón “+ agregar entidad”) para comenzar la comparación.</div>
           : visGse.length===0
           ? <div className="cmp-empty">Selecciona al menos un grupo socioeconómico (GSE).</div>
           : visGse.map((g,gi)=>{
@@ -1592,7 +1593,7 @@ __FONTS_CSS__
                 <div className="gse-sec-h"><span className="gse-sec-name">{GSE[g]||"sin clasificar"}</span><span className="gse-sec-sub">Grupo socioeconómico</span></div>
                 <div className="cmp-tscroll">
                   <table className="cmp-table">
-                    <thead><tr><th className="th-terr">Territorio</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
+                    <thead><tr><th className="th-terr">Entidad</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
                     <tbody>
                       {cmpTerrs.map((t,ti)=>(
                         <tr key={t.kind+"|"+t.cod} className={t.kind==="nacional"?"row-nac":undefined}>
@@ -1740,7 +1741,7 @@ __FONTS_CSS__
 
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
-          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar territorio a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
+          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
             multiple={true} seleccionados={cmpTerr.map(t=>t.kind+"|"+t.cod)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
