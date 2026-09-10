@@ -5,7 +5,8 @@
 - **Encargo:** `50_documentacion/activa/encargos/encargo_claude_code_idps_contraste_texto_estado_s29c.md`
 - **Referencia visual vinculante:** `50_documentacion/andamios/diseno/detalles/mockup_contraste_estados.html`
 - **Tipo:** decisión de presentación y accesibilidad. NO afecta ninguna cifra.
-- **Estado:** adoptada.
+- **Estado:** adoptada. **Enmendada el 2026-09-10 (s29d):** se cierra el pendiente §5.1
+  y se añade la excepción §3.5 de los glifos de estado.
 
 ---
 
@@ -126,6 +127,31 @@ Es decir: quien no distinga la etiqueta interna no pierde el dato; lo tiene bajo
 barra, en el tooltip y en la lectura asistida. La excepción queda documentada aquí y no
 se vuelve a discutir sin una razón nueva.
 
+### 3.5 Excepción explícita: los glifos de estado de la fila de establecimiento
+
+*Añadida el 2026-09-10 (s29d).*
+
+El glifo de `.ee-gl` —la pastilla redonda con `▼` / `=` / `▲` que abre la celda del
+establecimiento— pinta el color de estado sobre su propio relleno claro. Medido:
+
+| Glifo | Color | Relleno | Ratio | Texto (4,5) | Componente gráfico (3,0) |
+|---|---|---|---|---|---|
+| `▼` bajo | `--alerta` `#EE2D49` | `--alerta-bg` `#FBE3E6` | **3,37** | falla | cumple |
+| `=` neutro | `--st-neutro` `#7E8A99` | `#EDF0F3` | **3,07** | falla | cumple |
+| `▲` sobre | `--destaca` `#2A8FD9` | `--destaca-bg` `#E2F0FB` | **3,00** | falla | cumple, al filo |
+
+**Se aceptan así**, tratándolos como **componente gráfico** y no como texto. El mínimo
+aplicable pasa entonces a ser 3:1, que los tres cumplen. El argumento que lo sostiene
+es el mismo que el de §3.4 y aquí es más fuerte todavía: el glifo **no es la única vía
+del dato**. Va acompañado, dentro de la misma celda, del texto del estado (`.ee-st`),
+que desde s29c cumple AA con holgura (5,23–5,28), y el glifo lleva `aria-hidden="true"`
+mientras el texto es lo que lee un lector de pantalla. La información no depende del
+glifo en ningún momento.
+
+**Margen que hay que vigilar:** el `▲` da 3,0004. Cumple, pero por cuatro diezmilésimas.
+Cualquier retoque futuro de `--destaca` o de `--destaca-bg` lo rompe. Si esos dos
+tokens se tocan alguna vez, hay que volver a medir este glifo en la misma operación.
+
 ## 4. Garantía de fidelidad (ninguna cifra cambia)
 
 El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generador
@@ -133,46 +159,82 @@ El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generado
 encargo: métricas del bloque 7 del generador idénticas y payload JSON del motor
 byte-idéntico salvo `fecha_generacion`.
 
-## 5. Pendientes asociados (no ejecutados)
+## 5. Pendientes asociados (§5.1 resuelto; §5.2 sigue abierto)
 
-### 5.1 Hallazgo nuevo: `--gris` sobre los fondos teñidos de s29 (requiere decisión)
+### 5.1 `--gris` accesible en todos los fondos — **RESUELTO el 2026-09-10 (s29d)**
 
-La auditoría de la Fase 3 de este encargo destapó una falla de AA que **no estaba en
-la medición de partida y que este encargo no corrige**, porque cae fuera de los dos
-lugares que la Fase 1 autoriza a tocar. Es anterior a esta decisión: la introdujo s29
-al teñir de celeste las superficies de establecimiento.
+Este pendiente está **cerrado**, y con una salida **distinta a la que este mismo
+documento recomendaba**. Queda constancia de por qué.
 
-`--gris` (`#6b7780`), el gris de interfaz, da **4,59** sobre blanco —pasa— pero solo
-**4,41** sobre `#F7FBFE` (fondo de la fila y del chip de establecimiento) y **4,39**
-sobre `#FCFAF2` (fila nacional). Ambos quedan bajo 4,5. Elementos afectados, todos
-medidos en el motor vivo:
+#### Lo que decía el pendiente
 
-| Elemento | Fondo | Ratio | Estado |
+Se había detectado que `--gris` (`#6b7780`), el gris de interfaz, daba 4,41 sobre
+`#F7FBFE` y 4,39 sobre `#FCFAF2` —los fondos teñidos que s29 introdujo para las
+superficies de establecimiento— y se recomendaba **(a) un token paralelo**
+(`--gris-txt`) aplicado a los cuatro selectores afectados: `.cmp-cm`, `.td-ee-k`,
+`.td-ee-rbd` y `.ee-nd`.
+
+#### Por qué esa recomendación era la salida equivocada
+
+Aquella medición solo miró las cinco zonas del criterio de este encargo. Al auditar
+**todo el texto visible** del motor —las tres pantallas más el modal, colores
+computados en navegador, fondo efectivo compuesto hacia arriba— aparece que la falla
+es más amplia y que **su parte más severa es anterior a s29**:
+
+| Zona | Fondo | Ratio | ¿La introdujo s29? |
 |---|---|---|---|
-| `.cmp-cm` en el chip de establecimiento | `#F7FBFE` | 4,41 | **falla** |
-| `.cmp-cm` en los demás chips | `#ffffff` | 4,59 | ok |
-| `.td-ee-k` ("ESTABLECIMIENTO"), `.td-ee-rbd`, `.ee-nd` | `#F7FBFE` | 4,41 | **falla** |
-| `.td-ee-rbd` ("referencia nacional") | `#FCFAF2` | 4,39 | **falla** |
-| `.gse-sec-foot` | `#fffdf7` | 4,51 | ok, por 0,01 |
+| `.gse-sec-sub`, `.s100-nd`, `.check-region` | `#F4E9CC` cream-200 | **3,80** | no, preexistente |
+| `.eo-m` con el `:hover` de `.estab-opt` | `#D4E4F1` | **3,53** | no, preexistente |
+| `.cmp-cl`, leyenda ▼/=/▲, `.picker-lab` | `#FFF6E0` cream | **4,26** | no, preexistente |
+| `.td-ee-rbd` (fila nacional) | `#FCFAF2` | 4,39 | sí |
+| `.cmp-cm`, `.cmp-ck`, `.cmp-x`, `.td-ee-k`, `.td-ee-rbd` | `#F7FBFE` | 4,41 | sí |
 
-Consecuencia directa: `.cmp-cm` es una de las cinco zonas del criterio "0 fallas" de la
-Fase 3 del encargo, y ese criterio **no se cumple** por esta causa —no por los tokens
-de estado, que sí pasan en todas partes.
+`--gris` fallaba en **5 de los 7 fondos claros** del motor. Un token paralelo aplicado
+a cuatro selectores habría tapado exactamente lo que s29 introdujo y **habría dejado
+intacto lo peor**, que llevaba ahí desde antes: el subtítulo de cada sección de GSE y
+el "sin dato" de las barras, a 3,80.
 
-Es una decisión del titular, no de esta ejecución, porque las dos salidas posibles
-salen del alcance declarado:
+#### La salida adoptada
 
-- **(a) Un token de texto gris para fondos teñidos** —p. ej. `--gris-txt:#5F6A73`—
-  aplicado a `.cmp-cm`, `.td-ee-k`, `.td-ee-rbd` y `.ee-nd`. Es el camino recomendado:
-  simétrico con lo que esta decisión hace con los colores de estado, y verificado en
-  5,3 sobre ambos fondos teñidos.
-- **(b) Declarar una segunda excepción**, como se hizo con la etiqueta interna de la
-  barra. Es más débil que la de §3.4: aquí el dato **no** está repetido en otro sitio
-  (el RBD y la comuna del establecimiento solo se leen ahí), así que el argumento de
-  redundancia no aplica.
+Corregir el token **en la raíz**: `--gris` pasa de `#6b7780` a `#5C666E`. Misma
+saturación (8,9 %) y prácticamente el mismo tono (H 205,7° → 206,7°, diferencia por
+redondeo de 8 bits); solo baja la luminosidad relativa, de 0,1788 a 0,1290. `--gris` es
+gris de **interfaz**, no de la paleta institucional de estado ni de la de indicadores:
+cambiarlo no toca ninguna identidad de marca. Sigue siendo **un** token; no se creó
+ningún paralelo ni se sustituyó selector por selector.
 
-Mientras no se decida, queda escrito aquí que la falla existe, cuánto mide y por qué
-no se tocó.
+| Fondo | Antes `#6b7780` | Después `#5C666E` |
+|---|---|---|
+| `#F4E9CC` cream-200 | 3,80 | **4,85** |
+| `#D4E4F1` hover de `.estab-opt` | 3,53 | **4,51** |
+| `#FFF6E0` cream | 4,26 | **5,45** |
+| `#FCFAF2` fila nacional | 4,39 | **5,61** |
+| `#F7FBFE` fila EE | 4,41 | **5,64** |
+| `#FFFDF7` panel | 4,51 | **5,77** |
+| `#FFFFFF` paper | 4,59 | **5,86** |
+
+Método: colores **computados** en navegador sobre el motor cargado, fondo efectivo
+compuesto hacia arriba con alfa y `opacity` de cada capa, fórmula WCAG 2.1. Medido en
+las tres pantallas y en el modal, con el estado final de las animaciones forzado.
+Resultado: **0 fallas atribuibles a `--gris`**, frente a 10 antes del cambio en la
+pantalla del comparador.
+
+#### Comprobación de seguridad sobre fondo oscuro
+
+Antes de aplicar el cambio se enumeró **todo** uso de `--gris` sobre superficies
+oscuras, porque oscurecer el token ahí habría sido un retroceso. Resultado: **ningún
+texto en `--gris` cae sobre fondo oscuro**. Los únicos elementos en `--gris` sobre
+fondo oscuro son muestras de color sin texto (`.th-sw` y los `<i>` de `.leyenda`), que
+solo pintan `background` y heredan el `color` sin usarlo. Dentro del banner azul
+(`.cmp-chrome`) no hay ni un uso de `--gris`: usa `--cream` con opacidad.
+
+#### Corrección de una atribución del encargo s29d
+
+El encargo atribuía la falla de 3,53 sobre `#D4E4F1` a las **casillas GSE activas**
+(`.gfb.on`). No es así: `.gfb.on` usa `color:var(--foco)` `#0062A0` y mide **4,97**, es
+decir ya cumplía. El fondo `#D4E4F1` y el ratio 3,53 sí son reales, pero corresponden a
+`.eo-m` (la línea de metadatos de cada establecimiento del buscador) cuando su
+contenedor `.estab-opt` está en `:hover`. El cambio lo corrige igual, a 4,51.
 
 ### 5.2 Marca de "base pequeña"
 
@@ -185,7 +247,12 @@ lo justifique.
 
 ## 6. Reversión
 
-De un solo punto y trivial: borrar los tres tokens del `:root`, devolver
-`style={{color:s.c}}` a `.s100-ext-it`, devolver `.ee-st` a `color:var(--gris)` sin
-clase de estado, y regenerar con `run_all(only = 35L)`. Ninguna cifra se ve afectada
-por una reversión.
+De un solo punto y trivial en los dos cambios, y ninguno afecta a cifra alguna:
+
+- **Tokens de texto de estado (s29c):** borrar los tres tokens del `:root`, devolver
+  `style={{color:s.c}}` a `.s100-ext-it` y devolver `.ee-st` a `color:var(--gris)` sin
+  clase de estado.
+- **`--gris` (s29d):** devolver `--gris` a `#6b7780` en el `:root`. Una sola
+  declaración; los ~60 selectores que lo usan vuelven solos.
+
+En ambos casos, regenerar con `run_all(only = 35L)`.
