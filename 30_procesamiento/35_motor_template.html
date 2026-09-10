@@ -24,6 +24,18 @@ __FONTS_CSS__
        indicador son ejes distintos. alerta/destaca NO se tocan. */
     --alerta:#EE2D49; --alerta-bg:#FBE3E6; --destaca:#2A8FD9; --destaca-bg:#E2F0FB;
     --st-neutro:#7E8A99;
+    /* s29c: variantes de TEXTO de esos mismos tres estados. Mismo tono, menor
+       luminosidad. Razon: los colores de arriba son de BARRA — sobre fondo claro
+       y en 12px negrita dan 2,9-4,1 de contraste, bajo el 4,5 que WCAG 2.1 AA
+       exige para texto pequeño. La paleta del folleto de la Agencia no se toca
+       (invariante); se separa "color de barra" de "color de texto". Estos tres
+       tokens se usan SOLO en texto pequeño sobre fondo claro (tira externa y
+       texto de estado de la fila EE): nunca en barras, bordes, fondos ni leyenda.
+       Contraste medido en el motor vivo: 5,21 sobre el fondo de la fila nacional
+       (#FCFAF2), 5,35 sobre --panel y 5,23 sobre el de la fila EE (#F7FBFE).
+       Peor caso de la escala crema (--cream-200 #f4e9cc): 4,50 / 4,50 / 4,55. Ver
+       50_documentacion/activa/decisiones/20260910_decision_contraste_texto_estado.md */
+    --alerta-txt:#D2112D; --destaca-txt:#1E6EA9; --st-neutro-txt:#5F6A78;
     --sombra:0 2px 8px rgba(74,39,70,.10);
     --shadow-1:0 1px 0 rgba(28,18,18,.05);
     /* --- Escala de presentacion alineada a la referencia (slep_categoria_desempeno):
@@ -425,9 +437,11 @@ __FONTS_CSS__
      desplaza a los otros dos. */
   .s100-ext{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:3px;font-size:var(--fs-overline);line-height:1.2;align-items:baseline;}
   .s100-ext-it{font-weight:var(--fw-bold);white-space:nowrap;}
-  .s100-ext-it.ext-bajo{grid-column:1;justify-self:start;}
-  .s100-ext-it.ext-neutro{grid-column:2;justify-self:center;}
-  .s100-ext-it.ext-sobre{grid-column:3;justify-self:end;}
+  /* s29c: el color sale de la CLASE de estado, no de un estilo inline, y usa el
+     token de TEXTO (no el de barra) porque son 12px negrita sobre fondo claro. */
+  .s100-ext-it.ext-bajo{grid-column:1;justify-self:start;color:var(--alerta-txt);}
+  .s100-ext-it.ext-neutro{grid-column:2;justify-self:center;color:var(--st-neutro-txt);}
+  .s100-ext-it.ext-sobre{grid-column:3;justify-self:end;color:var(--destaca-txt);}
 
   /* ============================================================
      Fase 4 — Comparación entre territorios (banner del comparador + banda
@@ -503,7 +517,13 @@ __FONTS_CSS__
   .ee-gl.sobre{background:var(--destaca-bg);color:var(--destaca);border:1.5px solid var(--destaca);}
   .ee-val{display:flex;flex-direction:column;line-height:1.15;text-align:left;}
   .ee-pt{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-body-lg);color:var(--tinta);}
-  .ee-st{font-size:var(--fs-overline);color:var(--gris);white-space:nowrap;}
+  /* s29c: el texto de estado deja el gris de interfaz y toma el token de TEXTO
+     del estado que le corresponde, en negrita. Dos efectos: alcanza el contraste
+     de AA y queda amarrado al glifo, que ya venia teñido del estado. */
+  .ee-st{font-size:var(--fs-overline);font-weight:var(--fw-bold);white-space:nowrap;color:var(--st-neutro-txt);}
+  .ee-st.bajo{color:var(--alerta-txt);}
+  .ee-st.neutro{color:var(--st-neutro-txt);}
+  .ee-st.sobre{color:var(--destaca-txt);}
   .ee-nd{font-size:var(--fs-caption);color:var(--gris);font-style:italic;text-align:center;display:block;}
   .gse-sec-foot{padding:10px 18px;border-top:1px solid var(--linea);background:var(--paper);font-size:var(--fs-caption);color:var(--gris);line-height:1.5;}
   .cmp-empty{padding:40px;text-align:center;color:var(--gris);border:1px dashed var(--linea);border-radius:var(--radius-3);background:var(--panel);}
@@ -886,10 +906,11 @@ __FONTS_CSS__
       <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con dato"}>{segs}</div>
       {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
           completo no cupo dentro de la barra; cada uno con su glifo de estado, su
-          color y su "p% (n)" entero (el neutro usa --st-neutro de #23). El grid la
-          alinea al sector correspondiente: bajo | neutro | sobre. */}
+          color y su "p% (n)" entero. s29c: ese color ya no viaja inline; lo pone
+          la clase ext-* con el token de TEXTO del estado. El grid la alinea al
+          sector correspondiente: bajo | neutro | sobre. */}
       {fuera.length>0 && <div className="s100-ext">{fuera.map(s=>
-        <span key={s.k} className={"s100-ext-it ext-"+s.k} style={{color:s.c}}
+        <span key={s.k} className={"s100-ext-it ext-"+s.k}
           title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}% ({fmt(s.count)})</span>)}</div>}
     </>);
   }
@@ -1505,7 +1526,7 @@ __FONTS_CSS__
       <div className="ee-cell">
         <span className={"ee-gl "+k} title={st.lbl} aria-hidden="true">{st.g}</span>
         <span className="ee-val"><span className="ee-pt">{fmt(d.prom)}</span>
-          <span className="ee-st">{st.txt}</span></span>
+          <span className={"ee-st "+k}>{st.txt}</span></span>
       </div>);
   }
 
