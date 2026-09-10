@@ -87,7 +87,7 @@ ni la tira externa ni el texto de estado del EE se dibujan nunca ahí, así que 
 caso real. Si en el futuro se usan estos tokens sobre otra superficie, hay que
 re-medir: la garantía de esta decisión cubre los fondos listados, no cualquier fondo.
 
-### 3.3 Los tokens se aplican en dos lugares, y solo en esos dos
+### 3.3 Dónde se aplican los tokens (inventario al día)
 
 1. **`.s100-ext-it`** — la tira externa bajo la barra apilada. El color deja de viajar
    como estilo inline (`style={{color:s.c}}`, que traía el color de *barra*) y pasa a
@@ -99,8 +99,15 @@ re-medir: la garantía de esta decisión cubre los fondos listados, no cualquier
    una clase (`ee-st bajo|neutro|sobre`). Además de alcanzar el umbral, el texto queda
    amarrado al glifo, que ya venía teñido del estado.
 
+3. **`.chip.al` y `.chip.de`** — los chips de estado de la tarjeta de establecimiento
+   en el panorama territorial. *Añadido el 2026-09-10 por s29e*; ver §5.3 (a). En s29c
+   estos dos puntos eran **los únicos dos** y así se escribió aquí; desde s29e son tres.
+   Quien añada un cuarto uso tiene que anotarlo en esta lista y en el comentario del
+   `:root`, que lleva el mismo inventario.
+
 Los tokens **no entran** a barras, bordes de glifo, fondos ni leyenda. Esa restricción
-es un invariante del encargo y está escrita como comentario en el `:root`.
+sigue siendo el invariante, y es lo que permite añadir usos sin volver a decidir nada:
+los tres son texto pequeño sobre fondo claro.
 
 ### 3.4 Excepción explícita: la etiqueta DENTRO de la barra
 
