@@ -6874,7 +6874,13 @@ ACMBiwAUAYsAKAGLACcBiwAsAYsAIQGLACIBiwAjAYsAOQGLACwBiwAkAYsAFAGLACgBiwAn
 AYsALAGLACEBiwAiAYsAIwGLADkBiwAsAYsAJAGLABQBiwAoAYsAJwGLACwBiwAhAYsAIgAQ
 AAABrwBBAPMAAA==) format('opentype');}
   :root{
-    --azul:#0A3A5C; --cream:#FFF6E0; --tinta:#23303a; --gris:#6b7780;
+    /* s29d (2026-09-10): --gris pasa de #6b7780 a #5C666E (misma S 8,9%, H 205,7->206,7,
+       solo menor luminosidad) porque fallaba AA en 5 de los 7 fondos claros del motor
+       —hasta 3,80 sobre --cream-200— y es gris de INTERFAZ, no de la paleta
+       institucional. Ahora cumple 4,5:1 en todos ellos (peor caso 4,51 sobre #D4E4F1).
+       Ningun texto en --gris cae sobre fondo oscuro: verificado en las tres pantallas
+       y el modal. Ver 50_documentacion/activa/decisiones/20260910_decision_contraste_texto_estado.md */
+    --azul:#0A3A5C; --cream:#FFF6E0; --tinta:#23303a; --gris:#5C666E;
     --linea:#e4dcc6; --panel:#fffdf7; --foco:#0062A0;
     /* Paleta de INDICADOR (token espejo de INDICADOR_COLORS en 35): identidad del
        folleto oficial de la Agencia (P-PALETA). El runtime lee ind.color del JSON;
