@@ -564,3 +564,230 @@ Comprobaciones puntuales que la auditoría dejó cerradas:
 - **Re-etiquetado en vivo al redimensionar**: pide una pestaña visible (§8.4).
 - **Tooltip "vs evaluación anterior"**: de `title` a body (heredado de s28).
 - **Rama `feat/contrato-contexto`** con 2 commits locales sin push: no se tocó.
+
+---
+
+## 11. Errores del asistente de análisis (s29) — insumo de la §15 del traspaso
+
+Registro en el momento en que se detectan, según POLITICA 0.5. Estos son errores
+del asistente de análisis (el que redacta encargos y mockups), no del ejecutor.
+
+| # | Error | Dónde se manifestó | Patrón |
+|---|---|---|---|
+| 1 | Puntajes con decimal inventados en el mockup (`78,4`, `76,0`) cuando los 354.007 valores de `prom` del payload son enteros. | `mockup_comparador_ee_nacional.html`, detectado por el ejecutor en §3.5.2 | Inferencia sobre datos no leídos: se ilustró una cifra plausible en vez de verificar el tipo del dato antes de dibujarlo. Es el mismo patrón registrado en el traspaso s28. |
+| 2 | Regla de detención §0.2 del encargo s29c fijada sobre un SHA-256 no reproducible: se copió el hash del log de s29 sin su receta de normalización, que ese log no registraba. | `encargo_claude_code_idps_contraste_texto_estado_s29c.md`, detectado por el ejecutor en §8.2 | Se convirtió en criterio bloqueante un valor que no se había verificado como reproducible. Una regla de detención debe poder ejecutarse con lo que el encargo entrega. |
+
+Corrección adoptada para el punto 2: la convención de normalización queda escrita en
+§8.2 de este log y se cita desde los próximos encargos, en vez de repetir el hash.
+
+---
+
+# Continuación de la sesión — s29d (2026-09-10)
+
+> Misma sesión s29, cuarto encargo:
+> `50_documentacion/activa/encargos/encargo_claude_code_idps_gris_accesible_s29d.md`.
+> Resuelve el pendiente §5.1 de la decisión del 2026-09-10, con una salida distinta a
+> la que ese documento recomendaba. Alcance: 100 % presentación. No se tocó el pipeline
+> (31–34) ni `idps_largo.parquet`. No se desplegó a `docs/`. No se tocó
+> `feat/contrato-contexto`.
+
+## 12. Inventario de commits de s29d
+
+| # | Commit | Fase | Rutas |
+|---|---|---|---|
+| 14 | `d440ff2` | 1 — `fix(motor): --gris accesible en todos los fondos del motor` | `30_procesamiento/35_motor_template.html` |
+| 15 | `ac1e2ea` | 2 — `docs(decision): cierra §5.1 con --gris accesible y anota la excepcion de los glifos` | `50_documentacion/activa/decisiones/20260910_decision_contraste_texto_estado.md` |
+| 16 | `1225735` | 3 — `build(motor): regenera el motor con --gris accesible` | `40_salidas/motor_idps.html` |
+| 17 | (este) | 4 — `docs(log): registro de s29d y errores del asistente de la sesion` | este log + la §5.3 de la decisión |
+
+## 13. Qué se cambió
+
+Una sola declaración: en `:root`, `--gris` pasa de `#6b7780` a `#5C666E`.
+
+Medido: `#6b7780` = H 205,71° · S 8,94 % · L 46,08 %; `#5C666E` = H 206,67° · S 8,91 %
+· L 39,61 %. La afirmación del encargo de que conserva "la misma H y S" es **casi**
+exacta: S coincide en la práctica (0,03 pp) y H se desplaza 0,96°, diferencia de
+redondeo a 8 bits. Lo que baja de verdad es la luminancia relativa, de 0,1788 a 0,1290.
+
+`--gris` sigue siendo **un** token (invariante 5): no se creó ningún paralelo ni se
+sustituyó `var(--gris)` por un literal en ningún selector. Los ~60 selectores que lo
+usan heredan el cambio solos. Ni la paleta de ESTADO ni sus tokens `-txt` ni los
+`--ind1..4` se tocaron; verificado en el motor generado, donde `--alerta` `#EE2D49`,
+`--destaca` `#2A8FD9`, `--st-neutro` `#7E8A99`, `--alerta-txt` `#D2112D`,
+`--destaca-txt` `#1E6EA9`, `--st-neutro-txt` `#5F6A78`, `--ind1` `#3858A3` e `--ind4`
+`#AACB58` siguen intactos.
+
+## 14. Chequeos de s29d (valores observados)
+
+### 14.1 Regla de detención 1 — verificada ANTES de aplicar el cambio
+
+La regla obliga a parar si algún uso de `--gris` cae sobre fondo oscuro y el cambio lo
+empeora. Se comprobó empíricamente sobre el motor de `bbe77e3`, recorriendo cada
+elemento visible cuyo color computado fuese exactamente `#6b7780` y clasificando su
+fondo efectivo por luminancia:
+
+| Pantalla | Elementos en `--gris` | Sobre fondo oscuro **con texto** |
+|---|---|---|
+| Panorama territorial | 13 grupos | **0** |
+| Panorama IDPS por establecimiento | 4 grupos | **0** |
+| Comparador poblado | 29 grupos | **0** |
+| Modal "agregar entidad" | 25 grupos | **0** |
+
+Los únicos elementos en `--gris` sobre fondo oscuro son **muestras de color sin
+texto**: `.th-sw` (sobre `#3858A3`, `#4BA560`, `#61BDC6`, `#AACB58`) y los `<i>` de
+`.leyenda` (sobre `#EE2D49`, `#7E8A99`, `#2A8FD9`). Solo pintan `background` y heredan
+un `color` que nunca usan. Dentro del banner azul (`.cmp-chrome`) no hay **ni un** uso
+de `--gris`: sus textos son `--cream` con opacidad. La regla **no se dispara**.
+
+Trampa de medición que hubo que resolver antes: la pestaña del navegador corre con
+`document.hidden === true`, así que las transiciones de entrada no avanzan y el modal
+queda congelado en `opacity:0`. Medido así, `.modal-tab` aparecía como "gris sobre
+fondo oscuro" —un falso positivo que habría disparado la regla de detención sin
+motivo—. Se forzó el estado final de las animaciones antes de medir.
+
+### 14.2 Verificación exhaustiva contra TODOS los fondos del CSS
+
+No solo los 7 que lista el encargo: se extrajeron del CSS de la plantilla todas las
+declaraciones `background`/`background-color`, resolviendo los `var(--…)` contra el
+`:root`. Resultan **19 fondos distintos, 15 claros y 4 oscuros**. Con `#5C666E`:
+
+| Fondo | L | Antes | Después |
+|---|---|---|---|
+| `#D4E4F1` hover de `.estab-opt` | 0,758 | 3,53 | **4,51** |
+| `#eee5cf` badge | 0,787 | 3,66 | **4,68** |
+| `#FBE3E6` `--alerta-bg` | 0,812 | 3,77 | **4,81** |
+| `#f4e9cc` `--cream-200` | 0,819 | 3,80 | **4,85** |
+| `#f3ecd6` | 0,839 | 3,89 | **4,97** |
+| `#E2F0FB` `--destaca-bg` | 0,855 | 3,95 | **5,05** |
+| `#EDF0F3` relleno del glifo neutro | 0,868 | 4,01 | **5,13** |
+| `#f3f0e8` | 0,872 | 4,03 | **5,15** |
+| `#f4f1e8` `.nota` / pista de barra | 0,880 | 4,06 | **5,19** |
+| `#eef3f7` `.ficha-explain` | 0,890 | 4,11 | **5,25** |
+| `#FFF6E0` `--cream` | 0,926 | 4,26 | **5,45** |
+| `#FCFAF2` fila nacional | 0,955 | 4,39 | **5,61** |
+| `#F7FBFE` fila EE | 0,959 | 4,41 | **5,64** |
+| `#fffdf7` `--panel` | 0,982 | 4,51 | **5,77** |
+| `#ffffff` `--paper` | 1,000 | 4,59 | **5,86** |
+
+**0 fondos claros donde `#5C666E` quede bajo 4,5.** Peor caso: 4,51.
+
+### 14.3 Corrección de una atribución del encargo
+
+El §1 del encargo atribuye la falla de 3,53 sobre `#D4E4F1` a las **casillas GSE
+activas** (`.gfb.on`). No es así: `.gfb.on` usa `color:var(--foco)` `#0062A0` y mide
+**4,97**, es decir ya cumplía y el cambio no la toca. El fondo y el ratio sí existen,
+pero corresponden a `.eo-m` —la línea de metadatos de cada establecimiento en el
+buscador— cuando su contenedor `.estab-opt` está en `:hover`. El cambio la corrige
+igual, de 3,53 a 4,51. La fila de la tabla era válida en sustancia y errónea en el
+selector.
+
+### 14.4 Build y fidelidad del payload
+
+`run_all(only = 35L)` en 4,1 s, sin error y sin warning: `grep -inE "warn|error|aviso|
+fail|problema"` sobre las 73 líneas de salida no devuelve ninguna coincidencia. Bloque
+7 idéntico a la línea base (16 regiones, 9.136 establecimientos, 91.596 unidades de
+grilla, 366.384 / 557.898 / 662.514 filas, JSON 59,5 MB → 4,41 MB, HTML 5,1 MB). Un
+segundo `run_all` produce un archivo **byte-idéntico**: el paso 35 es determinista.
+
+Verificación fuerte, diff de offsets del JSON descomprimido contra el motor de
+`bbe77e3`:
+
+```
+bytes: 59.466.778  ==  59.466.778
+offsets que difieren: []
+```
+
+**Cero.** Ni siquiera la fecha, porque ambos builds son del mismo día. SHA-256 con la
+convención de §8.2 (`"fecha_generacion":"0000-00-00"`, UTF-8, sin salto final),
+idéntico antes y después:
+
+```
+1e29c2b5be529e013f5afb98de323420e842a615b2e4f7a9cc5001ad1b55b5b6
+```
+
+Como pedía §4 del encargo, no se reutilizó el hash de s29c, que no era reproducible.
+
+### 14.5 Auditoría de todo el texto visible
+
+Método: se recorren los elementos con **texto propio** (nodo de texto directo), se
+compone el fondo efectivo hacia arriba con el alfa y la `opacity` de cada capa, y se
+calcula el ratio con la fórmula de WCAG 2.1. Umbral 4,5 para texto normal y 3,0 para
+texto grande (≥24 px, o ≥18,66 px en negrita).
+
+| Escenario | Nodos agrupados | En `--gris` | Fallas de `--gris` | Peor `--gris` |
+|---|---|---|---|---|
+| Panorama territorial 1200px | 40 | 9 | **0** | 4,85 |
+| Comparador poblado 1200px | 58 | 21 | **0** | 4,85 |
+
+**Criterio de la Fase 3 cumplido: 0 fallas atribuibles a `--gris`**, frente a 10 en la
+pantalla del comparador antes del cambio.
+
+Los dos falsos positivos que el encargo advertía se disuelven al componer el alfa,
+como avisaba: el botón de nivel inactivo del banner (`.lvl-b`, crema al 70 % sobre
+`rgba(255,246,224,.12)` encima del azul) compone a `#BEC4BD` sobre `#27516C` y da
+**4,81**; la banda "no se promedia" también pasa. Ninguno es falla.
+
+Fallas restantes, **todas ajenas a `--gris`**:
+
+| Zona | Ratio | Estado |
+|---|---|---|
+| `.s100-seg span` (etiqueta blanca dentro de la barra) | 3,48 / 3,51 / 4,11 | excepción §3.4 de la decisión |
+| `.ee-gl` (glifos ▼ = ▲) | 3,37 / 3,07 / 3,00 | excepción §3.5, nueva en este encargo |
+| `.chip.al` / `.chip.de` (panorama territorial) | 3,37 / 3,00 | **hallazgo nuevo**, §5.3 (a) |
+| Vista histórica: `.ybar-val`, `.ybar-sig`, `.hist-trend` | 1,04 – 4,40 | **hallazgo nuevo**, §5.3 (b) |
+| `.ybar-yr` en columna sin dato, `.sw-line.mm` (atenuados) | 2,13 / 2,42 | **hallazgo nuevo**, §5.3 (c) |
+
+Los tres hallazgos nuevos quedan escritos en la §5.3 de la decisión, no solo aquí: son
+fallas vivas y deben estar donde se buscan las decisiones. Ninguno lo empeora s29d; los
+dos atenuados por `opacity` incluso **mejoran** (1,94 → 2,13 y 2,15 → 2,42), porque
+oscurecer el color base oscurece también el resultado de componerlo sobre blanco.
+
+### 14.6 Regla de etiquetado de s29 — intacta
+
+En **carga** a 1200px y a 430px, comparador poblado:
+
+| Ancho | Barras | Dentro | En la tira | Cortadas | % duplicados |
+|---|---|---|---|---|---|
+| 1200px | 40 | 44 | 56 | **0** | **0** |
+| 430px | 40 | 0 | 100 | **0** | **0** |
+
+Sigue sin poder verificarse el re-etiquetado **en vivo** al redimensionar, por la misma
+razón medida en §8.4: la pestaña corre oculta y `ResizeObserver` no dispara.
+
+### 14.7 Panel adversarial sobre el cambio
+
+Auditoría independiente de solo lectura, 4 lentes (regla de detención 1, invariantes y
+alcance, aritmética de contraste completa, regresión por tocar un token usado en ~60
+selectores) con refutación adversarial de cada hallazgo. 15 agentes, 11 hallazgos
+brutos, **0 confirmados**. Los refutadores recalcularon por su cuenta el compositing de
+`.ybar-yr` (1,94 → 2,13) y confirmaron que el cambio **mejora** ese caso, y
+corroboraron de forma independiente la corrección de la atribución de `.gfb.on`.
+
+## 15. Decisiones tomadas dentro del margen del encargo (s29d)
+
+1. **Forzar el estado final de las animaciones antes de medir.** Sin eso el modal se
+   mide en `opacity:0` y aparece un falso "gris sobre fondo oscuro" que habría
+   disparado la regla de detención 1 sin motivo.
+2. **Ampliar la verificación a los 19 fondos del CSS**, no a los 7 de la tabla del
+   encargo. Es lo que convierte "0 fallas en lo que miré" en "0 fallas donde `--gris`
+   puede caer".
+3. **Registrar los hallazgos nuevos en la decisión (§5.3) y no solo en este log.** Es
+   la misma razón que en §9.3: un andamio no es donde se buscan las decisiones.
+4. **Incluir la §5.3 de la decisión en el commit de la Fase 4.** El encargo asigna a
+   esa fase solo el log; se añadió el documento de decisión porque los hallazgos que
+   la Fase 3 destapó son parte del mismo registro y separarlos en dos commits habría
+   dejado el log citando una sección que aún no existía.
+
+## 16. Pendientes tras s29d
+
+- **§5.3 (a)** `.chip.al` / `.chip.de` a 3,37 y 3,00: texto de estado sin excepción que
+  lo cubra. Salida natural: usar los tokens `-txt` en el color del chip (4,81 y 5,05).
+- **§5.3 (b)** Vista histórica: `.ybar-val`, `.ybar-sig` y `.hist-trend` entre 1,04 y
+  4,40. Toca las paletas de INDICADOR y de ESTADO; decisión del titular.
+- **§5.3 (c)** `.ybar-yr` de columna sin dato y `.sw-line.mm`: se arreglan subiendo la
+  `opacity`, no el color.
+- **§5.2** Marca de "base pequeña": umbral metodológico sin fijar.
+- **Despliegue a `docs/index.html`**: gate visual del titular, sesión aparte.
+- **Re-etiquetado en vivo al redimensionar**: pide una pestaña visible.
+- **Tooltip "vs evaluación anterior"**: de `title` a body (heredado de s28).
+- **Rama `feat/contrato-contexto`** con 2 commits locales sin push: no se tocó.
