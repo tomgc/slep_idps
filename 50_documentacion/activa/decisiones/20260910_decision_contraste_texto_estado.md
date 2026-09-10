@@ -6,7 +6,9 @@
 - **Referencia visual vinculante:** `50_documentacion/andamios/diseno/detalles/mockup_contraste_estados.html`
 - **Tipo:** decisión de presentación y accesibilidad. NO afecta ninguna cifra.
 - **Estado:** adoptada. **Enmendada el 2026-09-10 (s29d):** se cierra el pendiente §5.1
-  y se añade la excepción §3.5 de los glifos de estado.
+  y se añade la excepción §3.5 de los glifos de estado. **Enmendada el 2026-09-10
+  (s29e):** se cierra la §5.3 — chips corregidos, atenuados exentos, histórica al
+  backlog.
 
 ---
 
@@ -159,7 +161,7 @@ El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generado
 encargo: métricas del bloque 7 del generador idénticas y payload JSON del motor
 byte-idéntico salvo `fecha_generacion`.
 
-## 5. Pendientes asociados (§5.1 resuelto; §5.2 y §5.3 abiertos)
+## 5. Pendientes asociados (§5.1 y §5.3 resueltos; §5.2 abierto)
 
 ### 5.1 `--gris` accesible en todos los fondos — **RESUELTO el 2026-09-10 (s29d)**
 
@@ -245,33 +247,59 @@ es una decisión metodológica, no de diseño**, y el titular aún no lo ha fija
 implementa nada de eso hasta que exista una decisión de proyecto que fije el umbral y
 lo justifique.
 
-### 5.3 Hallazgos nuevos de la auditoría de s29d (requieren decisión)
+### 5.3 Hallazgos de la auditoría de s29d — **CERRADOS el 2026-09-10 (s29e)**
 
-*Abiertos el 2026-09-10 (s29d).* Al auditar **todo** el texto visible —y no solo las
-zonas de un criterio— aparecieron fallas de AA que **no son de `--gris`** y que por
-tanto s29d no corrige. Todas son **anteriores** y ninguna la empeora el cambio de
-s29d. Se dejan escritas aquí para que no se pierdan.
+*Abiertos el 2026-09-10 (s29d), cerrados el mismo día por s29e.* Al auditar **todo** el
+texto visible —y no solo las zonas de un criterio— aparecieron tres fallas de AA que no
+eran de `--gris`. Cada una tiene ahora un destino distinto: **(a) corregida**,
+**(c) declarada exenta**, **(b) al backlog**.
 
-**(a) `.chip.al` y `.chip.de` del panorama territorial.** Son texto completo —"▼ 4
-indicadores bajo su GSE"— pintado con el color de estado sobre su propio fondo teñido,
-a 12 px/600:
+#### (a) `.chip.al` y `.chip.de` del panorama — **RESUELTO (parcialmente; ver el déficit)**
 
-| Chip | Color | Fondo | Ratio | Exige |
-|---|---|---|---|---|
-| `.chip.al` | `--alerta` `#EE2D49` | `--alerta-bg` `#FBE3E6` | **3,37** | 4,5 |
-| `.chip.de` | `--destaca` `#2A8FD9` | `--destaca-bg` `#E2F0FB` | **3,00** | 4,5 |
+Son texto completo —"▼ 4 indicadores bajo su GSE"— pintado con el color de estado sobre
+su propio fondo teñido, a 12 px/600. Ninguna de las dos excepciones vigentes lo cubre:
+§3.4 es la etiqueta blanca dentro de la barra y §3.5 son los glifos `.ee-gl`. Y aquí el
+argumento de §3.5 **no sirve**: el glifo se acepta como componente gráfico porque va
+acompañado del texto del estado; en el chip, el color **es** el texto, y la cifra
+("4 indicadores") no está repetida en ningún otro sitio de esa tarjeta.
 
-Ninguna de las dos excepciones vigentes lo cubre: §3.4 es la etiqueta blanca dentro de
-la barra y §3.5 son los glifos `.ee-gl`. Y aquí **el argumento de §3.5 no sirve**: el
-glifo se acepta como componente gráfico porque va acompañado del texto del estado; en
-el chip, el color **es** el texto, y la cifra ("4 indicadores") no está repetida en
-ningún otro sitio de esa tarjeta. La salida natural sería la misma de s29c: usar los
-tokens `-txt` (`--alerta-txt`, `--destaca-txt`) en el color del chip, sin tocar su
-fondo. Con eso darían 4,81 y 5,05. **No se aplicó** porque el invariante 1 de s29d
-prohíbe tocar la paleta de estado y sus tokens, y porque excede el alcance declarado.
+Corregido usando los tokens de TEXTO de §3.2, sin tocar los fondos `-bg`:
 
-**(b) Vista histórica de la ficha de establecimiento.** Es la zona con más deuda del
-motor y ninguna de sus fallas es de `--gris`:
+| Chip | Color antes | Color después | Fondo | Antes | Después | Exige |
+|---|---|---|---|---|---|---|
+| `.chip.al` | `--alerta` `#EE2D49` | `--alerta-txt` `#D2112D` | `--alerta-bg` `#FBE3E6` | 3,374 | **4,466** | 4,5 |
+| `.chip.de` | `--destaca` `#2A8FD9` | `--destaca-txt` `#1E6EA9` | `--destaca-bg` `#E2F0FB` | 3,000 | **4,689** | 4,5 |
+
+`.chip.nt` (`#6a5a2f` sobre `#eee5cf`) da **5,373**: ya cumplía y se dejó tal cual. La
+misma pareja de colores la usa `.badge`, con el mismo 5,373.
+
+**Déficit que queda abierto, y hay que decirlo:** `.chip.de` cumple, pero **`.chip.al`
+se queda en 4,466 y no alcanza el 4,5**. Le faltan **0,034**.
+
+El encargo s29e daba por esperados 4,81 y 5,05. Esos dos números **no corresponden a
+estos tokens**: son los de `--gris` `#5C666E` sobre esos mismos dos fondos, de la tabla
+§14.2 del log de s29d. El error se cometió al redactar la versión anterior de esta
+misma §5.3 (a) —se copiaron dos celdas de la columna equivocada— y de ahí pasó al
+encargo. La cifra correcta de `--alerta-txt` sobre `--alerta-bg` ya estaba calculada
+desde s29c, donde figuraba como 4,466 y marcada "solo AA-large".
+
+Cerrar esos 0,034 exige tocar un token, que es justo lo que la regla de detención de
+s29e prohíbe. Las dos vías, ambas mínimas y ambas verificadas, quedan aquí para que el
+titular decida:
+
+- **(i) Oscurecer `--alerta-txt` de `#D2112D` a `#D1112D`** —un solo escalón de rojo,
+  H y S idénticas—: da exactamente **4,500** sobre `--alerta-bg`, y mejora también donde
+  ya vive (4,54 sobre `--cream-200`, 5,10–5,39 en el resto). Es la vía recomendada: un
+  token, ningún fondo, y ningún sitio empeora.
+- **(ii) Aclarar `--alerta-bg` de `#FBE3E6` a `#FBE5E7`**: da **4,526**. Toca un fondo
+  de la paleta institucional, que es más invasivo que (i).
+
+Mientras no se decida, `.chip.al` queda a 4,466 —una mejora de 1,09 puntos sobre el
+3,374 de partida, pero por debajo del umbral— y así está anotado en el CSS.
+
+#### (b) Vista histórica de la ficha — **AL BACKLOG**
+
+Deja de ser un pendiente de esta decisión y pasa a ser un ítem propio del backlog.
 
 | Elemento | Color | Fondo | Ratio |
 |---|---|---|---|
@@ -279,22 +307,38 @@ motor y ninguna de sus fallas es de `--gris`:
 | `.ybar-sig` | `--st-neutro` / `--alerta` | colores de INDICADOR | 1,04 – 2,78 |
 | `.hist-trend.al`, `.ht-ic` | `--alerta` `#EE2D49` | `#FFFFFF` | 4,11 |
 
-Son texto sobre las barras de color de indicador. Corregirlo toca la paleta de
-INDICADOR o la de ESTADO —invariantes 1 y 2 de s29d— así que es, otra vez, decisión
-del titular y no de una ejecución.
+**Por qué no se resuelve con un token, que es lo que distingue este caso de (a):** los
+valores van **sobre las barras de color de INDICADOR**, y el peor caso —1,04— es texto
+sobre prácticamente su propio color. No existe un token de texto que sirva para las
+cuatro familias de indicador a la vez y para todos sus tonos derivados; cualquier color
+fijo que funcione sobre `#3858A3` fracasa sobre `#C8DD92`. La salida pasa por **diseño**:
+sacar el valor fuera de la barra, o elegir el color del texto según la luminancia del
+fondo de cada barra. Ambas cambian la lámina, así que piden **mockup y aprobación del
+titular** antes de tocar código. De ahí que sea backlog y no pendiente.
 
-**(c) Dos usos de `--gris` atenuados por `opacity`, que siguen bajo el umbral.** El
-cambio de s29d los **mejora**, pero no basta:
+#### (c) Los dos usos atenuados por `opacity` — **EXENTOS, no pendientes**
 
-| Elemento | Fondo | Antes | Después | Exige |
-|---|---|---|---|---|
-| `.ybar-yr` dentro de `.ybar-col.is-off` (`opacity:.5`) | `#FFFFFF` | 1,94 | 2,13 | 4,5 |
-| `.sw-line.mm` (`opacity:.6`) dentro de `.ficha-explain` | `#eef3f7` | 2,15 | 2,42 | 3,0 |
+| Elemento | Fondo | Ratio | Naturaleza |
+|---|---|---|---|
+| `.ybar-yr` dentro de `.ybar-col.is-off` (`opacity:.5`) | `#FFFFFF` | 2,13 | texto de componente **inactivo** |
+| `.sw-line.mm` (`opacity:.6`) dentro de `.ficha-explain` | `#eef3f7` | 2,42 | **muestra de línea**, no texto |
 
-El primero es la etiqueta de año de una columna **sin dato**, atenuada a propósito:
-cabe defender que es un componente de interfaz inactivo, que WCAG 1.4.3 exime. El
-segundo es una muestra de línea de 1,6 px en la leyenda del promedio móvil. Ambos se
-arreglarían subiendo la `opacity`, no tocando el color. Quedan anotados, sin aplicar.
+Se declaran **exentos**, con fundamento en la norma y no por conveniencia:
+
+- **`.ybar-yr` de una columna sin dato.** WCAG 2.1 SC 1.4.3 excluye explícitamente del
+  requisito de contraste el texto que forma parte de un **componente de interfaz
+  inactivo**. Una columna `.ybar-col.is-off` es exactamente eso: un año deshabilitado,
+  atenuado a propósito **para señalar su inactividad**. La atenuación no es un descuido
+  de estilo, es el significante.
+- **`.sw-line.mm`.** No es texto: es una muestra de línea de 1,6 px en la leyenda del
+  promedio móvil, es decir un componente gráfico, y su umbral sería 3:1, no 4,5.
+
+**Condición de caducidad de la exención.** Está atada a lo que la atenuación *significa*,
+no a su valor. Si alguna vez `.ybar-col.is-off` deja de marcar "inactivo" —por ejemplo si
+se reutiliza para marcar un año preliminar, uno filtrado o cualquier otro estado que el
+usuario sí deba leer—, **la exención caduca automáticamente** y hay que volver a medir y
+corregir. Lo mismo si `.sw-line.mm` pasa a llevar texto. Quien haga ese cambio es quien
+tiene que reabrir este punto.
 
 ## 6. Reversión
 
@@ -303,6 +347,8 @@ De un solo punto y trivial en los dos cambios, y ninguno afecta a cifra alguna:
 - **Tokens de texto de estado (s29c):** borrar los tres tokens del `:root`, devolver
   `style={{color:s.c}}` a `.s100-ext-it` y devolver `.ee-st` a `color:var(--gris)` sin
   clase de estado.
+- **Chips del panorama (s29e):** devolver `.chip.al` y `.chip.de` a `var(--alerta)` y
+  `var(--destaca)`. Dos declaraciones.
 - **`--gris` (s29d):** devolver `--gris` a `#6b7780` en el `:root`. Una sola
   declaración; los ~60 selectores que lo usan vuelven solos.
 
