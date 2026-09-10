@@ -168,7 +168,7 @@ El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generado
 encargo: métricas del bloque 7 del generador idénticas y payload JSON del motor
 byte-idéntico salvo `fecha_generacion`.
 
-## 5. Pendientes asociados (§5.1 y §5.3 resueltos; §5.2 abierto)
+## 5. Pendientes asociados (§5.1 y §5.3 resueltos; §5.2 y §5.4 abiertos)
 
 ### 5.1 `--gris` accesible en todos los fondos — **RESUELTO el 2026-09-10 (s29d)**
 
@@ -346,6 +346,36 @@ se reutiliza para marcar un año preliminar, uno filtrado o cualquier otro estad
 usuario sí deba leer—, **la exención caduca automáticamente** y hay que volver a medir y
 corregir. Lo mismo si `.sw-line.mm` pasa a llevar texto. Quien haga ese cambio es quien
 tiene que reabrir este punto.
+
+### 5.4 `.ancla.al` y `.ancla.de` — mismo defecto que los chips, sin corregir (abierto)
+
+*Abierto el 2026-09-10 (s29e).* La auditoría de s29e destapó que el componente
+`<Ancla/>` de la ficha de establecimiento repite **exactamente** el defecto que la
+§5.3 (a) acaba de corregir en los chips, con las mismas dos parejas de colores y los
+mismos ratios:
+
+| Elemento | Color | Fondo | Ratio | Exige |
+|---|---|---|---|---|
+| `.ancla.al` | `--alerta` `#EE2D49` | `--alerta-bg` `#FBE3E6` | **3,374** | 4,5 |
+| `.ancla.de` | `--destaca` `#2A8FD9` | `--destaca-bg` `#E2F0FB` | **3,000** | 4,5 |
+
+Es texto de 14 px: el ancla muestra el desvío vs GSE de cada dimensión y subdimensión
+—`"vs GSE ▼ -13 · sig."`— ahí donde no hay dato de GSE para dibujar la barra. Igual que
+en el chip, el color **es** el texto.
+
+**Por qué no se corrigió en s29e.** El encargo especificaba exactamente dos
+declaraciones —`.chip.al` y `.chip.de`— y se declaraba "sin decisiones nuevas". El
+ancla vive en la **ficha de establecimiento**, una tercera pantalla que no estaba entre
+los dos escenarios que ese encargo mandaba auditar, y cambiarla altera una lámina con
+su propia revisión visual. Extender el alcance por cuenta propia habría sido justo lo
+que la disciplina de estos encargos evita.
+
+**Salida.** Es la misma de §5.3 (a) y no necesita ninguna decisión nueva de color:
+cambiar `color:var(--alerta)` por `var(--alerta-txt)` y `var(--destaca)` por
+`var(--destaca-txt)` en las dos declaraciones, dejando los fondos `-bg` intactos. Da
+4,466 y 4,689 — con **el mismo déficit de 0,034 en la rama de alerta**, que se cerraría
+de una vez con la vía (i) de §5.3 (a) (`--alerta-txt` → `#D1112D`). Conviene resolver
+los dos juntos: son el mismo problema en dos sitios.
 
 ## 6. Reversión
 
