@@ -576,6 +576,7 @@ del asistente de análisis (el que redacta encargos y mockups), no del ejecutor.
 |---|---|---|---|
 | 1 | Puntajes con decimal inventados en el mockup (`78,4`, `76,0`) cuando los 354.007 valores de `prom` del payload son enteros. | `mockup_comparador_ee_nacional.html`, detectado por el ejecutor en §3.5.2 | Inferencia sobre datos no leídos: se ilustró una cifra plausible en vez de verificar el tipo del dato antes de dibujarlo. Es el mismo patrón registrado en el traspaso s28. |
 | 2 | Regla de detención §0.2 del encargo s29c fijada sobre un SHA-256 no reproducible: se copió el hash del log de s29 sin su receta de normalización, que ese log no registraba. | `encargo_claude_code_idps_contraste_texto_estado_s29c.md`, detectado por el ejecutor en §8.2 | Se convirtió en criterio bloqueante un valor que no se había verificado como reproducible. Una regla de detención debe poder ejecutarse con lo que el encargo entrega. |
+| 3 | Atribución errónea de selector en el §1 del encargo s29d: la falla de 3,53 sobre `#D4E4F1` se adjudicó a las casillas GSE activas (`.gfb.on`), que usan `--foco` y ya cumplían (4,97). El caso real era `.eo-m` con `.estab-opt:hover`. | `encargo_claude_code_idps_gris_accesible_s29d.md` §1, detectado por el ejecutor en §14.3 | Se nombró un selector por inferencia visual (el fondo azul claro se asoció a la casilla activa) en vez de leerlo del instrumento que produjo la medición. El fondo y el ratio eran correctos; el culpable, no. |
 
 Corrección adoptada para el punto 2: la convención de normalización queda escrita en
 §8.2 de este log y se cita desde los próximos encargos, en vez de repetir el hash.
@@ -791,3 +792,217 @@ corroboraron de forma independiente la corrección de la atribución de `.gfb.on
 - **Re-etiquetado en vivo al redimensionar**: pide una pestaña visible.
 - **Tooltip "vs evaluación anterior"**: de `title` a body (heredado de s28).
 - **Rama `feat/contrato-contexto`** con 2 commits locales sin push: no se tocó.
+
+---
+
+# Continuación de la sesión — s29e (2026-09-10)
+
+> Misma sesión s29, quinto y último encargo:
+> `50_documentacion/activa/encargos/encargo_claude_code_idps_chips_panorama_s29e.md`.
+> Cierra los tres hallazgos que la §5.3 de la decisión dejó abiertos. Alcance: 100 %
+> presentación, usando tokens que ya existían. No se tocó el pipeline (31–34) ni
+> `idps_largo.parquet`. No se desplegó a `docs/`. No se tocó `feat/contrato-contexto`.
+
+## 17. Inventario de commits de s29e
+
+| # | Commit | Fase | Rutas |
+|---|---|---|---|
+| 18 | `5d508f7` | 1 — `fix(motor): chips de estado del panorama con los tokens de texto` | `30_procesamiento/35_motor_template.html` |
+| 19 | `40a279c` | 2 — `docs(decision): cierra §5.3 — chips corregidos, atenuados exentos, historica al backlog` | decisión `20260910_…md` |
+| 20 | `ec22558` | 3 — `build(motor): regenera el motor con los chips de estado accesibles` | `40_salidas/motor_idps.html` |
+| 21 | `4550d2f` | corrección — `docs(motor): actualiza el inventario de usos de los tokens de texto` | plantilla + decisión + motor |
+| 22 | (este) | 4 — `docs(log): registro de s29e` | este log + decisión §5.4 + el encargo s29e |
+
+## 18. Qué se cambió
+
+Dos declaraciones. `.chip.al` y `.chip.de` dejan el token de **barra** y toman el de
+**texto**; los fondos `-bg` no se tocan y **ningún token cambia de valor**:
+
+```
+.chip.al{background:var(--alerta-bg);  color:var(--alerta-txt);}
+.chip.de{background:var(--destaca-bg); color:var(--destaca-txt);}
+```
+
+El razonamiento es el de §5.3 (a): el chip es **texto** (12 px, peso 600), no un glifo,
+así que no le sirve el argumento de componente gráfico de §3.5. Aquí el color **es** el
+texto.
+
+## 19. Chequeos de s29e (valores observados)
+
+### 19.1 Cifras de los chips — y un déficit que no se cierra
+
+Medido en el motor, colores computados en navegador:
+
+| Chip | Color antes | Color después | Fondo | Antes | Después | Exige | Veredicto |
+|---|---|---|---|---|---|---|---|
+| `.chip.al` | `--alerta` `#EE2D49` | `--alerta-txt` `#D2112D` | `#FBE3E6` | 3,374 | **4,466** | 4,5 | **no llega** |
+| `.chip.de` | `--destaca` `#2A8FD9` | `--destaca-txt` `#1E6EA9` | `#E2F0FB` | 3,000 | **4,689** | 4,5 | cumple |
+| `.chip.nt` | `#6a5a2f` (sin cambio) | — | `#eee5cf` | 5,373 | 5,373 | 4,5 | **ya cumplía** |
+
+**Veredicto sobre `.chip.nt`, que el encargo pedía expresamente:** da **5,373** y por
+tanto **ya cumplía**; se deja tal cual, sin tocar. La misma pareja de colores
+(`#6a5a2f` sobre `#eee5cf`) la usa `.badge`, con el mismo 5,373: tampoco necesita nada.
+`.badge.foco` (blanco sobre `--foco`) da 6,452.
+
+**El déficit.** `.chip.al` se queda en **4,466** y no alcanza el 4,5 de AA: le faltan
+**0,034**. El encargo daba por esperados 4,81 y 5,05 y pedía confirmarlos midiendo; la
+medición los desmiente. La aritmética se validó con dos controles conocidos (`#000`
+sobre `#fff` = 21,00 y `#777` sobre `#fff` = 4,48) y se comprobó dos veces: por cálculo
+propio y sobre el motor cargado en el navegador.
+
+Cerrar esos 0,034 exige tocar `--alerta-txt` o `--alerta-bg`, que es exactamente lo que
+la regla de detención 1 de este encargo prohíbe. Así que **no se tocó** y el déficit se
+reporta, con las dos vías mínimas ya calculadas y verificadas:
+
+| Vía | Cambio | Resultado sobre `--alerta-bg` | Efecto en el resto |
+|---|---|---|---|
+| **(i)** recomendada | `--alerta-txt` `#D2112D` → `#D1112D` (un escalón, H y S idénticas) | **4,500** | mejora: 4,54 sobre `--cream-200`, 5,10–5,39 en el resto |
+| **(ii)** | `--alerta-bg` `#FBE3E6` → `#FBE5E7` | **4,526** | toca un fondo de la paleta institucional |
+
+Queda escrito además en el CSS, junto a la propia declaración, para que quien lea el
+selector se entere del déficit sin ir a buscarlo.
+
+### 19.2 De dónde salió el "4,81 y 5,05" — error del ejecutor, no del asistente
+
+Estos dos números **no corresponden a `--alerta-txt` y `--destaca-txt`**: son los de
+`--gris` `#5C666E` sobre esos mismos dos fondos, que están en la tabla §14.2 de este
+log (`#FBE3E6` → 4,81; `#E2F0FB` → 5,05). Al redactar la §5.3 (a) de la decisión en
+s29d se copiaron dos celdas de la **columna equivocada** de esa tabla, y el encargo
+s29e heredó la cifra.
+
+Es un error **del ejecutor**, no del asistente de análisis, así que no entra en la §11.
+Se registra aquí. El agravante es que la cifra correcta ya estaba calculada desde s29c:
+en la tabla de aquel encargo, `--alerta-txt` sobre `--alerta-bg` figuraba como **4,466**
+y marcada explícitamente "solo AA-large". Es decir: el dato bueno estaba en el
+repositorio y se escribió encima uno malo.
+
+Patrón, para el traspaso: **al citar una cifra de una tabla propia, verificar que la
+columna es la que se cree, sobre todo cuando la tabla compara varios colores contra los
+mismos fondos.** Recalcular en vez de copiar cuesta segundos y no arrastra el error a
+los encargos siguientes.
+
+### 19.3 Build y fidelidad del payload
+
+`run_all(only = 35L)` sin error y sin warning: `grep -inE "warn|error|aviso|fail|
+problema"` sobre la salida completa no devuelve ninguna coincidencia. Bloque 7 idéntico
+a la línea base (16 regiones, 9.136 establecimientos, 91.596 unidades de grilla,
+366.384 / 557.898 / 662.514 filas, JSON 59,5 MB → 4,41 MB, HTML 5,1 MB).
+
+Verificación fuerte contra el motor de `f429b5e`:
+
+```
+bytes: 59.466.778  ==  59.466.778
+offsets que difieren: []
+```
+
+**Cero.** SHA-256 con la convención de §8.2, idéntico antes y después:
+
+```
+1e29c2b5be529e013f5afb98de323420e842a615b2e4f7a9cc5001ad1b55b5b6
+```
+
+### 19.4 Auditoría de todo el texto visible
+
+Mismo método que en s29d: elementos con texto propio, fondo efectivo compuesto hacia
+arriba con alfa y `opacity` de cada capa, fórmula WCAG 2.1, animaciones forzadas a su
+estado final porque la pestaña corre oculta.
+
+| Escenario | Nodos | Fallas |
+|---|---|---|
+| Panorama territorial 1200px | 40 | `.s100-seg span` (3,483 / 3,510 / 4,112) · `.chip.al` (4,466) |
+| Comparador poblado 1200px | 58 | `.s100-seg span` (3,483 / 3,510 / 4,112) · `.ee-gl` (3,069 / 3,374) |
+
+**Criterio de la Fase 3:** se cumple en el comparador, donde lo único que queda son las
+dos excepciones escritas —§3.4 la etiqueta blanca dentro de la barra y §3.5 los glifos
+`.ee-gl`—. En el panorama territorial queda además `.chip.al` a 4,466, que **no es un
+hallazgo nuevo** sino el déficit de la Fase 1, ya reportado arriba. Ninguna otra cosa
+aparece: `.chip.de` y `.chip.nt` pasan, y lo exento en §5.3 (c) no se dibuja en estos
+dos escenarios.
+
+### 19.5 Regla de etiquetado de s29 — intacta
+
+| Ancho | Barras | Dentro | En la tira | Cortadas | % duplicados |
+|---|---|---|---|---|---|
+| 1200px | 40 | 44 | 56 | **0** | **0** |
+| 430px | 40 | 0 | 100 | **0** | **0** |
+
+### 19.6 Nota de instrumentación
+
+La tabla de la §11 llegó con su tercera fila separada del cuerpo por una línea en
+blanco, lo que en markdown corta la tabla y deja esa fila como texto suelto. Se quitó
+la línea en blanco: el contenido de la fila no se tocó, solo se reunió con la tabla.
+
+Durante la auditoría, la pantalla activa saltaba sola a "Panorama IDPS por
+establecimiento" entre una llamada y la siguiente, lo que produjo una medición vacía
+(15 nodos, 0 fallas) que habría sido un falso "todo en orden". Se resolvió haciendo
+cada medición en **una sola** llamada autocontenida —cambiar de pantalla, poblar y
+medir sin volver— y verificando la pantalla activa y el número de entidades dentro del
+propio resultado.
+
+### 19.7 Hallazgo nuevo: `.ancla.al` y `.ancla.de` repiten el defecto de los chips
+
+La auditoría destapó que el componente `<Ancla/>` de la ficha de establecimiento tiene
+**exactamente** el mismo defecto que la Fase 1 corrige en los chips, con las mismas dos
+parejas de colores:
+
+| Elemento | Color | Fondo | Ratio |
+|---|---|---|---|
+| `.ancla.al` | `--alerta` `#EE2D49` | `--alerta-bg` `#FBE3E6` | **3,374** |
+| `.ancla.de` | `--destaca` `#2A8FD9` | `--destaca-bg` `#E2F0FB` | **3,000** |
+
+Es texto de 14 px —`"vs GSE ▼ -13 · sig."`— que se usa en dimensión y subdimensión, ahí
+donde no hay dato de GSE para dibujar barra. **No se corrigió**: el encargo especificaba
+dos declaraciones exactas, se declaraba "sin decisiones nuevas", y el ancla vive en la
+ficha, una tercera pantalla fuera de los dos escenarios que este encargo mandaba
+auditar. Queda anotado como §5.4 de la decisión, con su salida —la misma de §5.3 (a)—
+y la recomendación de resolverlo junto con el déficit de `.chip.al`, porque es el mismo
+problema en dos sitios y una sola vía (i) los cierra a la vez.
+
+Por qué no lo vio la auditoría de s29d: aquella recorrió el panorama territorial y el
+comparador, y el ancla solo se dibuja en la ficha. Es el límite conocido de auditar por
+escenarios en vez de por componentes.
+
+### 19.8 Corrección de una afirmación que esta misma sesión dejó obsoleta
+
+El comentario del `:root` declaraba que los tokens `-txt` se usan "SOLO ... (tira
+externa y texto de estado de la fila EE)", y la §3.3 de la decisión se titulaba "en dos
+lugares, y solo en esos dos". Con la Fase 1 pasaron a ser **tres**. La restricción de
+fondo —solo texto pequeño sobre fondo claro— sigue intacta: lo que había quedado
+obsoleto era el **inventario**, no el invariante.
+
+Se corrigieron los dos sitios (commit `4550d2f`) y ambos llevan ahora la lista al día
+más la instrucción de mantenerla. Es la misma clase de deriva que produjo el error de
+los 4,81/5,05 descrito en §19.2: un dato correcto en su momento que nadie actualizó al
+cambiar el código. El motor se regeneró; el payload no se movió (cero offsets, es un
+comentario CSS fuera del JSON).
+
+## 20. Decisiones tomadas dentro del margen del encargo (s29e)
+
+1. **Aplicar la Fase 1 aunque no alcance AA.** El cambio sube `.chip.al` de 3,374 a
+   4,466 y `.chip.de` de 3,000 a 4,689: es lo que el encargo pide y una mejora real.
+   Detenerse habría dejado los chips en 3,37 y 3,00 sin ganar nada, ya que la única
+   salida al déficit está fuera de este encargo por su propia regla de detención.
+2. **Escribir el déficit en el CSS, no solo en los documentos.** Quien lea
+   `.chip.al` tiene que enterarse ahí mismo de que ese selector no cumple y por qué.
+3. **Reunir la tabla de la §11** (ver §19.6). Incluir la fila tal cual habría
+   significado publicarla rota.
+4. **Registrar el error del "4,81 y 5,05" fuera de la §11**, porque esa sección es
+   explícitamente para errores del asistente de análisis y este es del ejecutor.
+
+## 21. Pendientes tras s29e
+
+- **Déficit de `.chip.al`** (4,466, faltan 0,034): decisión del titular entre la vía
+  (i) `--alerta-txt` → `#D1112D` —recomendada— y la (ii) `--alerta-bg` → `#FBE5E7`.
+  Ver §5.3 (a) de la decisión.
+- **`.ancla.al` / `.ancla.de`** (§5.4): mismo defecto que los chips, 3,374 y 3,000, sin
+  corregir por alcance. La vía (i) del punto anterior los cerraría junto con el chip.
+- **Vista histórica de la ficha** (§5.3 (b)): al **backlog**. Pide mockup y aprobación,
+  no un token.
+- **§5.2** Marca de "base pequeña": umbral metodológico sin fijar.
+- **Despliegue a `docs/index.html`**: gate visual del titular, sesión aparte.
+- **Re-etiquetado en vivo al redimensionar**: pide una pestaña visible.
+- **Tooltip "vs evaluación anterior"**: de `title` a body (heredado de s28).
+- **Rama `feat/contrato-contexto`** con 2 commits locales sin push: no se tocó.
+
+Cerrado por §5.3 (c): los dos usos atenuados por `opacity` quedan **exentos**, no
+pendientes, con la condición de caducidad escrita en la decisión.
