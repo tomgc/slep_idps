@@ -38,8 +38,9 @@ __FONTS_CSS__
        tokens se usan SOLO en texto pequeño sobre fondo claro: nunca en barras,
        bordes, fondos ni leyenda. Inventario de usos, al dia: la tira externa
        (.s100-ext-it) y el texto de estado de la fila EE (.ee-st), de s29c, mas
-       los chips del panorama (.chip.al/.chip.de), de s29e. Si se agrega un uso,
-       se agrega aqui.
+       los chips del panorama (.chip.al/.chip.de), de s29e, y las anclas de
+       desvio vs GSE de la ficha (.ancla.al/.ancla.de), de s29f. Si se agrega un
+       uso, se agrega aqui.
        s29f (2026-09-11): --alerta-txt baja de #D2112D a #CE112C (H 351,3->351,4,
        S 85,0->84,8; solo luminosidad). Con #D2112D, sobre --alerta-bg daba 4,466 y
        no llegaba a AA; #CE112C da 4,606 ahi y 4,644 sobre --cream-200, el peor de
@@ -162,8 +163,11 @@ __FONTS_CSS__
      conservan .ancla/.arr (usados por <Ancla/>). */
   .ancla{font-size:var(--fs-caption);padding:3px 9px;border-radius:7px;border:1px solid var(--linea);background:#fff;display:flex;gap:5px;align-items:center;}
   .ancla .k{color:var(--gris);font-size:var(--fs-overline);letter-spacing:.3px;}
-  .ancla.al{background:var(--alerta-bg);border-color:#f3c9c2;color:var(--alerta);}
-  .ancla.de{background:var(--destaca-bg);border-color:#c5e4cd;color:var(--destaca);}
+  /* s29f (2026-09-11): el ancla es TEXTO (14px: "vs GSE ▼ -13 · sig."), el mismo
+     caso que los chips de s29e. Color de TEXTO del estado, no el de barra; fondos
+     y bordes intactos. Medido: .ancla.al 3,37 -> 4,61 y .ancla.de 3,00 -> 4,69. */
+  .ancla.al{background:var(--alerta-bg);border-color:#f3c9c2;color:var(--alerta-txt);}
+  .ancla.de{background:var(--destaca-bg);border-color:#c5e4cd;color:var(--destaca-txt);}
   .arr{font-weight:800;}
   /* Fase 3: .go/.distrow muertos eliminados; .actores standalone (lo usa SubDist). */
   .actores{font-size:var(--fs-overline);color:var(--gris);font-weight:var(--fw-regular);}
