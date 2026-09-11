@@ -1006,3 +1006,182 @@ comentario CSS fuera del JSON).
 
 Cerrado por §5.3 (c): los dos usos atenuados por `opacity` quedan **exentos**, no
 pendientes, con la condición de caducidad escrita en la decisión.
+
+---
+
+# Continuación de la sesión — s29f (2026-09-11)
+
+> Misma sesión s29, sexto y último encargo:
+> `50_documentacion/activa/encargos/encargo_claude_code_idps_cierre_contraste_y_deploy_s29f.md`.
+> Cierra los dos déficits que s29e dejó medidos (§5.3 a y §5.4 de la decisión) y, con el
+> gate visual del titular concedido el 2026-09-10, **despliega** a `docs/index.html`.
+> No se tocó el pipeline (31–34) ni `idps_largo.parquet`. No se tocó
+> `feat/contrato-contexto`.
+
+## 22. Inventario de commits de s29f
+
+| # | Commit | Fase | Rutas |
+|---|---|---|---|
+| 23 | `65ced7f` | 1 — `fix(motor): --alerta-txt con margen sobre el fondo de alerta` | plantilla |
+| 24 | `c157a05` | 2 — `fix(motor): desvio vs GSE de la ficha con los tokens de texto` | plantilla |
+| 25 | `ea3b22c` | 3 — `build(motor): regenera el motor con el contraste cerrado` | `40_salidas/motor_idps.html` |
+| 26 | `8ae932b` | 4 — `deploy(docs): publica el comparador de entidades y el contraste accesible` | `docs/index.html` |
+| 27 | (este) | 5 — `docs(log): registro de s29f, cierre de contraste y despliegue` | log + decisión + `ESTADO.md` + encargo |
+
+## 23. Qué se cambió
+
+**Fase 1.** `--alerta-txt` pasa de `#D2112D` a **`#CE112C`**. H 351,3° → 351,4°, S 85,0 %
+→ 84,8 %; solo baja la luminancia relativa, 0,1429 → 0,1370. Se descartó `#D1112D` —la
+vía (i) que proponía la decisión— porque da 4,5003 sobre `--alerta-bg`, tres
+diezmilésimas de margen. Se descartó tocar `--alerta-bg`, fondo institucional.
+`--destaca-txt` no se toca: 4,689 ya cumple. Se retira del CSS la nota de déficit que
+s29e dejó junto a `.chip.al`.
+
+**Fase 2.** `.ancla.al` y `.ancla.de` pasan del token de barra al de texto. Fondos y
+bordes intactos. El inventario de usos de los `-txt` en el `:root` pasa a cuatro.
+
+## 24. Chequeos de s29f (valores observados)
+
+### 24.1 La aritmética del encargo, verificada antes de aplicar
+
+Después del error de s29e (4,81/5,05), la tabla del encargo se recalculó entera antes
+de tocar nada, con dos controles conocidos (`#000`/`#fff` = 21,00; `#777`/`#fff` =
+4,478). **Los siete valores coinciden al cuarto decimal.** Se añadieron seis fondos
+claros más que el encargo no lista; `#CE112C` pasa en todos los que el token usa. Los
+dos donde no llega (`#D4E4F1` 4,32 y `#eee5cf` 4,48) son fondos sobre los que
+`--alerta-txt` **no** se dibuja en ningún sitio.
+
+### 24.2 Regla de detención 1 — cada uso de `--alerta-txt`, antes y después
+
+Medido en el motor cargado, con el token sobreescrito en vivo antes de commitear:
+
+| Uso | Fondo | `#D2112D` | `#CE112C` |
+|---|---|---|---|
+| `.chip.al` | `--alerta-bg` `#FBE3E6` | 4,4661 | **4,6064** |
+| `.s100-ext-it.ext-bajo` | fila nacional `#FCFAF2` | 5,2082 | **5,3718** |
+| `.s100-ext-it.ext-bajo` | `--panel` `#FFFDF7` | 5,3507 | **5,5188** |
+| `.ee-st.bajo` | fila EE `#F7FBFE` | 5,2314 | **5,3957** |
+| `.ancla.al` (tras la Fase 2) | `--alerta-bg` `#FBE3E6` | 3,3742 (era `--alerta`) | **4,6064** |
+
+Ninguno baja de 4,5; todos suben. La regla **no se dispara**.
+
+### 24.3 Las anclas
+
+| Elemento | Antes | Después | Dónde se midió |
+|---|---|---|---|
+| `.ancla.al` | 3,3742 | **4,6064** | RBD 12301 (25 anclas) |
+| `.ancla.de` | 3,0000 | **4,6886** | Liceo Atenea, RBD 134 (el 12301 no dibuja ninguna) |
+
+Barrido del patrón "color de barra sobre su `-bg`" en toda la plantilla: los únicos
+selectores que lo repiten son los glifos `.ee-gl` (bajo/neutro/sobre), cubiertos por
+§3.5 como componente gráfico. **No queda ningún otro.**
+
+### 24.4 Build y fidelidad
+
+`run_all(only = 35L)` sin error y sin warning (`grep -inE "warn|error|aviso|fail|
+problema"` sobre la salida completa: ninguna coincidencia). Bloque 7 idéntico a la
+línea base.
+
+```
+bytes: 59.466.778  ==  59.466.778
+offsets que difieren: [38]      ← el dígito del día: 2026-09-10 → 2026-09-11
+SHA-256 (convención §8.2):  1e29c2b5be529e013f5afb98de323420e842a615b2e4f7a9cc5001ad1b55b5b6
+```
+
+Un solo offset, y es el permitido. **Ninguna cifra se movió.**
+
+### 24.5 Auditoría de todo el texto visible — tres escenarios a 1200px
+
+Mismo método: elementos con texto propio, fondo efectivo compuesto con alfa y `opacity`,
+animaciones forzadas a su estado final.
+
+| Escenario | Nodos | Fallas | Cubiertas por |
+|---|---|---|---|
+| A · Panorama territorial | 40 | `.s100-seg span` 3,483 / 3,510 / 4,112 | §3.4 |
+| B · Comparador poblado | 58 | `.s100-seg span` (ídem) · `.ee-gl` 3,069 / 3,374 | §3.4 · §3.5 |
+| C · Ficha de establecimiento (vista actual) | 68 | ver abajo | **cuatro sin cubrir** |
+
+En A los tres chips pasan: `.chip.al` **4,606**, `.chip.de` 4,689, `.chip.nt` 5,373.
+En B los tres usos de `--alerta-txt` suben (5,372 / 5,519 / 5,396). **A y B cumplen el
+criterio.**
+
+**C es la pantalla que s29e nunca auditó**, y ahí el criterio **no se cumple**: además
+de `.ancla.al` a 4,606 (resuelto), quedan cuatro fallas que ninguna excepción cubre.
+Todas son **anteriores** a s29f; ninguna la empeora; dos las mejora sin llegar:
+
+| # | Elemento | Color / fondo | Ratio | Nota |
+|---|---|---|---|---|
+| 1 | sufijo `"· sig."` del ancla, `opacity:.8` inline (JSX l.~771) | `--alerta-txt` @.8 / `#FBE3E6` | **3,718** (de 2,817) | a `opacity:1` daría 4,606 |
+| 1 | ídem, rama sobre | `--destaca-txt` @.8 / `#E2F0FB` | **3,301** (de 2,380) | a `opacity:1` daría 4,689 |
+| 2 | `.defn-title` con `ind.color` inline (JSX l.~707) | `--ind2` / `#fff` | **2,187** | `--ind3` 3,066 · `--ind4` 1,843 · `--ind1` 6,790 ✓ |
+| 3 | `"▼ rojo"` / `"▲ azul"` de `.ficha-explain` (JSX l.~1290) | `--alerta` / `#eef3f7` | **3,681** | con `-txt` 5,025 |
+| 3 | ídem | `--destaca` / `#eef3f7` | **3,118** | con `-txt` 4,872 |
+| 4 | `"10%"` blanco sobre barra de dimensión | `#fff` / `#4C939A` | **3,531** | hermana de §3.4, sobre tono de indicador |
+
+Los cuatro están en la **§5.5 de la decisión** con su salida y su costo. El más urgente
+es el (1): está **dentro del mismo componente** que la Fase 2 acaba de corregir, y el
+sufijo distingue "sig." de "n.s.", que sí es información. No se tocó porque es JSX y el
+encargo fijaba dos declaraciones CSS.
+
+### 24.6 Regla de etiquetado de s29 — intacta
+
+| Ancho | Barras | Dentro | En la tira | Cortadas | % duplicados |
+|---|---|---|---|---|---|
+| 1200px | 40 | 44 | 56 | **0** | **0** |
+| 430px | 40 | 0 | 100 | **0** | **0** |
+
+### 24.7 Despliegue
+
+`docs/index.html` es **copia byte a byte** de `40_salidas/motor_idps.html`: `cmp` sin
+diferencias, md5 `f61ac9c596bec51518d20fbe9ef4e02e` en ambos, 5.383.820 bytes. Verificado
+antes de commitear (regla de detención 4). Sustituye el `docs/index.html` del
+2026-07-03 (md5 `3f1d6e98…`), que llevaba tres sesiones sin promoverse.
+
+Servido `docs/` en local (`python3 -m http.server 8767`, entrada `docs-py` añadida a
+`.claude/launch.json`, que no se versiona): título correcto, payload decodificado en
+293 ms, las tres pantallas abren, `--alerta-txt` = `#CE112C` y `--gris` = `#5C666E` en
+el documento servido, **cero errores de consola y cero errores JS en vivo**.
+
+Lo publicado incorpora toda la línea s29: comparador de entidades, etiquetado adaptativo,
+aviso único de EE sin ubicación, tokens de texto de estado, `--gris` accesible, chips y
+anclas con los tokens de texto, `--alerta-txt` con margen.
+
+### 24.8 Panel adversarial — no hubo
+
+Se lanzó el panel de tres lentes (regla de detención 1, invariantes y alcance,
+cobertura de la ficha) y **los tres agentes murieron por límite de sesión antes de
+producir nada**. Este encargo descansa íntegramente en la auditoría directa del
+ejecutor —aritmética recalculada con controles, medición en navegador de cada uso, y
+barrido de los tres escenarios—. Queda dicho para que no se lea como verificado por
+terceros lo que no lo fue.
+
+## 25. Decisiones tomadas dentro del margen del encargo (s29f)
+
+1. **Recalcular la tabla del encargo antes de aplicar**, por el precedente de s29e.
+   Esta vez coincidió al cuarto decimal; el recálculo es barato y evita arrastrar
+   errores a `docs/`.
+2. **Medir `.ancla.de` en otro establecimiento.** El RBD 12301 no dibuja ninguna; en vez
+   de dar por buena la aritmética se buscó uno que sí (RBD 134).
+3. **Desplegar aunque la ficha tenga fallas sin cubrir.** El gate visual se concedió
+   sobre el motor de esta línea, que ya las tenía; lo publicado es estrictamente mejor
+   que lo que estaba en `docs/` desde julio, y ninguna de las cuatro la introdujo s29f.
+   Retener el despliegue por defectos anteriores que el encargo no autorizaba a tocar
+   habría sido decidir por el titular.
+4. **No tocar el sufijo del ancla (§5.5-1)** pese a estar dentro del componente
+   corregido: es JSX, no CSS, y el encargo fijaba dos declaraciones. Se reporta como lo
+   más urgente de la lista.
+
+## 26. Pendientes tras s29f (cierre de la línea)
+
+- **§5.5 (1)** sufijo `"· sig."` del ancla a `opacity:.8`: 3,718 / 3,301. Quitar la
+  opacidad da 4,606 / 4,689. JSX, una línea. **Lo más urgente.**
+- **§5.5 (3)** `"▼ rojo"` / `"▲ azul"` de `.ficha-explain`: 3,681 / 3,118. Con los
+  tokens `-txt` pasan. JSX inline.
+- **§5.5 (2)** `.defn-title` con color de indicador sobre blanco: 2,187 / 3,066 / 1,843.
+  Salida barata: título en `--tinta`, color solo en el punto.
+- **§5.5 (4)** `"10%"` blanco sobre barra de dimensión: 3,531. Extender §3.4 o sacar la
+  etiqueta.
+- **§5.3 (b)** vista histórica: backlog, pide mockup.
+- **§5.2** marca de "base pequeña": umbral metodológico sin fijar.
+- Re-etiquetado en vivo al redimensionar: pide una pestaña visible.
+- Tooltip "vs evaluación anterior" (s28). Rama `feat/contrato-contexto`: no se tocó.

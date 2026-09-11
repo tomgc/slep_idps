@@ -8,7 +8,9 @@
 - **Estado:** adoptada. **Enmendada el 2026-09-10 (s29d):** se cierra el pendiente §5.1
   y se añade la excepción §3.5 de los glifos de estado. **Enmendada el 2026-09-10
   (s29e):** se cierra la §5.3 — chips corregidos, atenuados exentos, histórica al
-  backlog.
+  backlog. **Enmendada el 2026-09-11 (s29f):** `--alerta-txt` pasa a `#CE112C` con
+  margen; se cierran §5.3 (a) y §5.4; se abre §5.5 con los hallazgos de la ficha.
+  Desplegado a `docs/` con gate visual del titular.
 
 ---
 
@@ -60,7 +62,7 @@ Se separa *color de barra* de *color de texto*. Tres tokens nuevos en el `:root`
 
 | Token nuevo | Hex | Deriva de | Peor caso de la escala crema (`--cream-200`) | Sobre `--panel` |
 |---|---|---|---|---|
-| `--alerta-txt` | `#D2112D` | `--alerta` `#EE2D49` | **4,50** | 5,35 |
+| `--alerta-txt` | `#CE112C` *(s29f; antes `#D2112D`)* | `--alerta` `#EE2D49` | **4,64** | 5,52 |
 | `--destaca-txt` | `#1E6EA9` | `--destaca` `#2A8FD9` | **4,50** | 5,35 |
 | `--st-neutro-txt` | `#5F6A78` | `--st-neutro` `#7E8A99` | **4,55** | 5,41 |
 
@@ -70,7 +72,7 @@ del encargo):
 
 | Token | `--cream` `#FFF6E0` | `--cream-200` `#f4e9cc` | `--panel` `#fffdf7` | `--paper` `#ffffff` | fila EE `#F7FBFE` | fila nacional `#FCFAF2` |
 |---|---|---|---|---|---|---|
-| `--alerta-txt` | 5,06 | 4,50 | 5,35 | 5,44 | 5,23 | 5,21 |
+| `--alerta-txt` `#CE112C` | 5,22 | 4,64 | 5,52 | 5,61 | 5,40 | 5,37 |
 | `--destaca-txt` | 5,06 | 4,50 | 5,35 | 5,44 | 5,23 | 5,21 |
 | `--st-neutro-txt` | 5,11 | 4,55 | 5,41 | 5,50 | 5,28 | 5,26 |
 
@@ -168,7 +170,7 @@ El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generado
 encargo: métricas del bloque 7 del generador idénticas y payload JSON del motor
 byte-idéntico salvo `fecha_generacion`.
 
-## 5. Pendientes asociados (§5.1 y §5.3 resueltos; §5.2 y §5.4 abiertos)
+## 5. Pendientes asociados (§5.1, §5.3 y §5.4 resueltos; §5.2, §5.3 b y §5.5 abiertos)
 
 ### 5.1 `--gris` accesible en todos los fondos — **RESUELTO el 2026-09-10 (s29d)**
 
@@ -261,48 +263,35 @@ texto visible —y no solo las zonas de un criterio— aparecieron tres fallas d
 eran de `--gris`. Cada una tiene ahora un destino distinto: **(a) corregida**,
 **(c) declarada exenta**, **(b) al backlog**.
 
-#### (a) `.chip.al` y `.chip.de` del panorama — **RESUELTO (parcialmente; ver el déficit)**
+#### (a) `.chip.al` y `.chip.de` del panorama — **RESUELTO del todo el 2026-09-11 (s29f)**
 
 Son texto completo —"▼ 4 indicadores bajo su GSE"— pintado con el color de estado sobre
-su propio fondo teñido, a 12 px/600. Ninguna de las dos excepciones vigentes lo cubre:
-§3.4 es la etiqueta blanca dentro de la barra y §3.5 son los glifos `.ee-gl`. Y aquí el
-argumento de §3.5 **no sirve**: el glifo se acepta como componente gráfico porque va
-acompañado del texto del estado; en el chip, el color **es** el texto, y la cifra
-("4 indicadores") no está repetida en ningún otro sitio de esa tarjeta.
+su propio fondo teñido, a 12 px/600. Ninguna de las dos excepciones lo cubre: §3.4 es
+la etiqueta blanca dentro de la barra y §3.5 son los glifos `.ee-gl`, y aquí el color
+**es** el texto.
 
-Corregido usando los tokens de TEXTO de §3.2, sin tocar los fondos `-bg`:
+Se resolvió en dos pasos, porque el primero no bastó:
 
-| Chip | Color antes | Color después | Fondo | Antes | Después | Exige |
+| Chip | Color | Fondo | s29d | s29e (`-txt` `#D2112D`) | **s29f (`-txt` `#CE112C`)** | Exige |
 |---|---|---|---|---|---|---|
-| `.chip.al` | `--alerta` `#EE2D49` | `--alerta-txt` `#D2112D` | `--alerta-bg` `#FBE3E6` | 3,374 | **4,466** | 4,5 |
-| `.chip.de` | `--destaca` `#2A8FD9` | `--destaca-txt` `#1E6EA9` | `--destaca-bg` `#E2F0FB` | 3,000 | **4,689** | 4,5 |
+| `.chip.al` | `--alerta-txt` | `--alerta-bg` `#FBE3E6` | 3,374 | 4,466 ✗ | **4,606** ✓ | 4,5 |
+| `.chip.de` | `--destaca-txt` | `--destaca-bg` `#E2F0FB` | 3,000 | 4,689 ✓ | 4,689 ✓ | 4,5 |
+| `.chip.nt` | `#6a5a2f` | `#eee5cf` | 5,373 ✓ | — | — | 4,5 |
 
-`.chip.nt` (`#6a5a2f` sobre `#eee5cf`) da **5,373**: ya cumplía y se dejó tal cual. La
-misma pareja de colores la usa `.badge`, con el mismo 5,373.
+**s29e** cambió el selector (token de barra → token de texto) y dejó `.chip.al` en 4,466,
+a 0,034 del umbral: la causa estaba en el token, no en el selector. **s29f** ajustó el
+token: `--alerta-txt` pasa de `#D2112D` a **`#CE112C`** (H 351,3° → 351,4°, S 85,0 % →
+84,8 %; solo baja la luminosidad, 0,1429 → 0,1370).
 
-**Déficit que queda abierto, y hay que decirlo:** `.chip.de` cumple, pero **`.chip.al`
-se queda en 4,466 y no alcanza el 4,5**. Le faltan **0,034**.
+**Corrección del valor recomendado.** La versión anterior de esta sección proponía
+`#D1112D` como vía (i). Se **descartó**: da 4,5003 sobre `--alerta-bg`, un margen de
+tres diezmilésimas que el próximo ajuste de fondo rompería. `#CE112C` da 4,606 ahí y
+4,644 sobre `--cream-200`, el peor de sus fondos. También se descartó tocar
+`--alerta-bg`, que es fondo institucional. `--destaca-txt` no se tocó: 4,689 ya cumple.
 
-El encargo s29e daba por esperados 4,81 y 5,05. Esos dos números **no corresponden a
-estos tokens**: son los de `--gris` `#5C666E` sobre esos mismos dos fondos, de la tabla
-§14.2 del log de s29d. El error se cometió al redactar la versión anterior de esta
-misma §5.3 (a) —se copiaron dos celdas de la columna equivocada— y de ahí pasó al
-encargo. La cifra correcta de `--alerta-txt` sobre `--alerta-bg` ya estaba calculada
-desde s29c, donde figuraba como 4,466 y marcada "solo AA-large".
-
-Cerrar esos 0,034 exige tocar un token, que es justo lo que la regla de detención de
-s29e prohíbe. Las dos vías, ambas mínimas y ambas verificadas, quedan aquí para que el
-titular decida:
-
-- **(i) Oscurecer `--alerta-txt` de `#D2112D` a `#D1112D`** —un solo escalón de rojo,
-  H y S idénticas—: da exactamente **4,500** sobre `--alerta-bg`, y mejora también donde
-  ya vive (4,54 sobre `--cream-200`, 5,10–5,39 en el resto). Es la vía recomendada: un
-  token, ningún fondo, y ningún sitio empeora.
-- **(ii) Aclarar `--alerta-bg` de `#FBE3E6` a `#FBE5E7`**: da **4,526**. Toca un fondo
-  de la paleta institucional, que es más invasivo que (i).
-
-Mientras no se decida, `.chip.al` queda a 4,466 —una mejora de 1,09 puntos sobre el
-3,374 de partida, pero por debajo del umbral— y así está anotado en el CSS.
+Regla de seguridad verificada antes de aplicar: **ningún uso existente de `--alerta-txt`
+baja de 4,5; todos suben**. Tira externa 5,208 → 5,372 (fila nacional) y 5,351 → 5,519
+(panel); `.ee-st.bajo` 5,231 → 5,396.
 
 #### (b) Vista histórica de la ficha — **AL BACKLOG**
 
@@ -347,35 +336,81 @@ usuario sí deba leer—, **la exención caduca automáticamente** y hay que vol
 corregir. Lo mismo si `.sw-line.mm` pasa a llevar texto. Quien haga ese cambio es quien
 tiene que reabrir este punto.
 
-### 5.4 `.ancla.al` y `.ancla.de` — mismo defecto que los chips, sin corregir (abierto)
+### 5.4 `.ancla.al` y `.ancla.de` — **RESUELTO el 2026-09-11 (s29f)**
 
-*Abierto el 2026-09-10 (s29e).* La auditoría de s29e destapó que el componente
-`<Ancla/>` de la ficha de establecimiento repite **exactamente** el defecto que la
-§5.3 (a) acaba de corregir en los chips, con las mismas dos parejas de colores y los
-mismos ratios:
+*Abierto el 2026-09-10 (s29e), cerrado el 2026-09-11 (s29f).* El componente `<Ancla/>`
+de la ficha de establecimiento —desvío vs GSE y vs evaluación anterior de dimensiones y
+subdimensiones, texto de 14 px: `"vs su GSE ▼ -15 · sig."`— repetía exactamente el
+defecto de los chips. Mismo remedio: color de texto del estado, fondos y bordes
+intactos.
 
-| Elemento | Color | Fondo | Ratio | Exige |
-|---|---|---|---|---|
-| `.ancla.al` | `--alerta` `#EE2D49` | `--alerta-bg` `#FBE3E6` | **3,374** | 4,5 |
-| `.ancla.de` | `--destaca` `#2A8FD9` | `--destaca-bg` `#E2F0FB` | **3,000** | 4,5 |
+| Elemento | Color antes | Color después | Fondo | Antes | Después | Exige |
+|---|---|---|---|---|---|---|
+| `.ancla.al` | `--alerta` `#EE2D49` | `--alerta-txt` `#CE112C` | `--alerta-bg` `#FBE3E6` | 3,374 | **4,606** | 4,5 |
+| `.ancla.de` | `--destaca` `#2A8FD9` | `--destaca-txt` `#1E6EA9` | `--destaca-bg` `#E2F0FB` | 3,000 | **4,689** | 4,5 |
 
-Es texto de 14 px: el ancla muestra el desvío vs GSE de cada dimensión y subdimensión
-—`"vs GSE ▼ -13 · sig."`— ahí donde no hay dato de GSE para dibujar la barra. Igual que
-en el chip, el color **es** el texto.
+Medido en el motor cargado; `.ancla.de` verificado en el Liceo Atenea (RBD 134), porque
+el RBD 12301 no dibuja ninguna. Barrido del patrón "color de barra sobre su `-bg`" en
+toda la plantilla: los únicos selectores que lo repiten son los glifos `.ee-gl`,
+cubiertos por §3.5. No queda ningún otro.
 
-**Por qué no se corrigió en s29e.** El encargo especificaba exactamente dos
-declaraciones —`.chip.al` y `.chip.de`— y se declaraba "sin decisiones nuevas". El
-ancla vive en la **ficha de establecimiento**, una tercera pantalla que no estaba entre
-los dos escenarios que ese encargo mandaba auditar, y cambiarla altera una lámina con
-su propia revisión visual. Extender el alcance por cuenta propia habría sido justo lo
-que la disciplina de estos encargos evita.
+**Con esto el inventario de usos de los tokens `-txt` (§3.3) tiene cuatro entradas:**
+tira externa, `.ee-st`, chips del panorama, anclas de la ficha.
 
-**Salida.** Es la misma de §5.3 (a) y no necesita ninguna decisión nueva de color:
-cambiar `color:var(--alerta)` por `var(--alerta-txt)` y `var(--destaca)` por
-`var(--destaca-txt)` en las dos declaraciones, dejando los fondos `-bg` intactos. Da
-4,466 y 4,689 — con **el mismo déficit de 0,034 en la rama de alerta**, que se cerraría
-de una vez con la vía (i) de §5.3 (a) (`--alerta-txt` → `#D1112D`). Conviene resolver
-los dos juntos: son el mismo problema en dos sitios.
+### 5.5 Hallazgos de la auditoría de la ficha (s29f) — abiertos, requieren decisión
+
+*Abiertos el 2026-09-11.* s29f auditó por primera vez la **ficha de establecimiento**
+(vista actual, no la histórica, que sigue en el backlog de §5.3 b). Aparecieron
+**cuatro** fallas de AA que ninguna excepción cubre. Todas son **anteriores** a s29f,
+ninguna la empeora, y dos las **mejora** sin llegar. Se dejan aquí para decidir.
+
+**(1) El sufijo `"· sig."` / `"· n.s."` dentro del ancla, atenuado.** El `<span>` que
+cierra cada ancla lleva `opacity:.8` inline (línea ~771 del JSX). Aunque la Fase 2 de
+s29f arregló el color del ancla, la opacidad deja ese sufijo por debajo:
+
+| Ancla | Antes de s29f | Tras s29f (`opacity:.8`) | A `opacity:1` |
+|---|---|---|---|
+| `.ancla.al` | 2,817 | **3,718** | 4,606 |
+| `.ancla.de` | 2,380 | **3,301** | 4,689 |
+
+Es 12 px y **sí es información** ("sig." vs "n.s." es lo que distingue una diferencia
+significativa de una aritmética). La salida es quitar la opacidad, o pasarla a un
+`font-weight` menor si se quiere mantener la jerarquía; ambas son JSX, no CSS, y por
+eso s29f —que fijaba dos declaraciones CSS— no lo tocó. **Es lo más urgente de esta
+lista**: está dentro del mismo componente que acaba de corregirse.
+
+**(2) `.defn-title` con el color del INDICADOR sobre blanco.** El título "¿Qué mide
+este indicador?" de cada panel toma `ind.color` por estilo inline (línea ~707), a
+14 px/700:
+
+| Indicador | Color | Ratio sobre `#FFFFFF` |
+|---|---|---|
+| Autoestima (`--ind1`) | `#3858A3` | 6,790 ✓ |
+| Convivencia (`--ind2`) | `#61BDC6` | **2,187** |
+| Participación (`--ind3`) | `#4BA560` | **3,066** |
+| Hábitos (`--ind4`) | `#AACB58` | **1,843** |
+
+Tres de cuatro fallan, dos de ellas gravemente. Es la paleta de INDICADOR usada como
+texto: no hay token de texto para ella y crearlo es una decisión de identidad
+(P-PALETA). La salida barata es dejar el título en `--tinta` y mantener el color del
+indicador solo en el punto (`.indp-dot`) que ya lo lleva al lado.
+
+**(3) Los `<span>` inline `"▼ rojo"` / `"▲ azul"` de `.ficha-explain`.** Texto
+explicativo a 14 px con el color de BARRA sobre `#eef3f7` (línea ~1290):
+
+| Span | Color | Ratio | Con el token `-txt` |
+|---|---|---|---|
+| "▼ rojo" | `--alerta` `#EE2D49` | **3,681** | 5,025 |
+| "▲ azul" | `--destaca` `#2A8FD9` | **3,118** | 4,872 |
+
+Se resuelve con los tokens que ya existen; es JSX inline, no una declaración CSS.
+
+**(4) La etiqueta blanca `"10%"` sobre la barra de dimensión.** Blanco a 12 px/600
+sobre `#4C939A`, un tono derivado de `--ind2`: **3,531**. Es hermana de la excepción
+§3.4 —etiqueta blanca dentro de una barra— pero sobre tono de **indicador**, no de
+estado, así que §3.4 no la cubre literalmente. Cabe extender §3.4 a las barras de
+dimensión con el mismo argumento (el valor está en el `title` y al lado de la barra),
+o sacar la etiqueta fuera. Es decisión, no ejecución.
 
 ## 6. Reversión
 
@@ -386,6 +421,8 @@ De un solo punto y trivial en los dos cambios, y ninguno afecta a cifra alguna:
   clase de estado.
 - **Chips del panorama (s29e):** devolver `.chip.al` y `.chip.de` a `var(--alerta)` y
   `var(--destaca)`. Dos declaraciones.
+- **`--alerta-txt` con margen y anclas (s29f):** devolver `--alerta-txt` a `#D2112D` y
+  `.ancla.al` / `.ancla.de` a `var(--alerta)` / `var(--destaca)`. Tres declaraciones.
 - **`--gris` (s29d):** devolver `--gris` a `#6b7780` en el `:root`. Una sola
   declaración; los ~60 selectores que lo usan vuelven solos.
 
