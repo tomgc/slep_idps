@@ -40,11 +40,13 @@ __FONTS_CSS__
        (.s100-ext-it) y el texto de estado de la fila EE (.ee-st), de s29c, mas
        los chips del panorama (.chip.al/.chip.de), de s29e. Si se agrega un uso,
        se agrega aqui.
-       Contraste medido en el motor vivo: 5,21 sobre el fondo de la fila nacional
-       (#FCFAF2), 5,35 sobre --panel y 5,23 sobre el de la fila EE (#F7FBFE).
-       Peor caso de la escala crema (--cream-200 #f4e9cc): 4,50 / 4,50 / 4,55. Ver
+       s29f (2026-09-11): --alerta-txt baja de #D2112D a #CE112C (H 351,3->351,4,
+       S 85,0->84,8; solo luminosidad). Con #D2112D, sobre --alerta-bg daba 4,466 y
+       no llegaba a AA; #CE112C da 4,606 ahi y 4,644 sobre --cream-200, el peor de
+       sus fondos. Se descarto #D1112D (4,5003: margen de tres diezmilesimas).
+       --destaca-txt no se toca: 4,689 sobre --destaca-bg ya cumple. Ver
        50_documentacion/activa/decisiones/20260910_decision_contraste_texto_estado.md */
-    --alerta-txt:#D2112D; --destaca-txt:#1E6EA9; --st-neutro-txt:#5F6A78;
+    --alerta-txt:#CE112C; --destaca-txt:#1E6EA9; --st-neutro-txt:#5F6A78;
     --sombra:0 2px 8px rgba(74,39,70,.10);
     --shadow-1:0 1px 0 rgba(28,18,18,.05);
     /* --- Escala de presentacion alineada a la referencia (slep_categoria_desempeno):
@@ -125,10 +127,9 @@ __FONTS_CSS__
   .chip{font-size:var(--fs-overline);padding:2px 7px;border-radius:11px;font-weight:600;display:inline-flex;gap:3px;align-items:center;}
   /* s29e (2026-09-10): el chip es TEXTO (12px, peso 600), no un glifo, asi que el
      color del estado tiene que ser el token de TEXTO y no el de barra. Los fondos
-     -bg no se tocan. Medido: .chip.al 3,37 -> 4,47 y .chip.de 3,00 -> 4,69.
-     OJO: .chip.al se queda en 4,47 y NO alcanza el 4,5 de AA — le faltan 0,03 y
-     cerrarlos exige tocar --alerta-txt o --alerta-bg, prohibido en este encargo.
-     Ver §5.3 (a) de 50_documentacion/activa/decisiones/20260910_decision_contraste_texto_estado.md */
+     -bg no se tocan. s29f cerro el deficit que quedaba en .chip.al ajustando el
+     token: hoy .chip.al da 4,61 y .chip.de 4,69. Ver §5.3 (a) de
+     50_documentacion/activa/decisiones/20260910_decision_contraste_texto_estado.md */
   .chip.al{background:var(--alerta-bg);color:var(--alerta-txt);}
   .chip.de{background:var(--destaca-bg);color:var(--destaca-txt);}
   .chip.nt{background:#eee5cf;color:#6a5a2f;}
