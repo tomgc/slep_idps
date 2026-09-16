@@ -38,9 +38,10 @@ __FONTS_CSS__
        tokens se usan SOLO en texto pequeño sobre fondo claro: nunca en barras,
        bordes, fondos ni leyenda. Inventario de usos, al dia: la tira externa
        (.s100-ext-it) y el texto de estado de la fila EE (.ee-st), de s29c, mas
-       los chips del panorama (.chip.al/.chip.de), de s29e, y las anclas de
-       desvio vs GSE de la ficha (.ancla.al/.ancla.de), de s29f. Si se agrega un
-       uso, se agrega aqui.
+       los chips del panorama (.chip.al/.chip.de), de s29e, las anclas de
+       desvio vs GSE de la ficha (.ancla.al/.ancla.de), de s29f, y los spans
+       "▼ rojo" / "▲ azul" de la glosa .ficha-explain (inline en el JSX), de s29g.
+       Si se agrega un uso, se agrega aqui.
        s29f (2026-09-11): --alerta-txt baja de #D2112D a #CE112C (H 351,3->351,4,
        S 85,0->84,8; solo luminosidad). Con #D2112D, sobre --alerta-bg daba 4,466 y
        no llegaba a AA; #CE112C da 4,606 ahi y 4,644 sobre --cream-200, el peor de
@@ -1305,7 +1306,9 @@ __FONTS_CSS__
             </div>)
             : (
             <div>
-              <div className="ficha-explain">El <b>radar de los 4 indicadores</b> contiene la foto actual del establecimiento en materia de IDPS. Cuando el establecimiento cuenta con un grupo de comparación (GSE), la <b>línea punteada</b> indica los resultados de su GSE de referencia. En la siguiente sección encontrará los resultados por dimensión y subdimensión de cada indicador. Los resultados de los indicadores y dimensiones son presentados con su diferencia en relación a la evaluación anterior y el GSE al que pertenece el establecimiento, especificando si se trata de una <b>diferencia significativa (sig.)</b> o <b>sólo aritmética</b> (<span style={{color:"var(--alerta)"}}>▼ rojo</span> = resultado es significativamente inferior al de su referencia; <span style={{color:"var(--destaca)"}}>▲ azul</span> = resultado es significativamente superior al de su referencia).</div>
+              {/* s29g (2026-09-16): "▼ rojo" / "▲ azul" son TEXTO de 14px sobre #eef3f7; con el
+                  color de barra daban 3,68 / 3,12. Tokens de texto: 5,03 / 4,87 (AA). */}
+              <div className="ficha-explain">El <b>radar de los 4 indicadores</b> contiene la foto actual del establecimiento en materia de IDPS. Cuando el establecimiento cuenta con un grupo de comparación (GSE), la <b>línea punteada</b> indica los resultados de su GSE de referencia. En la siguiente sección encontrará los resultados por dimensión y subdimensión de cada indicador. Los resultados de los indicadores y dimensiones son presentados con su diferencia en relación a la evaluación anterior y el GSE al que pertenece el establecimiento, especificando si se trata de una <b>diferencia significativa (sig.)</b> o <b>sólo aritmética</b> (<span style={{color:"var(--alerta-txt)"}}>▼ rojo</span> = resultado es significativamente inferior al de su referencia; <span style={{color:"var(--destaca-txt)"}}>▲ azul</span> = resultado es significativamente superior al de su referencia).</div>
 
               <div className="ficha-radar">
                 <div className="rquad">
