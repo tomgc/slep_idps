@@ -10,7 +10,11 @@
   (s29e):** se cierra la §5.3 — chips corregidos, atenuados exentos, histórica al
   backlog. **Enmendada el 2026-09-11 (s29f):** `--alerta-txt` pasa a `#CE112C` con
   margen; se cierran §5.3 (a) y §5.4; se abre §5.5 con los hallazgos de la ficha.
-  Desplegado a `docs/` con gate visual del titular.
+  Desplegado a `docs/` con gate visual del titular. **Enmendada el 2026-09-16
+  (s29g):** se cierran §5.5 (1) y (3) con los tokens ya existentes; §5.5 (2) y (4) se
+  agrupan con §5.3 (b) en la §5.6 como un solo problema de diseño —texto sobre color
+  de la paleta de INDICADOR—, que pide mockup. Redesplegado a `docs/`. Última
+  enmienda de la línea de contraste.
 
 ---
 
@@ -104,8 +108,21 @@ re-medir: la garantía de esta decisión cubre los fondos listados, no cualquier
 3. **`.chip.al` y `.chip.de`** — los chips de estado de la tarjeta de establecimiento
    en el panorama territorial. *Añadido el 2026-09-10 por s29e*; ver §5.3 (a). En s29c
    estos dos puntos eran **los únicos dos** y así se escribió aquí; desde s29e son tres.
-   Quien añada un cuarto uso tiene que anotarlo en esta lista y en el comentario del
+   Quien añada un uso tiene que anotarlo en esta lista y en el comentario del
    `:root`, que lleva el mismo inventario.
+
+4. **`.ancla.al` y `.ancla.de`** — las anclas de desvío vs GSE / vs evaluación anterior
+   de la ficha de establecimiento. *Añadido el 2026-09-11 por s29f*; ver §5.4. (s29f lo
+   anotó en el `:root` y al pie de §5.4, pero no en esta lista; s29g lo trae aquí para
+   que el inventario tenga una sola fuente.) Desde s29g su sufijo `"· sig."` / `"· n.s."`
+   va sin `opacity`, ver §5.5 (1).
+
+5. **Los `<span>` `"▼ rojo"` / `"▲ azul"` de `.ficha-explain`** — la glosa de estados
+   del texto explicativo de la ficha (vista actual). Color inline en el JSX, no
+   declaración CSS. *Añadido el 2026-09-16 por s29g*; ver §5.5 (3). Es el único uso de
+   los tokens sobre `#eef3f7`, fondo que no estaba en la tabla de §3.2: `--alerta-txt`
+   da ahí **5,025** y `--destaca-txt` **4,872** (cálculo de s29g con el instrumento
+   verificado con controles; la medición en navegador queda en el log de s29g).
 
 Los tokens **no entran** a barras, bordes de glifo, fondos ni leyenda. Esa restricción
 sigue siendo el invariante, y es lo que permite añadir usos sin volver a decidir nada:
@@ -170,7 +187,7 @@ El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generado
 encargo: métricas del bloque 7 del generador idénticas y payload JSON del motor
 byte-idéntico salvo `fecha_generacion`.
 
-## 5. Pendientes asociados (§5.1, §5.3 y §5.4 resueltos; §5.2, §5.3 b y §5.5 abiertos)
+## 5. Pendientes asociados (§5.1, §5.3 a/c, §5.4 y §5.5 1/3 resueltos; §5.2 y §5.6 abiertos)
 
 ### 5.1 `--gris` accesible en todos los fondos — **RESUELTO el 2026-09-10 (s29d)**
 
@@ -312,6 +329,10 @@ sacar el valor fuera de la barra, o elegir el color del texto según la luminanc
 fondo de cada barra. Ambas cambian la lámina, así que piden **mockup y aprobación del
 titular** antes de tocar código. De ahí que sea backlog y no pendiente.
 
+*Desde el 2026-09-16 (s29g) este ítem se lee junto con §5.5 (2) y (4) en la **§5.6**,
+que los agrupa como un solo problema —texto sobre color de la paleta de INDICADOR— y
+enumera las tres salidas posibles para el mockup.*
+
 #### (c) Los dos usos atenuados por `opacity` — **EXENTOS, no pendientes**
 
 | Elemento | Fondo | Ratio | Naturaleza |
@@ -355,33 +376,40 @@ toda la plantilla: los únicos selectores que lo repiten son los glifos `.ee-gl`
 cubiertos por §3.5. No queda ningún otro.
 
 **Con esto el inventario de usos de los tokens `-txt` (§3.3) tiene cuatro entradas:**
-tira externa, `.ee-st`, chips del panorama, anclas de la ficha.
+tira externa, `.ee-st`, chips del panorama, anclas de la ficha. *(Desde s29g son cinco:
+se suma la glosa de estados de `.ficha-explain`, §5.5 (3).)*
 
-### 5.5 Hallazgos de la auditoría de la ficha (s29f) — abiertos, requieren decisión
+### 5.5 Hallazgos de la auditoría de la ficha (s29f) — **(1) y (3) RESUELTOS el 2026-09-16 (s29g); (2) y (4) reagrupados en §5.6**
 
-*Abiertos el 2026-09-11.* s29f auditó por primera vez la **ficha de establecimiento**
-(vista actual, no la histórica, que sigue en el backlog de §5.3 b). Aparecieron
-**cuatro** fallas de AA que ninguna excepción cubre. Todas son **anteriores** a s29f,
-ninguna la empeora, y dos las **mejora** sin llegar. Se dejan aquí para decidir.
+*Abiertos el 2026-09-11; cerrados o reagrupados el 2026-09-16.* s29f auditó por primera
+vez la **ficha de establecimiento** (vista actual, no la histórica, que sigue en el
+backlog de §5.3 b). Aparecieron **cuatro** fallas de AA que ninguna excepción cubre.
+Todas son **anteriores** a s29f, ninguna la empeora, y dos las **mejora** sin llegar.
+s29g cierra las dos que se arreglan con tokens ya existentes —(1) y (3)— y saca las
+otras dos —(2) y (4)— de esta lista para juntarlas con §5.3 (b) en la §5.6, porque las
+tres son el mismo problema de diseño y ninguna se resuelve con un token.
 
-**(1) El sufijo `"· sig."` / `"· n.s."` dentro del ancla, atenuado.** El `<span>` que
-cierra cada ancla lleva `opacity:.8` inline (línea ~771 del JSX). Aunque la Fase 2 de
-s29f arregló el color del ancla, la opacidad deja ese sufijo por debajo:
+**(1) El sufijo `"· sig."` / `"· n.s."` dentro del ancla, atenuado — RESUELTO el
+2026-09-16 (s29g).** El `<span>` que cierra cada ancla llevaba `opacity:.8` inline
+(línea ~771 del JSX). Aunque la Fase 2 de s29f arregló el color del ancla, la opacidad
+dejaba ese sufijo por debajo. s29g quitó la `opacity` del `style` inline; tamaño
+(`--fs-overline`) y texto intactos:
 
-| Ancla | Antes de s29f | Tras s29f (`opacity:.8`) | A `opacity:1` |
-|---|---|---|---|
-| `.ancla.al` | 2,817 | **3,718** | 4,606 |
-| `.ancla.de` | 2,380 | **3,301** | 4,689 |
+| Ancla | Antes de s29f | Tras s29f (`opacity:.8`) | **Tras s29g (`opacity` 1)** | Exige |
+|---|---|---|---|---|
+| `.ancla.al` | 2,817 | 3,718 | **4,606** ✓ | 4,5 |
+| `.ancla.de` | 2,380 | 3,301 | **4,689** ✓ | 4,5 |
+| `.ancla` neutra (`--tinta` sobre `#fff`) | — | 7,121 ✓ | **13,502** ✓ | 4,5 |
 
 Es 12 px y **sí es información** ("sig." vs "n.s." es lo que distingue una diferencia
-significativa de una aritmética). La salida es quitar la opacidad, o pasarla a un
-`font-weight` menor si se quiere mantener la jerarquía; ambas son JSX, no CSS, y por
-eso s29f —que fijaba dos declaraciones CSS— no lo tocó. **Es lo más urgente de esta
-lista**: está dentro del mismo componente que acaba de corregirse.
+significativa de una aritmética). No se tocó el peso de fuente: la jerarquía visual del
+sufijo la da el tamaño (12 px frente a los 14 px del número), y a opacidad 1 sigue
+leyéndose como sufijo. La rama neutra del ancla (sin clase de estado, fondo blanco)
+también pierde la atenuación y sube; se anota para que nadie la lea como regresión.
 
-**(2) `.defn-title` con el color del INDICADOR sobre blanco.** El título "¿Qué mide
-este indicador?" de cada panel toma `ind.color` por estilo inline (línea ~707), a
-14 px/700:
+**(2) `.defn-title` con el color del INDICADOR sobre blanco — REAGRUPADO en §5.6
+(s29g).** El título "¿Qué mide este indicador?" de cada panel toma `ind.color` por
+estilo inline (línea ~707), a 14 px/700:
 
 | Indicador | Color | Ratio sobre `#FFFFFF` |
 |---|---|---|
@@ -393,24 +421,118 @@ este indicador?" de cada panel toma `ind.color` por estilo inline (línea ~707),
 Tres de cuatro fallan, dos de ellas gravemente. Es la paleta de INDICADOR usada como
 texto: no hay token de texto para ella y crearlo es una decisión de identidad
 (P-PALETA). La salida barata es dejar el título en `--tinta` y mantener el color del
-indicador solo en el punto (`.indp-dot`) que ya lo lleva al lado.
+indicador solo en el punto (`.indp-dot`) que ya lo lleva al lado. **s29g no la aplicó**:
+aunque es barata, elegirla fija implícitamente una regla ("el texto nunca lleva color
+de indicador") que también decide (4) y §5.3 (b); esa regla se decide una vez, en
+§5.6, con mockup.
 
-**(3) Los `<span>` inline `"▼ rojo"` / `"▲ azul"` de `.ficha-explain`.** Texto
-explicativo a 14 px con el color de BARRA sobre `#eef3f7` (línea ~1290):
+**(3) Los `<span>` inline `"▼ rojo"` / `"▲ azul"` de `.ficha-explain` — RESUELTO el
+2026-09-16 (s29g).** Texto explicativo a 14 px que llevaba el color de BARRA sobre
+`#eef3f7` (línea ~1310 del JSX). s29g lo pasó a los tokens de texto; es el quinto uso
+del inventario de §3.3:
 
-| Span | Color | Ratio | Con el token `-txt` |
-|---|---|---|---|
-| "▼ rojo" | `--alerta` `#EE2D49` | **3,681** | 5,025 |
-| "▲ azul" | `--destaca` `#2A8FD9` | **3,118** | 4,872 |
+| Span | Color antes | Color después | Antes | **Después** | Exige |
+|---|---|---|---|---|---|
+| "▼ rojo" | `--alerta` `#EE2D49` | `--alerta-txt` `#CE112C` | 3,681 | **5,025** ✓ | 4,5 |
+| "▲ azul" | `--destaca` `#2A8FD9` | `--destaca-txt` `#1E6EA9` | 3,118 | **4,872** ✓ | 4,5 |
 
-Se resuelve con los tokens que ya existen; es JSX inline, no una declaración CSS.
+Fondo, peso y texto intactos. Es JSX inline, no una declaración CSS.
 
-**(4) La etiqueta blanca `"10%"` sobre la barra de dimensión.** Blanco a 12 px/600
-sobre `#4C939A`, un tono derivado de `--ind2`: **3,531**. Es hermana de la excepción
-§3.4 —etiqueta blanca dentro de una barra— pero sobre tono de **indicador**, no de
-estado, así que §3.4 no la cubre literalmente. Cabe extender §3.4 a las barras de
-dimensión con el mismo argumento (el valor está en el `title` y al lado de la barra),
-o sacar la etiqueta fuera. Es decisión, no ejecución.
+**(4) La etiqueta blanca `"10%"` sobre la barra de dimensión — REAGRUPADO en §5.6
+(s29g).** Blanco a 12 px/600 sobre `#4C939A`, un tono derivado de `--ind2`: **3,531**.
+Es hermana de la excepción §3.4 —etiqueta blanca dentro de una barra— pero sobre tono
+de **indicador**, no de estado, así que §3.4 no la cubre literalmente. Cabe extender
+§3.4 a las barras de dimensión con el mismo argumento (el valor está en el `title` y al
+lado de la barra), o sacar la etiqueta fuera. Es decisión, no ejecución, y es la misma
+decisión que (2) y que §5.3 (b): ver §5.6, que además corrige la atribución: la
+etiqueta es la de `.bar span` en `DistBar` (niveles de la subdimensión), no la de la
+barra de dimensión, y ya lleva inversión por luminancia (`_txtOn`) que en ese tono no
+basta.
+
+### 5.6 Texto sobre un color de la paleta de INDICADOR — **BACKLOG, pide mockup y aprobación del titular**
+
+*Abierta el 2026-09-16 (s29g) como reagrupación; el único hallazgo nuevo es el anexo
+del tooltip.* Tres pendientes que hasta aquí vivían en secciones distintas —§5.3 (b),
+§5.5 (2) y §5.5 (4)— son **un solo problema de diseño**, y por eso se juntan en un solo
+ítem de backlog:
+
+| Origen | Elemento | Qué cae sobre qué | Ratio | Exige |
+|---|---|---|---|---|
+| §5.3 (b) | `.ybar-val`, `.ybar-sig` (vista histórica) | `--tinta` / `--alerta` / `--st-neutro` sobre **barras de indicador** | 1,04 – 4,40 | 4,5 |
+| §5.3 (b) | `.hist-trend.al`, `.ht-ic` (vista histórica) | `--alerta` sobre `#FFFFFF` | 4,11 | 4,5 |
+| §5.5 (2) | `.defn-title` (vista actual) | **color de indicador** (`--ind2` / `--ind3` / `--ind4`) sobre `#FFFFFF` | 2,19 / 3,07 / 1,84 | 4,5 |
+| §5.5 (4) | etiqueta `"10%"` de `.bar span` en `DistBar` (niveles de la subdimensión, vista actual) | blanco sobre **tono derivado de indicador** (`#4C939A` = `nivelRamp(--ind2).alto`) | 3,53 | 4,5 |
+
+**Corrección de atribución (s29g).** s29f llamó a la fila (4) "etiqueta blanca sobre la
+barra de dimensión". La barra de dimensión (`ScoreBar`, `.sbar-fill`) no lleva texto;
+la etiqueta `"10%"` a 12 px/600 es la de `.bar span` en **`DistBar`**, la distribución
+de niveles (bajo/medio/alto) de cada subdimensión, teñida con `nivelRamp(ind.color)`.
+`#4C939A` es exactamente `_darken(#61BDC6, .22)`, el nivel "alto" de Convivencia. El
+ratio 3,53 y el problema son reales; cambia el componente al que se le atribuye.
+
+**Anexo al ítem, hallado por el panel adversarial de s29g (fuera de alcance, no
+corregido).** El *tooltip* de la vista histórica (`.tt`, fondo `#23303a`, blanco 14 px)
+inyecta la línea `"vs GSE: ▼ -13 · sig."` con el color de **barra** del estado (JSX
+~l.1099: `var(--destaca)` / `var(--alerta)` / `var(--st-neutro)`). Recalculado sobre
+`#23303a`: 3,88 / 3,28 / 3,85, bajo 4,5. Se anota aquí y no en §3.3 por una razón que
+importa al que lo arregle: **los tokens `-txt` no sirven sobre fondo oscuro y lo
+empeorarían** (2,48 / 2,41 / 2,46), porque están diseñados para fondo claro
+(invariante del `:root`). Es de la vista histórica, así que viaja con §5.3 (b) y su
+mockup; si se decide una variante *clara* de texto de estado para fondo oscuro, será un
+cuarto juego de tokens y una decisión aparte. Cálculo propio con controles; no medido
+en navegador (el tooltip pide `hover`).
+
+**Lo que las une.** En las cuatro filas el texto y la superficie comparten la paleta de
+INDICADOR —`--ind1..4` y sus tonos derivados—, sea porque el texto *es* de ese color
+(`.defn-title`) o porque cae *sobre* él (`.ybar-*`, etiqueta de `DistBar`). Esa paleta
+es identidad del folleto de la Agencia (P-PALETA, `20260622_decision_paleta_indicadores.md`)
+y es **cuatro** familias con luminancias opuestas: `#3858A3` es oscuro y `#AACB58` y
+`#61BDC6` son claros.
+
+**Por qué no se resuelve con un token, a diferencia de los cinco usos de §3.3.** Los
+tokens `-txt` de estado funcionan porque los tres estados son colores saturados de
+luminancia media y hay un "mismo tono, más oscuro" que sirve sobre todos los fondos
+claros del motor. Con la paleta de indicador no existe ese punto: cualquier color fijo
+que cumpla sobre `#3858A3` fracasa sobre `#C8DD92`, y un `--indN-txt` por indicador
+resolvería el título pero no el texto que cae *sobre* las barras. Tampoco vale la
+extensión literal de §3.4 (redundancia del dato), porque `.defn-title` es un título y
+no tiene dato redundante en otro sitio.
+
+**Lo que hay que decidir es una regla general**, no cuatro arreglos: *qué hace el
+texto cuando cae sobre —o toma— un color de marca*. Las tres salidas posibles, para
+mockup:
+
+- **(a) Sacar el texto del relleno.** El valor va fuera de la barra (encima, al lado o
+  en la tira externa, como ya hace `StackedBar` desde s29) y el título va en `--tinta`
+  con el color del indicador reservado al punto (`.indp-dot`) y a la barra. Es la
+  salida que no toca la paleta y no crea tokens; cambia la lámina.
+- **(b) Invertir según luminancia.** El texto sobre una barra elige claro u oscuro
+  según la luminancia del relleno. **Esta salida ya existe en el motor**: `_txtOn()`
+  (plantilla, junto a `nivelRamp`) elige `#fff` o `#2e2710` con umbral 0,55 de luma
+  Rec. 601, y es lo que `DistBar` aplica hoy a la etiqueta de (4). Recalculado en s29g
+  sobre los 12 tonos de `nivelRamp` de los cuatro indicadores: `_txtOn` acierta en
+  **11 de 12** (ratios 4,75 – 10,67), y el único que falla es `#4C939A`, donde **ningún
+  color de texto alcanza 4,5** (blanco 3,53; `#2e2710` 4,21; el mejor posible es 4,21).
+  Es decir: (b) resolvería `.ybar-*` de la vista histórica, que hoy no invierte nada,
+  pero **no puede resolver (4)** —un tono de luminancia media que no admite texto AA a
+  12 px— ni `.defn-title`, que es color *como* texto y no *bajo* texto.
+- **(c) Una variante de texto por indicador.** Cuatro tokens `--indN-txt`, más oscuros,
+  para el texto que hoy toma `ind.color`. Resuelve `.defn-title`; no resuelve el texto
+  *sobre* barra. Es una decisión de identidad, porque la paleta pasa a tener ocho hex.
+
+Las tres cambian cómo se ve la lámina o la identidad de la paleta, así que **piden
+mockup y aprobación del titular antes de tocar código**. Hasta que exista esa decisión,
+las cuatro fallas de la tabla quedan **documentadas y aceptadas como deuda conocida**,
+igual que §5.3 (b) lo estaba desde s29e. El criterio de la auditoría de contraste las
+trata como una sola exclusión declarada ("ítem de backlog de paleta de indicador").
+
+**Recomendación:** (a) — no toca la paleta, no crea tokens, y su parte más barata
+(`.defn-title` en `--tinta`) ya estaba identificada en (2); el mockup debe mostrar la
+vista histórica con los valores fuera de la barra para que el titular vea el costo
+real. Para (4) en particular, si sacar la etiqueta de `DistBar` rompe la lectura de la
+barra de niveles, la alternativa honesta no es (b) —que ya está aplicada y no llega—
+sino **extender §3.4** con su mismo argumento: el valor está en el `title` del
+segmento (`"alto: 10%"`), y la etiqueta interna se acepta como redundante.
 
 ## 6. Reversión
 
@@ -423,6 +545,9 @@ De un solo punto y trivial en los dos cambios, y ninguno afecta a cifra alguna:
   `var(--destaca)`. Dos declaraciones.
 - **`--alerta-txt` con margen y anclas (s29f):** devolver `--alerta-txt` a `#D2112D` y
   `.ancla.al` / `.ancla.de` a `var(--alerta)` / `var(--destaca)`. Tres declaraciones.
+- **Sufijo del ancla y glosa de `.ficha-explain` (s29g):** devolver `opacity:.8` al
+  `style` inline del `<span>` del sufijo en `<Ancla/>`, y los dos `<span>` de la glosa a
+  `var(--alerta)` / `var(--destaca)`. Tres atributos inline en el JSX.
 - **`--gris` (s29d):** devolver `--gris` a `#6b7780` en el `:root`. Una sola
   declaración; los ~60 selectores que lo usan vuelven solos.
 
