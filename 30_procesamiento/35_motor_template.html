@@ -87,7 +87,7 @@ __FONTS_CSS__
   /* Barra de controles tipo referencia: sticky, acento azul, grupos label(overline)+control segmentado */
   .nav{background:var(--panel);border:1px solid var(--linea);border-top:3px solid var(--azul);border-radius:var(--radius-3);padding:14px 18px;margin-bottom:14px;box-shadow:var(--shadow-1);}
   .nav-row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;}
-  .ctl label{display:block;font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);margin-bottom:6px;}
+  .ctl label{display:block;font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);color:var(--gris);margin-bottom:6px;}
   select{font-family:var(--font-body);font-weight:var(--fw-medium);font-size:var(--fs-body);color:var(--tinta);padding:6px 10px;border:1px solid var(--border-2);border-radius:var(--radius-2);background:var(--paper);min-width:150px;}
   .seg{display:inline-flex;background:var(--cream-200);border:1px solid var(--linea);border-radius:var(--radius-2);padding:2px;gap:2px;}
   .seg button{border:0;background:transparent;padding:6px 13px;cursor:pointer;font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--gris);border-radius:var(--radius-1);font-family:inherit;transition:background .12s,color .12s;}
@@ -192,7 +192,7 @@ __FONTS_CSS__
   .nav-sel{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;}
   .sel-chip{display:inline-flex;align-items:center;gap:7px;background:var(--paper);border:1px solid var(--border-2);
     border-radius:var(--radius-2);padding:4px 10px;font-size:var(--fs-caption);}
-  .sel-chip .k{color:var(--gris);font-size:var(--fs-caption);letter-spacing:.04em;text-transform:uppercase;font-weight:var(--fw-bold);}
+  .sel-chip .k{color:var(--gris);font-size:var(--fs-caption);letter-spacing:.04em;font-weight:var(--fw-bold);}
   .sel-chip button{border:0;background:none;color:var(--gris);cursor:pointer;font-size:var(--fs-caption);padding:0 0 0 2px;}
   .sel-chip button:hover{color:var(--alerta);}
   .sel-link{border:0;background:none;color:var(--foco);cursor:pointer;font-size:var(--fs-caption);font-family:inherit;text-decoration:underline;}
@@ -270,7 +270,7 @@ __FONTS_CSS__
   /* Segmentador para barra oscura (cream translucido); misma estetica para Vista/Grado/Año */
   .nivelsel{display:flex;flex-direction:column;gap:6px;}
   .nivelsel-lab{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-caption);
-    letter-spacing:var(--tracking-overline);text-transform:uppercase;color:rgba(255,246,224,.74);}
+    letter-spacing:var(--tracking-overline);color:rgba(255,246,224,.74);}
   .seg-lvl{display:inline-flex;background:var(--cream-200);border:1px solid var(--linea);border-radius:var(--radius-2);padding:3px;}
   .seg-lvl .lvl-b{background:transparent;border:0;font:inherit;font-weight:var(--fw-bold);font-size:var(--fs-body);
     color:var(--gris);padding:6px 14px;border-radius:var(--radius-1);cursor:pointer;white-space:nowrap;transition:background .12s,color .12s;}
@@ -369,7 +369,7 @@ __FONTS_CSS__
   .hist-ind-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px 11px;padding:14px 16px;border-bottom:1px solid var(--linea);}
   .hist-ind-name{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-h4);color:var(--tinta);}
   .hist-main{padding:22px 16px 4px;}
-  .hist-dims-lab{font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);padding:4px 16px 0;}
+  .hist-dims-lab{font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);color:var(--gris);font-weight:var(--fw-bold);padding:4px 16px 0;}
   .hist-dims{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:10px 16px 16px;}
   @media(max-width:900px){.hist-dims{grid-template-columns:1fr;}}
   /* Vista historica: barras verticales por año (portado de .ybars del diseño,
@@ -490,7 +490,7 @@ __FONTS_CSS__
   .cmp-chrome{background:var(--azul);color:var(--cream);padding:20px 24px;border-radius:var(--radius-3) var(--radius-3) 0 0;}
   .cmp-bar{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;}
   .cmp-bar-tt{flex:1;min-width:0;}
-  .cmp-eyebrow{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--cream);opacity:.72;}
+  .cmp-eyebrow{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);color:var(--cream);opacity:.72;}
   .cmp-title{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-h2);margin:6px 0 0;letter-spacing:-.01em;color:var(--cream);line-height:1.12;}
   .cmp-title-sub{font-weight:var(--fw-regular);opacity:.75;}
   .cmp-noagg{background:rgba(255,201,46,.16);border:1px solid rgba(255,201,46,.45);border-top:0;border-radius:0 0 var(--radius-3) var(--radius-3);padding:11px 24px;font-size:var(--fs-caption);line-height:1.5;color:#5a4a2a;margin-bottom:18px;}
@@ -504,7 +504,7 @@ __FONTS_CSS__
   .cmp-cm{font-size:var(--fs-caption);color:var(--gris);margin-top:1px;}
   /* s29: chips diferenciados por TIPO de entidad — rotulo (cmp-ck) y banda de color
      a la izquierda. La banda identifica el tipo de entidad; no codifica dato. */
-  .cmp-ck{font-size:var(--fs-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);margin-bottom:2px;}
+  .cmp-ck{font-size:var(--fs-overline);letter-spacing:var(--tracking-overline);color:var(--gris);font-weight:var(--fw-bold);margin-bottom:2px;}
   .cmp-chip.is-nac{border-left:4px solid var(--azul);}
   .cmp-chip.is-ee{border-left:4px solid var(--foco);background:#F7FBFE;}
   .cmp-x{background:none;border:0;cursor:pointer;color:var(--gris);font-size:var(--fs-body);padding:0 0 0 2px;line-height:1;}
@@ -543,7 +543,7 @@ __FONTS_CSS__
   .cmp-table tr.row-ee td{background:#F7FBFE;}
   .cmp-table tr.row-ee-first td{border-top:2px solid var(--foco);}
   .row-ee .td-terr .td-tn{color:var(--foco);}
-  .td-ee-k{display:block;font-size:var(--fs-overline);letter-spacing:var(--tracking-overline);text-transform:uppercase;color:var(--gris);font-weight:var(--fw-bold);margin-bottom:2px;}
+  .td-ee-k{display:block;font-size:var(--fs-overline);letter-spacing:var(--tracking-overline);color:var(--gris);font-weight:var(--fw-bold);margin-bottom:2px;}
   .ee-cell{display:flex;align-items:center;justify-content:center;gap:9px;}
   .ee-gl{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs-body);font-weight:var(--fw-bold);flex:none;line-height:1;}
   .ee-gl.bajo{background:var(--alerta-bg);color:var(--alerta);border:1.5px solid var(--alerta);}
@@ -1919,7 +1919,7 @@ __FONTS_CSS__
               <div className="picker-ctl"><button className="terr-trigger" onClick={()=>setModalOpen(true)} aria-label="Cambiar territorio o dependencia">{terrTxt} ▾</button></div>
             </div>
             {(terr.dep || (SLEP_FOCO!=null && terr.kind!=="foco")) && <div className="picker-extra">
-              {terr.dep && <span className="sel-chip"><span className="k">dependencia</span> {DEPE[terr.dep]} <button onClick={()=>setTerr(t=>({...t,dep:""}))} aria-label="Quitar la dependencia del territorio">✕</button></span>}
+              {terr.dep && <span className="sel-chip"><span className="k">Dependencia</span> {DEPE[terr.dep]} <button onClick={()=>setTerr(t=>({...t,dep:""}))} aria-label="Quitar la dependencia del territorio">✕</button></span>}
               {SLEP_FOCO!=null && (terr.kind!=="foco"||terr.dep) && <button className="sel-link" onClick={()=>setTerr(FOCO_INICIAL)}>volver a {SLEP_FOCO_NOM}</button>}
             </div>}
 
