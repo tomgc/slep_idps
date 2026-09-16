@@ -231,6 +231,11 @@ __FONTS_CSS__
      de estado (la paleta de estado no se toca). */
   .check-row.is-nac{background:var(--panel);border:1px dashed var(--foco);}
   .modal-count{font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-bold);margin-right:auto;}
+  /* s29i: selector de DEPENDENCIA dentro del modal (tabs comuna/region/nacional), como
+     en el motor hermano. La dependencia es un ATRIBUTO DE LA ENTIDAD, no un filtro
+     global: por eso vive aqui y no en una barra suelta. */
+  .modal-dep{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+  .modal-dep-lab{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);color:var(--gris);}
   .estab-popup-btn.is-primary{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:var(--fw-bold);}
   .estab-popup-btn.is-primary:hover{background:var(--foco);}
   /* Jerarquia .axis-lab restaurada por PESO (no por pixel ad-hoc): ambas en var(--fs-overline) (12px); la variante .b va en negrita (var(--fw-bold)) para distinguirse de la base, conservando la escala tipografica de 7 tokens (cierra el pendiente tipografico de s20) */
@@ -1369,11 +1374,21 @@ __FONTS_CSS__
   //   multiple=true -> clic en fila TOGGLEA via onSelect sin cerrar; filas marcadas
   //   con casilla; al llegar al tope (maxSel) las no marcadas se deshabilitan; footer
   //   con boton primario "Listo" (onDone||onCancel) y conteo "N de maxSel".
+  // s29i: props OPT-IN para la DEPENDENCIA por entidad (default = modal intacto):
+  //   depOpts  -> catalogo [{cod,nom}]; sin el, el selector no existe.
+  //   depFor   -> tab => bool: en que tabs aplica (comuna/region/nacional).
+  //   avisoFor -> (tab,dep) => nodo o null: el aviso metodologico del SLEP.
+  // La dependencia elegida viaja EN el item que se entrega a onSelect, de modo que la
+  // entidad nace ya acotada; el modal no la aplica por su cuenta.
   function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia",
-                        multiple=false,seleccionados=[],maxSel=null,onDone=null}){
+                        multiple=false,seleccionados=[],maxSel=null,onDone=null,
+                        depOpts=null,depFor=null,depInicial="",avisoFor=null}){
     const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
     const [tab,setTab]=useState(tabInicial);
     const [q,setQ]=useState("");
+    const [dep,setDep]=useState(depInicial);
+    const depVisible=!!(depOpts&&depFor&&depFor(tab));
+    const depEfectiva=depVisible?dep:"";
     const ql=q.trim().toLowerCase();
     const selSet=new Set(seleccionados);
     const topeAlcanzado=multiple&&maxSel!=null&&seleccionados.length>=maxSel;
@@ -1395,18 +1410,27 @@ __FONTS_CSS__
               style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>
             <div className="comuna-checklist" style={{maxHeight:340}}>
               {list.length===0 && <div className="empty-state">{emptyText}</div>}
-              {list.map(item=>{const key=item.kind+"|"+item.cod;
+              {list.map(item=>{const key=keyEnt({kind:item.kind,cod:item.cod,dep:depEfectiva});
                 const checked=multiple&&selSet.has(key);
                 const dis=multiple&&!checked&&topeAlcanzado;
                 return (
                 <div key={key} className={"check-row"+(item.kind==="nacional"?" is-nac":"")+(checked?" is-checked":"")+(dis?" is-disabled":"")}
                   role={multiple?"checkbox":undefined} aria-checked={multiple?checked:undefined}
-                  onClick={()=>{if(dis)return; onSelect(item);}}>
+                  onClick={()=>{if(dis)return; onSelect({...item,dep:depEfectiva});}}>
                   {multiple && <span className="check-box" aria-hidden="true">{checked?"✓":""}</span>}
                   <span className="check-name">{item.nom}</span>
                   <span className="check-region">{item.sub}</span>
                 </div>);})}
             </div>
+            {avisoFor && avisoFor(tab,depEfectiva)}
+            {depVisible && (
+              <label className="modal-dep">
+                <span className="modal-dep-lab">Dependencia</span>
+                <select value={dep} onChange={e=>setDep(e.target.value)}>
+                  <option value="">Todas las dependencias</option>
+                  {depOpts.map(d=><option key={d.cod} value={d.cod}>{d.nom}</option>)}
+                </select>
+              </label>)}
           </div>
           <div className="modal-footer">
             {multiple
@@ -1427,10 +1451,34 @@ __FONTS_CSS__
   // liste comunas u otros valores ajenos a la dependencia (Hallazgo H5).
   const DEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null&&DEPE[e.cod_depe2])m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
     return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c],n:m[c]}));})();
+  // ===== Dependencia por ENTIDAD (s29i) =====
+  // El codigo de la dependencia SLEP NO se escribe a mano: el motor hermano usa "5" y
+  // este usa "4", asi que se DERIVA de la etiqueta del payload y el aviso sigue al dato.
+  const DEP_SLEP=Object.keys(DEPE).find(k=>/slep/i.test(DEPE[k]))||null;
+  // La clave de unicidad de una entidad incluye la DEPENDENCIA: es lo que permite tener
+  // la misma comuna con dos dependencias distintas como dos entidades comparables.
+  const keyEnt=t=>t.kind+"|"+t.cod+"|"+(t.dep||"");
+  // Donde aplica el selector: una comuna, una region o el pais se pueden acotar a una
+  // dependencia; un SLEP ya ES una dependencia y un establecimiento es uno solo. Igual
+  // que el hermano (su select vive en los tabs Comuna, Region y Nacional).
+  const DEP_TABS=tab=>tab==="comuna"||tab==="region"||tab==="nacional";
+  // Aviso metodologico del hermano, adaptado a este motor (serie 2014-2025, traspasos
+  // escalonados). El tab SLEP lo muestra siempre; los demas, solo con dependencia SLEP.
+  function AvisoSlep(){
+    const ca=DATA.meta.cobertura_anios||{};
+    const rango=(ca.min!=null&&ca.max!=null)?" ("+ca.min+"–"+ca.max+")":"";
+    return (<div className="nota"><b>Dependencia SLEP.</b> Los establecimientos se clasifican por su dependencia <b>actual</b>: un SLEP agrupa a los suyos en toda la serie{rango}, incluidos los años anteriores a su traspaso, cuando la gestión era municipal. Las cifras previas al año de traspaso no son atribuibles a la gestión del SLEP.</div>);
+  }
+  const avisoDepFor=(tab,dep)=>(tab==="slep"||(DEP_SLEP&&dep===DEP_SLEP))?<AvisoSlep/>:null;
   // s29i: el picker territorial tambien ofrece la entidad NACIONAL, en la misma
   // posicion relativa que en TABS_CMP (despues de Region). Chile existia solo en el
   // comparador; el panorama no lo ofrecia.
-  const TABS=[["comuna","Comuna"],["slep","SLEP"],["region","Región"],["nacional","Nacional"],["dependencia","Dependencia"],["establecimiento","Establecimiento"]];
+  // s29i: el tab "Dependencia" SE RETIRA (decision declarada y reversible del encargo
+  // §3.7): era un filtro global suelto que ahora duplicaria al selector del modal y
+  // permitiria estados contradictorios (un territorio con una dependencia y el filtro
+  // global con otra). "Solo municipales de la region" se pide hoy eligiendo Region +
+  // Dependencia en el mismo modal, como en el hermano.
+  const TABS=[["comuna","Comuna"],["slep","SLEP"],["region","Región"],["nacional","Nacional"],["establecimiento","Establecimiento"]];
   function buildList(tab,ql){
     // s29i: una sola fila, que no depende del texto buscado (igual que buildListCmp).
     if(tab==="nacional") return [NACIONAL_OPT];
@@ -1444,8 +1492,6 @@ __FONTS_CSS__
     // cod_slep, igual que el foco y el comparador.
     if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
       .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:"Traspaso "+(s.anio!=null?s.anio:"—")}));
-    if(tab==="dependencia") return DEPS_OPTS.filter(s=>!ql||s.nom.toLowerCase().includes(ql))
-      .map(s=>({kind:"dependencia",cod:s.cod,nom:s.nom,sub:s.n+" establecimientos"}));
     return ql ? DATA.establecimientos.filter(e=>(e.nom&&e.nom.toLowerCase().includes(ql))||String(e.rbd).includes(ql)).slice(0,60)
       .map(e=>({kind:"establecimiento",cod:e.rbd,nom:nomEE(e)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
   }
@@ -1528,9 +1574,9 @@ __FONTS_CSS__
   const cmpPlaceholderFor=tab=>tab==="nacional"?"Sin búsqueda: Chile es la única opción":tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar una región…";
 
   // ===== Roster de un territorio para (grado, agno), TODOS los GSE. =====
-  // Espejo de App.unidades pero parametrizado por territorio y SIN filtro de
-  // dependencia (el comparador no usa dep). El territorio solo ACOTA la lista
-  // (continue); jamas agrega una cifra. kind "slep" compara por cod_slep del EE
+  // Espejo de App.unidades pero parametrizado por entidad. s29i: el comparador SI usa
+  // dependencia — es un atributo de la entidad (t.dep), no un filtro global. Territorio
+  // y dependencia solo ACOTAN la lista (continue); jamas agregan una cifra. kind "slep" compara por cod_slep del EE
   // (D-s8-5; cod_slep vive en est[rbd], igual que el foco de App). comuna/region
   // como en el panorama territorial.
   function rosterTerr(t,grado,agno){const b=DATA.roster,out=[];
@@ -1542,6 +1588,8 @@ __FONTS_CSS__
       else if(t.kind==="slep"){ if(String(e.cod_slep)!==String(t.cod))continue; }
       else if(t.kind==="comuna"){ if(e.cod_com!==t.cod)continue; }
       else { if(e.cod_reg!==t.cod)continue; }
+      // s29i: la dependencia de la entidad acota igual que el territorio.
+      if(t.dep && e.cod_depe2!==t.dep)continue;
       out.push({rbd:b.rbd[i],gse:b.gse[i]});}
     return out;}
 
@@ -1594,8 +1642,8 @@ __FONTS_CSS__
     // establecimiento => RBD y su GSE en el mismo (grado, año).
     const metaChip=useMemo(()=>{const m={};
       cmpTerrs.forEach((t,i)=>{const q=metas[i]||{ncom:0,nee:0};
-        m[t.kind+"|"+t.cod]=fmt(q.ncom)+(q.ncom===1?" comuna":" comunas")+" · "+fmt(q.nee)+(q.nee===1?" establecimiento":" establecimientos");});
-      cmpEEs.forEach((t,i)=>{m[t.kind+"|"+t.cod]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
+        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+fmt(q.ncom)+(q.ncom===1?" comuna":" comunas")+" · "+fmt(q.nee)+(q.nee===1?" establecimiento":" establecimientos");});
+      cmpEEs.forEach((t,i)=>{m[keyEnt(t)]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
     // s29b: EE que no caen en ninguna seccion visible. Se avisa UNA vez arriba;
@@ -1619,7 +1667,7 @@ __FONTS_CSS__
         <div className="cmp-controls">
           <span className="cmp-cl">Entidades a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
           <div className="cmp-chips">
-            {cmpOrden.map(t=>{const key=t.kind+"|"+t.cod, esEE=t.kind==="establecimiento";
+            {cmpOrden.map(t=>{const key=keyEnt(t), esEE=t.kind==="establecimiento";
               return (
               <div className={"cmp-chip"+(t.kind==="nacional"?" is-nac":"")+(esEE?" is-ee":"")} key={key}>
                 <span className="cmp-ct">
@@ -1627,14 +1675,14 @@ __FONTS_CSS__
                   {esEE && <span className="cmp-ck">Establecimiento</span>}
                   <span className="cmp-cn">{t.nom}</span>
                   <span className="cmp-cm">{metaChip[key]}</span></span>
-                <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
+                <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod,t.dep)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
               </div>);})}
             {cmpTerr.length<CMP_MAX_TERR && <button className="cmp-add" onClick={onAdd}>+ agregar entidad</button>}
             {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar entidades" title="Limpiar entidades">↺</button>}
           </div>
           {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?`Agrega entidades (botón “+ agregar entidad”) para comparar, hasta ${CMP_MAX_TERR}.`:`Agrega al menos una entidad más para comparar (hasta ${CMP_MAX_TERR}).`}</div>}
           {eeSinUbicar.length>0 && <div className="cmp-nota-ee">{eeSinUbicar.map((x,k)=>(
-            <React.Fragment key={x.t.kind+"|"+x.t.cod}>{k>0?" ":""}<b>{x.t.nom}</b>{x.gse
+            <React.Fragment key={keyEnt(x.t)}>{k>0?" ":""}<b>{x.t.nom}</b>{x.gse
               ? " no aparece en la comparación: su GSE ("+(GSE[x.gse]||x.gse)+") está oculto en el segmentador."
               : " no aparece en la comparación: no tiene GSE en este nivel y año."}</React.Fragment>))}</div>}
         </div>
@@ -1672,15 +1720,17 @@ __FONTS_CSS__
                     <thead><tr><th className="th-terr">Entidad</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
                     <tbody>
                       {cmpTerrs.map((t,ti)=>(
-                        <tr key={t.kind+"|"+t.cod} className={t.kind==="nacional"?"row-nac":undefined}>
+                        <tr key={keyEnt(t)} className={t.kind==="nacional"?"row-nac":undefined}>
+                          {/* s29i: la fila lleva su dependencia bajo el nombre. Sin ella, dos
+                              filas de la misma comuna con dependencias distintas se leerian iguales. */}
                           <td className="td-terr"><span className="td-tn">{t.nom}</span>
-                            {t.kind==="nacional" && <span className="td-ee-rbd">referencia nacional</span>}</td>
+                            {(t.kind==="nacional"||t.dep) && <span className="td-ee-rbd">{[t.kind==="nacional"?"referencia nacional":null,t.dep?(DEPE[t.dep]||t.dep):null].filter(Boolean).join(" · ")}</span>}</td>
                           {DATA.indicadores.map(ind=>{const items=rosters[ti].filter(u=>u.gse===g);
                             return <td key={ind.id}><StackedBar rep={repartoInd(items,ind.id,cmpGrado,agno)}/></td>;})}
                         </tr>))}
                       {eeAqui.map((t,k)=>{const dind=indOf(t.cod,cmpGrado,agno), e=est[t.cod];
                         return (
-                        <tr key={t.kind+"|"+t.cod} className={"row-ee"+(k===0?" row-ee-first":"")}>
+                        <tr key={keyEnt(t)} className={"row-ee"+(k===0?" row-ee-first":"")}>
                           <td className="td-terr">
                             <span className="td-ee-k">Establecimiento</span>
                             <span className="td-tn">{t.nom}</span>
@@ -1691,7 +1741,7 @@ __FONTS_CSS__
                   </table>
                 </div>
                 {eeOtros.length>0 && <div className="gse-sec-foot">Los establecimientos seleccionados aparecen únicamente en la sección de su propio grupo socioeconómico. {eeOtros.map((x,k)=>(
-                  <React.Fragment key={x.t.kind+"|"+x.t.cod}>{k>0?"; ":""}<b>{x.t.nom}</b>{x.gse?" (GSE "+(GSE[x.gse]||x.gse)+")":""} {ubic(x)}</React.Fragment>))}.</div>}
+                  <React.Fragment key={keyEnt(x.t)}>{k>0?"; ":""}<b>{x.t.nom}</b>{x.gse?" (GSE "+(GSE[x.gse]||x.gse)+")":""} {ubic(x)}</React.Fragment>))}.</div>}
               </section>);})}
       </div>);
   }
@@ -1714,8 +1764,9 @@ __FONTS_CSS__
     // con dato. Fallback al universo global si el indice faltara (robustez).
     const gradosDe=rbd=>{const g=DATA.meta.grados_ee&&DATA.meta.grados_ee[rbd];return(g&&g.length)?g:grados;};
     const gradoValido=(rbd,g)=>{const av=gradosDe(rbd);return av.includes(g)?g:av[0];};
+    // s29i: la dependencia ya NO es un estado global suelto: es un campo de la entidad
+    // (terr.dep en el panorama, t.dep en el comparador), como en el motor hermano.
     const [terr,setTerr]=useState(FOCO_INICIAL);   // apertura: foco SLEP Costa Central (estado, no filtro fijo)
-    const [dep,setDep]=useState("");   // cod_depe2 (dependencia; combinable con el territorio)
     const [modalOpen,setModalOpen]=useState(false);
     // Estado por pantalla (revision P3): territorial y ficha tienen su PROPIO nivel
     // (independientes, como el handout); el comparador ya tenia cmpGrado. El año NO
@@ -1747,11 +1798,11 @@ __FONTS_CSS__
 
     // EntityModal devuelve un item; se aplica segun su kind (acota, nunca agrega).
     const onPick=item=>{setModalOpen(false);
-      if(item.kind==="nacional") setTerr({kind:"nacional",cod:"CL"});
-      else if(item.kind==="region") setTerr({kind:"region",cod:item.cod});
-      else if(item.kind==="slep") setTerr({kind:"slep",cod:item.cod});   // agrupa toda la serie por cod_slep (sin filtro de anio_traspaso)
-      else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod});
-      else if(item.kind==="dependencia") setDep(item.cod);
+      const d=item.dep||"";   // s29i: la dependencia viene EN el item, elegida en el modal
+      if(item.kind==="nacional") setTerr({kind:"nacional",cod:"CL",dep:d});
+      else if(item.kind==="region") setTerr({kind:"region",cod:item.cod,dep:d});
+      else if(item.kind==="slep") setTerr({kind:"slep",cod:item.cod});   // agrupa toda la serie por cod_slep (sin filtro de anio_traspaso); el tab SLEP no lleva selector
+      else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod,dep:d});
       else if(item.kind==="establecimiento"){setRbdSel(item.cod);setFichaGrado(gradoValido(item.cod,fichaGrado));setPantalla("ficha");}};
 
     // Comparador: el modal AGREGA un territorio a la lista (no acota como onPick).
@@ -1761,12 +1812,12 @@ __FONTS_CSS__
     // backdrop). Si ya esta -> quita; si no esta y hay cupo (<4) -> agrega; si tope -> no-op.
     const addTerr=item=>{
       setCmpTerr(prev=>{
-        const k=t=>t.kind+"|"+t.cod; const ki=k(item);
-        if(prev.some(t=>k(t)===ki)) return prev.filter(t=>k(t)!==ki);
+        const ki=keyEnt(item);   // s29i: kind|cod|dep
+        if(prev.some(t=>keyEnt(t)===ki)) return prev.filter(t=>keyEnt(t)!==ki);
         if(prev.length>=CMP_MAX_TERR) return prev;
-        return [...prev,{kind:item.kind,cod:item.cod,nom:(item.nom||"").replace(" ★","")}];
+        return [...prev,{kind:item.kind,cod:item.cod,dep:item.dep||"",nom:(item.nom||"").replace(" ★","")}];
       });};
-    const removeTerr=(kind,cod)=>setCmpTerr(prev=>prev.filter(t=>!(t.kind===kind&&t.cod===cod)));
+    const removeTerr=(kind,cod,dep)=>setCmpTerr(prev=>prev.filter(t=>!(t.kind===kind&&t.cod===cod&&(t.dep||"")===(dep||""))));
     const toggleCmpGse=g=>setCmpGseVis(prev=>{const n=new Set(prev);n.has(g)?n.delete(g):n.add(g);return n;});
 
     // roster del territorio seleccionado, para (grado, agno). El territorio y la
@@ -1781,10 +1832,10 @@ __FONTS_CSS__
         else if(terr.kind==="slep"){ if(String(e.cod_slep)!==String(terr.cod))continue; }
         else if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
         else { if(e.cod_reg!==terr.cod)continue; }
-        if(dep && e.cod_depe2!==dep)continue;
+        if(terr.dep && e.cod_depe2!==terr.dep)continue;
         if(!gseVis.has(b.gse[i]))continue;
         out.push({rbd:b.rbd[i],gse:b.gse[i]});}
-      return out;},[terr,dep,panGrado,panAgno,gseVis]);
+      return out;},[terr,panGrado,panAgno,gseVis]);
 
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
@@ -1804,7 +1855,7 @@ __FONTS_CSS__
       return noms.length<=1 ? noms.join("") : noms.slice(0,-1).join(", ")+" y "+noms[noms.length-1];
     },[unidades,esSlep]);
 
-    const depNom = dep ? (DEPE[dep]||dep) : null;
+    const depNom = terr.dep ? (DEPE[terr.dep]||terr.dep) : null;
     const terrTxt = terr.kind==="nacional" ? "Chile"
                   : terr.kind==="foco" ? "SLEP "+SLEP_FOCO_NOM
                   : terr.kind==="slep" ? "SLEP "+((SLEPS_OPTS.find(s=>String(s.cod)===String(terr.cod))||{}).nom||terr.cod)
@@ -1826,9 +1877,11 @@ __FONTS_CSS__
         </nav>
 
         <div className="wrap">
-          {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
+          {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}
+            depOpts={DEPS_OPTS} depFor={DEP_TABS} depInicial={terr.dep||""} avisoFor={avisoDepFor}/>}
           {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} emptyTextFor={emptyTextFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
-            multiple={true} seleccionados={cmpTerr.map(t=>t.kind+"|"+t.cod)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}/>}
+            depOpts={DEPS_OPTS} depFor={DEP_TABS} avisoFor={avisoDepFor}
+            multiple={true} seleccionados={cmpTerr.map(keyEnt)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
@@ -1851,9 +1904,9 @@ __FONTS_CSS__
               <span className="picker-lab">Territorio</span>
               <div className="picker-ctl"><button className="terr-trigger" onClick={()=>setModalOpen(true)} aria-label="Cambiar territorio o dependencia">{terrTxt} ▾</button></div>
             </div>
-            {(dep || (SLEP_FOCO!=null && terr.kind!=="foco")) && <div className="picker-extra">
-              {dep && <span className="sel-chip"><span className="k">dependencia</span> {DEPE[dep]} <button onClick={()=>setDep("")} aria-label="Quitar filtro de dependencia">✕</button></span>}
-              {SLEP_FOCO!=null && (terr.kind!=="foco"||dep) && <button className="sel-link" onClick={()=>{setTerr(FOCO_INICIAL);setDep("");}}>volver a {SLEP_FOCO_NOM}</button>}
+            {(terr.dep || (SLEP_FOCO!=null && terr.kind!=="foco")) && <div className="picker-extra">
+              {terr.dep && <span className="sel-chip"><span className="k">dependencia</span> {DEPE[terr.dep]} <button onClick={()=>setTerr(t=>({...t,dep:""}))} aria-label="Quitar la dependencia del territorio">✕</button></span>}
+              {SLEP_FOCO!=null && (terr.kind!=="foco"||terr.dep) && <button className="sel-link" onClick={()=>setTerr(FOCO_INICIAL)}>volver a {SLEP_FOCO_NOM}</button>}
             </div>}
 
             <div className="gse-filter-wrap">
