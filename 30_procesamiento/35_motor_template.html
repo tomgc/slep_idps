@@ -766,9 +766,13 @@ __FONTS_CSS__
     if(dif>0){arr="▲"; cls=significativo?"de":"";}
     else if(dif<0){arr="▼"; cls=significativo?"al":"";}
     const lbl = significativo ? "significativo" : "no significativo";
+    // s29g (2026-09-16): el sufijo "· sig." / "· n.s." es informacion (distingue una
+    // diferencia significativa de una aritmetica) y va sin opacity: con .8 quedaba en
+    // 3,72 / 3,30 sobre --alerta-bg / --destaca-bg; a 1 da 4,61 / 4,69 (AA). La
+    // jerarquia la da el tamano (--fs-overline frente a --fs-caption), no la atenuacion.
     return <div className={"ancla "+cls} title={tipo+": "+fmtSigned(dif)+" · "+lbl}>
       <span className="k">{tipo}</span><span className="arr">{arr}</span>{fmtSigned(dif)}
-      <span style={{fontSize:"var(--fs-overline)",opacity:.8}}>{significativo?"· sig.":"· n.s."}</span></div>;
+      <span style={{fontSize:"var(--fs-overline)"}}>{significativo?"· sig.":"· n.s."}</span></div>;
   }
 
   // (AnchorRow eliminado en Fase 2: la lectura indicador/dimension se reorganiza
