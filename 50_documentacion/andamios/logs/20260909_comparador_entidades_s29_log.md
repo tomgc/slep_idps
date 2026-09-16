@@ -1185,3 +1185,262 @@ terceros lo que no lo fue.
 - **§5.2** marca de "base pequeña": umbral metodológico sin fijar.
 - Re-etiquetado en vivo al redimensionar: pide una pestaña visible.
 - Tooltip "vs evaluación anterior" (s28). Rama `feat/contrato-contexto`: no se tocó.
+
+---
+
+## 27. Pendiente nuevo solicitado por el titular (2026-09-16)
+
+> *Nota de s29g:* este apartado se redactó como "§25" y quedó sin commitear; el número
+> ya lo llevaba "Decisiones tomadas dentro del margen del encargo (s29f)". Se renumera
+> a §27 sin tocar una palabra del texto. El encargo s29g lo cita como "§25 del log".
+
+**P-VISTA-TERRITORIAL — selector "Vista actual / Vista histórica" en el panorama
+territorial.** Hoy el selector de vista existe solo en el Panorama IDPS por
+establecimiento (banner de la ficha: "VISTA · Vista actual | Vista histórica"). El
+titular pide el mismo par de vistas en el Panorama territorial, con el selector en el
+mismo lugar del banner, junto al de NIVEL.
+
+Advertencia de diseño (no es un pendiente trivial): la vista histórica de la ficha
+grafica el **puntaje por año** de un establecimiento. Un territorio no tiene puntaje
+propio (invariante de cero agregación), así que su vista histórica no puede ser la
+misma curva. La forma compatible con el invariante es una **serie de repartos**: por
+cada año con medición, el % (n) de establecimientos del territorio en cada estado vs su
+GSE, es decir la barra apilada del panorama repetida en el eje del tiempo. Eso hay que
+decidirlo y mockearlo antes de encargarlo; el pendiente queda anotado, no especificado.
+
+Entra al backlog con su correlativo en el cierre de la sesión, según la regla de
+mantención del propio backlog (las entradas nuevas se agregan al final en cada cierre).
+
+---
+
+## 28. Inventario de commits de s29g
+
+| # | Commit | Fase | Rutas |
+|---|---|---|---|
+| 28 | `ef9fdeb` | 1 — `fix(motor): el sufijo de significancia del ancla deja de atenuarse` | plantilla |
+| 29 | `46e0e47` | 2 — `fix(motor): glosa de estados de la ficha con los tokens de texto` | plantilla |
+| 30 | `cde1d95` | 3 — `docs(decision): cierra §5.5 (1) y (3) y agrupa el resto como problema de paleta de indicador` | decisión |
+| 31 | `c63287b` | 4 — `build(motor): regenera el motor con el contraste de la ficha cerrado` | `40_salidas/motor_idps.html` |
+| 32 | `2388e88` | 4 — `deploy(docs): republica con los ultimos arreglos de contraste` | `docs/index.html` |
+| 33 | (este) | 5 — `docs(log): registro de s29g y pendiente de vista historica territorial` | log + `ESTADO.md` + encargo |
+
+Rama `feat/contrato-contexto` y su log (`20260711_contrato_contexto_idps_log.md`, sin
+seguimiento en el árbol) **no se tocaron**.
+
+## 29. Qué se cambió
+
+**Fase 1.** El `<span>` del sufijo `"· sig."` / `"· n.s."` de `<Ancla/>` pierde
+`opacity:.8`; conserva `fontSize:"var(--fs-overline)"` y el texto byte a byte. No se
+tocó el peso: la jerarquía la da el tamaño (12 px frente a los 14 px del número) y en
+pantalla sigue leyéndose como sufijo (captura en §30.6). Cuatro líneas de comentario
+en el JSX dejan la razón junto al código.
+
+**Fase 2.** Los `<span>` `"▼ rojo"` / `"▲ azul"` de la glosa `.ficha-explain` pasan de
+`var(--alerta)` / `var(--destaca)` a `var(--alerta-txt)` / `var(--destaca-txt)`. Es el
+**quinto uso** de los tokens de texto y se anotó en el comentario del `:root` (regla del
+propio comentario) y en §3.3 de la decisión. Comentario JSX `{/* */}` delante del `<div>`.
+
+**Fase 3.** Decisión: encabezado de estado; §3.3 pasa a cinco entradas (la 4, anclas,
+faltaba en la lista aunque s29f la anotó en el `:root` y en §5.4); §5.5 (1) y (3)
+**resueltos** con cifras antes/después; §5.5 (2) y (4) **reagrupados** con §5.3 (b) en la
+**§5.6 nueva**, "Texto sobre un color de la paleta de INDICADOR", con las tres salidas
+para mockup y recomendación; §6 reversión con la entrada s29g. Dos hallazgos propios de
+la fase, ambos en §5.6:
+
+- **Corrección de atribución de §5.5 (4).** No es la "barra de dimensión" (`ScoreBar`,
+  sin texto) sino `.bar span` de **`DistBar`** (niveles de la subdimensión), teñida con
+  `nivelRamp(ind.color)`; `#4C939A` = `_darken(#61BDC6, .22)`. Y esa etiqueta **ya lleva
+  inversión por luminancia** (`_txtOn`, umbral 0,55 de luma Rec. 601): la salida (b) de
+  la §5.6 existe en el código. Recalculado sobre los 12 tonos de la rampa: `_txtOn`
+  acierta en 11 (4,75–10,67) y en `#4C939A` **ningún** color de texto llega a 4,5
+  (blanco 3,53; `#2e2710` 4,21). Por eso (b) no puede cerrar (4).
+- **Anexo del panel adversarial (§30.7):** el tooltip `.tt` de la vista histórica pinta
+  `"vs GSE: …"` con color de barra sobre `#23303a` (3,88 / 3,28 / 3,85) y los tokens
+  `-txt` ahí **empeoran** (2,48 / 2,41 / 2,46): están diseñados para fondo claro. Viaja
+  con §5.3 (b).
+
+**Fase 4.** Motor regenerado y promovido a `docs/`. **Fase 5.** Este registro, el
+pendiente del titular (§27) en `ESTADO.md`, push.
+
+## 30. Chequeos de s29g (valores observados)
+
+### 30.1 Instrumento y aritmética, antes de aplicar
+
+Calculadora WCAG 2.1 propia (linealización sRGB, compositing de `opacity` en sRGB),
+verificada con los dos controles del §0bis: `#000`/`#fff` = **21,00**; `#777`/`#fff` =
+**4,48**. Las cuatro cifras del encargo se reprodujeron al tercer decimal antes de tocar
+la plantilla:
+
+| Elemento | Antes | Después | Exige |
+|---|---|---|---|
+| sufijo `.ancla.al` (`--alerta-txt` @.8 → @1 sobre `#FBE3E6`) | 3,718 | **4,606** | 4,5 |
+| sufijo `.ancla.de` (`--destaca-txt` @.8 → @1 sobre `#E2F0FB`) | 3,301 | **4,689** | 4,5 |
+| `"▼ rojo"` (`--alerta` → `--alerta-txt` sobre `#eef3f7`) | 3,681 | **5,025** | 4,5 |
+| `"▲ azul"` (`--destaca` → `--destaca-txt` sobre `#eef3f7`) | 3,118 | **4,872** | 4,5 |
+| sufijo `.ancla` neutra (`--tinta` @.8 → @1 sobre `#fff`) | 7,121 | 13,502 | 4,5 |
+
+La quinta fila no está en el encargo: se añadió porque quitar la `opacity` afecta a las
+tres ramas del ancla y había que descartar que la neutra empeorara. Mejora.
+
+### 30.2 Regla de detención 1 — no se dispara
+
+Ningún token de ESTADO (`--alerta`, `--st-neutro`, `--destaca`), de INDICADOR
+(`--ind1..4`) ni ningún fondo cambió de valor: el diff de todas las definiciones `--*:`
+del `:root` entre `1630ae8` y `46e0e47` es vacío, y las únicas líneas nuevas con
+`background`/`#hex` son comentarios. Solo se usaron `--alerta-txt` y `--destaca-txt`, ya
+definidos en `1630ae8` (l.50). Verificado por el ejecutor y, de forma independiente, por
+la lente "contrato" del panel (§30.7).
+
+### 30.3 Build y fidelidad (regla de detención 2 — no se dispara)
+
+`run_all(only = 35L)` en 4,2 s. `grep -inE "warn|error|aviso|fail|problema"` sobre la
+salida completa: **ninguna coincidencia**. Bloque 7 idéntico a la línea base (16
+regiones; 9.136 EE; 91.596 unidades; 366.384 / 557.898 / 662.514 filas; 59,5 MB → 4,41 MB;
+5,1 MB HTML).
+
+```
+bytes JSON:  59.466.778  ==  59.466.778
+offsets que difieren: [38]      ← el dígito del día: 2026-09-11 → 2026-09-16
+SHA-256 (convención §8.2):  1e29c2b5be529e013f5afb98de323420e842a615b2e4f7a9cc5001ad1b55b5b6
+```
+
+Un solo offset, el permitido; hash idéntico al de s29c, s29d, s29e y s29f. **Ninguna
+cifra se movió.** Nota de instrumentación: el `atob(...)` del motor es un flujo **zlib**
+(`78 9c`, salida de `memCompress(type="gzip")` en R), no gzip con cabecera; se
+descomprime con `zlib.decompress`, no con `gzip`.
+
+### 30.4 Auditoría de todo el texto visible — tres escenarios a 1200px
+
+Mismo método de s29d–s29f: todo elemento con nodo de texto propio, colores computados,
+fondo efectivo compuesto capa a capa hacia arriba (alfa del `background-color` y
+`opacity` de cada grupo) hasta lienzo blanco, animaciones forzadas a su estado final,
+umbral 4,5 (3,0 si grande). El recuento de nodos es por elemento (no por combinación
+única, como en s29f), de ahí las cifras mayores.
+
+| Escenario | Nodos | Fallas | Cubiertas por |
+|---|---|---|---|
+| A · Panorama territorial | 478 | `.s100-seg span` 3,483 / 3,510 / 4,112 (×38) | §3.4 |
+| B · Comparador poblado (Chile + SLEP Costa Central + 6 EE, tres estados) | 329 | `.s100-seg span` (×44) · `.ee-gl` 3,374 / 3,069 / 3,000 (×20) | §3.4 · §3.5 |
+| C · Ficha RBD 12301 (vista actual) | 422 | `.defn-title` 2,187 / 3,066 / 1,843 (×3) · `.bar span` blanco/`#4C939A` 3,531 (×5) | **§5.6** (backlog de paleta de indicador) |
+| C' · Ficha Liceo Atenea RBD 134 (vista actual) | 422 | ídem: `.defn-title` (×3) · `.bar span` 3,531 (×4) | **§5.6** |
+
+**El criterio de la Fase 4.2 se cumple en los tres escenarios**: no queda ninguna falla
+fuera de las excepciones escritas (§3.4, §3.5), lo exento (§5.3 c, sin nodos en estos
+escenarios) y el ítem de backlog de paleta de indicador (§5.6 = §5.3 b + §5.5 2 y 4).
+
+Los dos cierres, medidos en el motor cargado:
+
+| Elemento | Dónde | Medido | Calculado (§30.1) |
+|---|---|---|---|
+| sufijo `"· sig."` de `.ancla.al` | RBD 12301, 25 anclas `.al`, `opacity` computada 1 | **4,606** | 4,606 |
+| sufijo `"· sig."` de `.ancla.de` | Liceo Atenea (RBD 134), 4 anclas `.de` | **4,689** | 4,689 |
+| sufijo `"· n.s."` de `.ancla` neutra | ambos EE | 13,502 | 13,502 |
+| `"▼ rojo"` de `.ficha-explain` | ambos EE | **5,025** | 5,025 |
+| `"▲ azul"` de `.ficha-explain` | ambos EE | **4,872** | 4,872 |
+
+Resto del inventario `-txt`, intacto y al alza respecto de s29f: `.chip.al` 4,606,
+`.chip.de` 4,689 (A); tira externa 5,372 / 5,208 (fila nacional) y 5,519 / 5,351 / 5,405
+(panel); `.ee-st` 5,396 / 5,231 / 5,285 (B). La etiqueta `.k` del ancla (`--gris`) da
+4,812 sobre `--alerta-bg`, 5,052 sobre `--destaca-bg` y 5,865 sobre blanco.
+
+### 30.5 Regla de etiquetado de s29 — intacta
+
+Comparador poblado (8 entidades, 40 `.s100`, 36 con dato):
+
+| Ancho | Barras con dato | Dentro | En la tira | Cortadas | Duplicados |
+|---|---|---|---|---|---|
+| 1200px | 36 | 44 | 56 | **0** | **0** |
+| 430px | 36 | 0 | 100 | **0** | **0** |
+
+Mismos 44/56 y 0/100 de s29c–s29f. La pestaña sigue corriendo con `document.hidden ===
+true` (§8.4), así que a 430px se forzó el **remount** del comparador (salir a Panorama
+territorial y volver) para que `useLayoutEffect` remida el ancho; no es el re-etiquetado
+en vivo por `ResizeObserver`, que sigue pendiente de una pestaña visible.
+
+### 30.6 Despliegue (regla de detención 4 — no se dispara)
+
+`docs/index.html` es **copia byte a byte** de `40_salidas/motor_idps.html`: `cmp` sin
+diferencias, md5 **`02c742153ae36e19f6b4388e337ed62f`** en ambos, **5.384.452 bytes**
+(632 bytes más que s29f por los comentarios del JSX). Sustituye el `docs/index.html` de
+s29f (md5 `f61ac9c5…`, 5.383.820 bytes).
+
+Servido `docs/` en local (`docs-py`, puerto 8767): título correcto, tres pantallas,
+`--alerta-txt` = `#CE112C` y `--gris` = `#5C666E` en el documento servido, **0
+ocurrencias** de `opacity:.8}}` y **1** de `var(--alerta-txt)"}}>▼ rojo`, **cero errores
+de consola** en ambos servidores (8766 y 8767).
+
+A diferencia de s29c–s29f, esta vez el pane **sí compuso** y se pudo capturar la ficha
+del Liceo Atenea a 1200px: glosa con `▼ rojo` / `▲ azul` en los tokens de texto; anclas
+`vs su GSE ▼ -8 · sig.` (`.al`), `vs año anterior ▲ +5 · sig.` (`.de`) y `▼ -4 · n.s.`
+(neutra) con el sufijo a opacidad plena y jerarquía conservada por tamaño.
+
+### 30.7 Panel adversarial — esta vez sí hubo
+
+Tras la Fase 2 y antes del build se corrió el panel de solo lectura sobre el diff
+`1630ae8..46e0e47`: tres lentes (contrato y regla de detención 1; corrección del JSX y
+regresión visual; aritmética y cobertura), y cada hallazgo bruto sometido a dos
+refutadores (hechos del código; alcance y norma). **7 agentes, 2 hallazgos brutos, 0
+confirmados** (ambos refutados por unanimidad: preexistentes byte a byte en `1630ae8` y
+fuera del alcance declarado). Comprobaciones que el panel dejó cerradas por su cuenta:
+
+- El bloque `<script type="text/babel">` completo de ambas versiones **parsea con
+  `@babel/parser` y transforma con `@babel/core` + `preset-react`**; el JS emitido
+  difiere **solo en tres líneas** (la `opacity` y los dos `var(--*-txt)`). El comentario
+  `{/* */}` es un `JSXExpressionContainer(JSXEmptyExpression)` y no emite ningún hijo.
+- Ocho cifras recalculadas de forma independiente: delta máximo **0,0004** frente a las
+  del encargo (si se redondea la opacidad a 8 bits sale 3,719 / 3,304 en vez de 3,718 /
+  3,301: redondeo, no fórmula).
+- Barrido de los seis colores de barra (`var()` y hex) como `color` de texto en la ficha
+  vista actual: **ningún** uso fuera de las excepciones y de §5.6.
+- Los dos hallazgos refutados quedan como **observaciones útiles**, no como defectos de
+  s29g: (i) el tooltip `.tt` de la vista histórica, ya anexado a §5.6 de la decisión;
+  (ii) `.sel-chip button:hover` y `.cmp-x:hover` pintan el `✕` con `--alerta` sobre
+  blanco (**4,11**), fuera de la ficha; con `--alerta-txt` pasaría. Va a pendientes
+  (§32).
+
+### 30.8 Errores del asistente en s29g (regla 0.5)
+
+| # | Qué pasó | Cuándo se detectó | Efecto |
+|---|---|---|---|
+| 1 | En §3.3 (5) de la decisión se escribió "medidos en s29g" para 5,025 / 4,872 cuando aún solo estaban **calculados**. | Antes del commit de la Fase 3; se corrigió a "cálculo… medición en navegador queda en el log". | Ninguno en el repo. La medición posterior (§30.4) coincidió. |
+| 2 | Se indicó al panel el mismo directorio de scratchpad del ejecutor y un agente **sobrescribió** `wcag.py`, el instrumento del ejecutor. | Al reutilizarlo tras el panel (`ImportError`). | Ninguno en el repo ni en las cifras (ya capturadas); se rehízo con nombre propio. Lección: dar a los agentes un subdirectorio propio. |
+
+## 31. Decisiones tomadas dentro del margen del encargo (s29g)
+
+1. **No tocar el peso del sufijo.** El encargo lo permitía "si pierde la jerarquía". En
+   pantalla el tamaño (12 vs 14 px) basta; añadir peso habría sido cambiar más de lo
+   necesario.
+2. **Anotar el quinto uso en el `:root` dentro de la Fase 2**, no en la Fase 3: la regla
+   está escrita en el propio comentario y la plantilla es el archivo de esa fase.
+3. **Completar la lista de §3.3 con la entrada 4 (anclas)** que s29f dejó fuera de la
+   lista aunque la anotó en dos sitios: el inventario debe tener una sola fuente.
+4. **Corregir la atribución de §5.5 (4)** y **documentar `_txtOn`** al reagrupar en §5.6:
+   sin eso la §5.6 habría propuesto como salida (b) algo que el motor ya hace y que en ese
+   tono no basta. Es documentación, no código, y cambia la recomendación.
+5. **Anexar a §5.6 el hallazgo del panel sobre el tooltip histórico**, aunque el panel lo
+   refutó como defecto de s29g: la advertencia de que los `-txt` empeoran sobre fondo
+   oscuro es lo que evita que alguien lo "cierre" con el remedio de s29g.
+6. **Renumerar el §25 duplicado a §27** sin tocar su texto, con nota de por qué.
+7. **Panel adversarial antes del build**, como en s29c (§8.5), porque s29f no pudo
+   tenerlo (§24.8) y este encargo despliega a `docs/`.
+8. **Forzar remount para la medición a 430px** en vez de recargar (que habría perdido el
+   comparador poblado) o de dar por válido el re-etiquetado en vivo, que no se puede ver
+   con la pestaña oculta.
+
+## 32. Pendientes tras s29g (cierre de la línea de contraste)
+
+- **§5.6 — texto sobre color de la paleta de INDICADOR** (= §5.3 b + §5.5 2 y 4 + anexo
+  del tooltip histórico): **backlog, pide mockup y aprobación del titular**. Recomendación
+  escrita en la decisión: (a) sacar el texto del relleno; para la etiqueta de `DistBar`,
+  extender §3.4.
+- **P-VISTA-TERRITORIAL (§27):** selector "Vista actual / Vista histórica" en el panorama
+  territorial. **Solo anotado**, no especificado: la vista histórica de un territorio no
+  puede ser la curva de la ficha (cero agregación); §27 propone una serie de repartos y
+  pide mockup. Entra al backlog con su correlativo en el cierre de sesión. Anotado en
+  `ESTADO.md`.
+- **Hover `✕` de `.sel-chip button` y `.cmp-x`** (panorama y comparador): `--alerta`
+  sobre blanco, 4,11. Con `--alerta-txt` pasaría; sería el sexto uso del inventario.
+  Observación del panel, no verificada en navegador (pide `hover`). Menor.
+- **§5.2** marca de "base pequeña": umbral metodológico sin fijar.
+- Re-etiquetado en vivo al redimensionar: pide una pestaña visible.
+- Tooltip "vs evaluación anterior" (s28). Rama `feat/contrato-contexto`: no se tocó.
