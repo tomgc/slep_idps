@@ -7092,9 +7092,10 @@ AAABrwBBAPMAAA==) format('opentype');}
   .check-row.is-checked .check-box{background:var(--foco);border-color:var(--foco);}
   .check-row.is-disabled{opacity:.45;cursor:not-allowed;}
   .check-row.is-disabled:hover{background:transparent;}
-  /* s29: fila fija de la entidad NACIONAL en el modal del comparador (arriba de la
-     lista, en todos los tabs). Se distingue con borde punteado de foco, no con un
-     color de estado (la paleta de estado no se toca). */
+  /* s29h (antes s29): fila de la entidad NACIONAL en el modal del comparador. Ya NO
+     es una fila fija arriba de todas las listas: vive sola en su tab "Nacional"
+     (ver buildListCmp). Se distingue con borde punteado de foco, no con un color
+     de estado (la paleta de estado no se toca). */
   .check-row.is-nac{background:var(--panel);border:1px dashed var(--foco);}
   .modal-count{font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-bold);margin-right:auto;}
   .estab-popup-btn.is-primary{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:var(--fw-bold);}
@@ -8313,7 +8314,13 @@ AAABrwBBAPMAAA==) format('opentype');}
       .map(e=>({kind:"establecimiento",cod:e.rbd,nom:nomEE(e)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
   }
   const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":tab==="slep"?"Buscar un SLEP…":"Buscar…";
-  const emptyTextFor=(tab,ql)=>tab==="establecimiento"&&!ql?"Escribe para buscar un establecimiento":"Sin resultados";
+  // s29h: el tab "nacional" del comparador no tiene busqueda (una sola opcion), asi
+  // que su vacio no invita a escribir. Esa rama es una guarda: hoy no se pinta nunca,
+  // porque buildListCmp("nacional") siempre devuelve una fila. Las otras ramas no
+  // cambian, pero el modal del COMPARADOR pasa a recibir esta funcion (antes caia al
+  // "Sin resultados" por defecto), asi que su tab de establecimiento —ahora el
+  // primero, y vacio al abrir— dice "Escribe para buscar un establecimiento".
+  const emptyTextFor=(tab,ql)=>tab==="nacional"?"Nivel nacional: Chile es la única opción":tab==="establecimiento"&&!ql?"Escribe para buscar un establecimiento":"Sin resultados";
 
   // ===== Buscador de establecimiento embebido en la ficha (revision P3 #19) =====
   // Reusa la rama "establecimiento" de buildList (nombre/RBD). onPick(rbd) abre o
@@ -8359,11 +8366,15 @@ AAABrwBBAPMAAA==) format('opentype');}
     DATA.establecimientos.forEach(e=>{ee++;if(e.cod_com!=null)coms.add(e.cod_com);});
     return {kind:"nacional",cod:"CL",nom:"Chile",
             sub:"Nivel nacional · "+fmt(coms.size)+" comunas · "+fmt(ee)+" establecimientos"};})();
-  const TABS_CMP=[["slep","SLEP"],["comuna","Comuna"],["region","Región"],["establecimiento","Establecimiento"]];
-  // La entidad nacional es una fila FIJA arriba de la lista en TODOS los tabs (no un
-  // tab propio) y no depende del texto buscado: Chile es la referencia, no un
-  // resultado de busqueda.
-  function buildListCmp(tab,ql,grado,agno){ return [NACIONAL_OPT].concat(_listaCmpEnt(tab,ql,grado,agno)); }
+  // s29h: el orden de los tabs es el del proyecto hermano slep_simce_adecuado (de
+  // menor a mayor alcance), SIN "Grupo personalizado", categoria que este motor no
+  // tiene. Con este orden el modal abre en Establecimiento, igual que el hermano.
+  const TABS_CMP=[["establecimiento","Establecimiento"],["comuna","Comuna"],["slep","SLEP"],["region","Región"],["nacional","Nacional"]];
+  // s29h (corrige s29 §3.2): la entidad nacional vive en su PROPIO tab, como en el
+  // hermano. Chile no es un establecimiento, ni una comuna, ni un SLEP, ni una region:
+  // no encabeza ninguna de esas listas. Su tab no tiene lista ni buscador — una sola
+  // fila, que no depende del texto buscado.
+  function buildListCmp(tab,ql,grado,agno){ return tab==="nacional"?[NACIONAL_OPT]:_listaCmpEnt(tab,ql,grado,agno); }
   function _listaCmpEnt(tab,ql,grado,agno){
     // s29: el tab de establecimiento REUSA la rama de buildList (nombre o RBD, tope
     // 60) y solo le agrega el GSE del EE en (cmpGrado, agnoCmp) — el mismo par con el
@@ -8378,7 +8389,7 @@ AAABrwBBAPMAAA==) format('opentype');}
     return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
       .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
   }
-  const cmpPlaceholderFor=tab=>tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar una región…";
+  const cmpPlaceholderFor=tab=>tab==="nacional"?"Sin búsqueda: Chile es la única opción":tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar una región…";
 
   // ===== Roster de un territorio para (grado, agno), TODOS los GSE. =====
   // Espejo de App.unidades pero parametrizado por territorio y SIN filtro de
@@ -8670,7 +8681,7 @@ AAABrwBBAPMAAA==) format('opentype');}
 
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}/>}
-          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
+          {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} emptyTextFor={emptyTextFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
             multiple={true} seleccionados={cmpTerr.map(t=>t.kind+"|"+t.cod)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
