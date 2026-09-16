@@ -1444,3 +1444,262 @@ fuera del alcance declarado). Comprobaciones que el panel dejó cerradas por su 
 - **§5.2** marca de "base pequeña": umbral metodológico sin fijar.
 - Re-etiquetado en vivo al redimensionar: pide una pestaña visible.
 - Tooltip "vs evaluación anterior" (s28). Rama `feat/contrato-contexto`: no se tocó.
+
+
+---
+
+## 33. Error del asistente de análisis detectado en revisión del titular (2026-09-16)
+
+| # | Error | Dónde se manifestó | Patrón |
+|---|---|---|---|
+| 4 | La entidad nacional se especificó como fila fija **en todos los tabs** del modal del comparador. El encargo s29 §3.2 lo dice literalmente ("aparece arriba de la lista en todos los tabs, no dentro de un tab propio"), y así se implementó. En pantalla, "Chile" aparece dentro del tab **Establecimiento** (donde no es un establecimiento) y encabeza las listas de SLEP, Comuna y Región (donde tampoco es ninguna de las tres). | `encargo_claude_code_idps_comparador_entidades_s29.md` §3.2; detectado por el titular sobre el motor publicado | Se diseñó desde cero un problema que el proyecto **hermano** `slep_simce_adecuado` ya tenía resuelto (su modal "Agregar territorio" lleva tabs Establecimiento · Comuna · SLEP · Región · Nacional · Grupo personalizado, con Nacional como tab propio y sin lista). El objetivo del backlog declara esa hermandad y aun así no se consultó la implementación existente antes de especificar. Sub-patrón: se confundió "fácil de encontrar" con "presente en todas partes". |
+
+**Regla que se adopta:** antes de especificar cualquier componente de interfaz que el
+hermano `slep_simce_adecuado` también tenga, se lee su implementación y se cita como
+referencia vinculante en el encargo. Inventar una solución propia cuando existe una
+hermana produce divergencia entre dos motores que el mismo equipo usa en paralelo.
+
+Corrección: ver encargo de corrección posterior. La entidad nacional pasa a un tab propio.
+
+---
+
+## 34. Inventario de commits de s29h
+
+| # | Commit | Fase | Rutas |
+|---|---|---|---|
+| 34 | `be340c9` | 1 — `fix(comparador): tabs del modal alineados al proyecto hermano; nacional en su tab` | plantilla |
+| 35 | `145b91b` | 2 — `build(motor): regenera el motor con el tab nacional` | `40_salidas/motor_idps.html` |
+| 36 | `747e7e3` | 3 — `deploy(docs): republica con la entidad nacional en su propio tab` | `docs/index.html` |
+| 37 | (este) | 4 — `docs(log): registro de s29h` | log (incluida la §33, que llegaba sin commitear) + `ESTADO.md` + encargo |
+
+Rama `feat/contrato-contexto` y su log (`20260711_contrato_contexto_idps_log.md`, sin
+seguimiento en el árbol) **no se tocaron**.
+
+## 35. Qué se cambió
+
+s29h corrige un **error de especificación** (§33), no de ejecución: s29 §3.2 mandó poner
+la entidad nacional como fila fija arriba de la lista en todos los tabs, y así se
+implementó. La corrección replica lo que el proyecto hermano `slep_simce_adecuado` ya
+tenía resuelto (`30_procesamiento/33_motor_template.html`, pestañas en 3952-3959, cuerpo
+del tab nacional en 4137), que el encargo declara **referencia vinculante**.
+
+**Fase 1** — cuatro cambios de catálogo del modal, todos en la plantilla:
+
+1. `TABS_CMP` pasa de cuatro a cinco entradas y cambia de orden, al del hermano, de menor
+   a mayor alcance: **Establecimiento · Comuna · SLEP · Región · Nacional**. Sin "Grupo
+   personalizado" (categoría que este motor no tiene; no se inventa). Con ese orden el
+   modal abre en Establecimiento, igual que el hermano, **sin tocar `EntityModal`**: el
+   tab inicial es `tabs[0][0]`.
+2. `buildListCmp` deja de concatenar `NACIONAL_OPT` a todas las listas:
+   `return tab==="nacional"?[NACIONAL_OPT]:_listaCmpEnt(tab,ql,grado,agno)`. La fila no
+   depende del texto buscado.
+3. `cmpPlaceholderFor` y `emptyTextFor` ganan su rama para el tab Nacional, de modo que
+   no inviten a buscar. El buscador del andamio **no se elimina ni cambia de layout**, como
+   ordena el encargo.
+4. Los **dos** comentarios que afirmaban lo derogado: el del JS (líneas 1494-1496 del
+   archivo previo, que el encargo §2.2 pedía corregir) y su gemelo en el CSS de
+   `.check-row.is-nac`, que decía exactamente lo mismo y que el encargo no había visto.
+
+La fila de Chile conserva su marca `is-nac` y su `sub`. No se tocó `addTerr`, ni
+`CMP_MAX_TERR`, ni `rosterTerr`, ni ninguna cifra (regla de detención 1: no se dispara).
+
+**Fase 2.** Motor regenerado. **Fase 3.** Promovido a `docs/`. **Fase 4.** Este registro,
+la §33 que llegaba sin commitear, `ESTADO.md` y push.
+
+## 36. Chequeos de s29h (valores observados)
+
+### 36.1 El hermano, leído antes de editar
+
+Lo que manda la referencia vinculante, y qué se tomó de ella:
+
+| Del hermano | Se replica en `slep_idps` |
+|---|---|
+| Seis tabs de menor a mayor alcance, transversal al final | Cinco, mismo orden, sin "Grupo personalizado" |
+| Abre en Establecimiento | Sí, por `tabs[0][0]`; `EntityModal` intacto |
+| Tab Nacional sin lista ni buscador: una sola opción | Una sola fila, que ignora la consulta; el buscador del andamio queda, pero declarado inerte en su texto |
+| Al guardar produce la entidad nacional | Ya existía: `NACIONAL_OPT` / `kind:"nacional"`, sin cambios |
+
+Lo que **no** se replica, por instrucción expresa del encargo: título del modal, footer,
+filtro de dependencia y "Grupo personalizado". El inventario completo de divergencias
+está en §36.7.
+
+### 36.2 Panel adversarial antes del build
+
+Sobre el árbol de trabajo de la Fase 1, antes de commitear: cuatro lentes (regresión;
+reglas de detención y alcance; fidelidad al hermano e inventario de divergencias; texto
+visible y presentación) y cada hallazgo bruto sometido a **dos** refutadores (hechos del
+código; ¿lo notaría el usuario del motor y lo prohíbe el encargo?). **12 agentes, 4
+hallazgos brutos, 0 confirmados** y 29 notas. Comprobaciones que el panel dejó cerradas:
+
+- Las cuatro funciones modificadas, ejecutadas **aisladas en node**: `TABS_CMP` en el
+  orden esperado, tab inicial `establecimiento`, ningún tab distinto de `nacional`
+  devuelve un item `kind==="nacional"`, y `buildListCmp("nacional", ql)` devuelve una
+  fila **para todo `ql`**.
+- Los cuatro placeholders del generador (`__FONTS_CSS__`, `__D3_INLINE__`,
+  `__PAKO_INLINE__`, `__JSON_DATA__`) idénticos antes y después, y el generador solo hace
+  esos cuatro `sub()` fijos (`35_generar_motor_html.R:546-552`): la plantilla no puede
+  mover el payload.
+- Dos hallazgos brutos apuntaban al comentario CSS gemelo y uno a un anglicismo en cadena
+  visible: ambos se corrigieron **antes** del commit (§36.8), y por eso no figuran como
+  defectos del cambio.
+
+### 36.3 Build y fidelidad (regla de detención 2 — no se dispara)
+
+`run_all(only = 35L)` en **4,2 s**. `grep -inE "warn|error|aviso|fail|problema"` sobre la
+salida completa: **ninguna coincidencia**, igual que la línea base de s29g (§30.3). Bloque
+7 idéntico: 16 regiones; 9.136 EE; 91.596 unidades; 366.384 / 557.898 / 662.514 filas;
+59,5 MB → 4,41 MB gzip+base64 (7,4%); 5,1 MB de HTML.
+
+```
+bytes JSON:  59.466.778  ==  59.466.778
+offsets que difieren: []          ← ninguno: el motor anterior se generó el MISMO día
+SHA-256 (convención §8.2):  1e29c2b5be529e013f5afb98de323420e842a615b2e4f7a9cc5001ad1b55b5b6
+```
+
+Es el caso más fuerte posible de la regla: **cero** offsets, no uno. El instrumento se
+validó antes de tocar nada, contra el motor publicado, y reprodujo exacto el hash y el
+recuento de bytes que §8.2 dejó escritos. El `diff` del HTML generado son **exactamente
+los cinco hunks de la plantilla** (22 inserciones, 11 supresiones); el archivo pasa de
+5.384.452 a **5.385.578 bytes** (+1.126, todos de comentario).
+
+### 36.4 Verificación funcional en navegador — antes y después
+
+Chrome 152 headless, motor **generado** (no la plantilla), mismo guion sobre los dos
+motores para que el antes/después sea comparable. Consola **limpia** (sin errores ni
+warnings) en las cuatro corridas.
+
+| | Motor publicado (antes) | Motor de s29h (después) |
+|---|---|---|
+| Tabs | SLEP · Comuna · Región · Establecimiento | **Establecimiento · Comuna · SLEP · Región · Nacional** |
+| Tab activo al abrir | SLEP | **Establecimiento** |
+| Tabs en una línea a 1200px | sí | sí |
+| Tab Establecimiento, sin consulta | **1 fila: Chile** | 0 filas, "Escribe para buscar un establecimiento" |
+| Tab Establecimiento, "liceo" | 61 filas, **con Chile** | **60**, sin Chile |
+| Tab Comuna | 346, **con Chile** | **345**, sin Chile |
+| Tab SLEP | 37, **con Chile** | **36**, sin Chile |
+| Tab Región | 17, **con Chile** | **16**, sin Chile |
+| Tab Nacional | no existía | **1 fila: Chile**, `is-nac`, sub "Nivel nacional · 346 comunas · 9.136 establecimientos" |
+
+Exactamente una fila menos en cada uno de los cuatro tabs: la que sobraba. El tab
+Establecimiento, que era el caso más visible, pasa de mostrar **solo a Chile** cuando no
+hay consulta a mostrar la invitación a buscar.
+
+Lo demás del comparador, sin cambio (verificado sobre el motor nuevo):
+
+- Placeholder del tab Nacional: "Sin búsqueda: Chile es la única opción".
+- Elegir Chile desde su tab lo agrega igual que antes: chip **"Nacional · fijo"** con
+  `is-nac`, y **primera fila (`row-nac`) de las cinco secciones de GSE**.
+- Toggle: `1 de 10 → 0 de 10 → 1 de 10`.
+- Tope: poblado a 8 (Chile + SLEP Costa Central + 6 EE) y llevado a **10 de 10**; las 52
+  filas no marcadas de la lista quedan `is-disabled` y un clic más no agrega nada.
+
+### 36.5 Regla de etiquetado de s29 — intacta y sin moverse
+
+Mismo escenario poblado (8 entidades; 2 filas territoriales × 4 indicadores × 5 GSE):
+
+| Ancho | Motor | Barras | Con dato | Dentro | En la tira | Cortadas | Duplicados |
+|---|---|---|---|---|---|---|---|
+| 1200px | antes | 40 | 36 | 45 | 55 | **0** | **0** |
+| 1200px | **después** | 40 | 36 | **45** | **55** | **0** | **0** |
+| 430px | antes | 40 | 36 | 0 | 100 | **0** | **0** |
+| 430px | **después** | 40 | 36 | **0** | **100** | **0** | **0** |
+
+No se movió una sola etiqueta: era lo esperable, porque el cambio no toca ni el reparto ni
+el ancho de las columnas. Los 45/55 de esta corrida difieren de los 44/56 de §30.5 por el
+conjunto de EE elegido (los nombres de las filas EE cambian el ancho de `.td-terr` y con
+él el de las columnas de indicador); lo que importa —0 cortadas, 0 duplicados— se sostiene
+en los cuatro casos.
+
+### 36.6 Despliegue (regla de detención 4 — no se dispara)
+
+`docs/index.html` es **copia byte a byte** de `40_salidas/motor_idps.html`: `cmp` sin
+diferencias, md5 **`5ab600724e8642e769d9e8936f81188e`** en ambos, **5.385.578 bytes**.
+Sustituye al `docs/index.html` de s29g (md5 `02c74215…`, 5.384.452 bytes). Abierto desde
+`docs/`: consola limpia y las mismas cifras de §36.4 y §36.5.
+
+### 36.7 Divergencias del modal con el hermano que NO se corrigen
+
+El encargo ordena anotarlas, no corregirlas: son diferencias reales entre dos motores, o
+deuda que pide su propio encargo.
+
+| # | Divergencia | Lectura |
+|---|---|---|
+| 1 | Cuerpo del tab Nacional: prosa explicativa en el hermano; fila de lista con cifras del directorio en el local | Diferencia de forma; el local informa cobertura con números |
+| 2 | `EntityModal` es un andamio **portable** con cuerpo genérico por tab; el hermano escribe un formulario a medida por tab | Divergencia estructural de la que cuelgan casi todas las demás |
+| 3 | El hermano no dibuja buscador en el tab Nacional; el local sí (inerte) | Suprimirlo pediría una prop nueva en `EntityModal`, que el encargo excluye |
+| 4 | Título "Agregar/Editar territorio" con modo edición; el local dice "Agregar entidad a la comparación" y no edita (se quita con el ✕ del chip) | Diferencia real; "entidad" es convención de s29 |
+| 5 | Footer: confirmación diferida ("Cancelar" + "Agregar al análisis") vs alta inmediata por toggle y "Listo" | Diferencia real de arquitectura del modal |
+| 6 | El modal local no tiene ✕ de cierre en el encabezado (Escape, backdrop o "Listo") | Deuda menor |
+| 7 | El hermano ofrece filtro de dependencia, incluso en el tab Nacional | Diferencia real: el comparador IDPS no usa dependencia |
+| 8 | Selección múltiple en todos los tabs del local; en el hermano solo SLEP y Región, y Nacional es alta simple | Diferencia real |
+| 9 | Buscador único que se borra al cambiar de tab vs buscador por tab, con umbral de 3 caracteres y tope propio | Diferencia real |
+| 10 | El tab SLEP del comparador no muestra "Traspaso AAAA" ni el disclaimer SLEP | Deuda menor: el **otro** modal del mismo motor sí etiqueta el traspaso |
+| 11 | El color por entidad no aparece en el modal local | Diferencia real: el comparador no colorea por entidad |
+| 12 | Conteo: cupos libres en el hermano vs "N de 10" en el local | Diferencia real (regla de detención 1) |
+| 13 | a11y: filas `div[role=checkbox]` sin foco de teclado vs controles nativos | **Deuda preexistente**, no la introduce s29h |
+
+Observaciones sobre la solución adoptada, que no son defectos pero conviene tener escritas:
+
+- La rama `emptyTextFor("nacional")` es una **guarda que hoy no se pinta nunca**: la lista
+  del tab siempre trae una fila, así que `list.length===0` no ocurre. Lo único que
+  comunica "aquí no se busca" es el placeholder, y el placeholder desaparece al primer
+  carácter. Es el precio de conservar el buscador del andamio, como ordena el encargo.
+- Ese placeholder se pinta con el gris por defecto del navegador (no hay regla
+  `::placeholder` en el motor), de modo que queda **fuera** del inventario de la decisión
+  de contraste.
+- `.check-row.is-nac` gana por orden de fuente a `.check-row.is-checked`: la fila de Chile
+  **no cambia de fondo** al marcarse, y el acuse queda en el ✓ de la casilla y en el
+  contador del footer. Comprobado en captura. Es preexistente.
+- Con una sola fila, el destacado de `is-nac` se reduce al borde punteado: su fondo
+  (`--panel`) es el mismo del contenedor.
+- A 430px la tira de pestañas envuelve a dos líneas. **Ya lo hacía con cuatro tabs**
+  (medido sobre el motor anterior): no lo introduce s29h.
+
+### 36.8 Errores del asistente en s29h (regla 0.5)
+
+| # | Qué pasó | Cuándo se detectó | Efecto |
+|---|---|---|---|
+| 1 | La primera pasada corrigió el comentario del JS que el encargo §2.2 señalaba, pero dejó intacto su **gemelo en el CSS** de `.check-row.is-nac`, que afirmaba lo mismo que se estaba derogando. | Panel adversarial, antes del commit de la Fase 1. | Ninguno en el repo: se corrigió antes de commitear. |
+| 2 | La cadena de vacío nueva decía "…de este **tab**": habría sido el único anglicismo visible del motor (y en un texto que además no llega a pantalla). | Panel adversarial, antes del commit de la Fase 1. | Ninguno: quedó "Nivel nacional: Chile es la única opción". |
+
+**Nota de instrumentación.** (a) La verificación funcional corre con Puppeteer 25.9.0
+tomado por `NODE_PATH` de `slep_servicio_educativo_regional` (este proyecto no tiene
+`node_modules`) sobre el Chrome 152 del sistema; el motor se abre por `file://`. (b) El
+verificador de fidelidad se validó **antes** de tocar nada contra el motor publicado y
+reprodujo exacto el `1e29c2b5…` de §8.2: la convención escrita ahí es reproducible. (c) Un
+`.git/index.lock` obsoleto (0 bytes, de las 11:38, sin proceso git vivo) bloqueó el primer
+intento de commit; se retiró.
+
+## 37. Decisiones tomadas dentro del margen del encargo (s29h)
+
+1. **Conectar `emptyTextFor` al modal del comparador.** El encargo pedía ajustarlo, pero
+   ese modal no recibía la prop: sin conectarla el ajuste habría sido nominal y, peor, el
+   tab Establecimiento —ahora el primero y vacío al abrir— habría dicho "Sin resultados"
+   donde corresponde "Escribe para buscar un establecimiento". Es la segunda cadena
+   visible que cambia, y queda declarada en el comentario y aquí.
+2. **Corregir también el comentario gemelo del CSS.** El encargo nombraba uno; había dos
+   diciendo lo mismo. Dejar el del CSS habría dejado el archivo contradiciéndose.
+3. **No filtrar `NACIONAL_OPT` por la consulta.** El encargo dice devolver `[NACIONAL_OPT]`
+   y filtrar contradiría "el buscador no aplica"; de ahí que la rama de vacío sea una
+   guarda y no un texto alcanzable.
+4. **No tocar el `<input>` del andamio** pese a que el hermano no lo dibuja: el encargo lo
+   prohíbe expresamente. La divergencia queda anotada (§36.7, 3).
+5. **Panel adversarial antes del build**, como en s29g (§30.7), porque este encargo
+   despliega a `docs/` sin revisión previa del titular.
+6. **Corregir en `ESTADO.md` el md5 y el peso del despliegue**, que quedaban falsos tras la
+   Fase 3. El encargo no lo pide, pero publicar un estado con el hash equivocado es el
+   mismo tipo de defecto que s29h viene a corregir.
+
+## 38. Pendientes tras s29h
+
+Los de §32 siguen abiertos sin cambio (**§5.6** de la decisión de contraste;
+**P-VISTA-TERRITORIAL**; hover `✕` a 4,11; **§5.2** marca de base pequeña; re-etiquetado
+en vivo; tooltip "vs evaluación anterior"; rama `feat/contrato-contexto`, no tocada). Se
+suman:
+
+- **Divergencias del modal con el hermano** (§36.7): trece, ninguna corregida por decisión
+  del encargo. Las que parecen deuda y no diferencia de motor son la 6 (sin ✕ de cierre),
+  la 10 ("Traspaso AAAA" en un modal sí y en el otro no) y la 13 (a11y de teclado).
+- **El aviso de "aquí no se busca" depende de un placeholder** (§36.7). Si el titular
+  quiere el remedio del hermano —no dibujar buscador en ese tab— hay que darle a
+  `EntityModal` una prop para suprimirlo por tab. Es un encargo propio, chico.
