@@ -1427,8 +1427,13 @@ __FONTS_CSS__
   // liste comunas u otros valores ajenos a la dependencia (Hallazgo H5).
   const DEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null&&DEPE[e.cod_depe2])m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
     return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c],n:m[c]}));})();
-  const TABS=[["comuna","Comuna"],["slep","SLEP"],["region","Región"],["dependencia","Dependencia"],["establecimiento","Establecimiento"]];
+  // s29i: el picker territorial tambien ofrece la entidad NACIONAL, en la misma
+  // posicion relativa que en TABS_CMP (despues de Region). Chile existia solo en el
+  // comparador; el panorama no lo ofrecia.
+  const TABS=[["comuna","Comuna"],["slep","SLEP"],["region","Región"],["nacional","Nacional"],["dependencia","Dependencia"],["establecimiento","Establecimiento"]];
   function buildList(tab,ql){
+    // s29i: una sola fila, que no depende del texto buscado (igual que buildListCmp).
+    if(tab==="nacional") return [NACIONAL_OPT];
     if(tab==="region") return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
       .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
@@ -1444,7 +1449,7 @@ __FONTS_CSS__
     return ql ? DATA.establecimientos.filter(e=>(e.nom&&e.nom.toLowerCase().includes(ql))||String(e.rbd).includes(ql)).slice(0,60)
       .map(e=>({kind:"establecimiento",cod:e.rbd,nom:nomEE(e)||("RBD "+e.rbd),sub:comNom(e.cod_com)+" · RBD "+e.rbd})) : [];
   }
-  const searchPlaceholderFor=tab=>tab==="establecimiento"?"Buscar por nombre o RBD…":tab==="slep"?"Buscar un SLEP…":"Buscar…";
+  const searchPlaceholderFor=tab=>tab==="nacional"?"Sin búsqueda: Chile es la única opción":tab==="establecimiento"?"Buscar por nombre o RBD…":tab==="slep"?"Buscar un SLEP…":"Buscar…";
   // s29h: el tab "nacional" del comparador no tiene busqueda (una sola opcion), asi
   // que su vacio no invita a escribir. Esa rama es una guarda: hoy no se pinta nunca,
   // porque buildListCmp("nacional") siempre devuelve una fila. Las otras ramas no
@@ -1742,7 +1747,8 @@ __FONTS_CSS__
 
     // EntityModal devuelve un item; se aplica segun su kind (acota, nunca agrega).
     const onPick=item=>{setModalOpen(false);
-      if(item.kind==="region") setTerr({kind:"region",cod:item.cod});
+      if(item.kind==="nacional") setTerr({kind:"nacional",cod:"CL"});
+      else if(item.kind==="region") setTerr({kind:"region",cod:item.cod});
       else if(item.kind==="slep") setTerr({kind:"slep",cod:item.cod});   // agrupa toda la serie por cod_slep (sin filtro de anio_traspaso)
       else if(item.kind==="comuna") setTerr({kind:"comuna",cod:item.cod});
       else if(item.kind==="dependencia") setDep(item.cod);
@@ -1768,7 +1774,10 @@ __FONTS_CSS__
     const unidades=useMemo(()=>{const b=DATA.roster,out=[];
       for(let i=0;i<b.rows;i++){if(b.grado[i]!==panGrado||b.agno[i]!==panAgno)continue;
         const e=est[b.rbd[i]]; if(!e)continue;
-        if(terr.kind==="foco"){ if(e.cod_slep!==SLEP_FOCO)continue; }
+        // s29i: "nacional" es la entidad que NO filtra. Va PRIMERO en la cadena para no
+        // caer por descarte en el else final (que captura region), igual que rosterTerr.
+        if(terr.kind==="nacional"){ /* sin filtro territorial: todo Chile */ }
+        else if(terr.kind==="foco"){ if(e.cod_slep!==SLEP_FOCO)continue; }
         else if(terr.kind==="slep"){ if(String(e.cod_slep)!==String(terr.cod))continue; }
         else if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
         else { if(e.cod_reg!==terr.cod)continue; }
@@ -1783,6 +1792,11 @@ __FONTS_CSS__
     // #3 (s21): para SLEP, lista de NOMBRES de comuna del territorio (orden alfabetico
     // es-CL, formato "A, B y C"). Solo SLEP (foco/slep); comuna/region/dependencia no la muestran.
     const esSlep = terr.kind==="foco" || terr.kind==="slep";
+    // s29i: con el territorio NACIONAL no se dibuja la grilla de establecimientos. El
+    // roster nacional de un nivel son miles de EE (6.717 en 4° basico 2025): pintar esas
+    // tarjetas es inviable y no es lo que esta pantalla responde. Las barras por GSE SI
+    // se calculan y muestran: son CONTEO, no agregacion. Decision reversible (s29i §2).
+    const esNacional = terr.kind==="nacional";
     const panComunasNoms=useMemo(()=>{
       if(!esSlep) return "";
       const s=new Set();unidades.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});
@@ -1791,7 +1805,8 @@ __FONTS_CSS__
     },[unidades,esSlep]);
 
     const depNom = dep ? (DEPE[dep]||dep) : null;
-    const terrTxt = terr.kind==="foco" ? "SLEP "+SLEP_FOCO_NOM
+    const terrTxt = terr.kind==="nacional" ? "Chile"
+                  : terr.kind==="foco" ? "SLEP "+SLEP_FOCO_NOM
                   : terr.kind==="slep" ? "SLEP "+((SLEPS_OPTS.find(s=>String(s.cod)===String(terr.cod))||{}).nom||terr.cod)
                   : terr.kind==="comuna" ? "comuna de "+comNom(terr.cod)
                   : "Región de "+regNom(terr.cod);
@@ -1826,7 +1841,7 @@ __FONTS_CSS__
               <div className="pan-id">
                 <div className="pan-name">{terrTxt}</div>
                 {esSlep && panComunasNoms && <div className="pan-comunas">{panComunasNoms}</div>}
-                <div className="pan-meta">{!esSlep && <>{panComunas} {panComunas===1?"comuna":"comunas"} · </>}{unidades.length} establecimientos en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {gseVis.size} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}{depNom?" · dependencia: "+depNom:""}</div>
+                <div className="pan-meta">{!esSlep && <>{fmt(panComunas)} {panComunas===1?"comuna":"comunas"} · </>}{fmt(unidades.length)} establecimientos en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {gseVis.size} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}{depNom?" · dependencia: "+depNom:""}</div>
               </div>
               <div className="pan-nivel"><div className="nivelsel"><span className="nivelsel-lab">Nivel</span>
                 <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===panGrado?" on":"")} onClick={()=>setPanGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div></div>
@@ -1870,8 +1885,10 @@ __FONTS_CSS__
                               <StackedBar rep={rep}/>
                             </div>);})}
                       </div>
-                      <div className="pan-sub-h" style={{marginTop:18}}>Establecimientos <span className="pan-sub-note">· clic para ver el Panorama IDPS del establecimiento</span></div>
-                      <div className="pan-grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={panGrado} agno={panAgno} onSel={irFicha}/>)}</div>
+                      <div className="pan-sub-h" style={{marginTop:18}}>Establecimientos{!esNacional && <span className="pan-sub-note"> · clic para ver el Panorama IDPS del establecimiento</span>}</div>
+                      {esNacional
+                        ? <div className="nota">La grilla de establecimientos no se muestra a nivel nacional ({fmt(grp.items.length)} establecimientos en este grupo). Elige una región, un SLEP o una comuna para verla.</div>
+                        : <div className="pan-grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={panGrado} agno={panAgno} onSel={irFicha}/>)}</div>}
                     </div>
                   </section>))}
           </div>}
