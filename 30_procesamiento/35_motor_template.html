@@ -1681,7 +1681,13 @@ __FONTS_CSS__
             {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar entidades" title="Limpiar entidades">↺</button>}
           </div>
           {cmpTerr.length<2 && <div className="cmp-invite">{cmpTerr.length===0?`Agrega entidades (botón “+ agregar entidad”) para comparar, hasta ${CMP_MAX_TERR}.`:`Agrega al menos una entidad más para comparar (hasta ${CMP_MAX_TERR}).`}</div>}
-          {eeSinUbicar.length>0 && <div className="cmp-nota-ee">{eeSinUbicar.map((x,k)=>(
+          {/* s29i: la EXPLICACION GENERAL se dice una sola vez, aqui, junto al aviso de
+              los EE que no aparecen. Antes encabezaba el pie de CADA seccion de GSE y se
+              repetia tantas veces como grupos visibles; lo que cambia entre secciones es
+              solo el nombre del EE y donde esta. */}
+          {cmpEEs.length>0 && <div className="cmp-nota-ee">
+            Los establecimientos seleccionados aparecen únicamente en la sección de su propio grupo socioeconómico.{eeSinUbicar.length>0?" ":""}
+            {eeSinUbicar.map((x,k)=>(
             <React.Fragment key={keyEnt(x.t)}>{k>0?" ":""}<b>{x.t.nom}</b>{x.gse
               ? " no aparece en la comparación: su GSE ("+(GSE[x.gse]||x.gse)+") está oculto en el segmentador."
               : " no aparece en la comparación: no tiene GSE en este nivel y año."}</React.Fragment>))}</div>}
@@ -1740,7 +1746,8 @@ __FONTS_CSS__
                     </tbody>
                   </table>
                 </div>
-                {eeOtros.length>0 && <div className="gse-sec-foot">Los establecimientos seleccionados aparecen únicamente en la sección de su propio grupo socioeconómico. {eeOtros.map((x,k)=>(
+                {/* s29i: solo la parte que cambia; la explicacion general vive arriba. */}
+                {eeOtros.length>0 && <div className="gse-sec-foot">{eeOtros.map((x,k)=>(
                   <React.Fragment key={keyEnt(x.t)}>{k>0?"; ":""}<b>{x.t.nom}</b>{x.gse?" (GSE "+(GSE[x.gse]||x.gse)+")":""} {ubic(x)}</React.Fragment>))}.</div>}
               </section>);})}
       </div>);
