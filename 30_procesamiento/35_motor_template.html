@@ -650,6 +650,7 @@ __FONTS_CSS__
      padding propio; lo ponen sus hijos), alineada a la derecha como el
      .section-actions del hermano en la cabecera de su panorama. */
   .ficha-export{justify-content:flex-end;padding:11px 22px;background:var(--panel);border-bottom:1px solid var(--linea);}
+  .export-bar-note{font-size:var(--fs-caption);color:var(--gris);font-style:italic;}
 </style>
 </head>
 <body>
@@ -1341,6 +1342,19 @@ __FONTS_CSS__
             <IconExport label="CSV de la serie" icon="download"
               title="Descarga en CSV la serie de este establecimiento en el nivel seleccionado: los cuatro indicadores y sus dimensiones, año por año"
               onExport={()=>descargarFichaCSV({rbd,grado,anios})}/>
+            {/* s30: la imagen solo se ofrece sobre el RADAR, que es el unico grafico
+                vectorial del motor. En la Vista historica no hay radar; el aviso evita
+                que los dos botones parezcan haberse perdido. */}
+            {!isHist
+              ? <React.Fragment>
+                  <IconExport label="Radar en SVG" icon="chart"
+                    title="Descarga el radar de los cuatro indicadores como SVG (vectorial, sin límite de tamaño)"
+                    onExport={()=>exportarRadarSVG({rbd,grado,agno,hasGse})}/>
+                  <IconExport label="Radar en PNG" icon="image"
+                    title="Descarga el radar de los cuatro indicadores como PNG a 2x"
+                    onExport={()=>exportarRadarPNG({rbd,grado,agno,hasGse})}/>
+                </React.Fragment>
+              : <span className="export-bar-note">La imagen del radar se descarga desde la Vista actual.</span>}
           </div>
           {isHist
             ? (
@@ -2106,6 +2120,229 @@ __FONTS_CSS__
     const filas=filasFichaCSV(args);
     if(!confirmarTamano(filas.length-1,"ficha del establecimiento")) return;
     descargarCSV(filas,"idps_ficha_"+args.rbd+"_"+slugArchivo(args.grado)+".csv");
+  }
+
+  // ===== Fase 4 (s30) — imagen (SVG y PNG) del radar de la ficha =====
+  // Diferencia real entre los dos motores, y lo que acota esta fase: en el hermano
+  // TODOS los graficos son SVG, por eso puede componer un SVG grande y rasterizarlo.
+  // En slep_idps solo el RADAR de la ficha es SVG (D3, Radar); las barras del
+  // panorama y las celdas del comparador son HTML/CSS (divs con width en %). Por eso
+  // la exportacion de imagen se ofrece SOLO sobre el radar.
+  //
+  // PENDIENTE ANOTADO, con la razon escrita para que la proxima sesion no la
+  // redescubra: exportar como imagen el comparador o el panorama exigiria reconstruir
+  // en SVG lo que hoy es HTML —StackedBar, su regla de etiquetado medida en pixeles,
+  // la tira externa y la tabla entera—, es decir un segundo dibujante que podria
+  // divergir del de pantalla. La leccion que el hermano dejo escrita en su propio
+  // codigo (33_motor_template.html ~3067) es la contraria: un solo dibujante que
+  // recibe un <g> de destino, para que pantalla y export no puedan separarse. Eso es
+  // un rediseño de StackedBar, no un añadido: encargo propio.
+
+  // Pila de fuentes del SVG exportado. Las OTF de marca (gobCL, Museo Sans) van
+  // embebidas en el HTML como @font-face; un SVG suelto —y sobre todo un SVG
+  // rasterizado dentro de un <img>— no las tiene. Se fija una pila del sistema, como
+  // hace el hermano en toda su exportacion, para que el resultado sea predecible.
+  const SVG_FUENTE="system-ui, -apple-system, Helvetica, Arial, sans-serif";
+  // Propiedades de presentacion que hay que RESOLVER al clonar. El radar toma su
+  // estilo de dos sitios que un SVG suelto no tiene: clases del documento (.ring,
+  // .axis-lab) y custom properties en atributos (stroke="var(--linea)",
+  // fill="var(--azul)"). Fuera del documento var() no resuelve y el trazo desaparece.
+  const SVG_PROPS=["fill","fill-opacity","stroke","stroke-width","stroke-dasharray",
+    "stroke-opacity","stroke-linecap","stroke-linejoin","opacity",
+    "font-size","font-weight","font-style","text-anchor","dominant-baseline","letter-spacing"];
+  const SVG_NS="http://www.w3.org/2000/svg";
+  // Valor efectivo de un token del motor. Los colores del export se DERIVAN de :root,
+  // no se escriben a mano: la paleta no se duplica (si --azul cambia, la imagen
+  // exportada cambia con el).
+  const tokenCSS=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  const svgEl=(tag,attrs,padre)=>{const n=document.createElementNS(SVG_NS,tag);
+    Object.keys(attrs||{}).forEach(k=>n.setAttribute(k,attrs[k]));
+    if(padre)padre.appendChild(n); return n;};
+  const svgTxt=(texto,attrs,padre)=>{const n=svgEl("text",attrs,padre); n.textContent=texto; return n;};
+
+  // Ancho real del texto con la fuente del export, medido en canvas. El SVG no
+  // envuelve texto y el cuadro es de ancho fijo, asi que un nombre largo se saldria
+  // por el borde. Mismo instrumento que la regla de etiquetado de s29 (medir, no
+  // estimar por numero de caracteres), con otra fuente.
+  function _medirExport(txt,peso,px){
+    _ctxMed.font=peso+" "+px+"px "+SVG_FUENTE;
+    return _ctxMed.measureText(String(txt==null?"":txt)).width;
+  }
+  function truncarA(txt,ancho,peso,px){
+    let t=String(txt==null?"":txt);
+    if(_medirExport(t,peso,px)<=ancho) return t;
+    while(t.length>1 && _medirExport(t+"…",peso,px)>ancho) t=t.slice(0,-1);
+    return t+"…";
+  }
+
+  // Clona un subarbol SVG del documento resolviendo su estilo a atributos literales,
+  // y lo devuelve como <g> (NO como <svg> anidado: un <svg> interior recorta a su
+  // viewport y se comeria las etiquetas de eje, que el radar dibuja FUERA del cuadro
+  // con overflow:visible).
+  function clonarSvgResuelto(vivo){
+    const copia=vivo.cloneNode(true);
+    const av=[vivo].concat(Array.prototype.slice.call(vivo.querySelectorAll("*")));
+    const ac=[copia].concat(Array.prototype.slice.call(copia.querySelectorAll("*")));
+    for(let i=0;i<av.length && i<ac.length;i++){
+      const cs=getComputedStyle(av[i]), c=ac[i];
+      SVG_PROPS.forEach(p=>{const v=cs.getPropertyValue(p); if(v) c.setAttribute(p,v);});
+      const tag=(c.tagName||"").toLowerCase();
+      if(tag==="text"||tag==="tspan") c.setAttribute("font-family",SVG_FUENTE);
+      // Las clases y el style ya se resolvieron a atributos; dejarlos apuntaria a un
+      // CSS que el archivo exportado no lleva.
+      c.removeAttribute("class"); c.removeAttribute("style");
+    }
+    const g=svgEl("g",{});
+    while(copia.firstChild) g.appendChild(copia.firstChild);
+    return g;
+  }
+
+  // Construye el SVG autocontenido del radar: fondo, identidad del establecimiento,
+  // el radar resuelto, la leyenda de los dos trazos y el pie de fuente.
+  function construirSvgRadar({rbd,grado,agno,hasGse}){
+    const vivo=document.querySelector(".rquad-svg svg");
+    if(!vivo) return null;
+    const e=est[rbd];
+    const PAD=24, TIT_H=70, LEY_H=30, PIE_H=42;
+    const FS_TIT=19, FS_SUB=12, FS_LEY=12, FS_PIE=11;
+    // Ancho minimo y maximo del cuadro. El minimo evita una tarjeta enjuta; el maximo
+    // evita que un nombre de establecimiento muy largo produzca una imagen apaisada
+    // inutil. Entre los dos, el cuadro se ADAPTA al texto: truncar la linea de
+    // identidad para respetar un ancho fijo seria comerse el nivel y el año.
+    const W_MIN=560, W_MAX=900;
+    // Extension REAL del dibujo, etiquetas de eje incluidas. getBBox mide el
+    // contenido, no el cuadro de 300x300 del <svg>, que las etiquetas desbordan.
+    let bb; try{ bb=vivo.getBBox(); }catch(err){ bb=null; }
+    if(!bb||!bb.width||!bb.height) bb={x:0,y:0,width:300,height:300};
+    const MARGEN=10;   // aire alrededor del dibujo dentro del cuadro
+    const anchoDibujo=bb.width+MARGEN*2, altoDibujo=bb.height+MARGEN*2;
+
+    const nom=(e&&e.nom)?nomEE(e):("RBD "+rbd);
+    const sub="RBD "+rbd+" · "+terrFicha(e)+" · "+(DEPE[e&&e.cod_depe2]||"—")+
+      " · GSE "+gseLbl(rbd,grado,agno)+" · "+(DATA.meta.grados[grado]||grado)+
+      " · "+agno+(PRELIM.has(String(agno))?" (preliminar)":"");
+    // El pie va en DOS lineas: la fuente del dato y la del motor son dos hechos
+    // distintos, y en una sola linea empujarian el cuadro mas alla de W_MAX.
+    const pie1="Indicadores de Desarrollo Personal y Social · Agencia de Calidad de la Educación";
+    const pie2=(SLEP_FOCO_NOM?"Motor IDPS · SLEP "+SLEP_FOCO_NOM+" · ":"Motor IDPS · ")+
+      "Exportado el "+new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"});
+    // HOLGURA de redondeo: el ancho se mide en decimales y el atributo del SVG va en
+    // enteros. Sin ella, un texto que mide 605,1 en un cuadro de 653 (= 605 utiles)
+    // se trunca por una decima de pixel y pierde el ultimo caracter.
+    const HOLGURA_SVG=2;
+    const anchoNecesario=Math.max(anchoDibujo,
+      _medirExport(nom,800,FS_TIT), _medirExport(sub,400,FS_SUB),
+      _medirExport(pie1,400,FS_PIE), _medirExport(pie2,400,FS_PIE))+HOLGURA_SVG;
+    const totalW=Math.ceil(Math.min(W_MAX,Math.max(W_MIN,PAD*2+anchoNecesario)));
+    const totalH=Math.round(TIT_H+altoDibujo+LEY_H+PIE_H+PAD);
+    const anchoTexto=totalW-PAD*2;
+
+    const COL_TINTA=tokenCSS("--tinta")||"#23303a";
+    const COL_AZUL=tokenCSS("--azul")||"#0A3A5C";
+    const COL_GRIS=tokenCSS("--gris")||"#5C666E";
+    const COL_FONDO=tokenCSS("--panel")||"#fffdf7";
+    const COL_LINEA=tokenCSS("--linea")||"#e4dcc6";
+
+    // El atributo xmlns NO se fija a mano: createElementNS ya deja el nodo en el
+    // espacio de nombres SVG y XMLSerializer emite la declaracion; fijarlo ademas
+    // produce un xmlns duplicado, que es XML mal formado (nota del hermano ~3292).
+    const root=svgEl("svg",{width:totalW,height:totalH,viewBox:"0 0 "+totalW+" "+totalH});
+    svgEl("rect",{x:0,y:0,width:totalW,height:totalH,fill:COL_FONDO},root);
+
+    svgTxt(truncarA(nom,anchoTexto,800,FS_TIT),
+      {x:PAD,y:34,"font-family":SVG_FUENTE,"font-size":FS_TIT,"font-weight":800,fill:COL_AZUL},root);
+    svgTxt(truncarA(sub,anchoTexto,400,FS_SUB),
+      {x:PAD,y:54,"font-family":SVG_FUENTE,"font-size":FS_SUB,fill:COL_GRIS},root);
+    svgEl("line",{x1:PAD,y1:TIT_H-9,x2:totalW-PAD,y2:TIT_H-9,stroke:COL_LINEA,"stroke-width":1},root);
+
+    // Radar centrado bajo la cabecera. El translate compensa el origen del bbox: el
+    // radar dibuja etiquetas en coordenadas negativas.
+    const dibujo=clonarSvgResuelto(vivo);
+    dibujo.setAttribute("transform","translate("+
+      ((totalW-anchoDibujo)/2-bb.x+MARGEN).toFixed(1)+","+(TIT_H-bb.y+MARGEN).toFixed(1)+")");
+    root.appendChild(dibujo);
+
+    // Leyenda: los dos trazos del radar, con la misma geometria que .radar-cmp
+    // (solido para el establecimiento, punteado gris para el GSE).
+    const leyY=TIT_H+altoDibujo+18;
+    const items=[{c:COL_AZUL,d:null,t:"Resultado del establecimiento"}];
+    if(hasGse) items.push({c:COL_GRIS,d:"2 4",t:"Promedio del mismo GSE"});
+    let lx=PAD;
+    items.forEach(it=>{
+      const l=svgEl("line",{x1:lx,y1:leyY-4,x2:lx+20,y2:leyY-4,stroke:it.c,"stroke-width":2.2},root);
+      if(it.d) l.setAttribute("stroke-dasharray",it.d);
+      svgTxt(it.t,{x:lx+26,y:leyY,"font-family":SVG_FUENTE,"font-size":FS_LEY,fill:COL_TINTA},root);
+      lx+=26+_medirExport(it.t,400,FS_LEY)+22;
+    });
+
+    svgEl("line",{x1:PAD,y1:totalH-PIE_H-2,x2:totalW-PAD,y2:totalH-PIE_H-2,stroke:COL_LINEA,"stroke-width":1},root);
+    svgTxt(truncarA(pie1,anchoTexto,400,FS_PIE),
+      {x:PAD,y:totalH-PAD-10,"font-family":SVG_FUENTE,"font-size":FS_PIE,fill:COL_GRIS},root);
+    svgTxt(truncarA(pie2,anchoTexto,400,FS_PIE),
+      {x:PAD,y:totalH-PAD+5,"font-family":SVG_FUENTE,"font-size":FS_PIE,fill:COL_GRIS},root);
+
+    const svgStr=new XMLSerializer().serializeToString(root);
+    const fnameBase="idps_radar_"+rbd+"_"+slugArchivo(grado)+"_"+agno;
+    return {svgStr,totalW,totalH,fnameBase};
+  }
+
+  // Factor 2x para nitidez en documentos y presentaciones sin inflar el peso.
+  const PNG_SCALE=2;
+  // Techo conservador de superficie de canvas de Safari. Por encima de esa area el
+  // navegador no avisa: devuelve un canvas en blanco o lanza al serializar. Se
+  // comprueba ANTES de crear el canvas, para explicar la causa en vez de fallar sin
+  // motivo aparente. (Copiado del hermano, ~2995.)
+  const PNG_MAX_SUPERFICIE_PX=16777216;
+  function rasterizarSvgAPng({svgStr,totalW,totalH,fnameBase}){
+    const svgBlob=new Blob([svgStr],{type:"image/svg+xml;charset=utf-8"});
+    const url=URL.createObjectURL(svgBlob);
+    // Un solo punto de liberacion: el catch no puede saber si el camino feliz
+    // alcanzo a liberar la URL antes de fallar.
+    let urlLiberada=false;
+    const liberarUrl=()=>{ if(!urlLiberada){URL.revokeObjectURL(url); urlLiberada=true;} };
+    const img=new Image();
+    img.onload=()=>{
+      // canvas.toBlob puede lanzar de forma sincrona (canvas contaminado, superficie
+      // rechazada). Sin este try/catch la excepcion escapa del manejador de eventos y
+      // el usuario no recibe ni alerta ni archivo.
+      try{
+        const superficie=(totalW*PNG_SCALE)*(totalH*PNG_SCALE);
+        if(superficie>PNG_MAX_SUPERFICIE_PX){
+          liberarUrl();
+          alert("La imagen pedida son "+Math.round(superficie/1e6)+" millones de píxeles y el "+
+            "máximo seguro son "+Math.round(PNG_MAX_SUPERFICIE_PX/1e6)+". Exporta en SVG, que no tiene ese límite.");
+          return;
+        }
+        const canvas=document.createElement("canvas");
+        canvas.width=totalW*PNG_SCALE; canvas.height=totalH*PNG_SCALE;
+        const ctx=canvas.getContext("2d");
+        ctx.scale(PNG_SCALE,PNG_SCALE);
+        ctx.drawImage(img,0,0,totalW,totalH);
+        liberarUrl();
+        canvas.toBlob(blob=>{
+          if(!blob){alert("No se pudo generar el PNG."); return;}
+          descargarBlob(blob,fnameBase+".png");
+        },"image/png");
+      }catch(err){
+        liberarUrl();
+        alert("No se pudo generar el PNG: "+((err&&err.message)?err.message:err));
+      }
+    };
+    img.onerror=()=>{ liberarUrl(); alert("No se pudo rasterizar el SVG a PNG."); };
+    img.src=url;
+  }
+
+  const SIN_RADAR="No se encontró el radar en pantalla. La exportación de imagen solo está disponible en la Vista actual.";
+  function exportarRadarSVG(args){
+    const r=construirSvgRadar(args);
+    if(!r){alert(SIN_RADAR); return;}
+    descargarBlob(new Blob([r.svgStr],{type:"image/svg+xml;charset=utf-8"}),r.fnameBase+".svg");
+  }
+  function exportarRadarPNG(args){
+    const r=construirSvgRadar(args);
+    if(!r){alert(SIN_RADAR); return;}
+    rasterizarSvgAPng(r);
   }
 
   // ===== Andamiaje de navegacion: 3 pantallas (rediseno Fase 1; completado en Fase 4) =====
