@@ -2905,10 +2905,11 @@ __FONTS_CSS__
                 <div className="pan-name">{terrTxt}</div>
                 {esSlep && panComunasNoms && <div className="pan-comunas">{panComunasNoms}</div>}
                 {/* s31: en la vista historica el banner dice la serie (primer-ultimo anio del
-                    eje) y cuenta los EE con resultado en algun anio (roster de todos los anios). */}
+                    eje) y cuenta los EE con resultado en algun anio (roster de todos los anios).
+                    s31c: el plural sale de nEE (s31b), como en el subtitulo de seccion. */}
                 <div className="pan-meta">{!esSlep && <>{fmt(panComunas)} {panComunas===1?"comuna":"comunas"} · </>}{isHistPan
-                  ? <>{fmt(nHist)} establecimientos con resultado en algún año · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAnios[0]}–{panAgno}{PRELIM.has(String(panAgno))?"*":""}</>
-                  : <>{fmt(unidades.length)} establecimientos en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}</>}{depNom?" · dependencia: "+depNom:""}</div>
+                  ? <>{nEE(nHist)} con resultado en algún año · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAnios[0]}–{panAgno}{PRELIM.has(String(panAgno))?"*":""}</>
+                  : <>{nEE(unidades.length)} en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}</>}{depNom?" · dependencia: "+depNom:""}</div>
               </div>
               <div className="pan-nivel">
                 {/* s31: segmentador Vista actual / Vista historica, mismo patron que la ficha
