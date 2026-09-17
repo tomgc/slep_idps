@@ -1992,3 +1992,713 @@ del editor abierto sobre el repo—.
 `✕` a 4,11; §5.2 marca de base pequeña; re-etiquetado en vivo; tooltip "vs evaluación
 anterior"; las trece divergencias del modal con el hermano (§36.7); rama
 `feat/contrato-contexto`, no tocada.
+
+
+---
+
+## 44. Errores del asistente de análisis en el encargo s29i (2026-09-17)
+
+| # | Error | Dónde se manifestó | Patrón |
+|---|---|---|---|
+| 5 | El §3.6 fijó el código de la dependencia SLEP en `"5"`, copiado del motor hermano. En `slep_idps` la dependencia tiene **4 categorías** (`10_utils/10_configuracion.R` líneas 39-42: 1 Municipal, 2 Particular subvencionado, 3 Particular pagado, 4 SLEP) y SLEP es `"4"`. De haberse seguido al pie, el aviso metodológico del SLEP nunca se habría mostrado. | `encargo_claude_code_idps_correcciones_revision_s29i.md` §3.6; detectado por el ejecutor, que lo derivó de `DATA.meta.depe2_labels` en vez de fijarlo | Se copió del hermano un **valor de dominio**, no solo un patrón de interfaz. La referencia hermana vale para la forma (dónde va el selector, cómo se rotula); los códigos, glosas y categorías son de cada motor y se leen de su propia configuración. |
+| 6 | El §5 describió el defecto de la tira externa como "las tres etiquetas se superponen entre sí". Medido: dentro de la tira no hay superposición (es un grid, no pisa sus pistas); lo que ocurría era **desborde de la celda sobre la vecina**. El remedio pedido servía igual, pero el diagnóstico era incorrecto. | `encargo_claude_code_idps_correcciones_revision_s29i.md` §5; corregido por el ejecutor con medición | Se describió el síntoma tal como se ve en una captura en vez de medir qué elemento invade a cuál. Un encargo que nombra mal la causa puede llevar al ejecutor a arreglar el sitio equivocado. |
+
+**Regla que se adopta:** de la referencia hermana se toma la **forma**; los valores de
+dominio (códigos, glosas, categorías, topes) se leen siempre de la configuración del
+motor que se está editando.
+
+
+---
+
+# Anexo s30 — Exportación de datos (CSV) e imagen (2026-09-17)
+
+> Encargos: `encargo_claude_code_idps_exportacion_s30.md` (s30a) y
+> `encargo_claude_code_idps_reanudar_exportacion_s30b.md` (s30b, reanudación).
+> Ejecución autónoma secuencial en dos sesiones: **s30a** (17-sep, 00:09–03:05) corrió
+> las fases 1-4 y las commiteó, corrigió los hallazgos del panel adversarial en la
+> plantilla y se quedó sin cuota antes de commitear ese fix, regenerar, desplegar y
+> cerrar; **s30b** (17-sep, 08:45→) auditó lo hecho, commiteó el fix, corrió a mano las
+> dos lentes que el panel no alcanzó, regeneró, desplegó y cerró. Alcance: 100 %
+> presentación; el pipeline (31–34) no se tocó. **Sí** se desplegó a `docs/`. No se tocó
+> `feat/contrato-contexto`.
+>
+> El borrador de este anexo lo escribió s30a en su scratchpad y **sobrevivió** (el
+> encargo s30b asumía que se había perdido): s30b lo completó y corrigió sus cifras
+> donde las medidas de hoy difieren, en vez de reconstruirlo. Se marca con **[s30b]**
+> lo que s30b añadió o cambió.
+
+## 45. Inventario de commits de s30 (s30a y s30b)
+
+| # | Commit | Fase | Rutas |
+|---|---|---|---|
+| 47 | `d703d20` | 1 — `feat(export): infraestructura de descarga y boton de exportacion` | plantilla |
+| 48 | `c03a393` | 2 — `feat(export): CSV del comparador de entidades` | plantilla |
+| 49 | `5ccdae2` | 3 — `feat(export): CSV del panorama territorial y de la ficha` | plantilla |
+| 50 | `ce91580` | 4 — `feat(export): imagen SVG y PNG del radar de la ficha` | plantilla |
+| 51 | `07d2293` | s30b F1 — `fix(export): correcciones posteriores al panel adversarial de s30a` | plantilla |
+| 52 | `3969248` | s30b F3 — `build(motor): regenera el motor con la exportacion` | `40_salidas/motor_idps.html` |
+| 53 | `b7fc213` | s30b F3 — `deploy(docs): publica la exportacion CSV e imagen` | `docs/index.html` |
+| 54 | (este) | s30b F4 — `docs(log): registro de s30a y cierre de la exportacion` | log (§44–§49) + `ESTADO.md` + los dos encargos |
+
+Rama `feat/contrato-contexto` y su log (`20260711_contrato_contexto_idps_log.md`, sin
+seguimiento en el árbol) **no se tocaron**. Los commits 47-50 son de s30a; 51-54 de
+s30b. Entre 50 y 51 no hubo push: `origin/main` estuvo en `98fc4d3` hasta el cierre.
+
+**[s30b] Fase 0 — auditoría de lo hecho, antes de tocar nada.** Todas las mediciones del
+encargo s30b §1 se confirmaron; se reporta cada una:
+
+| # | Verificación | Resultado |
+|---|---|---|
+| 0.1 | Git | `HEAD ce91580`, 4 ahead de `origin/main 98fc4d3`; los cuatro commits tocan solo `35_motor_template.html`; sin `.git/index.lock`. |
+| 0.2 | Sintaxis | Bloque `text/babel` transpilado con `@babel/standalone` **7.29.0** y presets `env,react` (los del motor): **OK**, 1.960 líneas → 167.314 bytes. |
+| 0.3 | Plantilla → motor | Las 13 funciones de exportación están en los dos con el mismo conteo, pero el bloque JSX **no era byte-idéntico**: un comentario de cuatro líneas (el de `clonarSvgResuelto`) estaba en otra posición en el motor —un estado intermedio de la edición del `rgba`—, misma longitud total, misma función. La plantilla era la correcta. **Se regeneró en la Fase 3** para que el motor publicado corresponda byte a byte a la plantilla commiteada. |
+| 0.4 | Payload | `HEAD:40_salidas/motor_idps.html` vs el sin commitear: 59.466.778 bytes, **un solo offset** (el 38, día de `fecha_generacion`), SHA-256 normalizado `1e29c2b5…` idéntico a §8.2. `docs/index.html` tenía el md5 del motor de s29i (`5ac4a1b8…`): desactualizado, como decía el encargo. |
+| 0.5 | Criterios por muestreo (Chrome headless, motor por `file://`, Blob interceptado) | Caso exigido reproducido **dígito a dígito** (§47.3). BOM `ef bb bf` en los bytes; `;`; CRLF (240 en el panorama, 0 `\n` sueltos); `numCSV(78.4)="78,4"`; `aCSV` escapa `"` como `""` y entrecomilla el salto de línea. Los cuatro botones disparan descarga (§47.7). Sufijo `_gse_1` con un solo GSE visible y predicción 40 = real 40. Consola limpia, cero `alert`, cero `confirm`. |
+| 0.6 | Diff sin commitear (9 hunks) | Leídos uno a uno contra la tabla del panel (§47.10) más el `rgba` (hallazgo propio); todos los identificadores nuevos en alcance (`cmpTerrs`, `cmpEEs`, `eeGse`, `visGse`, `EST_EE`, `DATA.dimensiones`, `gseVis`). Ejecutado sobre el JSX real transpilado con el payload real: `nFilasFicha` = `filasFichaCSV` en **24 casos** (12 RBD × 2 niveles, 91 filas todos); `DATA.dimensiones.length` (11) = suma de `dimsByInd` (11); `estadoVsGse` da la misma glosa por la ficha y por llamada directa en tres celdas con `sigdifgru` nulo (RBD 35, ind 1-3); la divergencia declarada de §47.9 se reprodujo exacta: 26.328 con puntaje, 3.495 sin `sigdifgru`, 13,3 %, distribución `{0: 12315, 1: 5517, -1: 5001, null: 3495}`. |
+
+Nada de lo auditado se rehízo. Lo único que falló (0.3) se resolvió regenerando, que es
+lo que la Fase 3 pedía de todos modos si la plantilla cambiaba.
+
+## 46. Qué se cambió
+
+s30a implementa **P-EXPORTACION** (§43): poder llevarse lo que se está viendo en vez de
+capturar la pantalla. Todo es plantilla: ninguna fase toca el pipeline, y el payload no
+se mueve (§47.2). Del motor hermano `slep_simce_adecuado` se copió la **forma**
+—`descargarBlob` (~2981), `IconExport` (~2721), el mapa de iconos (~1743),
+`rasterizarSvgAPng` (~3007), el saneo NFD del nombre de archivo (~3394)— y los valores
+de dominio se leyeron de este motor, como manda la regla de §44.
+
+**Fase 1 — infraestructura.** Las decisiones metodológicas van como constantes
+nombradas (POLITICA §5.3, punto 10) y no como literales sueltos por el JSX: `CSV_SEP`
+`";"`, `CSV_DEC` `","`, `CSV_EOL` el CRLF de RFC 4180, `CSV_BOM` como el escape `\ufeff` y
+`CSV_AVISO_FILAS` = 10.000. `aCSV()` entrecomilla según RFC 4180 y antepone el BOM, que
+es lo que hace que Excel en locale español abra el archivo en columnas y con los acentos
+correctos. `numCSV()` pone coma decimal y **quita** el separador de miles: `fmt()` es
+capa de pantalla y sí escribe "6.717", que en una celda numérica Excel leería como
+decimal. `slugArchivo()` descompone en NFD y retira diacríticos **antes** de sanear, de
+modo que "Región de Valparaíso" da `region_de_valparaiso` y no `regi_n_de_valpara_so`;
+la ñ se resuelve por el mismo camino (NFD la parte en "n" más tilde combinante).
+
+**Fase 2 — CSV del comparador.** El botón vive en `.gse-filter-wrap`, al lado del
+segmentador de GSE, en la misma posición relativa que en el hermano (cuyo
+`.section-actions` junta `GseFilter` y el `IconExport` de la tabla). La garantía de que
+el archivo no puede divergir de la tabla es **estructural**: `filasComparadorCSV` no
+recalcula el universo, recibe los MISMOS arreglos con los que `Comparador` dibuja
+—`cmpTerrs`, `cmpEEs`, `rosters`, `eeGse`, `visGse`— y los recorre en el mismo orden.
+Dos tipos de fila distinguidos por la columna `tipo`, con el encabezado como unión de
+sus columnas (22): la de territorio lleva conteos y porcentajes, la de establecimiento
+lleva puntaje y estado. Los porcentajes son los de `pctRound`, los mismos que pinta
+`StackedBar`, y con N=0 las tres celdas quedan **vacías**: `pctRound` sobre un total de
+0 devolvería un 34/33/33 inventado, y la barra en ese caso dice "sin dato".
+
+**Fase 3 — CSV del panorama y de la ficha.** El panorama recorre `grupos`, el mismo
+arreglo ya agrupado por GSE y ordenado por nombre con el que la pantalla dibuja
+secciones y tarjetas, así que el orden del archivo es el de la vista. A nivel nacional
+el botón **sigue disponible**: la restricción de s29i era de render, no de datos. La
+ficha recorre el eje contiguo recortado por familia (`meta.primer_anio_familia`:
+indicador desde 2014, dimensión desde 2018).
+
+**Fase 4 — imagen del radar.** Aquí está la diferencia real entre los dos motores, y es
+lo que acota la fase: en el hermano **todos** los gráficos son SVG y por eso puede
+componer un SVG grande y rasterizarlo; en `slep_idps` solo el **radar** de la ficha es
+SVG (D3), mientras las barras del panorama y las celdas del comparador son HTML/CSS. La
+imagen se ofrece solo sobre el radar y solo en la Vista actual; en la histórica, donde
+no hay radar, va un aviso de una línea en vez de dos botones desaparecidos.
+
+El radar no se puede serializar tal cual: toma su estilo de dos sitios que un SVG suelto
+no tiene —clases del documento (`.ring`, `.axis-lab`) y custom properties en atributos
+(`stroke="var(--linea)"`)— y fuera del documento `var()` no resuelve y el trazo
+desaparece. `clonarSvgResuelto` clona resolviendo `getComputedStyle` a atributos
+literales, y devuelve un `<g>` y **no** un `<svg>` anidado: un svg interior recorta a su
+viewport y se comería las etiquetas de eje, que el radar dibuja fuera del cuadro con
+`overflow:visible`. Los colores del export se **derivan** de `:root` (`tokenCSS`), no se
+escriben a mano; las fuentes son una pila de sistema, como en el hermano, porque las OTF
+de marca van embebidas en el HTML y un SVG rasterizado dentro de un `<img>` no las
+tiene.
+
+## 47. Chequeos de s30a y s30b (valores observados)
+
+### 47.1 Build limpio (regla de detención 3 — no se dispara)
+
+`Rscript -e 'source("00_build.R"); run_all(only = 35L)'` → **OK, exit 0**, paso 35 en
+**4,0 s**, sin warnings nuevos. La salida informativa es la de siempre: `[NOMBRES] saneo
+OK: 0 nombres con U+00B4/U+005E/U+0060; 68 EE con nombre curado`, `[H6] Dependencia
+reclasificada en 192 RBD`, `[s21] prom_gse: 69646 con valor, 296738 NA`,
+`[s14] primer_anio_familia: ind=2014 dim=2018 niv=2023`, `[s19] grados_ee: índice para
+9103 establecimientos`. HTML de **5,2 MB**.
+
+**[s30b]** Segundo build, el que se publicó: `run_all(only = 35L)` → **exit 0**, paso 35 en
+**4,2 s**, la misma salida informativa línea por línea. Motor de **5.431.955 bytes**, md5
+`2f34dafe1309b67e5e1e1cfb3eea47a3`. Bloque JSX del motor **byte a byte igual** al de la
+plantilla en `07d2293` (verificado extrayendo los dos bloques y comparándolos), CSS de
+la plantilla contenido entero en el motor, `grep -c text-transform` = 0.
+
+Antes del build, cada fase se validó con el **mismo Babel y los mismos presets** que usa
+el motor en el navegador (`@babel/standalone` 7.29.0, `presets: env,react`), transpilando
+el bloque `<script type="text/babel">` completo en node. Es un instrumento nuevo de esta
+sesión y conviene dejarlo escrito: sin él, un error de sintaxis del JSX solo aparece
+después de regenerar y abrir el motor.
+
+### 47.2 Fidelidad del payload — cero movimiento (regla de detención 2 — no se dispara)
+
+Convención de §8.2, aplicada sobre el motor de `98fc4d3` y el regenerado:
+
+```
+magic zlib:  789c / 789c
+bytes JSON:  59.466.778  ==  59.466.778
+offsets que difieren: [38]
+  off 38: '6' -> '7'
+  contexto: ...fecha_generacion":"2026-09-16","cobertur  ->  ...fecha_generacion":"2026-09-17","cobertur
+
+SHA-256 normalizado (fecha_generacion -> "0000-00-00", UTF-8 sin salto final):
+  1e29c2b5be529e013f5afb98de323420e842a615b2e4f7a9cc5001ad1b55b5b6   antes y después
+```
+
+Un solo offset distinto en 59,4 MB: el dígito del día. El hash coincide con el que §8.2
+dejó escrito y que §41.3 reverificó. Ninguna cifra se movió.
+
+### 47.3 Fidelidad del CSV — el caso exigido por el encargo (§6.2)
+
+Exigido: para Chile + SLEP Costa Central en 4° básico, GSE Bajo, indicador 1, los
+conteos y porcentajes del CSV deben coincidir **exactamente** con los que pinta la barra.
+Medido en una sola sesión de Chrome: se agregaron las dos entidades por la interfaz real
+(modal → tab Nacional → fila única; tab SLEP → buscar "Costa Central"), se leyó el
+`aria-label` de las barras en pantalla y se pulsó el botón, interceptando el Blob.
+
+**En pantalla** (`aria-label` de `.s100`, sección "Bajo", primera columna):
+
+```
+Chile              — Distribución de 1355 establecimientos con dato:
+                     ▼ 233 (17%);  = 890 (66%);  ▲ 232 (17%)
+SLEP Costa Central — Distribución de 10 establecimientos con dato:
+                     ▼ 6 (60%);    = 3 (30%);    ▲ 1 (10%)
+```
+
+**En el CSV descargado en ese mismo clic** (`idps_comparador_4b_2025.csv`, 5.105 bytes):
+
+```
+tipo;entidad;tipo_entidad;dependencia;rbd;comuna;gse;gse_label;indicador;indicador_label;n_con_dato;n_bajo;n_neutro;n_sobre;pct_bajo;pct_neutro;pct_sobre;puntaje;estado_vs_gse;nivel;anio;preliminar
+territorio;Chile;nacional;;;;1;Bajo;1;Autoestima Académica y Motivación Escolar;1355;233;890;232;17;66;17;;;4° básico;2025;1
+territorio;SLEP Costa Central;slep;;;;1;Bajo;1;Autoestima Académica y Motivación Escolar;10;6;3;1;60;30;10;;;4° básico;2025;1
+```
+
+Coinciden dígito a dígito. Verificaciones complementarias sobre el mismo archivo: las
+36 filas con porcentaje suman 100 exacto, y `n_bajo + n_neutro + n_sobre == n_con_dato`
+en las 40 filas de territorio.
+
+### 47.4 El CSV en Excel con configuración regional española (§6.3)
+
+- **BOM**: los tres primeros bytes de cada archivo descargado son `ef bb bf`, medidos con
+  `blob.arrayBuffer()` en el navegador. (Con `blob.text()` el BOM no aparece: el
+  decodificador UTF-8 del estándar lo retira al decodificar. Hay que mirar los bytes.)
+- **Separador**: `;`, 21 ocurrencias por fila en el comparador (22 columnas), 12 en el
+  panorama, 9 en la ficha.
+- **Fin de línea**: CRLF.
+- **Acentos**: `Peñaflor`, `Región de Valparaíso`, `Autoestima Académica y Motivación
+  Escolar` y `Participación y Formación Ciudadana` se leen correctamente.
+- **Decimal coma**: el mecanismo está (`numCSV(78.4) → "78,4"`, `numCSV(-3.5) → "-3,5"`,
+  `numCSV(1234.5) → "1234,5"`, sin separador de miles), pero **ninguna celda del CSV de
+  hoy lo ejercita**: el payload vigente trae todos los puntajes como enteros (medido: el
+  conjunto de longitudes decimales de `ind.prom`, `dim.prom` y `niv` es `{0}`). Conviene
+  decirlo antes que dar por probado algo que no se probó con dato real.
+- **Entrecomillado**: `aCSV([["a;b","dice \"hola\"","normal"]])` da
+  `"a;b";"dice ""hola""";normal`.
+
+### 47.5 Auditoría de contraste de los botones nuevos (§6.4)
+
+Método de s29d–s29g: color y fondo **efectivos** leídos con `getComputedStyle` sobre el
+motor generado, subiendo por los ancestros hasta el primer fondo opaco.
+
+| Elemento | Color | Sobre | px / peso | Ratio |
+|---|---|---|---|---|
+| `.btn-export` "Exportar CSV" (panorama y comparador) | `rgb(10, 58, 92)` `--azul` | `#ffffff` `.btn-export` | 14 / 700 | **11,847** |
+| `.btn-export` "CSV de la serie", "Radar en SVG", "Radar en PNG" | `rgb(10, 58, 92)` | `#ffffff` | 14 / 700 | **11,847** |
+| `.export-bar-lab` "Exportar" | `rgb(92, 102, 110)` `--gris` | `#fffdf7` `--panel` | 14 / 700 | **5,766** |
+
+En hover el fondo pasa a `--cream-200` (`#f4e9cc`): `--azul` da **9,801** ahí, el peor
+caso de la serie y muy por encima de AA. El anillo de foco usa `--foco` (`#0062A0`):
+6,45 sobre `--paper`, 5,34 sobre `--cream-200`.
+
+El borde va en `--border-2`, que da 1,37 sobre blanco y no alcanza el 3:1 de WCAG 1.4.11.
+No se corrige y conviene decir por qué: es la convención ya vigente en `.nav-trigger`,
+`.estab-popup-btn`, `.gfb` y `.cmp-chip`, y el control se identifica por su **texto**,
+no por el borde —a diferencia del `.icon-export` del hermano, que oculta el rótulo hasta
+el hover y sí depende del contorno. Cambiar el token de borde sería una línea de trabajo
+propia sobre todo el motor, no un añadido de esta fase.
+
+### 47.5bis Accesibilidad y comportamiento en anchos extremos
+
+El botón es un `<button type="button">` nativo con `aria-label`, `title` explicativo y el
+icono marcado `aria-hidden="true"` y `focusable="false"`. En el árbol de accesibilidad de
+Chrome aparece como `{role: "button", name: "Exportar CSV"}`. Se alcanza con **6
+pulsaciones de Tab** desde el primer tab de pantalla y se activa tanto con **Enter** como
+con **Espacio**; las dos disparan la descarga (comprobado interceptando el Blob). El
+anillo de foco es `rgb(0, 98, 160) solid 2px` con 2px de separación, es decir `--foco`.
+
+Medido a **430, 760, 980, 1180 y 1400px**: en ninguno hay scroll horizontal del documento,
+ningún elemento de la barra se sale del contenedor, el botón conserva 138×33 y nunca se
+solapa con el segmentador de GSE. La barra de la ficha envuelve a tres filas a 430px y a
+dos desde 760px. Cero `pageerror` en las cinco corridas.
+
+### 47.6 Regla de etiquetado de s29 — intacta y sin moverse
+
+Se ejecutó el mismo extractor sobre el motor de `98fc4d3` y sobre el regenerado, a
+1400px, en el panorama de apertura (SLEP Costa Central, 4° básico, 2025):
+
+```
+Bajo       | 60% (6)/30% (3)/10% (1) || 60% (6)/20% (2)/20% (2) || 50% (5)/40% (4)/10% (1) || 40% (4)/50% (5)/10% (1)
+Medio bajo | 19% (4)/71% (15)/10% (2) || 43% (9)/48% (10)/9% (2) || 28% (6)/48% (10)/24% (5) || 38% (8)/48% (10)/14% (3)
+Medio      | 32% (9)/61% (17)/7% (2) || 41% (11)/55% (15) EXT:▲ 4% (1) || 36% (10)/50% (14)/14% (4) || 36% (10)/61% (17) EXT:▲ 3% (1)
+Medio alto | 100% (1) || 100% (1) || 100% (1) || 100% (1)
+```
+
+**Idéntico** antes y después, incluidas las dos bajadas a la tira externa. El banner
+tampoco se movió (60 establecimientos · 4° básico · 5 de 5 GSE · 2025 preliminar). La
+barra de exportación no desplaza el segmentador: medido en layout, el botón queda en la
+fila del rótulo (y=15 dentro del contenedor) y las pastillas en la suya (y=58), sin
+solaparse, con el botón a 17px del borde derecho.
+
+`grep -c text-transform` sobre la plantilla: **0**. Los rótulos nuevos solo llevan
+mayúsculas sostenidas en siglas (CSV, SVG, PNG, GSE), como manda la regla de s29i.
+
+### 47.7 Verificación funcional en navegador (Chrome headless, consola limpia)
+
+Instrumento: Puppeteer 25.9.0 tomado por `NODE_PATH` de
+`/Users/tomgc/Projects/slep_servicio_educativo_regional/node_modules`, Chrome del
+sistema, motor abierto por `file://`, viewport 1400×1100. Las descargas se interceptan
+parcheando `URL.createObjectURL` y `HTMLAnchorElement.prototype.click`, de modo que se
+lee el Blob real que el motor entrega.
+
+| Acción | Archivo | Resultado |
+|---|---|---|
+| Panorama (SLEP Costa Central) → Exportar CSV | `idps_panorama_slep_costa_central_4b_2025.csv` | 241 líneas (60 EE × 4 + 1), **32.465 bytes** [s30b: medido sobre el motor publicado; s30a había medido 32.313 antes de la glosa nueva, más larga que "sin diferencia"], BOM `ef bb bf` |
+| Ficha RBD 11853 → CSV de la serie | `idps_ficha_11853_4b.csv` | **12.338 bytes** [s30b: sobre el motor publicado; s30a midió 12.621 con la glosa anterior, más larga], 91 filas de dato, 9 años (2014-2018, 2022-2025) |
+| Ficha → Radar en SVG | `idps_radar_11853_4b_2025.svg` | 656×459, 13,2 KB |
+| Ficha → Radar en PNG | `idps_radar_11853_4b_2025.png` | 1312×918 (2x), 174 KB |
+| Comparador (Chile + SLEP) → Exportar CSV | `idps_comparador_4b_2025.csv` | 5.105 bytes, 41 líneas |
+| Vista histórica | — | solo el botón de CSV y el aviso "La imagen del radar se descarga desde la Vista actual." |
+| Comparador vacío | — | botón desactivado (`disabled`), en vez de entregar un archivo con solo el encabezado |
+
+**Consola: cero errores y cero warnings** en todas las corridas; cero `alert()`.
+
+Auditoría del SVG generado: `var(--` **no aparece**, tampoco `class=` ni `style=`; un
+solo `xmlns`; los anillos salen con `stroke="rgb(228, 220, 198)"`, que es `--linea`
+resuelto; 13 `<circle>` (5 anillos + 4 vértices del EE + 4 del GSE), 10 `<text>` y 8
+`<tspan>` (etiqueta y valor de cada eje); cero referencias a las fuentes de marca; y
+**cero `rgba()`**, tras la corrección de §47.10.
+
+**Radar sin ningún dato.** RBD 12664 (Escuela San Santiago de Macaya, Pozo Almonte) no
+tiene un solo indicador con puntaje en ningún grado ni año: su radar dibuja los cinco
+anillos y ningún vértice. Los tres botones siguen funcionando —CSV de 11.234 bytes, SVG
+de 9.687, PNG de 146.553— sin `alert`, sin error de consola y sin `pageerror`. La imagen
+sale con las cuatro etiquetas de eje, un `—` bajo cada una y sin la leyenda del GSE,
+exactamente como el radar en pantalla.
+
+### 47.8 Tamaño del panorama nacional
+
+`idps_panorama_chile_4b_2025.csv` son **26.868 filas** (6.717 establecimientos × 4
+indicadores) y **3,75 MB** de texto. Supera `CSV_AVISO_FILAS` (10.000), así que
+`confirmarTamano` pide confirmación diciendo la cifra antes de generar, como pide el
+encargo §4. Una región grande no llega al umbral.
+
+### 47.9 Hallazgo del dato: la comparación vs GSE no existe en toda la serie
+
+Al escribir el CSV apareció algo que el encargo no anticipaba y que estuvo a punto de
+colarse como una afirmación inventada. Medido sobre el payload, en 4° básico:
+
+| año | filas | `difgru` nulo | `sigdifgru` nulo | `prom_gse` nulo |
+|---|---|---|---|---|
+| 2014–2023 | 233.592 | **100 %** | **100 %** | **100 %** |
+| 2024 | 28.740 | 5.751 (20,0 %) | 5.751 | 5.751 |
+| 2025 | 26.868 | 4.035 (15,0 %) | 4.035 | 4.035 |
+
+La Agencia publica la comparación con el GSE **desde 2024**, y dentro de 2024–2025 sigue
+nula para el establecimiento sin grupo de comparación: son dos causas distintas de la
+misma ausencia.
+
+La primera versión de los tres constructores clasificaba con
+`sigdifgru === -1 ? bajo : sigdifgru === 1 ? sobre : neutro` —el patrón de `CeldaEE` y
+`alertSummary`— y por lo tanto escribía **"sin diferencia"** donde no hay ninguna
+comparación que informar. Se corrigió en dos tiempos, y el segundo lo forzó el panel
+(§47.10): primero solo en la ficha, lo que dejó al panorama y a la ficha **diciendo
+cosas distintas de la misma celda** (mismo RBD, mismo indicador, mismo año); después,
+en una sola función `estadoVsGse` que usan las tres exportaciones. Comprobado sobre una
+celda real con `sigdifgru` nulo (RBD 1869, indicador 1, 4° básico 2025, puntaje 70): los
+tres archivos dicen ahora `sin comparación vs GSE publicada`.
+
+La glosa **no nombra la causa**, porque son dos y la guarda no las separa. Una que
+dijera "ese año" sería falsa para el establecimiento sin grupo de comparación en 2025.
+Distinguirlas pide que el build publique el primer año con `difgru`, igual que ya
+publica `meta.primer_anio_familia`; queda anotado.
+
+**Divergencia con la pantalla, declarada y reversible.** En ese mismo caso `CeldaEE`
+dice "sin diferencia" y el chip de la tarjeta dice "≈ en su GSE", porque `repartoInd` y
+`alertSummary` mandan el nulo al cubo neutro: son **3.495 celdas EE × indicador** en 4°
+básico 2025, el **13,3 %** de las 26.328 que tienen puntaje. El CSV no las repite. Es la
+única divergencia deliberada entre pantalla y archivo de toda la sesión, y se toma
+porque el invariante del motor es que el estado vs GSE se **lee** de `sigdifgru`: cuando
+ese campo es nulo no hay nada que leer y escribir "sin diferencia" sería **derivar** una
+conclusión de una ausencia. No se corrige la pantalla aquí porque cambiaría las cifras
+de las barras y de la regla de etiquetado, que este encargo manda conservar; va como
+pendiente propio (**P-ESTADO-SIN-COMPARACION**).
+
+### 47.9bis Barrido de estados
+
+Además de los casos puntuales, se generaron **118 combinaciones alcanzables por la
+interfaz** —dos niveles × cuatro selecciones de GSE (todos, uno, dos, ninguno) ×
+territorios de los cinco tipos, con y sin dependencia, más doce fichas de muestra— y se
+comprobó sobre las **26.774 filas de dato** resultantes, con un parser RFC 4180
+independiente del que escribe: ancho de fila uniforme e igual al del encabezado, BOM
+presente, `n_bajo + n_neutro + n_sobre == n_con_dato`, porcentajes que suman 100 exacto
+cuando N>0 y celdas vacías cuando N=0, ningún salto de línea sin escapar y todo nombre
+de archivo dentro de `[a-z0-9_]+\.csv` y sin huecos. **Cero problemas.**
+
+También se comprobó que el conteo de filas que predice el aviso previo coincide
+**exactamente** con el que produce cada constructor, en los 14 casos probados: si se
+desincronizaran, el aviso mentiría.
+
+### 47.10 Panel adversarial
+
+Cinco lentes independientes sobre el diff —fidelidad pantalla↔CSV, formato del CSV,
+exportación de imagen, estado de React e interfaz, y cumplimiento del encargo—, cada
+hallazgo sometido después a tres refutadores con ángulos distintos (código, dato,
+encargo) que arrancan del lado de refutar. El panel se cortó por límite de sesión y las
+dos últimas lentes se relanzaron después (§47.12).
+
+**Lo que encontró, y qué se hizo con cada cosa:**
+
+| # | Hallazgo | Gravedad | Resolución |
+|---|---|---|---|
+| 1 | El CSV escribe "sin diferencia" donde la Agencia no publica comparación vs GSE. **Tres lentes lo levantaron por separado**, y una lo afiló hasta el punto decisivo: la guarda vivía solo en la ficha, así que el panorama y la ficha **decían cosas distintas de la misma celda**, a un clic de distancia. | alta | **Corregido.** Una sola función `estadoVsGse` para las tres exportaciones (§47.9). El propio refutador de la ronda siguiente lo verificó ejecutando el código nuevo sobre RBD 1008 y confirmó que los tres archivos coinciden. |
+| 2 | La glosa decía "…**ese año**", atribuyendo al año una ausencia que en 2024-2025 es del establecimiento (sin grupo de comparación). | media | **Corregido.** La glosa pasó a `sin comparación vs GSE publicada`, que no nombra una causa que la guarda no distingue. |
+| 3 | `confirmarTamano` se llamaba **después** de construir las filas: el aviso decía "puede tardar unos segundos en generarse" cuando la generación ya había ocurrido, y no ahorraba nada. | baja | **Corregido.** Cada exportación predice el conteo con la misma aritmética que recorre su constructor, verificado contra el real en 14 casos. |
+| 4 | El nombre del CSV del panorama no recogía el filtro de GSE: dos universos distintos producían el mismo archivo. Dos lentes. | media/baja | **Corregido.** Sufijo `_gse_<códigos>` cuando no están los cinco. |
+| 5 | El "CSV de la serie" de la ficha no tiene guarda: para un establecimiento sin ninguna medición entrega 91 filas sin un solo puntaje. | baja | **No se corrige.** Es fiel a la pantalla, que en ese caso también muestra "sin dato" en todo (comprobado con RBD 12664). Va a pendientes. |
+
+Los veredictos de los refutadores de esa ronda hay que leerlos con cuidado: leyeron el
+archivo **mientras se estaba corrigiendo**, así que varios dicen "refutado contra el
+estado actual" sobre hallazgos que eran correctos cuando se emitieron. El juicio útil es
+el de los que verificaron el dato, y ahí no hubo ninguna cifra inventada: los recuentos
+del hallazgo 1 (26.328 con puntaje, 3.495 sin `sigdifgru`, 900 establecimientos
+distintos, distribución `{0: 12315, 1: 5517, -1: 5001, null: 3495}`) se reprodujeron
+exactos de forma independiente.
+
+**Hallazgo propio, fuera del panel.** Revisando el SVG generado apareció que el relleno
+del polígono salía como `fill="rgba(10, 58, 92, 0.1)"`. Chrome lo pinta —el PNG estaba
+bien—, pero un color con alfa **no es un valor válido de atributo de presentación en SVG
+1.1**, y un editor vectorial estricto lo descarta: el relleno se perdería o caería a
+negro justo al abrir el archivo en la herramienta para la que se exporta un SVG. Se
+separa en `fill="rgb(10, 58, 92)"` más `fill-opacity="0.1"`. Comprobado sobre el SVG
+regenerado: cero `rgba()`, y el PNG sale idéntico.
+
+### 47.10bis [s30b] Las dos lentes que el panel no corrió, verificadas en directo
+
+El encargo s30b prohibió relanzar paneles (la cuota de s30a se fue en 12 a 33 agentes)
+y pidió las dos lentes **a mano, acotadas y deterministas**. Se corrieron en la Fase 2,
+es decir sobre el motor sin commitear de s30a (bloque JSX funcionalmente idéntico al de
+la plantilla, ver 0.3; el regenerado de la Fase 3 repitió después el muestreo de 0.5 con
+salida idéntica), en Chrome headless (Puppeteer 25.9.0, Chrome del sistema, `file://`,
+1400×1100), interceptando el Blob real que el motor entrega; los archivos se validaron
+después con herramientas **ajenas a Chrome**: `xmllint` (XML bien formado),
+`rsvg-convert` (librsvg 2x, renderizador independiente) e ImageMagick (`compare -metric
+AE`). Ninguna de las dos encontró un defecto: **no hubo commit de la Fase 2**.
+
+**Lente imagen.** Cinco establecimientos elegidos por el dato, exportados por los botones
+reales: RBD **11853** (normal, 4 de 4), **12664** (Escuela San Santiago de Macaya: sin un
+solo indicador con puntaje en ningún grado ni año), **14** (Escuela Romulo J. Pena
+Maturana: 3 de 4, sin GSE), **16843** (Liceo Bicentenario … People Help People de
+Panguipulli: nombre de 86 caracteres, rama del cuadro adaptativo) y **144** (4 de 4,
+Iquique).
+
+| RBD | SVG (px) | PNG 2x (px, bytes) | `xmllint` | `xmlns` | `rgba(` | `var(--` | `class=`/`style=` | AE PNG motor vs render Chrome del **archivo** SVG |
+|---|---|---|---|---|---|---|---|---|
+| 11853 | 656×459 | 1312×918, 174.621 | OK | 1 | 0 | 0 | 0 | 1,5 px de 1.204.416 |
+| 12664 | 560×459 (W_MIN) | 1120×918, 146.553 | OK | 1 | 0 | 0 | 0 | 0,03 px de 1.028.160 |
+| 14 | 560×459 | 1120×918, 149.831 | OK | 1 | 0 | 0 | 0 | 1,2 px |
+| 16843 | 853×459 (< W_MAX 900) | 1706×918, 192.937 | OK | 1 | 0 | 0 | 0 | 1,7 px de 1.566.108 |
+| 144 | 611×459 | 1222×918, 167.942 | OK | 1 | 0 | 0 | 0 | 19,3 px de 1.121.796 |
+
+- **SVG 1.1.** La raíz lleva `width`, `height` y `viewBox`. El inventario de atributos es
+  el mismo en los cinco archivos y todos son atributos de presentación válidos en 1.1:
+  `cx cy d dominant-baseline dy fill fill-opacity font-family font-size font-style
+  font-weight height letter-spacing opacity r stroke stroke-dasharray stroke-linecap
+  stroke-linejoin stroke-opacity stroke-width text-anchor transform width x y`. Todos
+  los colores son `rgb(r, g, b)` o `#hex` o `none`; el polígono del establecimiento sale
+  como `fill="rgb(10, 58, 92)"` + `fill-opacity="0.1"` (la corrección de §47.10). Los
+  anillos: `stroke="rgb(228, 220, 198)"` (= `--linea` resuelto).
+- **PNG con el mismo contenido.** Es estructural —`exportarRadarPNG` rasteriza el mismo
+  `svgStr` que `exportarRadarSVG` descarga— y se midió: el PNG del motor contra una
+  captura a 2x del **archivo** SVG exportado, abierto en una página limpia (sin el CSS,
+  las fuentes ni los tokens del motor), difiere en 0,03 a 19,3 píxeles sobre 1,0 a 1,6
+  millones (< 0,002 %; antialiasing subpíxel). librsvg dibuja los cinco archivos con
+  5-10 % de píxeles distintos del fondo, es decir con contenido; sus diferencias con
+  Chrome (0,7-1,2 % a `fuzz 10%`) son rasterizado de texto, como corresponde a otro motor
+  de fuentes.
+- **Establecimiento sin ningún dato (12664).** Exporta sin `alert`, sin `pageerror`, sin
+  error de consola. El SVG trae los 5 anillos, las 4 etiquetas de eje con `—` debajo, la
+  identidad con `GSE —`, la leyenda **solo** con el trazo del establecimiento (sin la
+  línea del GSE, porque `hasGse` es falso) y un `<path>` sin `d` (D3 no genera trazo sin
+  puntos; es válido). Legible, y exactamente lo que el radar muestra en pantalla.
+- **Parcial (14).** El radar vivo y el exportado tienen el mismo inventario (8 `circle`,
+  1 `path`, 4 `text`, 8 `tspan`); en los dos, Autoestima queda como vértice aislado y
+  Hábitos–Participación como segmento, porque el generador de línea de D3 corta donde
+  falta el vecino (`defined`). Es conducta del **radar**, previa y de pantalla; el
+  exportador la copia. Se anota como observación, no como defecto de esta línea.
+- **Nombre largo (16843).** El cuadro creció a 853 px y el título salió entero, sin
+  `…`: la medición en canvas de `_medirExport` hizo lo que §48.17 dice.
+
+**Lente estado de React.** Una sola sesión de Chrome, **24 pasos** encadenados; tras
+cada cambio se exporta y el archivo se compara con el DOM leído **en ese instante**
+(conjunto de RBD de las tarjetas, secciones GSE dibujadas, nivel marcado, chips del
+comparador, filas de cada sección, identidad de la ficha y los valores del radar
+vivo). **24 de 24 OK**, consola limpia, cero `alert`, cero `confirm`.
+
+| Paso | Estado provocado | Criterio verificado |
+|---|---|---|
+| P1 | Apertura: SLEP Costa Central, 4° básico | 60 tarjetas ↔ 60 RBD × 4 filas; secciones {Bajo, Medio bajo, Medio, Medio alto} = `gse_label` del CSV (el toggle "Alto" está encendido pero el SLEP no tiene EE en ese grupo, y el CSV no lo inventa) |
+| P2 | Modal de territorio abierto y **cancelado** | CSV byte-idéntico al de P1 |
+| P3 | Nivel → 2° medio | 12 EE ↔ 48 filas, columna `nivel` = "2° medio", nombre `_2m_`, año único |
+| P4 | Territorio → comuna de Quintero | 5 EE, `comuna` = Quintero en toda fila, nombre `idps_panorama_comuna_de_quintero_2m_2025.csv` (el slug es el de `terrTxt`) |
+| P5 | Región de Valparaíso · dependencia Municipal (desde el `<select>` del modal) | 79 EE, chip de dependencia presente, `dependencia` = Municipal en toda fila, nombre `…_region_de_valparaiso_municipal_2m_2025.csv` |
+| P6 | Quitar el primer y el último GSE | 60 EE, secciones {Medio bajo, Medio} = CSV, sufijo `_gse_2_3_4` |
+| P7 | `✕` del chip de dependencia | 297 EE ↔ 1.188 filas, chip fuera, varias dependencias en el CSV, nombre sin `municipal` |
+| C1 | Comparador vacío | Botón `disabled` con su `title` |
+| C2 | + Chile + SLEP Costa Central + Quintero | Entidades del CSV = chips; por cada sección GSE, las entidades del CSV = filas de la tabla; el comparador tiene **su propio nivel** (4° básico), no hereda el del panorama, y el CSV lo dice |
+| C3 | `✕` SLEP Costa Central | Solo Chile y Quintero |
+| C4 | Nivel del comparador → 4° básico | `nivel` y nombre `_4b_` |
+| C5 | Solo el GSE Medio visible | `gse_label` = {Medio} |
+| C6 | + establecimiento RBD 14 (GSE Bajo) con solo Medio visible | El chip está, la tabla no lo dibuja, `.cmp-nota-ee` lo avisa y el CSV **no** lo exporta (0 filas de tipo establecimiento) |
+| C7 | GSE Bajo visible otra vez | 4 filas de establecimiento con `rbd` = 14 |
+| C8 | Modal del comparador abierto y cerrado con "Listo" sin tocar nada | CSV byte-idéntico al de C7 |
+| F1 | Ficha 11853, Vista actual | `rbd`, `establecimiento` y `nivel` = cabecera; los cuatro puntajes de 2025 del CSV = los del radar vivo (83, 83, 84, 78); tres botones |
+| F2 | Vista histórica | CSV byte-idéntico al de F1 (§48.8); un solo botón y la nota "La imagen del radar se descarga desde la Vista actual."; sin radar en el DOM |
+| F3 | Ficha 14 abierta **después** de la 11853 | `rbd` = 14, valores del CSV = radar vivo (77, —, 81, 70), nombre `idps_ficha_14_4b.csv` |
+| F3b | Radar SVG de la 14 | Nombre `idps_radar_14_4b_2025.svg`; el SVG contiene el nombre del EE |
+| F4 | Ficha **22464** (Liceo Bicentenario de Excelencia de Dalcahue, primer resultado de la búsqueda), nivel → 2° medio | `nivel` = "2° medio", nombre `idps_ficha_22464_2m.csv`, valores = radar (71, 74, 74, 72) |
+| F4b | Radar SVG en 2° medio | Nombre `idps_radar_22464_2m_2025.svg`, subtítulo con "2° medio" |
+| P8 | Vuelta al panorama tras ficha y comparador | Estado conservado (región, 2° medio, 3 GSE) y CSV byte-idéntico al de P7 |
+| C9 | Vuelta al comparador | CSV = pantalla y byte-idéntico al de C8 |
+| C10 | `↺` limpiar entidades | Cero chips, botón `disabled` |
+
+Ningún paso dejó al exportador leyendo la selección anterior: las tres exportaciones
+reciben los mismos arreglos con los que la pantalla dibuja (§46), y eso es lo que las
+24 comparaciones confirman.
+
+**Nota sobre el instrumento.** La primera corrida marcó 12 pasos como fallidos; los
+doce eran del **chequeo**, no del motor: un diccionario de verificación con valores no
+booleanos (el año, los puntajes) y una suposición falsa del ejecutor —que los toggles de
+GSE encendidos deben coincidir con los GSE del CSV, cuando lo que la pantalla muestra
+son las **secciones** con establecimientos—. Se corrigió el chequeo y se repitió entero.
+Se deja escrito por la regla 0.5: un verificador que falla por su propia cuenta se parece
+demasiado a un motor que falla.
+
+**Lo que NO se hizo, dicho antes que se infiera:** ninguna revisión adversarial
+multiagente sobre estas dos lentes. Si el titular la quiere, es un encargo propio.
+
+
+### 47.11 Despliegue (regla de detención 4 — no se dispara)
+
+**[s30b]** `docs/index.html` = copia byte a byte de `40_salidas/motor_idps.html`,
+verificada con `cmp` (sin diferencias) y `md5` (`2f34dafe1309b67e5e1e1cfb3eea47a3` en
+los dos), **5.431.955 bytes**. Antes del despliegue `docs/index.html` era el motor de
+s29i (`5ac4a1b8…`, 5.393.686 bytes). El muestreo de la Fase 0.5 se repitió sobre el
+motor regenerado antes de commitearlo: salida idéntica a la del motor sin commitear
+salvo el conteo de nodos del DOM (que no es del archivo).
+
+### 47.12 Errores del ejecutor en s30a y s30b (regla 0.5)
+
+| # | Qué pasó | Cuándo se detectó | Efecto |
+|---|---|---|---|
+| 1 | Al escribir el código se colaron **caracteres invisibles literales** en el fuente: un U+FEFF como valor de `CSV_BOM` y el rango de diacríticos de `slugArchivo` escrito con combinantes reales en vez de `\u0300-\u036f`. | Por un chequeo propio antes del primer commit | Ninguno en el motor publicado: el archivo quedó con escapes explícitos. El riesgo era real: un carácter invisible en el fuente sobrevive a un diff sin verse. |
+| 2 | La guarda del `sigdifgru` nulo se aplicó **solo en la ficha**, dejando al panorama y a la ficha diciendo cosas distintas de la misma celda. | Por el panel adversarial, no por el ejecutor | Contradicción interna entre dos archivos del mismo motor, corregida antes del build definitivo con una función única. Es el hallazgo más valioso de la sesión y no salió de la revisión propia. |
+| 3 | El aviso de tamaño se llamaba **después** de construir las filas, contradiciendo su propio texto y el encargo. | Por el panel | Corregido con un conteo predicho, verificado contra el real en 14 casos. |
+| 4 | El mensaje del commit de la Fase 4 decía que el PNG era de `1312x886` cuando el verificado era `1312x918`: la cifra venía de una versión anterior del cuadro. | Al redactar el log | Corregido con `--amend` antes de cualquier push (el commit pasó de `fc02f4d` a `ce91580`). |
+| 5 | **[s30a]** El motor regenerado sin commitear quedó con un **estado intermedio** de la plantilla: el comentario de `clonarSvgResuelto` en otra posición (la edición del `rgba` lo dejó huérfano y luego se movió en la plantilla sin regenerar). Función idéntica, bytes distintos. | Fase 0.3 de s30b | Ninguno en lo publicado: se regeneró en la Fase 3 de s30b y el motor desplegado es byte a byte el de la plantilla commiteada. |
+| 6 | **[s30b]** La primera corrida de la lente de React marcó 12 falsos fallos por defectos del propio chequeo (valores no booleanos; toggles de GSE frente a secciones). | Al leer el detalle de cada uno | Se corrigió el instrumento y se repitió: 24/24. Lección: mirar el detalle de un FAIL antes de tocar el motor. |
+| 7 | **[s30b]** El caso "parcial" de la lente de imagen eligió el RBD **144** (4 de 4) en vez del **14**, porque la búsqueda por "14" calzó primero con "RBD 144". | Al leer el inventario del radar vivo (13 `circle`, no 8) | Se repitió con búsqueda por nombre. El 144 se conservó como quinto caso. |
+
+**Nota de instrumentación.** El panel adversarial se cortó por **límite de sesión** con 14
+de 32 agentes caídos, y dos lentes —la de imagen y la de estado de React— no llegaron a
+ejecutarse como panel. s30a empezó a correrlas a mano contra la plantilla vigente
+(quedan sus scripts en el scratchpad) y se quedó sin cuota; **s30b las reemplazó por las
+verificaciones directas de §47.10bis**, deterministas y sin agentes, como mandaba su
+encargo. Conviene declararlo antes que dejar creer que la cobertura fue de una sola
+pasada o que hubo refutadores sobre esas dos lentes: no los hubo. Los refutadores que sí corrieron leyeron el archivo **mientras se estaba
+corrigiendo**, así que varios veredictos dicen "refutado contra el estado actual" sobre
+hallazgos que eran correctos cuando se emitieron: el juicio útil de esa ronda es el de
+los que verificaron el dato, no el del veredicto final.
+
+### 47.13 [s30b] El aviso `renv::status(): the project is out-of-sync`
+
+Aparece como primera línea de **todo** `Rscript` del proyecto, también del build de la
+Fase 3. Medido:
+
+- `renv::status()` → «The following package(s) are used in this project, but are not
+  installed: **suitedoc**».
+- `suitedoc` lo carga `50_documentacion/suite/documentar.R:21` (`library(suitedoc)`), que
+  entró en `c674254` (suite de documentación, julio de 2026). No está en `renv.lock`
+  (último snapshot `9d2ba43`, 2026-08-19) ni en `renv/library`; **sí** está en la
+  librería del sistema (`system.file(package="suitedoc")` con `--vanilla` la encuentra),
+  así que `documentar.R` corre fuera de renv y renv marca el proyecto desincronizado.
+- **Es previo a esta línea de trabajo**: está en la primera línea de los cinco logs de
+  build que sobreviven de s29g a s29i (16-sep, 11:08 → 21:56) y no lo introdujo s30. No
+  afecta al paso 35, que no usa `suitedoc`. No se registró antes en ningún log.
+
+No se toca aquí (regla 3 del encargo original habla de warnings **nuevos**, y este no lo
+es; y es decisión del titular): las salidas son `renv::snapshot()` tras instalar
+`suitedoc` en la librería del proyecto, o excluir `50_documentacion/suite/` de la
+detección (`.renvignore`) si la suite se considera herramienta externa. Va a pendientes.
+
+## 48. Decisiones tomadas dentro del margen del encargo (s30a y s30b)
+
+1. **Un solo archivo para el comparador, con encabezado de unión.** El encargo enumera
+   columnas distintas para `tipo = "territorio"` y `tipo = "establecimiento"` pero fija
+   **un** nombre de archivo. Se resolvió con 22 columnas, unión de las dos listas: cada
+   fila llena las suyas y deja vacías las de la otra naturaleza.
+2. **Cada columna de código va con su columna de etiqueta.** `gse`/`gse_label` e
+   `indicador`/`indicador_label` en los tres archivos, no solo en el comparador, que es
+   donde el encargo los enumera. Razón: la pantalla solo muestra etiquetas, así que un
+   código suelto sería exportar algo que nadie ve; y el propio encargo pide `id` y
+   `label` juntos para la ficha.
+3. **`dependencia` no significa lo mismo en las dos filas del comparador, así que solo
+   va en una.** En la fila de territorio es el filtro aplicado a la entidad; una fila de
+   establecimiento no está acotada por una dependencia, es un caso único, y se deja
+   vacía para no dar dos sentidos a la misma columna. En el panorama, donde toda fila es
+   un establecimiento, la columna sí lleva la dependencia del propio EE, que es lo que
+   la tarjeta muestra.
+4. **Los dos acotes entran en el nombre del panorama: dependencia y selección de GSE.**
+   Sin ellos, "Región de Valparaíso", la misma región acotada a Municipal y la misma
+   región mostrando solo el GSE Bajo darían **el mismo archivo**, y son tres universos
+   distintos. El sufijo de GSE se omite cuando están los cinco, que es el caso de
+   apertura: `idps_panorama_region_de_valparaiso_4b_2025_gse_1_3.csv`.
+5. **El nombre del comparador no codifica la selección de entidades**, a diferencia del
+   panorama. Podrían ser diez, y el nombre se volvería ilegible; el archivo es
+   autodescriptivo, porque la columna `entidad` las nombra todas.
+6. **Nombres de archivo en minúsculas.** El encargo pide sanear el territorio a
+   `[a-zA-Z0-9_]`; POLITICA §2 manda snake_case en minúsculas sin tildes ni ñ para todo
+   nombre de archivo. `[a-z0-9_]` cumple las dos.
+7. **`<nivel>` es la clave del grado, no su rótulo.** `idps_comparador_4b_2025.csv`:
+   sanear "4° básico" daría `4__b_sico`.
+8. **El CSV de la ficha no depende de la vista abierta** (declarada y reversible). El
+   nombre que fija el encargo —`idps_ficha_<rbd>_<nivel>.csv`— no lleva año ni vista, así
+   que el archivo es el **registro** del establecimiento en ese nivel y el toggle es una
+   lente sobre el mismo dato; con la lectura contraria, las dos vistas producirían dos
+   archivos distintos con el mismo nombre. No se calcula nada nuevo: cada año es la
+   misma lectura de `indOf`/`dimOf` que hace la Vista histórica.
+9. **La ficha exporta solo los años CON medición.** Un año de pandemia o sin evaluación
+   no es un dato ausente sino la ausencia de una medición, y las columnas que el encargo
+   fija no tienen dónde decir el motivo; una fila vacía sin explicación mentiría por
+   omisión. Va a pendientes: una columna `estado_anio` lo resolvería.
+10. **Una sola función `estadoVsGse` para las tres exportaciones**, con tres salidas:
+    "sin dato" cuando no hay puntaje, `sin comparación vs GSE publicada` cuando hay
+    puntaje pero no hay `sigdifgru`, y las palabras de `EST_EE` cuando sí lo hay. Es la
+    corrección que forzó el panel: mientras la guarda vivía solo en la ficha, dos
+    archivos del mismo motor decían cosas distintas de la misma celda. El caso del medio
+    se resuelve del lado de **no afirmar**, porque el invariante manda **leer**
+    `sigdifgru` y de un nulo no se lee nada. Divergencia con la pantalla declarada y
+    medida en §47.9.
+11. **La glosa no nombra la causa de la ausencia**, porque son dos y la guarda no las
+    separa: el año (la Agencia publica la comparación desde 2024) y el establecimiento
+    (sin grupo de comparación, también en 2024-2025). Una glosa que dijera "ese año"
+    sería falsa en el segundo caso.
+12. **`estado_vs_gse` de una dimensión dice "no aplica (solo a nivel indicador)"** en vez
+    de quedar vacía, que se leería como "no se pudo calcular". `dimOf` trae
+    `prom`/`dif`/`sigdif` pero no `difgru`/`sigdifgru`: el desvío vs GSE solo existe a
+    nivel indicador, y es invariante del motor.
+13. **El conteo de filas se predice antes de armar el archivo.** El encargo pide avisar
+    "antes de generar" y el aviso dice "puede tardar unos segundos en generarse":
+    contarlas después de construirlas hacía de ese texto una mentira. Las tres
+    predicciones coinciden exactamente con lo que produce cada constructor (§47.9bis).
+14. **El rótulo del botón va siempre visible**, a diferencia del `.icon-export` del
+    hermano, que lo oculta y lo despliega al hover con un `max-width` animado de 36 a
+    220px. Este motor no esconde rótulos tras una interacción, y un cuadrado de 36px no
+    se anuncia a sí mismo.
+15. **El BOM va como el escape `\ufeff`, no como carácter literal.** El hermano lo tiene
+    de las dos formas (`exportarCSV` literal, `exportarPanoramaCSV` escapado); el escape
+    sobrevive a cualquier recodificación de la plantilla y se ve en el diff.
+16. **`CSV_EOL` es CRLF**, no el `\n` del hermano: es lo que fija RFC 4180 y lo que
+    Excel escribe. No hay contrapartida; Excel y R leen ambos.
+17. **El cuadro del SVG exportado se adapta al texto entre 560 y 900px**, midiendo cada
+    línea en canvas con la fuente del export, en vez de truncar para respetar un ancho
+    fijo: truncar la línea de identidad se comía el nivel y el año. Es el mismo
+    instrumento de la regla de etiquetado de s29 —medir en píxeles, no estimar por
+    número de caracteres— aplicado a otra fuente.
+18. **El `<svg>` clonado se inserta como `<g>`, no como `<svg>` anidado.** Un svg
+    interior recorta a su viewport y se comería las etiquetas de eje, que el radar
+    dibuja fuera del cuadro con `overflow:visible`.
+19. **[s30b] Se regeneró el motor aunque la diferencia con la plantilla fuera un
+    comentario.** El encargo s30b permitía no regenerar si la plantilla no cambiaba en
+    las Fases 1-2; pero la Fase 0.3 mostró que el motor sin commitear no correspondía
+    byte a byte a la plantilla, y publicar un motor que no es el de su plantilla —aunque
+    funcione igual— rompe la trazabilidad plantilla → motor → docs. Cuatro segundos de
+    build contra una duda permanente.
+20. **[s30b] El borrador del log se completó, no se reconstruyó.** El encargo daba el
+    borrador por perdido; estaba en el scratchpad de s30a. Reconstruirlo desde los
+    commits habría perdido las cifras del panel (§47.10) y las decisiones 1-18, que solo
+    s30a vio. Se conservó, se marcó lo añadido con **[s30b]** y se corrigieron las dos
+    cifras que hoy difieren (§47.7).
+21. **[s30b] Las dos lentes se corrieron como verificaciones directas, no como panel.**
+    Lo mandaba el encargo; y lo que las lentes preguntan (¿es válido el SVG?, ¿el CSV
+    sigue a la pantalla?) tiene respuesta determinista con `xmllint`, librsvg,
+    ImageMagick y un DOM leído en el mismo instante. Un refutador aportaría ángulos que
+    no se pensaron; se anota como pendiente, no se simula.
+
+## 49. Pendientes tras s30 (s30a y s30b)
+
+**Nacidos de esta sesión:**
+
+- **P-EXPORTACION-IMAGEN** — exportar como imagen el comparador y el panorama. La razón
+  de que no entre aquí está escrita en el propio código: exigiría reconstruir en SVG lo
+  que hoy es HTML (`StackedBar`, su regla de etiquetado medida en píxeles, la tira
+  externa y la tabla entera), es decir un **segundo dibujante** que podría divergir del
+  de pantalla. La lección que el hermano dejó escrita en su código (~3067) es la
+  contraria: un solo dibujante que recibe un `<g>` de destino. Es un rediseño de
+  `StackedBar`, no un añadido.
+- **P-ESTADO-SIN-COMPARACION** — `repartoInd`, `alertSummary` y `CeldaEE` mandan el
+  `sigdifgru` nulo al cubo neutro y lo muestran como "= sin diferencia" / "≈ en su GSE".
+  Son 3.495 celdas EE × indicador en 4° básico 2025 (13,3 % de las que tienen puntaje) y
+  3.445 en 2024. Corregirlo mueve las cifras de las barras y de la regla de etiquetado,
+  así que es encargo propio con su propia verificación. Hoy el CSV ya no lo repite
+  (§47.9), de modo que pantalla y archivo dicen cosas distintas en esas celdas: es la
+  única divergencia deliberada de la sesión y conviene cerrarla por el lado de la
+  pantalla.
+- **Columna `estado_anio` en el CSV de la ficha**, para poder incluir los años sin
+  medición diciendo el motivo (pandemia / no evaluado / sin dato del establecimiento) en
+  vez de omitirlos.
+- **El build podría publicar el primer año con `difgru`**, igual que ya publica
+  `meta.primer_anio_familia`. Con ese dato la glosa de §47.9 podría distinguir las dos
+  causas de la ausencia en vez de callarlas.
+- **El "CSV de la serie" de la ficha no tiene guarda**: para un establecimiento sin
+  ninguna medición en ese nivel entrega 91 filas sin un solo puntaje. Es fiel a la
+  pantalla, que también muestra "sin dato" en todo; queda anotado por si conviene
+  desactivar el botón.
+- **`tc()` sobre un nombre que empieza con comilla**: `COLEGIO PARTICULAR N. 244 "MADRE
+  DE DIOS"` se presenta como `... ""madre de Dios""`, porque `tc` pone en mayúscula el
+  primer carácter de la palabra, que es la comilla. Son 11 establecimientos del
+  directorio. Es defecto **previo** —la tarjeta y la ficha ya lo mostraban así—, pero el
+  CSV lo hace más visible.
+- **El borde `--border-2` de los controles da 1,37 sobre blanco**, bajo el 3:1 de WCAG
+  1.4.11. No es del botón nuevo: es la convención vigente en `.nav-trigger`,
+  `.estab-popup-btn`, `.gfb` y `.cmp-chip`. Cerrarlo es una línea sobre todo el motor.
+- **POLITICA §10 pediría un archivo propio en `decisiones/`** para el formato de
+  exportación (separador, decimal, universo exportado, patrón de nombre). Aquí esas
+  decisiones las fijó el encargo y las registra este log; si se quiere el archivo
+  canónico, es un trámite de cierre.
+
+- **[s30b] `renv` desincronizado por `suitedoc`** (§47.13): decisión del titular entre
+  `renv::snapshot()` con el paquete en la librería del proyecto o `.renvignore` sobre
+  `50_documentacion/suite/`. Previo a s30; sin efecto sobre el build.
+- **[s30b] Revisión adversarial de las lentes de imagen y de estado de React**, si se
+  quiere: no la hubo (§47.10bis). Encargo propio y con cuota.
+- **[s30b] Observación sobre el radar, no defecto de la exportación:** con un indicador
+  sin dato entre dos con dato, el vértice queda aislado y el resto forma un segmento
+  (D3 `defined`). Es conducta previa de pantalla; si se quisiera cerrar el polígono
+  saltando el hueco, sería una decisión de diseño del radar.
+
+**Heredados, sin cambio:** §5.6 de la decisión de contraste; **P-VISTA-TERRITORIAL**;
+hover `✕` de `.sel-chip`/`.cmp-x` a 4,11; §5.2 marca de "base pequeña"; el tope de 10 más
+el cambio de selector que deja el modal sin poder desmarcar; `.cmp-table` que se comprime
+en vez de hacer scroll; el aviso de dependencia que solo se dispara con SLEP;
+`NACIONAL_OPT.sub` frente al banner; la regla de mayúsculas fuera de `POLITICA`; las
+trece divergencias del modal con el hermano (§36.7); rama `feat/contrato-contexto`, no
+tocada.
