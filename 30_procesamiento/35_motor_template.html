@@ -590,7 +590,9 @@ __FONTS_CSS__
   .pan-name{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-h2);line-height:1.1;color:var(--cream);}
   .pan-meta{font-size:var(--fs-caption);opacity:.82;margin-top:3px;color:var(--cream);}
   .pan-comunas{font-size:var(--fs-caption);color:var(--cream);opacity:.9;margin-top:4px;line-height:1.35;}
-  .pan-nivel{display:flex;align-items:center;gap:10px;}
+  /* s31: con dos segmentadores (Vista + Nivel) la fila debe poder saltar de linea;
+     sin wrap desbordaba el body a 390px (518px de ancho). */
+  .pan-nivel{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;}
   .pan-nivel .nivelsel-lab{color:rgba(255,246,224,.74);}
   /* Picker de Territorio (#9) — control tipo select que abre el modal todo-Chile */
   .picker-bar{display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
@@ -661,6 +663,69 @@ __FONTS_CSS__
      .section-actions del hermano en la cabecera de su panorama. */
   .ficha-export{justify-content:flex-end;padding:11px 22px;background:var(--panel);border-bottom:1px solid var(--linea);}
   .export-bar-note{font-size:var(--fs-caption);color:var(--gris);font-style:italic;}
+  /* ============================================================
+     s31 — Vista historica del panorama territorial (P-VISTA-TERRITORIAL).
+     Forma tomada del mockup 50_documentacion/andamios/diseno/detalles/
+     mockup_vista_historica_territorial.html sobre los tokens del motor. Clases
+     con prefijo vt-, sin mayusculas sostenidas. La rampa de la celda es una mezcla de
+     blanco hacia ind.color (paleta de INDICADOR intacta); la trama rayada de los
+     anios sin medicion usa --cream-200/--panel (sin color nuevo). El color del
+     texto de la celda lo decide el JS por contraste WCAG (decision §3.5).
+     ============================================================ */
+  /* Panel de controles de la matriz: rotulo (140px) + contenido, tres filas. */
+  .vt-ctl{display:grid;grid-template-columns:140px minmax(0,1fr);gap:12px 16px;align-items:center;margin:0 0 16px;padding:14px 16px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radius-3);box-shadow:var(--shadow-1);}
+  .vt-lab{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-caption);color:var(--gris);}
+  .vt-ind-sel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+  .vt-ind-b{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--linea);border-radius:7px;padding:7px 12px;font:inherit;font-size:var(--fs-caption);font-weight:var(--fw-bold);line-height:1.25;color:var(--tinta);cursor:pointer;min-height:40px;}
+  .vt-ind-b:hover{border-color:var(--foco);}
+  .vt-ind-b.on{border-color:var(--tinta);box-shadow:inset 0 -3px 0 var(--sw);}
+  .vt-ind-b:focus-visible,.vt-th-sort:focus-visible,.vt-mx td.vt-c-ee:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
+  @media (max-width:1000px){ .vt-ind-sel{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  @media (max-width:640px){ .vt-ctl{grid-template-columns:1fr;gap:6px;} .vt-ctl .vt-leg{margin-bottom:8px;} }
+  /* Leyendas en una sola linea: items centrados y de la misma altura. */
+  .vt-leg{display:flex;gap:8px 20px;font-size:var(--fs-caption);color:var(--gris);margin:0;flex-wrap:wrap;align-items:center;line-height:20px;}
+  .vt-leg > span{display:inline-flex;align-items:center;gap:6px;height:20px;white-space:nowrap;}
+  .vt-leg i{width:12px;height:12px;border-radius:2px;display:inline-block;flex:none;}
+  .vt-leg-bar{width:160px;height:12px;border-radius:2px;border:1px solid var(--linea);flex:none;}
+  .vt-leg-gap{display:inline-block;width:12px;height:12px;border:1px solid var(--linea);background:repeating-linear-gradient(135deg,var(--cream-200) 0 3px,var(--panel) 3px 6px);flex:none;}
+  /* Franja A: estado vs GSE solo en los anios que lo publican (una barra por celda). */
+  .vt-franja{display:grid;grid-template-columns:minmax(180px,260px) repeat(var(--ny),minmax(150px,1fr));gap:9px 14px;align-items:start;}
+  .vt-franja-yr{font-size:var(--fs-caption);font-weight:var(--fw-bold);color:var(--gris);text-align:center;}
+  .vt-franja-lab{display:flex;align-items:center;gap:8px;font-size:var(--fs-caption);font-weight:var(--fw-bold);padding-top:3px;}
+  .vt-franja-lab.is-sel{color:var(--azul);text-decoration:underline;text-underline-offset:3px;}
+  .vt-franja-foot{font-size:var(--fs-caption);color:var(--gris);margin-top:10px;}
+  /* Matriz B: establecimiento x anio, sin agregar. Scroll horizontal SOLO dentro
+     del contenedor (el body nunca desborda); primera columna fija. */
+  .vt-scroll{overflow-x:auto;border:1px solid var(--linea);border-radius:var(--radius-2);background:var(--paper);}
+  table.vt-mx{border-collapse:separate;border-spacing:0;min-width:760px;width:100%;font-variant-numeric:tabular-nums;}
+  .vt-mx caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .vt-mx th,.vt-mx td{padding:0;border-bottom:1px solid var(--cream-200);}
+  .vt-mx thead th{position:sticky;top:0;background:var(--paper);font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-bold);padding:8px 4px;text-align:center;border-bottom:1.5px solid var(--linea);white-space:nowrap;z-index:2;}
+  .vt-mx th.vt-c-ee,.vt-mx td.vt-c-ee{position:sticky;left:0;background:var(--paper);text-align:left;z-index:1;border-right:1px solid var(--linea);}
+  .vt-mx thead th.vt-c-ee{z-index:3;padding-left:12px;}
+  .vt-mx td.vt-c-ee{padding:5px 10px 5px 12px;min-width:230px;max-width:280px;cursor:pointer;}
+  .vt-mx td.vt-c-ee:hover .vt-ee-nom,.vt-mx td.vt-c-ee:focus-visible .vt-ee-nom{text-decoration:underline;color:var(--foco);}
+  .vt-ee-nom{font-size:var(--fs-caption);font-weight:var(--fw-bold);line-height:1.25;display:block;}
+  .vt-ee-rbd{font-size:var(--fs-overline);color:var(--gris);}
+  .vt-ee-gsechg{font-size:var(--fs-overline);color:var(--gris);font-style:italic;}
+  .vt-mx td.vt-c-v{text-align:center;font-size:var(--fs-caption);font-weight:var(--fw-bold);color:var(--tinta);min-width:62px;height:40px;border-left:2px solid var(--paper);}
+  .vt-mx td.vt-c-na{color:var(--gris);font-weight:var(--fw-regular);background:var(--paper);}
+  .vt-mx th.vt-c-gap,.vt-mx td.vt-c-gap{width:54px;min-width:54px;background:repeating-linear-gradient(135deg,var(--cream-200) 0 3px,var(--panel) 3px 6px);}
+  /* Encabezado del bloque sin medicion: horizontal, en dos lineas (nunca vertical). */
+  .vt-mx thead th.vt-c-gap{font-weight:var(--fw-regular);font-size:var(--fs-overline);line-height:1.25;padding:6px 2px;writing-mode:horizontal-tb;}
+  .vt-mx thead th.vt-c-gap span{display:block;}
+  .vt-th-sort{background:none;border:0;font:inherit;color:inherit;cursor:pointer;padding:0;}
+  .vt-th-sort.on{color:var(--azul);text-decoration:underline;text-underline-offset:3px;}
+  /* El glifo toma el color de texto de la celda: sobre el tinte del indicador los
+     colores de estado no alcanzan contraste; la forma (▼ = ▲) lleva el significado. */
+  .vt-gl{margin-left:3px;font-size:var(--fs-overline);font-weight:var(--fw-heavy);}
+  .vt-foot{font-size:var(--fs-caption);color:var(--gris);margin-top:8px;}
+  @media (max-width:640px){
+    .vt-franja{grid-template-columns:1fr;}
+    .vt-franja-yr.hdr{display:none;}
+    .vt-franja-cell::before{content:attr(data-yr);display:block;font-size:var(--fs-overline);color:var(--gris);font-weight:var(--fw-bold);}
+    .vt-mx td.vt-c-ee{min-width:170px;}
+  }
 </style>
 </head>
 <body>
@@ -2454,6 +2519,191 @@ __FONTS_CSS__
     rasterizarSvgAPng(r);
   }
 
+  // ===== s31 — Vista historica del panorama territorial (P-VISTA-TERRITORIAL) =====
+  // Decision 50_documentacion/activa/decisiones/20260917_decision_vista_historica_territorial.md;
+  // referencia visual: 50_documentacion/andamios/diseno/detalles/mockup_vista_historica_territorial.html.
+  // Por cada seccion de GSE VIGENTE (el del ultimo anio con GSE publicado del EE):
+  //  A. franja: <StackedBar/> por indicador x anio, SOLO en los anios con sigdifgru
+  //     publicado (meta.vista_territorial.anios_estado, derivado en R). Cada anio se
+  //     lee contra el GSE que el EE tenia ESE anio: repartoInd lee el dato del anio.
+  //  B. matriz establecimiento x anio con el puntaje PROPIO del EE (prom), un
+  //     indicador a la vez; el color va del casi blanco al color del indicador,
+  //     calibrado a meta.vista_territorial.dominio_color (p5-p95 del pais por
+  //     nivel e indicador, calculado en R). El texto se elige por contraste WCAG.
+  // Cero agregacion: ninguna celda, barra ni rotulo suma o promedia puntajes; el
+  // territorio y la dependencia solo ACOTAN (pasaTerr).
+
+  // Filtro territorial COMPARTIDO por la vista actual (unidades) y la historica.
+  // Extraido de unidades sin cambio de conducta: "nacional" no filtra y va PRIMERO
+  // (como rosterTerr); "foco" es el SLEP de apertura; la dependencia acota igual.
+  function pasaTerr(e,terr){
+    if(terr.kind==="nacional"){ /* sin filtro territorial: todo Chile */ }
+    else if(terr.kind==="foco"){ if(e.cod_slep!==SLEP_FOCO) return false; }
+    else if(terr.kind==="slep"){ if(String(e.cod_slep)!==String(terr.cod)) return false; }
+    else if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod) return false; }
+    else { if(e.cod_reg!==terr.cod) return false; }
+    if(terr.dep && e.cod_depe2!==terr.dep) return false;
+    return true;
+  }
+  // --gris efectivo (tokenCSS, s30), leido UNA vez: la matriz lo consulta por celda y
+  // getComputedStyle por celda seria un costo inutil. Fallback al hex del :root.
+  let _vtGris=null;
+  const vtGris=()=>{ if(_vtGris) return _vtGris; let v=""; try{ v=tokenCSS("--gris"); }catch(e){}
+    return (_vtGris=v||"#5C666E"); };
+  // Contraste WCAG 2.1 (luminancia relativa con linealizacion sRGB), distinto de
+  // _txtOn (luminancia perceptual con umbral fijo, que sigue sirviendo a DistBar).
+  const _lumWCAG=h=>{const c=_hx(h).map(x=>{x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);});
+    return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];};
+  const contrasteWCAG=(a,b)=>{const A=_lumWCAG(a),B=_lumWCAG(b);return (Math.max(A,B)+0.05)/(Math.min(A,B)+0.05);};
+  // Fondo de la celda: k en [0,1] sobre el dominio calibrado (satura fuera), y la
+  // mezcla blanco -> color reserva el tinte minimo (una celda con dato nunca queda
+  // tan blanca como una sin resultado).
+  function vtTinte(color,v,dom,k0){
+    const k=Math.max(0,Math.min(1,(v-dom[0])/(dom[1]-dom[0])));
+    return _mix('#ffffff',color,k0+(1-k0)*k);
+  }
+  // Color del numero: el de mayor razon de contraste con el fondo entre negro, el
+  // --gris efectivo y blanco (decision §3.5). Nunca una pastilla bajo el numero.
+  function vtTexto(bg){
+    const cands=['#000000',vtGris(),'#ffffff'];
+    return cands.reduce((m,c)=>contrasteWCAG(bg,c)>contrasteWCAG(bg,m)?c:m);
+  }
+  // Eje contiguo en bloques: cada anio con_dato es una columna; los anios sin
+  // medicion CONTIGUOS (pandemia/no_eval) se agrupan en UNA columna angosta.
+  function bloquesEje(eje){
+    const out=[];
+    eje.forEach(y=>{
+      if(y.estado==="con_dato") out.push({tipo:"y",y});
+      else{const last=out[out.length-1]; if(last&&last.tipo==="gap") last.ys.push(y); else out.push({tipo:"gap",ys:[y]});}
+    });
+    return out;
+  }
+  // "2024 y 2025" / "2023, 2024 y 2025": derivado del dato, nunca escrito a mano.
+  const listaY=arr=>arr.length<=1?arr.join(""):arr.slice(0,-1).join(", ")+" y "+arr[arr.length-1];
+
+  // Roster historico del territorio para un grado: por RBD, el GSE de cada anio del
+  // roster (nulo si ese anio no traia GSE), el GSE vigente (ultimo anio con GSE no
+  // nulo; nulo si nunca lo tuvo) y el GSE anterior distinto mas reciente con su
+  // ultimo anio ("hasta 2023: Medio bajo"). Alfabetico por nombre de presentacion.
+  function rosterHistorico(terr,grado){
+    const b=DATA.roster, porRbd=new Map();
+    for(let i=0;i<b.rows;i++){ if(b.grado[i]!==grado) continue;
+      const e=est[b.rbd[i]]; if(!e) continue; if(!pasaTerr(e,terr)) continue;
+      let r=porRbd.get(b.rbd[i]); if(!r){ r={rbd:b.rbd[i],anios:{}}; porRbd.set(b.rbd[i],r); }
+      r.anios[b.agno[i]]=b.gse[i]; }
+    const out=[];
+    porRbd.forEach(r=>{
+      const ys=Object.keys(r.anios).map(Number).sort((a,b)=>a-b);
+      let gse=null; for(let i=ys.length-1;i>=0;i--){ if(r.anios[ys[i]]!=null){ gse=r.anios[ys[i]]; break; } }
+      let previo=null; for(let i=ys.length-1;i>=0;i--){ const g=r.anios[ys[i]]; if(g!=null&&g!==gse){ previo={agno:ys[i],gse:g}; break; } }
+      out.push({rbd:r.rbd, gse, anios:r.anios, previo, nom:nomEE(est[r.rbd])||String(r.rbd)});
+    });
+    out.sort((a,b)=>a.nom.localeCompare(b.nom,'es'));
+    return out;
+  }
+
+  function PanoramaHistorico({rosterHist,panGrado,gseVis,vtInd,onInd,orden,onOrden,esNacional,onSel}){
+    const VT=DATA.meta.vista_territorial||{};
+    const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[panGrado])||[];
+    const aniosEstado=(VT.anios_estado&&VT.anios_estado[panGrado])||[];
+    const dom=(VT.dominio_color&&VT.dominio_color[panGrado+"|"+vtInd])||[0,100];
+    const k0=VT.tinte_minimo!=null?VT.tinte_minimo:0;
+    const indSel=indById[vtInd]||DATA.indicadores[0];
+    const bloques=useMemo(()=>bloquesEje(eje),[eje]);
+    const conDato=useMemo(()=>eje.filter(y=>y.estado==="con_dato"),[eje]);
+    const ult=conDato[conDato.length-1]||null;
+    const ejeIni=eje.length?eje[0].agno:null;
+    // "2014–2023" cuando la serie empieza antes del primer anio con estado publicado.
+    const antesEstado=(aniosEstado.length&&ejeIni!=null&&aniosEstado[0]>ejeIni)?(ejeIni+"–"+(aniosEstado[0]-1)):null;
+    // Lectura por EE y anio con dato, UNA vez por roster (la matriz y el orden la reusan).
+    const filas=useMemo(()=>rosterHist.map(r=>{const porAnio={}; conDato.forEach(y=>{porAnio[y.agno]=indOf(r.rbd,panGrado,y.agno);}); return {...r,porAnio};}),[rosterHist,panGrado,conDato]);
+    const kUlt=ult?ult.agno:null;
+    const ordenar=items=>{ const arr=[...items];
+      if(orden==="ult"&&kUlt!=null) arr.sort((a,b)=>{
+        const va=((a.porAnio[kUlt]||{})[vtInd]||{}).prom, vb=((b.porAnio[kUlt]||{})[vtInd]||{}).prom;
+        const na=va==null, nb=vb==null; if(na!==nb) return na?1:-1;
+        if(!na&&va!==vb) return vb-va; return a.nom.localeCompare(b.nom,'es'); });
+      return arr; };
+    const grupos=[...DATA.meta.gse,"sin"].filter(g=>gseVis.has(g))
+      .map(g=>({gse:g,items:ordenar(filas.filter(r=>(r.gse||"sin")===g))})).filter(x=>x.items.length>0);
+    const nomGse=g=>g==="sin"?"Sin clasificar":(GSE[g]||g);
+    const prelimY=y=>PRELIM.has(String(y));
+    const estadoTxt=s=>s===-1?"bajo":s===1?"sobre":"sin diferencia con";
+    return (
+      <div>
+        <div className="help"><b>Vista histórica del territorio, sin agregar.</b> Cada fila es un establecimiento con su propio puntaje en cada año; el territorio no produce un puntaje propio. Sobre cada grupo, cómo se reparten sus establecimientos por <b>estado vs su GSE</b> en los años en que la Agencia lo publica{aniosEstado.length?" ("+listaY(aniosEstado)+")":""}. Un año sin resultado no es un resultado bajo: indica que no hubo medición o que no fue válida.</div>
+        <div className="vt-ctl">
+          <span className="vt-lab" id="vt-lab-ind">Indicador</span>
+          <div className="vt-ind-sel" role="group" aria-labelledby="vt-lab-ind">{DATA.indicadores.map(i=>
+            <button key={i.id} className={"vt-ind-b"+(i.id===vtInd?" on":"")} style={{"--sw":i.color}} aria-pressed={i.id===vtInd} onClick={()=>onInd(i.id)}>
+              <span className="sw" style={{background:i.color}}></span>{i.nombre}</button>)}</div>
+          <span className="vt-lab">Estado vs su GSE</span>
+          <div className="vt-leg"><span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span><span><i style={{background:"var(--st-neutro)"}}></i>= sin diferencia</span><span><i style={{background:"var(--destaca)"}}></i>▲ sobre su GSE</span></div>
+          <span className="vt-lab">Puntaje</span>
+          <div className="vt-leg">
+            <span title={"Escala de 0 a 100. El color se calibra entre "+dom[0]+" y "+dom[1]+" y se satura fuera de ese rango."}>0<span className="vt-leg-bar" style={{background:"linear-gradient(90deg,"+vtTinte(indSel.color,dom[0],dom,k0)+","+vtTinte(indSel.color,dom[1],dom,k0)+")"}}></span>100</span>
+            <span>– sin resultado</span><span><span className="vt-leg-gap"></span>sin medición nacional</span><span>* resultado preliminar</span>
+          </div>
+        </div>
+        {grupos.length===0 && <div className="empty">No hay establecimientos educacionales con datos en ningún año para esta combinación de territorio, nivel y GSE.</div>}
+        {grupos.map(grp=>{ const gseNom=nomGse(grp.gse);
+          return (
+          <section className="gse-sec vt-sec" key={grp.gse}>
+            <div className="gse-sec-h"><span className="gse-sec-name">{gseNom}</span><span className="gse-sec-sub">{fmt(grp.items.length)} establecimientos · {grp.gse==="sin"?"sin GSE publicado en ningún año":"GSE de su último año con resultado"}</span></div>
+            <div className="pan-gse-body">
+              {/* A. Franja: reparto por estado, solo en los anios con sigdifgru publicado. */}
+              <div className="pan-sub-h">Estado vs su GSE, por año</div>
+              {aniosEstado.length===0
+                ? <div className="nota">La Agencia no publica el estado vs GSE en ningún año de este nivel.</div>
+                : <div className="vt-franja" style={{"--ny":aniosEstado.length}}>
+                    <div></div>{aniosEstado.map(y=><div key={y} className="vt-franja-yr hdr">{y}{prelimY(y)?"*":""}</div>)}
+                    {DATA.indicadores.map(ind=><React.Fragment key={ind.id}>
+                      <div className={"vt-franja-lab"+(ind.id===vtInd?" is-sel":"")}><span className="sw" style={{background:ind.color}}></span>{ind.nombre}</div>
+                      {aniosEstado.map(y=>{const itemsY=grp.items.filter(r=>Object.prototype.hasOwnProperty.call(r.anios,y));
+                        return <div key={y} className="vt-franja-cell" data-yr={y}><StackedBar rep={repartoInd(itemsY,ind.id,panGrado,y)}/></div>;})}
+                    </React.Fragment>)}
+                  </div>}
+              <div className="vt-franja-foot">{antesEstado?antesEstado+": la Agencia no publicó el estado vs GSE. ":""}En cada año, el estado de un establecimiento se mide contra el GSE que tenía ese año.</div>
+              {/* B. Matriz: puntaje propio por anio, un indicador. */}
+              <div className="pan-sub-h" style={{marginTop:20}}>Puntaje de cada establecimiento por año · {indSel.nombre}{!esNacional && <span className="pan-sub-note"> · clic en una fila para ver su Panorama IDPS</span>}</div>
+              {esNacional
+                ? <div className="nota">La grilla de establecimientos no se muestra a nivel nacional ({fmt(grp.items.length)} establecimientos en este grupo). Elige una región, un SLEP o una comuna para verla.</div>
+                : <>
+                  <div className="vt-scroll"><table className="vt-mx">
+                    <caption>Puntaje de cada establecimiento por año en {indSel.nombre}, {DATA.meta.grados[panGrado]}, grupo {gseNom}. Las columnas rayadas son años sin medición nacional.</caption>
+                    <thead><tr>
+                      <th className="vt-c-ee" scope="col" aria-sort={orden==="nom"?"ascending":"none"}><button className={"vt-th-sort"+(orden==="nom"?" on":"")} onClick={()=>onOrden("nom")} title="Ordenar alfabéticamente">Establecimiento</button></th>
+                      {bloques.map((bq,i)=> bq.tipo==="gap"
+                        ? <th key={"g"+i} className="vt-c-gap" scope="col" title={bq.ys.map(y=>y.agno+": "+(y.motivo||"")).join("\n")} aria-label={bq.ys[0].agno+" a "+bq.ys[bq.ys.length-1].agno+", sin medición nacional"}><span>{bq.ys[0].agno}–</span><span>{bq.ys[bq.ys.length-1].agno}</span></th>
+                        : (ult&&bq.y.agno===ult.agno
+                          ? <th key={bq.y.agno} scope="col" aria-sort={orden==="ult"?"descending":"none"}><button className={"vt-th-sort"+(orden==="ult"?" on":"")} onClick={()=>onOrden("ult")} title={"Ordenar de mayor a menor puntaje "+bq.y.agno}>{bq.y.agno}{bq.y.preliminar?"*":""} ↓</button></th>
+                          : <th key={bq.y.agno} scope="col">{bq.y.agno}{bq.y.preliminar?"*":""}</th>))}
+                    </tr></thead>
+                    <tbody>{grp.items.map(r=>
+                      <tr key={r.rbd}>
+                        <td className="vt-c-ee" role="button" tabIndex={0} title="Ver Panorama IDPS de este establecimiento"
+                          onClick={()=>onSel(r.rbd)} onKeyDown={ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();onSel(r.rbd);}}}>
+                          <span className="vt-ee-nom">{r.nom}</span><span className="vt-ee-rbd">RBD {r.rbd}</span>
+                          {r.previo && <span className="vt-ee-gsechg"> · hasta {r.previo.agno}: {GSE[r.previo.gse]||r.previo.gse}</span>}
+                        </td>
+                        {bloques.map((bq,i)=>{
+                          if(bq.tipo==="gap") return <td key={"g"+i} className="vt-c-gap" aria-label="sin medición nacional"></td>;
+                          const y=bq.y.agno, d=(r.porAnio[y]||{})[vtInd];
+                          if(!d||d.prom==null) return <td key={y} className="vt-c-v vt-c-na" title={y+": sin resultado"}>–</td>;
+                          const bg=vtTinte(indSel.color,d.prom,dom,k0), fg=vtTexto(bg), gy=r.anios[y], s=d.sigdifgru;
+                          return <td key={y} className="vt-c-v" style={{background:bg,color:fg}} title={y+": "+fmt(d.prom)+(gy!=null?" · GSE "+(GSE[gy]||gy):"")}>
+                            {fmt(d.prom)}{s!=null && <span className="vt-gl" title={estadoTxt(s)+" su GSE de "+y}>{s===-1?"▼":s===1?"▲":"="}</span>}</td>;})}
+                      </tr>)}</tbody>
+                  </table></div>
+                  <div className="vt-foot">{fmt(grp.items.length)} filas · orden {orden==="nom"
+                    ? "alfabético"+(ult?" (clic en el año "+ult.agno+" para ordenar por puntaje)":"")
+                    : "por puntaje "+(ult?ult.agno:"")+" de mayor a menor, sin resultado al final"}.</div>
+                </>}
+            </div>
+          </section>);})}
+      </div>);
+  }
+
   // ===== Andamiaje de navegacion: 3 pantallas (rediseno Fase 1; completado en Fase 4) =====
   // Las 3 pantallas estan funcionales: territorio (panorama por GSE), ficha (todo
   // desplegado) y comparar (matriz territorios x GSE x indicador). Ya no quedan
@@ -2484,7 +2734,18 @@ __FONTS_CSS__
     const [panGrado,setPanGrado]=useState(grados.includes("4b")?"4b":grados[0]);
     const panAnios=DATA.meta.grado_anios[panGrado]||[];
     const panAgno=panAnios[panAnios.length-1];
-    const [gseVis,setGseVis]=useState(()=>new Set(DATA.meta.gse));   // #10 GSE multi-select (todos al abrir)
+    // s31: el filtro de GSE lleva ademas la llave "sin" (Sin clasificar), que solo la
+    // vista historica dibuja y consume; en la vista actual `unidades` compara contra
+    // el codigo del roster (nunca "sin"), asi que su conducta no cambia. El conteo
+    // del banner y el CSV cuentan solo los codigos de DATA.meta.gse.
+    const [gseVis,setGseVis]=useState(()=>new Set([...DATA.meta.gse,"sin"]));   // #10 GSE multi-select (todos al abrir)
+    const nGseVis=DATA.meta.gse.filter(g=>gseVis.has(g)).length;
+    // s31: vista del panorama (actual | historica), indicador y orden de la matriz.
+    const [vistaPan,setVistaPan]=useState("actual");
+    const [vtInd,setVtInd]=useState(DATA.indicadores[0]?DATA.indicadores[0].id:1);
+    const [vtOrden,setVtOrden]=useState("nom");
+    const seriePan=panAnios.length>1;
+    const isHistPan=vistaPan==="historica"&&seriePan;
     const [rbdSel,setRbdSel]=useState(null);
     const [pantalla,setPantalla]=useState("territorio");
     const [fichaGrado,setFichaGrado]=useState(grados.includes("4b")?"4b":grados[0]);
@@ -2504,6 +2765,8 @@ __FONTS_CSS__
 
     // Vista historica solo con serie (>1 anio del nivel de la ficha); si no, "actual".
     useEffect(()=>{if((DATA.meta.grado_anios[fichaGrado]||[]).length<=1) setVistaFicha("actual");},[fichaGrado]);
+    // s31: misma regla para el panorama (>1 anio del nivel del panorama).
+    useEffect(()=>{if((DATA.meta.grado_anios[panGrado]||[]).length<=1) setVistaPan("actual");},[panGrado]);
 
     // EntityModal devuelve un item; se aplica segun su kind (acota, nunca agrega).
     const onPick=item=>{setModalOpen(false);
@@ -2534,17 +2797,17 @@ __FONTS_CSS__
     const unidades=useMemo(()=>{const b=DATA.roster,out=[];
       for(let i=0;i<b.rows;i++){if(b.grado[i]!==panGrado||b.agno[i]!==panAgno)continue;
         const e=est[b.rbd[i]]; if(!e)continue;
-        // s29i: "nacional" es la entidad que NO filtra. Va PRIMERO en la cadena para no
-        // caer por descarte en el else final (que captura region), igual que rosterTerr.
-        if(terr.kind==="nacional"){ /* sin filtro territorial: todo Chile */ }
-        else if(terr.kind==="foco"){ if(e.cod_slep!==SLEP_FOCO)continue; }
-        else if(terr.kind==="slep"){ if(String(e.cod_slep)!==String(terr.cod))continue; }
-        else if(terr.kind==="comuna"){ if(e.cod_com!==terr.cod)continue; }
-        else { if(e.cod_reg!==terr.cod)continue; }
-        if(terr.dep && e.cod_depe2!==terr.dep)continue;
+        // s29i/s31: el filtro territorial y de dependencia vive en pasaTerr (compartido
+        // con la vista historica); "nacional" no filtra y va primero, como rosterTerr.
+        if(!pasaTerr(e,terr))continue;
         if(!gseVis.has(b.gse[i]))continue;
         out.push({rbd:b.rbd[i],gse:b.gse[i]});}
       return out;},[terr,panGrado,panAgno,gseVis]);
+    // s31: roster de TODOS los anios del nivel para la vista historica (solo se
+    // construye cuando esa vista esta activa; el GSE se filtra al dibujar).
+    const rosterHist=useMemo(()=>isHistPan?rosterHistorico(terr,panGrado):[],[isHistPan,terr,panGrado]);
+    const haySinGse=isHistPan&&rosterHist.some(r=>r.gse==null);
+    const nHist=rosterHist.filter(r=>gseVis.has(r.gse||"sin")).length;
 
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
@@ -2603,9 +2866,21 @@ __FONTS_CSS__
               <div className="pan-id">
                 <div className="pan-name">{terrTxt}</div>
                 {esSlep && panComunasNoms && <div className="pan-comunas">{panComunasNoms}</div>}
-                <div className="pan-meta">{!esSlep && <>{fmt(panComunas)} {panComunas===1?"comuna":"comunas"} · </>}{fmt(unidades.length)} establecimientos en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {gseVis.size} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}{depNom?" · dependencia: "+depNom:""}</div>
+                {/* s31: en la vista historica el banner dice la serie (primer-ultimo anio del
+                    eje) y cuenta los EE con resultado en algun anio (roster de todos los anios). */}
+                <div className="pan-meta">{!esSlep && <>{fmt(panComunas)} {panComunas===1?"comuna":"comunas"} · </>}{isHistPan
+                  ? <>{fmt(nHist)} establecimientos con resultado en algún año · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAnios[0]}–{panAgno}{PRELIM.has(String(panAgno))?"*":""}</>
+                  : <>{fmt(unidades.length)} establecimientos en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}</>}{depNom?" · dependencia: "+depNom:""}</div>
               </div>
-              <div className="pan-nivel"><div className="nivelsel"><span className="nivelsel-lab">Nivel</span>
+              <div className="pan-nivel">
+                {/* s31: segmentador Vista actual / Vista historica, mismo patron que la ficha
+                    (L1322); desactivado (is-off) si el nivel tiene un solo anio. */}
+                <div className="nivelsel"><span className="nivelsel-lab">Vista</span>
+                  <div className="seg-lvl big">
+                    <button className={"lvl-b"+(!isHistPan?" on":"")} onClick={()=>setVistaPan("actual")}>Vista actual</button>
+                    <button className={"lvl-b"+(isHistPan?" on":"")+(seriePan?"":" is-off")} onClick={()=>seriePan&&setVistaPan("historica")} disabled={!seriePan} title={seriePan?"Serie por año de cada establecimiento":"Sin serie suficiente"}>Vista histórica</button>
+                  </div></div>
+                <div className="nivelsel"><span className="nivelsel-lab">Nivel</span>
                 <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===panGrado?" on":"")} onClick={()=>setPanGrado(g)}>{DATA.meta.grados[g]}</button>)}</div></div></div>
             </div>
 
@@ -2621,8 +2896,9 @@ __FONTS_CSS__
             <div className="gse-filter-wrap">
               <span className="gse-filter-lab">Grupo socioeconómico (GSE)</span>
               <span className="gse-filter-note">Muestra u oculta cada grupo; selecciona los que quieras, incluso todos.</span>
-              {/* s30: mismo lugar que en el comparador — al lado del segmentador de GSE. */}
-              <div className="export-bar">
+              {/* s30: mismo lugar que en el comparador — al lado del segmentador de GSE.
+                  s31: en la vista historica la barra de exportacion NO se dibuja (decision §3.10). */}
+              {!isHistPan && <div className="export-bar">
                 <IconExport label="Exportar CSV" icon="download"
                   disabled={unidades.length===0}
                   title={unidades.length===0
@@ -2632,12 +2908,19 @@ __FONTS_CSS__
                     gseSel:DATA.meta.gse.filter(g=>gseVis.has(g)),
                     nomArchivoTerr:terrTxt+(depNom?" "+depNom:""),
                     glosaTerr:terrTxt+(depNom?" · "+depNom:"")})}/>
-              </div>
+              </div>}
               <div className="gse-filter">{DATA.meta.gse.map(g=>
                 <button key={g} className={"gfb"+(gseVis.has(g)?" on":"")} onClick={()=>toggleGse(g)} aria-pressed={gseVis.has(g)}>
-                  <span className="gf-check" aria-hidden="true">{gseVis.has(g)?"✓":""}</span>{GSE[g]}</button>)}</div>
+                  <span className="gf-check" aria-hidden="true">{gseVis.has(g)?"✓":""}</span>{GSE[g]}</button>)}
+                {/* s31: "Sin clasificar" solo en la vista historica y solo si hay EE sin GSE en la serie. */}
+                {haySinGse && <button className={"gfb"+(gseVis.has("sin")?" on":"")} onClick={()=>toggleGse("sin")} aria-pressed={gseVis.has("sin")} title="Establecimientos sin GSE publicado en ningún año de la serie">
+                  <span className="gf-check" aria-hidden="true">{gseVis.has("sin")?"✓":""}</span>Sin clasificar</button>}</div>
             </div>
 
+            {isHistPan
+              ? <PanoramaHistorico rosterHist={rosterHist} panGrado={panGrado} gseVis={gseVis} vtInd={vtInd} onInd={setVtInd}
+                  orden={vtOrden} onOrden={setVtOrden} esNacional={esNacional} onSel={irFicha}/>
+              : <>
             <div className="help"><b>Panorama del territorio sin agregar.</b> El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia){esNacional?". ":" y la grilla para abrir el Panorama IDPS de cada uno. "}Las barras son <b>% (n) de establecimientos, nunca un promedio</b>.</div>
             <div className="leyenda pan-state-leg">
               <span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span>
@@ -2665,6 +2948,7 @@ __FONTS_CSS__
                         : <div className="pan-grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={panGrado} agno={panAgno} onSel={irFicha}/>)}</div>}
                     </div>
                   </section>))}
+              </>}
           </div>}
 
           {/* Pantalla ficha (#19): EE seleccionado (con buscador embebido) o el
