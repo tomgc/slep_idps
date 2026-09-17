@@ -481,6 +481,37 @@ grados_ee <- lapply(split(grados_ee_df$grado, grados_ee_df$rbd),
 message(sprintf("[s19] grados_ee: indice de disponibilidad para %d establecimientos",
                 length(grados_ee)))
 
+# Vista historica del panorama territorial (s31, P-VISTA-TERRITORIAL; decision
+# 20260917_decision_vista_historica_territorial.md §4-§5). Dos insumos que el
+# template NO puede derivar por su cuenta sin recorrer el pais entero:
+#  - dominio_color: por "<grado>|<id_indicador>", los percentiles
+#    VT_PERCENTILES_COLOR (tipo 7) del prom que VIAJA en el payload (ind_lst$prom,
+#    ya redondeado), sobre todos los anios del grado. Es un rango de REFERENCIA
+#    para estirar el color de cada celda (puntaje propio del EE); no es una cifra
+#    del territorio ni entra en ninguna pantalla como numero (cero agregacion).
+#  - anios_estado: por grado, los anios con al menos un sigdifgru publicado (la
+#    franja de estado se dibuja solo ahi). I() fuerza arreglo aun con un solo anio.
+vt_claves <- expand.grid(grado = names(grado_anios), ind = sort(unique(ind_lst$ind)),
+                         stringsAsFactors = FALSE)
+vt_dominio <- lapply(seq_len(nrow(vt_claves)), function(i) {
+  x <- ind_lst$prom[ind_lst$grado == vt_claves$grado[i] & ind_lst$ind == vt_claves$ind[i]]
+  as.integer(round(stats::quantile(x, VT_PERCENTILES_COLOR, type = 7, names = FALSE, na.rm = TRUE)))
+})
+names(vt_dominio) <- paste(vt_claves$grado, vt_claves$ind, sep = "|")
+vt_anios_estado <- lapply(names(grado_anios), function(g) {
+  a <- ind_lst$agno[ind_lst$grado == g & !is.na(ind_lst$sigdifgru)]
+  I(as.integer(sort(unique(a))))
+})
+names(vt_anios_estado) <- names(grado_anios)
+message(sprintf("[s31] vista_territorial: dominio_color %s; anios_estado %s; tinte_minimo %s",
+                paste(sprintf("%s %d-%d", names(vt_dominio),
+                              vapply(vt_dominio, `[`, integer(1), 1L),
+                              vapply(vt_dominio, `[`, integer(1), 2L)), collapse = " · "),
+                paste(sprintf("%s [%s]", names(vt_anios_estado),
+                              vapply(vt_anios_estado, function(a) paste(a, collapse = ","), character(1))),
+                      collapse = " · "),
+                format(VT_TINTE_MINIMO)))
+
 meta <- list(
   fecha_generacion = format(Sys.Date()),
   cobertura = "Todo Chile",
@@ -491,7 +522,11 @@ meta <- list(
   gse = names(GSE_LABELS), gse_labels = as.list(GSE_LABELS),
   depe2 = names(DEPENDENCIAS), depe2_labels = as.list(DEPENDENCIAS),
   comunas_foco = comunas_foco,
-  nota_8b = "8b: distribucion numerica disponible; sin texto cualitativo de nivel (decision sesion 6)."
+  nota_8b = "8b: distribucion numerica disponible; sin texto cualitativo de nivel (decision sesion 6).",
+  # s31: ULTIMO elemento de meta (el chequeo de fidelidad del payload lo recorta
+  # por su clave y exige que lo que sigue sea el cierre de meta).
+  vista_territorial = list(dominio_color = vt_dominio, anios_estado = vt_anios_estado,
+                           tinte_minimo = VT_TINTE_MINIMO)
 )
 
 json_root <- list(meta = meta, regiones = regiones_lst, sleps = sleps_lst, comunas = comunas_lst,
