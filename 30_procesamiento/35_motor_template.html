@@ -1725,9 +1725,14 @@ __FONTS_CSS__
     // el pie de cada seccion queda solo con los que si estan en otra seccion.
     const eeSinUbicar=cmpEEs.map((t,i)=>({t,gse:eeGse[i]})).filter(x=>!x.gse||visGse.indexOf(x.gse)<0);
     const prelim=PRELIM.has(String(agno));
-    // s30: sin entidades o sin ningun GSE visible la tabla no se dibuja; el boton de
-    // exportacion se desactiva en vez de entregar un archivo con solo el encabezado.
-    const sinQueExportar=cmpTerr.length===0||visGse.length===0;
+    // s30: el boton se desactiva cuando no se produciria NINGUNA fila, en vez de
+    // entregar un archivo con solo el encabezado. Son tres casos: sin entidades, sin
+    // ningun GSE visible, y —el que no se ve a primera vista— solo establecimientos
+    // seleccionados y todos con su GSE oculto en el segmentador, que es un estado
+    // alcanzable y que la pantalla ya avisa en .cmp-nota-ee. El predicado es barato:
+    // no arma el CSV, solo pregunta si alguna fila caeria dentro.
+    const sinQueExportar=visGse.length===0 ||
+      (cmpTerrs.length===0 && !cmpEEs.some((t,i)=>visGse.indexOf(eeGse[i])>=0));
     return (
       <div>
         <div className="cmp-chrome">
@@ -1880,8 +1885,11 @@ __FONTS_CSS__
   // no "regi_n_de_valpara_so"; la ñ se resuelve por el mismo camino (NFD la parte en
   // "n" + tilde combinante, que cae en el rango de diacriticos).
   function slugArchivo(s){
-    return String(s==null?"":s).normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    const t=String(s==null?"":s).normalize("NFD").replace(/[\u0300-\u036f]/g,"")
       .toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+    // Nunca vacio: un nombre con dos guiones bajos seguidos delata un hueco y es peor
+    // que una palabra de relleno.
+    return t||"sin_nombre";
   }
 
   // Numero para celda de CSV: coma decimal y SIN separador de miles. fmt() es la capa
@@ -1915,8 +1923,38 @@ __FONTS_CSS__
     descargarBlob(new Blob([aCSV(filas)],{type:"text/csv;charset=utf-8;"}),fname);
   }
 
-  // Aviso previo de tamaño: devuelve false si el titular cancela. El conteo se dice
-  // en filas y en establecimientos, que es como se piensa el universo.
+  // Estado vs GSE en PALABRAS. Una sola funcion para las tres exportaciones: cuando
+  // cada constructor lo derivaba por su cuenta, el CSV del panorama y el de la ficha
+  // decian cosas distintas de la MISMA celda (RBD, indicador y año), que es lo que
+  // detecto el panel adversarial de esta sesion.
+  //
+  //   sin puntaje                     -> "sin dato"
+  //   con puntaje pero sin sigdifgru  -> CSV_SIN_CMP_GSE
+  //   con sigdifgru                   -> las palabras de EST_EE
+  //
+  // El caso del medio es el que importa, y se resuelve del lado de no afirmar. El
+  // invariante del motor es que el estado vs GSE se **LEE** de `sigdifgru`; cuando ese
+  // campo es nulo no hay nada que leer, y escribir "sin diferencia" seria DERIVAR una
+  // conclusion de una ausencia. Ocurre por dos motivos distintos que la guarda no
+  // separa: la Agencia publica la comparacion desde 2024, y dentro de 2024-2025 sigue
+  // nula para el establecimiento sin grupo de comparacion.
+  //
+  // DIVERGENCIA CON LA PANTALLA, declarada y reversible: en ese caso `CeldaEE` y el chip
+  // de la tarjeta si dicen "sin diferencia" / "≈ en su GSE", porque `repartoInd` y
+  // `alertSummary` mandan el nulo al cubo neutro. Son 3.495 celdas EE x indicador en 4°
+  // basico 2025, el 13,3% de las que tienen puntaje. No se corrige la pantalla aqui:
+  // cambiaria las cifras de las barras y la regla de etiquetado, que este encargo manda
+  // conservar. Va como pendiente propio (P-ESTADO-SIN-COMPARACION).
+  const CSV_SIN_CMP_GSE="sin comparación vs GSE publicada";
+  function estadoVsGse(d){
+    if(!d||d.prom==null) return "sin dato";
+    if(d.difgru==null||d.sigdifgru==null) return CSV_SIN_CMP_GSE;
+    return EST_EE[d.sigdifgru===-1?"bajo":(d.sigdifgru===1?"sobre":"neutro")].txt;
+  }
+
+  // Aviso previo de tamaño: devuelve false si el titular cancela. Dice la cifra —las
+  // filas del archivo— antes de generarlo, en vez de dejar el navegador colgado sin
+  // explicacion mientras arma varios MB de texto.
   function confirmarTamano(nFilas,glosa){
     if(nFilas<CSV_AVISO_FILAS) return true;
     return window.confirm("El archivo que vas a descargar tiene "+fmt(nFilas)+" filas"+
@@ -1987,27 +2025,35 @@ __FONTS_CSS__
       // Filas de ESTABLECIMIENTO: solo los que cierran la tabla de ESTE GSE, que son
       // los unicos que la pantalla dibuja aqui. Un caso individual no se reparte: no
       // lleva conteos ni porcentajes, lleva su puntaje y su estado vs su propio GSE,
-      // leido de sigdifgru. Los EE con el GSE oculto no se exportan, porque tampoco
-      // se ven (la pantalla ya lo avisa en .cmp-nota-ee).
+      // leido de sigdifgru por estadoVsGse. Los EE con el GSE oculto no se exportan,
+      // porque tampoco se ven (la pantalla ya lo avisa en .cmp-nota-ee).
       cmpEEs.forEach((t,i)=>{ if(eeGse[i]!==g) return;
         const dind=indOf(t.cod,grado,agno), e=est[t.cod];
         DATA.indicadores.forEach(ind=>{
           const d=dind[ind.id];
-          const st=(!d||d.prom==null)?null:EST_EE[d.sigdifgru===-1?"bajo":(d.sigdifgru===1?"sobre":"neutro")];
           filas.push(["establecimiento",t.nom,"establecimiento","",t.cod,
             (e&&e.cod_com!=null)?comNom(e.cod_com):"",
             g,gl,ind.id,ind.nombre,"","","","","","","",
-            st?numCSV(d.prom):"", st?st.txt:"sin dato", nivel,agno,prelim]);
+            (d&&d.prom!=null)?numCSV(d.prom):"", estadoVsGse(d), nivel,agno,prelim]);
         });
       });
     });
     return filas;
   }
 
+  // El conteo de filas se PREDICE antes de armar el archivo. El encargo pide avisar
+  // "antes de generar", y el aviso dice "puede tardar unos segundos en generarse":
+  // contarlas despues de construirlas haria de ese texto una mentira y dejaria el
+  // navegador armando 3,75 MB de texto sin haber preguntado. La aritmetica es la misma
+  // que recorre cada constructor, escrita una vez al lado de el.
+  const nFilasComparador=({cmpTerrs,cmpEEs,eeGse,visGse})=>
+    DATA.indicadores.length*(visGse.length*cmpTerrs.length+
+      cmpEEs.filter((t,i)=>visGse.indexOf(eeGse[i])>=0).length);
+
   function descargarComparadorCSV(args){
-    const filas=filasComparadorCSV(args);
-    if(!confirmarTamano(filas.length-1,"comparación de entidades")) return;
-    descargarCSV(filas,"idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+".csv");
+    if(!confirmarTamano(nFilasComparador(args),"comparación de entidades")) return;
+    descargarCSV(filasComparadorCSV(args),
+      "idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+".csv");
   }
 
   // ===== Fase 3 (s30) — CSV del panorama territorial =====
@@ -2038,27 +2084,30 @@ __FONTS_CSS__
         const e=est[u.rbd], im=indOf(u.rbd,grado,agno);
         DATA.indicadores.forEach(ind=>{
           const d=im[ind.id];
-          // El estado vs GSE se LEE de sigdifgru y se escribe en palabras, igual que
-          // en la tarjeta y en la fila de establecimiento del comparador.
-          const st=(!d||d.prom==null)?null:EST_EE[d.sigdifgru===-1?"bajo":(d.sigdifgru===1?"sobre":"neutro")];
           filas.push([u.rbd,nomEE(e),(e&&e.cod_com!=null)?comNom(e.cod_com):"",
             (e&&e.cod_depe2!=null)?(DEPE[e.cod_depe2]||e.cod_depe2):"",
             cod,gl,ind.id,ind.nombre,
-            st?numCSV(d.prom):"", st?st.txt:"sin dato", nivel,agno,prelim]);
+            (d&&d.prom!=null)?numCSV(d.prom):"", estadoVsGse(d), nivel,agno,prelim]);
         });
       });
     });
     return filas;
   }
 
+  const nFilasPanorama=({grupos})=>
+    DATA.indicadores.length*grupos.reduce((a,g)=>a+g.items.length,0);
+
   function descargarPanoramaCSV(args){
-    const filas=filasPanoramaCSV(args);
-    if(!confirmarTamano(filas.length-1,args.glosaTerr)) return;
-    // La dependencia entra en el NOMBRE cuando hay una: sin ella, "Region de
-    // Valparaiso" y "Region de Valparaiso acotada a Municipal" darian el mismo
-    // archivo, y son dos universos distintos.
-    descargarCSV(filas,"idps_panorama_"+slugArchivo(args.nomArchivoTerr)+
-      "_"+slugArchivo(args.grado)+"_"+args.agno+".csv");
+    if(!confirmarTamano(nFilasPanorama(args),args.glosaTerr)) return;
+    // Los dos ACOTES entran en el NOMBRE, porque los dos cambian el universo y sin
+    // ellos dos exportaciones distintas darian el mismo archivo: la dependencia
+    // ("Region de Valparaiso" frente a la misma region acotada a Municipal) y la
+    // seleccion de GSE (los cinco grupos frente a solo Bajo). El sufijo de GSE se
+    // omite cuando estan todos, que es el caso de apertura.
+    const gseSel=(args.gseSel||[]);
+    const sufGse=(gseSel.length&&gseSel.length<DATA.meta.gse.length)?"_gse_"+gseSel.join("_"):"";
+    descargarCSV(filasPanoramaCSV(args),"idps_panorama_"+slugArchivo(args.nomArchivoTerr)+
+      "_"+slugArchivo(args.grado)+"_"+args.agno+sufGse+".csv");
   }
 
   // ===== Fase 3 (s30) — CSV de la ficha de establecimiento =====
@@ -2085,41 +2134,41 @@ __FONTS_CSS__
   const CSV_FICHA_COLS=["rbd","establecimiento","anio","familia","id","label",
     "puntaje","estado_vs_gse","nivel","preliminar"];
   const CSV_FICHA_NA="no aplica (solo a nivel indicador)";
-  // La comparacion vs GSE (difgru/sigdifgru) NO existe en toda la serie: la Agencia la
-  // publica desde 2024 (medido sobre el payload: en 4° basico, difgru es nulo en el
-  // 100% de las filas de 2014 a 2023). Sin este caso el CSV diria "sin diferencia" en
-  // diez años en los que no hay ninguna comparacion que informar — una afirmacion
-  // inventada sobre un dato que no existe. La Vista historica hace lo mismo: su
-  // tooltip solo dibuja la linea "vs GSE" si difgru!=null.
-  const CSV_SIN_CMP_GSE="la Agencia no publica la comparación vs GSE ese año";
+
+  // Años de cada familia, en una sola funcion: la usan el constructor y el contador de
+  // filas del aviso previo, de modo que no pueden desincronizarse.
+  function aniosFicha(grado,anios){
+    const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[grado])||(anios||[]).map(a=>({agno:a,estado:"con_dato"}));
+    const PAF=(DATA.meta.primer_anio_familia)||{};
+    const de=fam=>{const y0=PAF[fam];
+      return eje.filter(y=>y.estado==="con_dato"&&(y0==null||y.agno>=y0)).map(y=>y.agno);};
+    return {ind:de("indicador"), dim:de("dimension")};
+  }
 
   function filasFichaCSV({rbd,grado,anios}){
     const e=est[rbd];
     const nivel=DATA.meta.grados[grado]||grado;
-    const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[grado])||(anios||[]).map(a=>({agno:a,estado:"con_dato"}));
-    const PAF=(DATA.meta.primer_anio_familia)||{};
-    const aniosDe=fam=>{const y0=PAF[fam];
-      return eje.filter(y=>y.estado==="con_dato"&&(y0==null||y.agno>=y0)).map(y=>y.agno);};
-    const aInd=aniosDe("indicador"), aDim=aniosDe("dimension");
+    const _a=aniosFicha(grado,anios), aInd=_a.ind, aDim=_a.dim;
     const filas=[CSV_FICHA_COLS];
     const fila=(a,fam,id,label,d,estado)=>filas.push([rbd,nomEE(e),a,fam,id,label,
       (d&&d.prom!=null)?numCSV(d.prom):"", estado, nivel, PRELIM.has(String(a))?"1":"0"]);
     DATA.indicadores.forEach(ind=>{
       aInd.forEach(a=>{const d=indOf(rbd,grado,a)[ind.id];
-        const estado=(!d||d.prom==null) ? "sin dato"
-          : (d.difgru==null||d.sigdifgru==null) ? CSV_SIN_CMP_GSE
-          : EST_EE[d.sigdifgru===-1?"bajo":(d.sigdifgru===1?"sobre":"neutro")].txt;
-        fila(a,"indicador",ind.id,ind.nombre,d,estado);});
+        fila(a,"indicador",ind.id,ind.nombre,d,estadoVsGse(d));});
       (dimsByInd[ind.id]||[]).forEach(dimo=>{
         aDim.forEach(a=>fila(a,"dimension",dimo.id,dimo.nombre,dimOf(rbd,grado,a)[dimo.id],CSV_FICHA_NA));});
     });
     return filas;
   }
 
+  const nFilasFicha=({grado,anios})=>{
+    const a=aniosFicha(grado,anios);
+    return DATA.indicadores.length*a.ind.length+DATA.dimensiones.length*a.dim.length;
+  };
+
   function descargarFichaCSV(args){
-    const filas=filasFichaCSV(args);
-    if(!confirmarTamano(filas.length-1,"ficha del establecimiento")) return;
-    descargarCSV(filas,"idps_ficha_"+args.rbd+"_"+slugArchivo(args.grado)+".csv");
+    if(!confirmarTamano(nFilasFicha(args),"ficha del establecimiento")) return;
+    descargarCSV(filasFichaCSV(args),"idps_ficha_"+args.rbd+"_"+slugArchivo(args.grado)+".csv");
   }
 
   // ===== Fase 4 (s30) — imagen (SVG y PNG) del radar de la ficha =====
@@ -2176,6 +2225,21 @@ __FONTS_CSS__
     return t+"…";
   }
 
+  // Un color CON ALFA no es un valor valido de atributo de presentacion en SVG 1.1: el
+  // relleno del poligono del establecimiento es `rgba(10,58,92,.10)` y, aunque Chrome lo
+  // pinta, un editor vectorial estricto (Inkscape, Illustrator) lo descarta y el relleno
+  // se pierde o cae a negro. Se separa en color solido mas su `*-opacity`, que es como
+  // SVG expresa lo mismo. La opacidad resultante multiplica la que ya tenia el nodo,
+  // para no perder una transparencia que viniera del CSS.
+  const _RGBA=/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,/\s]+([\d.]+))?\s*\)$/i;
+  function _ponColor(nodo,prop,valor,alfaNodo){
+    const m=_RGBA.exec(String(valor==null?"":valor).trim());
+    if(!m){ if(valor) nodo.setAttribute(prop,valor); return; }
+    nodo.setAttribute(prop,"rgb("+m[1]+", "+m[2]+", "+m[3]+")");
+    const a=(m[4]==null?1:Number(m[4]))*(alfaNodo==null||alfaNodo===""?1:Number(alfaNodo));
+    nodo.setAttribute(prop+"-opacity",String(a));
+  }
+
   // Clona un subarbol SVG del documento resolviendo su estilo a atributos literales,
   // y lo devuelve como <g> (NO como <svg> anidado: un <svg> interior recorta a su
   // viewport y se comeria las etiquetas de eje, que el radar dibuja FUERA del cuadro
@@ -2187,6 +2251,9 @@ __FONTS_CSS__
     for(let i=0;i<av.length && i<ac.length;i++){
       const cs=getComputedStyle(av[i]), c=ac[i];
       SVG_PROPS.forEach(p=>{const v=cs.getPropertyValue(p); if(v) c.setAttribute(p,v);});
+      // fill y stroke se reescriben DESPUES, ya con su *-opacity puesta arriba.
+      _ponColor(c,"fill",cs.getPropertyValue("fill"),cs.getPropertyValue("fill-opacity"));
+      _ponColor(c,"stroke",cs.getPropertyValue("stroke"),cs.getPropertyValue("stroke-opacity"));
       const tag=(c.tagName||"").toLowerCase();
       if(tag==="text"||tag==="tspan") c.setAttribute("font-family",SVG_FUENTE);
       // Las clases y el style ya se resolvieron a atributos; dejarlos apuntaria a un
@@ -2520,6 +2587,7 @@ __FONTS_CSS__
                     ? "No hay establecimientos que exportar con esta combinación"
                     : "Descarga en CSV los "+fmt(unidades.length)+" establecimientos de esta vista, con su puntaje y su estado vs GSE en los cuatro indicadores"}
                   onExport={()=>descargarPanoramaCSV({grupos,grado:panGrado,agno:panAgno,
+                    gseSel:DATA.meta.gse.filter(g=>gseVis.has(g)),
                     nomArchivoTerr:terrTxt+(depNom?" "+depNom:""),
                     glosaTerr:terrTxt+(depNom?" · "+depNom:"")})}/>
               </div>
