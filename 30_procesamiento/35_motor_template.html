@@ -485,6 +485,14 @@ __FONTS_CSS__
      claros del motor desde s29d), --fs-overline; sin color de estado porque no
      afirma ninguno. Va despues de la tira externa. */
   .s100-sin{font-size:var(--fs-overline);color:var(--gris);margin-top:3px;line-height:1.2;}
+  /* s31b (revision de s31, T1): StackedBar devolvia un Fragment y sus hijos (barra,
+     tira externa, nota) entraban SUELTOS como items del grid .pan-dist-row
+     (300px | 1fr): sin tira, la nota caia en la celda del rotulo, 316 px a la
+     izquierda de la barra que califica; con tira, era la tira la que caia ahi.
+     Ahora los tres viven en un contenedor propio, como ya pasaba en la celda de la
+     franja historica y en el <td> del comparador. min-width:0 para que la columna
+     1fr pueda encoger (misma razon que .s100-seg). */
+  .s100-wrap{min-width:0;}
 
   /* ============================================================
      Fase 4 — Comparación entre territorios (banner del comparador + banda
@@ -1055,10 +1063,12 @@ __FONTS_CSS__
     const notaSin = sin>0
       ? <div className="s100-sin" title={"Establecimientos con puntaje cuya comparación con su GSE la Agencia no publica: "+fmt(sin)+". No entran en el 100 % de la barra."}>+{fmt(sin)} sin comparación publicada</div>
       : null;
-    if(vacia) return (<>
+    // s31b: contenedor propio (.s100-wrap) en vez de Fragment: barra, tira externa y
+    // nota quedan en la MISMA columna del grid del panorama (ver CSS de .s100-wrap).
+    if(vacia) return (<div className="s100-wrap">
       <div className="s100 s100-empty" role="img" aria-label={"Sin establecimientos con comparación publicada"+(sin>0?"; "+sin+" con puntaje sin comparación publicada":"")}><span className="s100-nd">sin dato</span></div>
       {notaSin}
-    </>);
+    </div>);
     const parts=pctRound([
       {k:"bajo",c:"var(--alerta)",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
       {k:"neutro",c:"var(--st-neutro)",count:rep.neutro,lbl:"= sin diferencia significativa"},
@@ -1079,7 +1089,7 @@ __FONTS_CSS__
       if(!cabe) fuera.push(s);
       return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
         title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{cabe&&<span>{full}</span>}</div>;});
-    return (<>
+    return (<div className="s100-wrap">
       <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con comparación publicada"}>{segs}</div>
       {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
           completo no cupo dentro de la barra; cada uno con su glifo de estado, su
@@ -1090,7 +1100,7 @@ __FONTS_CSS__
         <span key={s.k} className={"s100-ext-it ext-"+s.k}
           title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}% ({fmt(s.count)})</span>)}</div>}
       {notaSin}
-    </>);
+    </div>);
   }
 
   // ===== Tonos derivados del color del indicador (para dimensiones) =====
