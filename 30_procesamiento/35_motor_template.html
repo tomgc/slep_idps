@@ -1698,6 +1698,9 @@ __FONTS_CSS__
     // el pie de cada seccion queda solo con los que si estan en otra seccion.
     const eeSinUbicar=cmpEEs.map((t,i)=>({t,gse:eeGse[i]})).filter(x=>!x.gse||visGse.indexOf(x.gse)<0);
     const prelim=PRELIM.has(String(agno));
+    // s30: sin entidades o sin ningun GSE visible la tabla no se dibuja; el boton de
+    // exportacion se desactiva en vez de entregar un archivo con solo el encabezado.
+    const sinQueExportar=cmpTerr.length===0||visGse.length===0;
     return (
       <div>
         <div className="cmp-chrome">
@@ -1746,6 +1749,17 @@ __FONTS_CSS__
         <div className="gse-filter-wrap">
           <span className="gse-filter-lab">Segmentar por GSE</span>
           <span className="gse-filter-note">Muestra u oculta cada grupo socioeconómico; baja para verlos todos.</span>
+          {/* s30: el boton de exportacion vive AL LADO del segmentador de GSE, en la
+              misma posicion relativa que en el motor hermano (su .section-actions
+              junta GseFilter y el IconExport de la tabla). */}
+          <div className="export-bar">
+            <IconExport label="Exportar CSV" icon="download"
+              disabled={sinQueExportar}
+              title={sinQueExportar
+                ? "Agrega al menos una entidad y deja visible al menos un grupo socioeconómico"
+                : "Descarga en CSV lo que muestra esta comparación: las entidades elegidas, el nivel, el año vigente y los GSE visibles"}
+              onExport={()=>descargarComparadorCSV({cmpTerrs,cmpEEs,rosters,eeGse,visGse,grado:cmpGrado,agno})}/>
+          </div>
           <div className="gse-filter">{DATA.meta.gse.map(g=>
             <button key={g} className={"gfb"+(cmpGseVis.has(g)?" on":"")} onClick={()=>onToggleGse(g)} aria-pressed={cmpGseVis.has(g)}>
               <span className="gf-check" aria-hidden="true">{cmpGseVis.has(g)?"✓":""}</span>{GSE[g]}</button>)}</div>
@@ -1902,6 +1916,71 @@ __FONTS_CSS__
         disabled={!!disabled} onClick={onExport}>
         <IconExp name={icon||"download"}/><span className="btn-export-lab">{label}</span>
       </button>);
+  }
+
+  // ===== Fase 2 (s30) — CSV del comparador de entidades =====
+  // Exporta EXACTAMENTE lo que la pantalla muestra: entidades elegidas, nivel, año
+  // vigente, dependencia de cada entidad y GSE visibles. La garantia de que no puede
+  // divergir de la tabla es estructural: la funcion NO recalcula el universo, recibe
+  // los MISMOS arreglos con los que Comparador dibuja (cmpTerrs, cmpEEs, rosters,
+  // eeGse, visGse) y los recorre en el mismo orden.
+  //
+  // Dos tipos de fila, distinguidas por la columna `tipo`, con el encabezado como
+  // UNION de sus columnas: una fila de territorio deja vacias las de establecimiento
+  // y al reves. Es un solo archivo porque es una sola pantalla.
+  const CSV_CMP_COLS=["tipo","entidad","tipo_entidad","dependencia","rbd","comuna",
+    "gse","gse_label","indicador","indicador_label",
+    "n_con_dato","n_bajo","n_neutro","n_sobre","pct_bajo","pct_neutro","pct_sobre",
+    "puntaje","estado_vs_gse","nivel","anio","preliminar"];
+
+  function filasComparadorCSV({cmpTerrs,cmpEEs,rosters,eeGse,visGse,grado,agno}){
+    const nivel=DATA.meta.grados[grado]||grado;
+    const prelim=PRELIM.has(String(agno))?"1":"0";
+    const filas=[CSV_CMP_COLS];
+    visGse.forEach(g=>{
+      const gl=GSE[g]||g;
+      // Filas de TERRITORIO: el mismo reparto que pinta StackedBar, celda por celda.
+      cmpTerrs.forEach((t,ti)=>{
+        const items=rosters[ti].filter(u=>u.gse===g);
+        DATA.indicadores.forEach(ind=>{
+          const rep=repartoInd(items,ind.id,grado,agno);
+          // Los porcentajes son los de pctRound —los mismos que la barra—, no un
+          // redondeo propio: si el CSV los recalculara de otra forma discreparia de
+          // lo que se ve. Con N=0 la barra dice "sin dato" y no pinta ningun
+          // porcentaje, asi que las tres celdas quedan VACIAS: pctRound sobre un
+          // total de 0 devolveria un 34/33/33 inventado.
+          const pr=rep.N>0?pctRound([{k:"bajo",count:rep.bajo},{k:"neutro",count:rep.neutro},{k:"sobre",count:rep.sobre}]):null;
+          filas.push(["territorio",t.nom,t.kind,t.dep?(DEPE[t.dep]||t.dep):"","","",
+            g,gl,ind.id,ind.nombre,
+            numCSV(rep.N),numCSV(rep.bajo),numCSV(rep.neutro),numCSV(rep.sobre),
+            pr?numCSV(pr[0].p):"",pr?numCSV(pr[1].p):"",pr?numCSV(pr[2].p):"",
+            "","",nivel,agno,prelim]);
+        });
+      });
+      // Filas de ESTABLECIMIENTO: solo los que cierran la tabla de ESTE GSE, que son
+      // los unicos que la pantalla dibuja aqui. Un caso individual no se reparte: no
+      // lleva conteos ni porcentajes, lleva su puntaje y su estado vs su propio GSE,
+      // leido de sigdifgru. Los EE con el GSE oculto no se exportan, porque tampoco
+      // se ven (la pantalla ya lo avisa en .cmp-nota-ee).
+      cmpEEs.forEach((t,i)=>{ if(eeGse[i]!==g) return;
+        const dind=indOf(t.cod,grado,agno), e=est[t.cod];
+        DATA.indicadores.forEach(ind=>{
+          const d=dind[ind.id];
+          const st=(!d||d.prom==null)?null:EST_EE[d.sigdifgru===-1?"bajo":(d.sigdifgru===1?"sobre":"neutro")];
+          filas.push(["establecimiento",t.nom,"establecimiento","",t.cod,
+            (e&&e.cod_com!=null)?comNom(e.cod_com):"",
+            g,gl,ind.id,ind.nombre,"","","","","","","",
+            st?numCSV(d.prom):"", st?st.txt:"sin dato", nivel,agno,prelim]);
+        });
+      });
+    });
+    return filas;
+  }
+
+  function descargarComparadorCSV(args){
+    const filas=filasComparadorCSV(args);
+    if(!confirmarTamano(filas.length-1,"comparación de entidades")) return;
+    descargarCSV(filas,"idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+".csv");
   }
 
   // ===== Andamiaje de navegacion: 3 pantallas (rediseno Fase 1; completado en Fase 4) =====
