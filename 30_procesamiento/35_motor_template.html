@@ -234,7 +234,8 @@ __FONTS_CSS__
   /* s29i: selector de DEPENDENCIA dentro del modal (tabs comuna/region/nacional), como
      en el motor hermano. La dependencia es un ATRIBUTO DE LA ENTIDAD, no un filtro
      global: por eso vive aqui y no en una barra suelta. */
-  .modal-dep{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+  .modal-dep{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;}
+  .modal-body .nota{margin:0 0 12px;}
   .modal-dep-lab{font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-caption);letter-spacing:var(--tracking-overline);color:var(--gris);}
   .estab-popup-btn.is-primary{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:var(--fw-bold);}
   .estab-popup-btn.is-primary:hover{background:var(--foco);}
@@ -465,10 +466,13 @@ __FONTS_CSS__
      LINEA. Con el grid, cuando los tres textos no cabian en el ancho de la celda se
      SUPERPONIAN (se leia "▼ 17% (233)" y "▲ 17% (232)" encima de "= 63% (822)");
      ahora se apilan. `white-space:nowrap` se conserva: un numero no se parte nunca.
-     Las tres posiciones se sostienen con MARGENES AUTOMATICOS en vez de columnas —
-     bajo empuja a su derecha, sobre a su izquierda y el neutro a ambos lados—, de
-     modo que un estado ausente sigue sin mover a los otros dos, y en cada linea que
-     resulte del salto la alineacion a los extremos se mantiene. */
+     Las tres posiciones se sostienen con MARGENES AUTOMATICOS en vez de columnas:
+     bajo empuja a su derecha, sobre a su izquierda y el neutro a ambos lados. Los
+     extremos quedan anclados igual que antes (bajo a la izquierda, sobre a la derecha,
+     tambien en cada linea que resulte del salto) y el neutro solo, sin vecinos, sigue
+     exactamente centrado. Lo que el grid daba y esto no: con DOS items, el del medio
+     ya no cae en el centro del contenedor sino repartido entre los otros dos. Es el
+     precio de poder saltar de linea, y se prefiere a que los textos se pisen. */
   .s100-ext{display:flex;flex-wrap:wrap;gap:2px 8px;margin-top:3px;font-size:var(--fs-overline);line-height:1.2;align-items:baseline;}
   .s100-ext-it{font-weight:var(--fw-bold);white-space:nowrap;}
   /* s29c: el color sale de la CLASE de estado, no de un estilo inline, y usa el
@@ -1415,6 +1419,20 @@ __FONTS_CSS__
           <div className="modal-body">
             <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
               style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>
+            {/* s29i: el selector va ARRIBA de la lista, al reves que en el hermano. Alli el
+                modal tiene boton de guardar y el orden visual da igual; aqui el clic en la
+                fila CONFIRMA de inmediato, asi que la dependencia tiene que verse y poder
+                fijarse ANTES de elegir la entidad. Debajo de una lista de 340px quedaba
+                fuera de la caja en pantallas de portatil. */}
+            {depVisible && (
+              <label className="modal-dep">
+                <span className="modal-dep-lab">Dependencia</span>
+                <select value={dep} onChange={e=>setDep(e.target.value)}>
+                  <option value="">Todas las dependencias</option>
+                  {depOpts.map(d=><option key={d.cod} value={d.cod}>{d.nom}</option>)}
+                </select>
+              </label>)}
+            {avisoFor && avisoFor(tab,depEfectiva)}
             <div className="comuna-checklist" style={{maxHeight:340}}>
               {list.length===0 && <div className="empty-state">{emptyText}</div>}
               {list.map(item=>{const key=keyEnt({kind:item.kind,cod:item.cod,dep:depEfectiva});
@@ -1429,15 +1447,6 @@ __FONTS_CSS__
                   <span className="check-region">{item.sub}</span>
                 </div>);})}
             </div>
-            {avisoFor && avisoFor(tab,depEfectiva)}
-            {depVisible && (
-              <label className="modal-dep">
-                <span className="modal-dep-lab">Dependencia</span>
-                <select value={dep} onChange={e=>setDep(e.target.value)}>
-                  <option value="">Todas las dependencias</option>
-                  {depOpts.map(d=><option key={d.cod} value={d.cod}>{d.nom}</option>)}
-                </select>
-              </label>)}
           </div>
           <div className="modal-footer">
             {multiple
@@ -1453,11 +1462,13 @@ __FONTS_CSS__
 
   // Catalogos para buildList (del JSON ya embebido; sin cambios en 35.R).
   const COMUNAS_POR_REGION=(()=>{const m={};DATA.comunas.forEach(c=>{m[c.cod_reg]=(m[c.cod_reg]||0)+1;});return m;})();
-  // Opciones de DEPENDENCIA: SOLO las 4 categorias de cod_depe2 con etiqueta
-  // conocida en DEPE. Blindado (DEPE[e.cod_depe2]) para que la pestana jamas
-  // liste comunas u otros valores ajenos a la dependencia (Hallazgo H5).
-  const DEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null&&DEPE[e.cod_depe2])m[e.cod_depe2]=(m[e.cod_depe2]||0)+1;});
-    return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c],n:m[c]}));})();
+  // Opciones de DEPENDENCIA: SOLO las categorias de cod_depe2 con etiqueta conocida en
+  // DEPE. Blindado (DEPE[e.cod_depe2]) para que el selector jamas liste comunas u otros
+  // valores ajenos a la dependencia (Hallazgo H5). s29i: alimenta el <select> del modal
+  // (antes alimentaba el tab "Dependencia", retirado); el conteo por categoria dejo de
+  // usarse — seria del directorio completo, no del territorio elegido, y engañaria.
+  const DEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_depe2!=null&&DEPE[e.cod_depe2])m[e.cod_depe2]=true;});
+    return Object.keys(m).sort().map(c=>({cod:c,nom:DEPE[c]}));})();
   // ===== Dependencia por ENTIDAD (s29i) =====
   // El codigo de la dependencia SLEP NO se escribe a mano: el motor hermano usa "5" y
   // este usa "4", asi que se DERIVA de la etiqueta del payload y el aviso sigue al dato.
@@ -1537,9 +1548,9 @@ __FONTS_CSS__
 
   // s29: "territorio" en el codigo del comparador (cmpTerr/rosterTerr/addTerr/removeTerr y las clases cmp-*) significa "entidad comparable": territorio, nivel nacional o establecimiento; la interfaz dice "entidad" y los identificadores no se renombran.
   // ===== Comparador (Fase 4): catalogos de seleccion via EntityModal =====
-  // El comparador compara TERRITORIOS arbitrarios (SLEP/comuna/region), no
-  // dependencias ni un EE: por eso usa SUS PROPIOS tabs y buildList (kind ∈
-  // {slep,comuna,region}). Conteo de comunas/EE por SLEP (del directorio publico)
+  // El comparador usa SUS PROPIOS tabs y buildList (kind ∈ {establecimiento,comuna,
+  // slep,region,nacional}; s29i suma la dependencia como atributo de la entidad).
+  // Conteo de comunas/EE por SLEP (del directorio publico)
   // SOLO para la etiqueta del picker; la meta del chip se calcula del roster real
   // por grado/año (D-s8-4).
   const SLEPS_OPTS=(()=>{const m={};DATA.establecimientos.forEach(e=>{if(e.cod_slep!=null){const k=e.cod_slep;(m[k]=m[k]||{ee:0,coms:new Set()});m[k].ee++;if(e.cod_com!=null)m[k].coms.add(e.cod_com);}});
@@ -1669,7 +1680,7 @@ __FONTS_CSS__
               <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===cmpGrado?" on":"")} onClick={()=>onNivel(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
           </div>
         </div>
-        <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda de territorio reparte el <b>100% de los establecimientos</b> del territorio (en ese GSE e indicador) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes. Las filas de <b>establecimiento</b> son un caso único: muestran su estado, no un reparto.</div>
+        <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda de entidad reparte el <b>100% de los establecimientos</b> de esa entidad (en ese GSE e indicador, y en su dependencia cuando se eligió una) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes. Las filas de <b>establecimiento</b> son un caso único: muestran su estado, no un reparto.</div>
 
         <div className="cmp-controls">
           <span className="cmp-cl">Entidades a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
@@ -1682,7 +1693,9 @@ __FONTS_CSS__
                   {esEE && <span className="cmp-ck">Establecimiento</span>}
                   <span className="cmp-cn">{t.nom}</span>
                   <span className="cmp-cm">{metaChip[key]}</span></span>
-                <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod,t.dep)} aria-label={"Quitar "+t.nom} title={"Quitar "+t.nom}>✕</button>
+                {/* s29i: con dos entidades de la misma comuna y distinta dependencia, el
+                    nombre solo no basta para distinguir los dos botones. */}
+                <button className="cmp-x" onClick={()=>onRemove(t.kind,t.cod,t.dep)} aria-label={"Quitar "+t.nom+(t.dep?" · "+(DEPE[t.dep]||t.dep):"")} title={"Quitar "+t.nom+(t.dep?" · "+(DEPE[t.dep]||t.dep):"")}>✕</button>
               </div>);})}
             {cmpTerr.length<CMP_MAX_TERR && <button className="cmp-add" onClick={onAdd}>+ agregar entidad</button>}
             {cmpTerr.length>=1 && <button className="cmp-reset" onClick={onReset} aria-label="Limpiar entidades" title="Limpiar entidades">↺</button>}
@@ -1769,7 +1782,8 @@ __FONTS_CSS__
                    ["ficha","Panorama IDPS por establecimiento"],
                    ["comparar","Comparación entre territorios"]];
 
-  // ===== Navegacion territorial via EntityModal: region/comuna/dependencia/EE =====
+  // ===== Navegacion territorial via EntityModal: comuna/slep/region/nacional/EE =====
+  // (s29i: el tab "dependencia" ya no existe; la dependencia es atributo de la entidad.)
   function App(){
     const grados=Object.keys(DATA.meta.grados);
     // Item 8 (s19): disponibilidad de grados por EE (indice server-side, meta.grados_ee).
@@ -1855,7 +1869,7 @@ __FONTS_CSS__
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
     const panComunas=useMemo(()=>{const s=new Set();unidades.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});return s.size;},[unidades]);
     // #3 (s21): para SLEP, lista de NOMBRES de comuna del territorio (orden alfabetico
-    // es-CL, formato "A, B y C"). Solo SLEP (foco/slep); comuna/region/dependencia no la muestran.
+    // es-CL, formato "A, B y C"). Solo SLEP (foco/slep); comuna/region/nacional no la muestran.
     const esSlep = terr.kind==="foco" || terr.kind==="slep";
     // s29i: con el territorio NACIONAL no se dibuja la grilla de establecimientos. El
     // roster nacional de un nivel son miles de EE (6.717 en 4° basico 2025): pintar esas
@@ -1931,17 +1945,17 @@ __FONTS_CSS__
                   <span className="gf-check" aria-hidden="true">{gseVis.has(g)?"✓":""}</span>{GSE[g]}</button>)}</div>
             </div>
 
-            <div className="help"><b>Panorama del territorio sin agregar.</b> El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia) y la grilla para abrir el Panorama IDPS de cada uno. Las barras son <b>% (n) de establecimientos, nunca un promedio</b>.</div>
+            <div className="help"><b>Panorama del territorio sin agregar.</b> El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia){esNacional?". ":" y la grilla para abrir el Panorama IDPS de cada uno. "}Las barras son <b>% (n) de establecimientos, nunca un promedio</b>.</div>
             <div className="leyenda pan-state-leg">
               <span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span>
               <span><i style={{background:"var(--st-neutro)"}}></i>= sin diferencia</span>
               <span><i style={{background:"var(--destaca)"}}></i>▲ sobre su GSE</span>
             </div>
             {unidades.length===0
-              ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio, nivel y GSE.</div>
+              ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio{terr.dep?", dependencia":""}, nivel y GSE.</div>
               : grupos.map(grp=>(
                   <section className="gse-sec pan-sec" key={grp.gse}>
-                    <div className="gse-sec-h"><span className="gse-sec-name">{GSE[grp.gse]||"sin clasificar"}</span><span className="gse-sec-sub">{grp.items.length} establecimientos · grupo socioeconómico</span></div>
+                    <div className="gse-sec-h"><span className="gse-sec-name">{GSE[grp.gse]||"sin clasificar"}</span><span className="gse-sec-sub">{fmt(grp.items.length)} establecimientos · grupo socioeconómico</span></div>
                     <div className="pan-gse-body">
                       <div className="pan-sub-h">Distribución por estado vs su GSE</div>
                       <div className="pan-dist">
