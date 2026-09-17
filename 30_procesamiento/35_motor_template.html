@@ -480,6 +480,11 @@ __FONTS_CSS__
   .s100-ext-it.ext-bajo{margin-right:auto;color:var(--alerta-txt);}
   .s100-ext-it.ext-neutro{margin-left:auto;margin-right:auto;color:var(--st-neutro-txt);}
   .s100-ext-it.ext-sobre{margin-left:auto;color:var(--destaca-txt);}
+  /* s31: nota bajo la barra para los EE con puntaje y sin comparacion publicada
+     (fuera del 100 %). Texto de interfaz en --gris (4,5:1 sobre todos los fondos
+     claros del motor desde s29d), --fs-overline; sin color de estado porque no
+     afirma ninguno. Va despues de la tira externa. */
+  .s100-sin{font-size:var(--fs-overline);color:var(--gris);margin-top:3px;line-height:1.2;}
 
   /* ============================================================
      Fase 4 — Comparación entre territorios (banner del comparador + banda
@@ -553,6 +558,10 @@ __FONTS_CSS__
   .ee-gl.bajo{background:var(--alerta-bg);color:var(--alerta);border:1.5px solid var(--alerta);}
   .ee-gl.neutro{background:#EDF0F3;color:var(--st-neutro);border:1.5px solid var(--st-neutro);}
   .ee-gl.sobre{background:var(--destaca-bg);color:var(--destaca);border:1.5px solid var(--destaca);}
+  /* s31: "·" sin comparacion publicada. Mismo aspecto neutro del glifo (no afirma
+     estado); el texto, en el token neutro de TEXTO y con salto permitido porque
+     "sin comparación publicada" no cabe en una columna comprimida del comparador. */
+  .ee-gl.sin{background:#EDF0F3;color:var(--st-neutro);border:1.5px solid var(--st-neutro);}
   .ee-val{display:flex;flex-direction:column;line-height:1.15;text-align:left;}
   .ee-pt{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:var(--fs-body-lg);color:var(--tinta);}
   /* s29c: el texto de estado deja el gris de interfaz y toma el token de TEXTO
@@ -562,6 +571,7 @@ __FONTS_CSS__
   .ee-st.bajo{color:var(--alerta-txt);}
   .ee-st.neutro{color:var(--st-neutro-txt);}
   .ee-st.sobre{color:var(--destaca-txt);}
+  .ee-st.sin{color:var(--st-neutro-txt);white-space:normal;}
   .ee-nd{font-size:var(--fs-caption);color:var(--gris);font-style:italic;text-align:center;display:block;}
   .gse-sec-foot{padding:10px 18px;border-top:1px solid var(--linea);background:var(--paper);font-size:var(--fs-caption);color:var(--gris);line-height:1.5;}
   .cmp-empty{padding:40px;text-align:center;color:var(--gris);border:1px dashed var(--linea);border-radius:var(--radius-3);background:var(--panel);}
@@ -832,10 +842,16 @@ __FONTS_CSS__
   //  en los paneles "todo desplegado"; las anclas se arman con <Ancla/> directo.)
 
   // ===== Resumen de alertas de un establecimiento (para la tarjeta) =====
+  // s31 (decision 20260917 §6): ademas de bajo/sobre, cuenta `cmp` (indicadores con
+  // sigdifgru publicado) y `sin` (con puntaje, sin sigdifgru). El chip "≈ en su GSE"
+  // solo se afirma cuando hay al menos una comparacion publicada y ninguna es ±1; con
+  // puntaje pero sin ninguna comparacion, la tarjeta lo dice asi y no deriva un
+  // estado de una ausencia (892 EE en 4b 2025, 2 de ellos del SLEP foco).
   function alertSummary(im){
-    let bajo=0,sobre=0,dato=0;
-    DATA.indicadores.forEach(ind=>{const d=im[ind.id];if(d&&d.prom!=null){dato++;if(d.sigdifgru===-1)bajo++;else if(d.sigdifgru===1)sobre++;}});
-    return {bajo,sobre,dato};
+    let bajo=0,sobre=0,dato=0,cmp=0,sin=0;
+    DATA.indicadores.forEach(ind=>{const d=im[ind.id];if(d&&d.prom!=null){dato++;
+      if(d.sigdifgru==null)sin++; else {cmp++; if(d.sigdifgru===-1)bajo++; else if(d.sigdifgru===1)sobre++;}}});
+    return {bajo,sobre,dato,cmp,sin};
   }
 
   // ===== Tarjeta de establecimiento =====
@@ -855,7 +871,8 @@ __FONTS_CSS__
         <div className="alerts">
           {al.bajo>0 && <span className="chip al" title="indicadores significativamente bajo su GSE">▼ {al.bajo} indicadores bajo su GSE</span>}
           {al.sobre>0 && <span className="chip de" title="indicadores significativamente sobre su GSE">▲ {al.sobre} indicadores sobre su GSE</span>}
-          {al.dato>0 && al.bajo===0 && al.sobre===0 && <span className="chip nt">≈ en su GSE</span>}
+          {al.cmp>0 && al.bajo===0 && al.sobre===0 && <span className="chip nt">≈ en su GSE</span>}
+          {al.dato>0 && al.cmp===0 && <span className="chip nt" title="Con puntaje, pero la Agencia no publica la comparación con su GSE para ningún indicador">· sin comparación publicada</span>}
           {al.dato===0 && <span className="chip nt sup">sin dato</span>}
         </div>
         <span className="gc-go">ver más detalles →</span>
@@ -887,14 +904,19 @@ __FONTS_CSS__
 
   // ===== Reparto de estado vs GSE (Fase 3 — CONTEO de EE, NO promedio) =====
   // Por indicador, cuenta EE del grupo en ▼ bajo / = sin diferencia / ▲ sobre,
-  // LEIDO de sigdifgru (misma clasificacion que alertSummary/la tarjeta). NA NO
-  // cuenta como estado ni como 0: queda FUERA del reparto; N = EE con dato. Cero
+  // LEIDO de sigdifgru (misma clasificacion que alertSummary/la tarjeta). Cero
   // agregacion: es % (n) de establecimientos, jamas un promedio de puntajes.
+  // s31 (decision 20260917 §6): el sigdifgru NULO ya no cae en `neutro`. Un EE con
+  // puntaje y sin comparacion publicada se cuenta en `sin` y queda FUERA del 100 %:
+  // N = bajo + neutro + sobre = EE CON comparacion publicada. Antes, "sin
+  // diferencia" absorbia la ausencia (en la seccion Medio del SLEP foco, 4b 2025,
+  // Autoestima: N=28 con 17 neutros; el dato publicado es N=26 con 15).
   function repartoInd(items,indId,grado,agno){
-    let bajo=0,neutro=0,sobre=0,N=0;
+    let bajo=0,neutro=0,sobre=0,sin=0;
     items.forEach(u=>{const d=indOf(u.rbd,grado,agno)[indId];
-      if(d&&d.prom!=null){N++; if(d.sigdifgru===-1)bajo++; else if(d.sigdifgru===1)sobre++; else neutro++;}});
-    return {bajo,neutro,sobre,N};
+      if(!d||d.prom==null) return;
+      if(d.sigdifgru===-1)bajo++; else if(d.sigdifgru===1)sobre++; else if(d.sigdifgru===0)neutro++; else if(d.sigdifgru==null)sin++;});
+    return {bajo,neutro,sobre,sin,N:bajo+neutro+sobre};
   }
   // Redondeo a enteros que suma 100 exacto (reparte el residuo por parte fraccional).
   function pctRound(parts){
@@ -959,14 +981,27 @@ __FONTS_CSS__
     // Repintado cuando las OTF embebidas terminan de cargar (cambia el ancho del texto).
     useEffect(()=>{const fn=()=>setFuenteVer(v=>v+1); _fuenteSubs.add(fn);
       return ()=>{_fuenteSubs.delete(fn);};},[]);
-    if(vacia) return <div className="s100 s100-empty"><span className="s100-nd">sin dato</span></div>;
+    // s31 (decision 20260917 §6): los EE con puntaje y sin comparacion publicada
+    // (rep.sin) quedan FUERA del 100 % y se declaran en una nota bajo la barra (y
+    // bajo la tira externa, si la hay), tambien con N=0. Es texto en --gris y
+    // --fs-overline: no es un cuarto segmento ni una trama nueva (alternativa
+    // descartada por el titular), y no entra en la regla de etiquetado de la barra.
+    const sin=rep.sin||0;
+    const notaSin = sin>0
+      ? <div className="s100-sin" title={"Establecimientos con puntaje cuya comparación con su GSE la Agencia no publica: "+fmt(sin)+". No entran en el 100 % de la barra."}>+{fmt(sin)} sin comparación publicada</div>
+      : null;
+    if(vacia) return (<>
+      <div className="s100 s100-empty" role="img" aria-label={"Sin establecimientos con comparación publicada"+(sin>0?"; "+sin+" con puntaje sin comparación publicada":"")}><span className="s100-nd">sin dato</span></div>
+      {notaSin}
+    </>);
     const parts=pctRound([
       {k:"bajo",c:"var(--alerta)",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
       {k:"neutro",c:"var(--st-neutro)",count:rep.neutro,lbl:"= sin diferencia significativa"},
       {k:"sobre",c:"var(--destaca)",count:rep.sobre,lbl:"▲ sobre su GSE (significativo)"}]);
     // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
     // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
-    const aria="Distribución de "+rep.N+" establecimientos con dato: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ");
+    const aria="Distribución de "+rep.N+" establecimientos con comparación publicada: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
+      +(sin>0?"; además "+sin+" con puntaje sin comparación publicada, fuera del 100 %":"");
     // REGLA UNICA de etiquetado (s29): dentro del segmento va SOLO el dato completo
     // "p% (n)", y solo si cabe entero con holgura. Lo que no cabe no se recorta ni se
     // degrada a "p%" a secas: baja ENTERO a la tira externa. Asi nunca se lee un
@@ -980,7 +1015,7 @@ __FONTS_CSS__
       return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
         title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{cabe&&<span>{full}</span>}</div>;});
     return (<>
-      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con dato"}>{segs}</div>
+      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con comparación publicada"}>{segs}</div>
       {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
           completo no cupo dentro de la barra; cada uno con su glifo de estado, su
           color y su "p% (n)" entero. s29c: ese color ya no viaja inline; lo pone
@@ -989,6 +1024,7 @@ __FONTS_CSS__
       {fuera.length>0 && <div className="s100-ext">{fuera.map(s=>
         <span key={s.k} className={"s100-ext-it ext-"+s.k}
           title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}% ({fmt(s.count)})</span>)}</div>}
+      {notaSin}
     </>);
   }
 
@@ -1683,11 +1719,14 @@ __FONTS_CSS__
   // puntaje del propio EE tal cual (cero agregacion, no es una media).
   const EST_EE={bajo:{g:"▼",txt:"bajo su GSE",lbl:"Bajo su GSE (diferencia significativa)"},
                 neutro:{g:"=",txt:"sin diferencia",lbl:"Sin diferencia significativa con su GSE"},
-                sobre:{g:"▲",txt:"sobre su GSE",lbl:"Sobre su GSE (diferencia significativa)"}};
+                sobre:{g:"▲",txt:"sobre su GSE",lbl:"Sobre su GSE (diferencia significativa)"},
+                // s31 (decision 20260917 §6): con puntaje y sigdifgru nulo no se afirma
+                // estado; misma señaletica "·" que la vista historica de la ficha (#147).
+                sin:{g:"·",txt:"sin comparación publicada",lbl:"Con puntaje; la Agencia no publica la comparación con su GSE"}};
   function CeldaEE({d}){
     // prom nulo => "sin dato" en cursiva; jamas un cero ni un guion.
     if(!d||d.prom==null) return <span className="ee-nd">sin dato</span>;
-    const k=d.sigdifgru===-1?"bajo":d.sigdifgru===1?"sobre":"neutro", st=EST_EE[k];
+    const k=d.sigdifgru===-1?"bajo":d.sigdifgru===1?"sobre":d.sigdifgru===0?"neutro":"sin", st=EST_EE[k];
     return (
       <div className="ee-cell">
         <span className={"ee-gl "+k} title={st.lbl} aria-hidden="true">{st.g}</span>
@@ -1939,12 +1978,11 @@ __FONTS_CSS__
   // separa: la Agencia publica la comparacion desde 2024, y dentro de 2024-2025 sigue
   // nula para el establecimiento sin grupo de comparacion.
   //
-  // DIVERGENCIA CON LA PANTALLA, declarada y reversible: en ese caso `CeldaEE` y el chip
-  // de la tarjeta si dicen "sin diferencia" / "≈ en su GSE", porque `repartoInd` y
-  // `alertSummary` mandan el nulo al cubo neutro. Son 3.495 celdas EE x indicador en 4°
-  // basico 2025, el 13,3% de las que tienen puntaje. No se corrige la pantalla aqui:
-  // cambiaria las cifras de las barras y la regla de etiquetado, que este encargo manda
-  // conservar. Va como pendiente propio (P-ESTADO-SIN-COMPARACION).
+  // Divergencia con la pantalla CERRADA en s31 (P-ESTADO-SIN-COMPARACION, decision
+  // 20260917 §6): `repartoInd`, `CeldaEE` y el chip de la tarjeta ya no mandan el nulo
+  // al cubo neutro (eran 3.495 celdas EE x indicador en 4° basico 2025, el 13,3% de
+  // las que tienen puntaje). Pantalla y CSV leen hoy la misma ausencia de la misma
+  // forma; el CSV conserva su glosa propia (con "vs GSE") por continuidad de archivo.
   const CSV_SIN_CMP_GSE="sin comparación vs GSE publicada";
   function estadoVsGse(d){
     if(!d||d.prom==null) return "sin dato";
@@ -1993,9 +2031,13 @@ __FONTS_CSS__
   // Dos tipos de fila, distinguidas por la columna `tipo`, con el encabezado como
   // UNION de sus columnas: una fila de territorio deja vacias las de establecimiento
   // y al reves. Es un solo archivo porque es una sola pantalla.
+  // s31 (decision 20260917 §6): `n_con_dato` pasa a ser N = EE CON comparacion
+  // publicada (el 100 % de la barra) y se agrega `n_sin_comparacion` (con puntaje,
+  // sin sigdifgru), justo despues de `n_sobre`. El nombre `n_con_dato` se conserva
+  // por contrato aunque ya no describe "con puntaje": va como duda al titular.
   const CSV_CMP_COLS=["tipo","entidad","tipo_entidad","dependencia","rbd","comuna",
     "gse","gse_label","indicador","indicador_label",
-    "n_con_dato","n_bajo","n_neutro","n_sobre","pct_bajo","pct_neutro","pct_sobre",
+    "n_con_dato","n_bajo","n_neutro","n_sobre","n_sin_comparacion","pct_bajo","pct_neutro","pct_sobre",
     "puntaje","estado_vs_gse","nivel","anio","preliminar"];
 
   function filasComparadorCSV({cmpTerrs,cmpEEs,rosters,eeGse,visGse,grado,agno}){
@@ -2017,7 +2059,7 @@ __FONTS_CSS__
           const pr=rep.N>0?pctRound([{k:"bajo",count:rep.bajo},{k:"neutro",count:rep.neutro},{k:"sobre",count:rep.sobre}]):null;
           filas.push(["territorio",t.nom,t.kind,t.dep?(DEPE[t.dep]||t.dep):"","","",
             g,gl,ind.id,ind.nombre,
-            numCSV(rep.N),numCSV(rep.bajo),numCSV(rep.neutro),numCSV(rep.sobre),
+            numCSV(rep.N),numCSV(rep.bajo),numCSV(rep.neutro),numCSV(rep.sobre),numCSV(rep.sin),
             pr?numCSV(pr[0].p):"",pr?numCSV(pr[1].p):"",pr?numCSV(pr[2].p):"",
             "","",nivel,agno,prelim]);
         });
@@ -2033,7 +2075,7 @@ __FONTS_CSS__
           const d=dind[ind.id];
           filas.push(["establecimiento",t.nom,"establecimiento","",t.cod,
             (e&&e.cod_com!=null)?comNom(e.cod_com):"",
-            g,gl,ind.id,ind.nombre,"","","","","","","",
+            g,gl,ind.id,ind.nombre,"","","","","","","","",
             (d&&d.prom!=null)?numCSV(d.prom):"", estadoVsGse(d), nivel,agno,prelim]);
         });
       });
