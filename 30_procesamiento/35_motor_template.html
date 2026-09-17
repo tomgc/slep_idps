@@ -2811,7 +2811,12 @@ __FONTS_CSS__
 
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
-    const panComunas=useMemo(()=>{const s=new Set();unidades.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});return s.size;},[unidades]);
+    // s31 (auditoria R-25): las comunas del banner se cuentan sobre el universo de la
+    // vista activa (roster de todos los anios en la historica; el del ultimo anio en la
+    // actual). Con el universo del ultimo anio, el banner nacional 4b decia 343 comunas
+    // junto a 8.284 EE de 346 comunas.
+    const univBanner=isHistPan?rosterHist:unidades;
+    const panComunas=useMemo(()=>{const s=new Set();univBanner.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});return s.size;},[univBanner]);
     // #3 (s21): para SLEP, lista de NOMBRES de comuna del territorio (orden alfabetico
     // es-CL, formato "A, B y C"). Solo SLEP (foco/slep); comuna/region/nacional no la muestran.
     const esSlep = terr.kind==="foco" || terr.kind==="slep";
@@ -2822,10 +2827,10 @@ __FONTS_CSS__
     const esNacional = terr.kind==="nacional";
     const panComunasNoms=useMemo(()=>{
       if(!esSlep) return "";
-      const s=new Set();unidades.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});
+      const s=new Set();univBanner.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});
       const noms=[...s].map(c=>comNom(c)).filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'));
       return noms.length<=1 ? noms.join("") : noms.slice(0,-1).join(", ")+" y "+noms[noms.length-1];
-    },[unidades,esSlep]);
+    },[univBanner,esSlep]);
 
     const depNom = terr.dep ? (DEPE[terr.dep]||terr.dep) : null;
     const terrTxt = terr.kind==="nacional" ? "Chile"
