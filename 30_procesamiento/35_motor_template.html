@@ -2817,15 +2817,22 @@ __FONTS_CSS__
     // construye cuando esa vista esta activa; el GSE se filtra al dibujar).
     const rosterHist=useMemo(()=>isHistPan?rosterHistorico(terr,panGrado):[],[isHistPan,terr,panGrado]);
     const haySinGse=isHistPan&&rosterHist.some(r=>r.gse==null);
-    const nHist=rosterHist.filter(r=>gseVis.has(r.gse||"sin")).length;
+    // s31b (revision de s31, T2): UN solo universo filtrado por GSE alimenta los dos
+    // conteos del banner historico (establecimientos y comunas), para que no puedan
+    // divergir. R-25 de s31 conto las comunas sobre rosterHist SIN filtrar por gseVis
+    // mientras nHist si filtraba: en nacional 4b con solo "Alto" encendido el banner
+    // decia "346 comunas · 555 establecimientos", y esos 555 viven en 96 comunas.
+    const rosterHistVis=useMemo(()=>rosterHist.filter(r=>gseVis.has(r.gse||"sin")),[rosterHist,gseVis]);
+    const nHist=rosterHistVis.length;
 
     const grupos=useMemo(()=>{const g={};unidades.forEach(u=>{(g[u.gse||"sin"]=g[u.gse||"sin"]||[]).push(u);});
       return Object.keys(g).sort().map(k=>({gse:k,items:g[k].sort((a,b)=>(est[a.rbd]?.nom||"").localeCompare(est[b.rbd]?.nom||""))}));},[unidades]);
     // s31 (auditoria R-25): las comunas del banner se cuentan sobre el universo de la
     // vista activa (roster de todos los anios en la historica; el del ultimo anio en la
     // actual). Con el universo del ultimo anio, el banner nacional 4b decia 343 comunas
-    // junto a 8.284 EE de 346 comunas.
-    const univBanner=isHistPan?rosterHist:unidades;
+    // junto a 8.284 EE de 346 comunas. s31b: en la historica, el universo es el roster
+    // YA filtrado por GSE (rosterHistVis), el mismo que cuenta nHist.
+    const univBanner=isHistPan?rosterHistVis:unidades;
     const panComunas=useMemo(()=>{const s=new Set();univBanner.forEach(u=>{const e=est[u.rbd];if(e&&e.cod_com!=null)s.add(e.cod_com);});return s.size;},[univBanner]);
     // #3 (s21): para SLEP, lista de NOMBRES de comuna del territorio (orden alfabetico
     // es-CL, formato "A, B y C"). Solo SLEP (foco/slep); comuna/region/nacional no la muestran.
