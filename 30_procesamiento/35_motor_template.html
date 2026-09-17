@@ -2590,6 +2590,9 @@ __FONTS_CSS__
   }
   // "2024 y 2025" / "2023, 2024 y 2025": derivado del dato, nunca escrito a mano.
   const listaY=arr=>arr.length<=1?arr.join(""):arr.slice(0,-1).join(", ")+" y "+arr[arr.length-1];
+  // s31b (revision de s31, T3): "1 establecimiento", no "1 establecimientos". Mismo
+  // patron que el banner ("comuna"/"comunas") y el modal ("establecimiento(s)").
+  const nEE=n=>fmt(n)+(n===1?" establecimiento":" establecimientos");
 
   // Roster historico del territorio para un grado: por RBD, el GSE de cada anio del
   // roster (nulo si ese anio no traia GSE), el GSE vigente (ultimo anio con GSE no
@@ -2659,7 +2662,7 @@ __FONTS_CSS__
         {grupos.map(grp=>{ const gseNom=nomGse(grp.gse);
           return (
           <section className="gse-sec vt-sec" key={grp.gse}>
-            <div className="gse-sec-h"><span className="gse-sec-name">{gseNom}</span><span className="gse-sec-sub">{fmt(grp.items.length)} establecimientos · {grp.gse==="sin"?"sin GSE publicado en ningún año":"GSE de su último año con resultado"}</span></div>
+            <div className="gse-sec-h"><span className="gse-sec-name">{gseNom}</span><span className="gse-sec-sub">{nEE(grp.items.length)} · {grp.gse==="sin"?"sin GSE publicado en ningún año":"GSE de su último año con GSE publicado"}</span></div>
             <div className="pan-gse-body">
               {/* A. Franja: reparto por estado, solo en los anios con sigdifgru publicado. */}
               <div className="pan-sub-h">Estado vs su GSE, por año</div>
@@ -2677,7 +2680,7 @@ __FONTS_CSS__
               {/* B. Matriz: puntaje propio por anio, un indicador. */}
               <div className="pan-sub-h" style={{marginTop:20}}>Puntaje de cada establecimiento por año · {indSel.nombre}{!esNacional && <span className="pan-sub-note"> · clic en una fila para ver su Panorama IDPS</span>}</div>
               {esNacional
-                ? <div className="nota">La grilla de establecimientos no se muestra a nivel nacional ({fmt(grp.items.length)} establecimientos en este grupo). Elige una región, un SLEP o una comuna para verla.</div>
+                ? <div className="nota">La grilla de establecimientos no se muestra a nivel nacional ({nEE(grp.items.length)} en este grupo). Elige una región, un SLEP o una comuna para verla.</div>
                 : <>
                   <div className="vt-scroll"><table className="vt-mx">
                     <caption>Puntaje de cada establecimiento por año en {indSel.nombre}, {DATA.meta.grados[panGrado]}, grupo {gseNom}. Las columnas rayadas son años sin medición nacional.</caption>
@@ -2705,7 +2708,7 @@ __FONTS_CSS__
                             {fmt(d.prom)}{s!=null && <span className="vt-gl" title={estadoTxt(s)+" su GSE de "+y}>{s===-1?"▼":s===1?"▲":"="}</span>}</td>;})}
                       </tr>)}</tbody>
                   </table></div>
-                  <div className="vt-foot">{fmt(grp.items.length)} filas · orden {orden==="nom"
+                  <div className="vt-foot">{fmt(grp.items.length)}{grp.items.length===1?" fila":" filas"} · orden {orden==="nom"
                     ? "alfabético"+(ult?" (clic en el año "+ult.agno+" para ordenar por puntaje)":"")
                     : "por puntaje "+(ult?ult.agno:"")+" de mayor a menor, sin resultado al final"}.</div>
                 </>}
@@ -2953,7 +2956,7 @@ __FONTS_CSS__
               ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio{terr.dep?", dependencia":""}, nivel y GSE.</div>
               : grupos.map(grp=>(
                   <section className="gse-sec pan-sec" key={grp.gse}>
-                    <div className="gse-sec-h"><span className="gse-sec-name">{GSE[grp.gse]||"sin clasificar"}</span><span className="gse-sec-sub">{fmt(grp.items.length)} establecimientos · grupo socioeconómico</span></div>
+                    <div className="gse-sec-h"><span className="gse-sec-name">{GSE[grp.gse]||"sin clasificar"}</span><span className="gse-sec-sub">{nEE(grp.items.length)} · grupo socioeconómico</span></div>
                     <div className="pan-gse-body">
                       <div className="pan-sub-h">Distribución por estado vs su GSE</div>
                       <div className="pan-dist">
@@ -2966,7 +2969,7 @@ __FONTS_CSS__
                       </div>
                       <div className="pan-sub-h" style={{marginTop:18}}>Establecimientos{!esNacional && <span className="pan-sub-note"> · clic para ver el Panorama IDPS del establecimiento</span>}</div>
                       {esNacional
-                        ? <div className="nota">La grilla de establecimientos no se muestra a nivel nacional ({fmt(grp.items.length)} establecimientos en este grupo). Elige una región, un SLEP o una comuna para verla.</div>
+                        ? <div className="nota">La grilla de establecimientos no se muestra a nivel nacional ({nEE(grp.items.length)} en este grupo). Elige una región, un SLEP o una comuna para verla.</div>
                         : <div className="pan-grid">{grp.items.map(u=><Card key={u.rbd} rbd={u.rbd} grado={panGrado} agno={panAgno} onSel={irFicha}/>)}</div>}
                     </div>
                   </section>))}
