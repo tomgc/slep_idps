@@ -687,7 +687,7 @@ __FONTS_CSS__
   .vt-ind-b{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--linea);border-radius:7px;padding:7px 12px;font:inherit;font-size:var(--fs-caption);font-weight:var(--fw-bold);line-height:1.25;color:var(--tinta);cursor:pointer;min-height:40px;}
   .vt-ind-b:hover{border-color:var(--foco);}
   .vt-ind-b.on{border-color:var(--tinta);box-shadow:inset 0 -3px 0 var(--sw);}
-  .vt-ind-b:focus-visible,.vt-th-sort:focus-visible,.vt-mx td.vt-c-ee:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
+  .vt-ind-b:focus-visible,.vt-th-sort:focus-visible,.vt-ee-btn:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   @media (max-width:1000px){ .vt-ind-sel{grid-template-columns:repeat(2,minmax(0,1fr));} }
   @media (max-width:640px){ .vt-ctl{grid-template-columns:1fr;gap:6px;} .vt-ctl .vt-leg{margin-bottom:8px;} }
   /* Leyendas en una sola linea: items centrados y de la misma altura. */
@@ -706,13 +706,19 @@ __FONTS_CSS__
      del contenedor (el body nunca desborda); primera columna fija. */
   .vt-scroll{overflow-x:auto;border:1px solid var(--linea);border-radius:var(--radius-2);background:var(--paper);}
   table.vt-mx{border-collapse:separate;border-spacing:0;min-width:760px;width:100%;font-variant-numeric:tabular-nums;}
-  .vt-mx caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  /* Texto solo para el lector de pantalla (caption de la matriz y, desde s31b, la
+     glosa del estado que acompana al glifo). */
+  .vt-mx caption,.vt-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
   .vt-mx th,.vt-mx td{padding:0;border-bottom:1px solid var(--cream-200);}
   .vt-mx thead th{position:sticky;top:0;background:var(--paper);font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-bold);padding:8px 4px;text-align:center;border-bottom:1.5px solid var(--linea);white-space:nowrap;z-index:2;}
   .vt-mx th.vt-c-ee,.vt-mx td.vt-c-ee{position:sticky;left:0;background:var(--paper);text-align:left;z-index:1;border-right:1px solid var(--linea);}
   .vt-mx thead th.vt-c-ee{z-index:3;padding-left:12px;}
-  .vt-mx td.vt-c-ee{padding:5px 10px 5px 12px;min-width:230px;max-width:280px;cursor:pointer;}
-  .vt-mx td.vt-c-ee:hover .vt-ee-nom,.vt-mx td.vt-c-ee:focus-visible .vt-ee-nom{text-decoration:underline;color:var(--foco);}
+  /* s31b (revision de s31, T4): la celda del nombre es un <th scope="row"> (cada
+     celda de la fila se anuncia con su establecimiento) y el clic vive en un <button>
+     adentro (foco y Enter/Espacio nativos, sin role="button" sobre la celda). */
+  .vt-mx tbody th.vt-c-ee{padding:5px 10px 5px 12px;min-width:230px;max-width:280px;font-weight:var(--fw-regular);}
+  .vt-ee-btn{display:block;width:100%;text-align:left;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;}
+  .vt-ee-btn:hover .vt-ee-nom,.vt-ee-btn:focus-visible .vt-ee-nom{text-decoration:underline;color:var(--foco);}
   .vt-ee-nom{font-size:var(--fs-caption);font-weight:var(--fw-bold);line-height:1.25;display:block;}
   .vt-ee-rbd{font-size:var(--fs-overline);color:var(--gris);}
   .vt-ee-gsechg{font-size:var(--fs-overline);color:var(--gris);font-style:italic;}
@@ -732,7 +738,7 @@ __FONTS_CSS__
     .vt-franja{grid-template-columns:1fr;}
     .vt-franja-yr.hdr{display:none;}
     .vt-franja-cell::before{content:attr(data-yr);display:block;font-size:var(--fs-overline);color:var(--gris);font-weight:var(--fw-bold);}
-    .vt-mx td.vt-c-ee{min-width:170px;}
+    .vt-mx tbody th.vt-c-ee{min-width:170px;}
   }
 </style>
 </head>
@@ -2694,18 +2700,25 @@ __FONTS_CSS__
                     </tr></thead>
                     <tbody>{grp.items.map(r=>
                       <tr key={r.rbd}>
-                        <td className="vt-c-ee" role="button" tabIndex={0} title="Ver Panorama IDPS de este establecimiento"
-                          onClick={()=>onSel(r.rbd)} onKeyDown={ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();onSel(r.rbd);}}}>
-                          <span className="vt-ee-nom">{r.nom}</span><span className="vt-ee-rbd">RBD {r.rbd}</span>
-                          {r.previo && <span className="vt-ee-gsechg"> · hasta {r.previo.agno}: {GSE[r.previo.gse]||r.previo.gse}</span>}
-                        </td>
+                        {/* s31b: encabezado de fila (th scope=row) con un boton adentro; antes era un
+                            td con role="button", que dejaba de ser celda y la fila sin encabezado. */}
+                        <th className="vt-c-ee" scope="row">
+                          <button type="button" className="vt-ee-btn" title="Ver Panorama IDPS de este establecimiento" onClick={()=>onSel(r.rbd)}>
+                            <span className="vt-ee-nom">{r.nom}</span><span className="vt-ee-rbd">RBD {r.rbd}</span>
+                            {r.previo && <span className="vt-ee-gsechg"> · hasta {r.previo.agno}: {GSE[r.previo.gse]||r.previo.gse}</span>}
+                          </button>
+                        </th>
                         {bloques.map((bq,i)=>{
                           if(bq.tipo==="gap") return <td key={"g"+i} className="vt-c-gap" aria-label="sin medición nacional"></td>;
                           const y=bq.y.agno, d=(r.porAnio[y]||{})[vtInd];
                           if(!d||d.prom==null) return <td key={y} className="vt-c-v vt-c-na" title={y+": sin resultado"}>–</td>;
                           const bg=vtTinte(indSel.color,d.prom,dom,k0), fg=vtTexto(bg), gy=r.anios[y], s=d.sigdifgru;
                           return <td key={y} className="vt-c-v" style={{background:bg,color:fg}} title={y+": "+fmt(d.prom)+(gy!=null?" · GSE "+(GSE[gy]||gy):"")}>
-                            {fmt(d.prom)}{s!=null && <span className="vt-gl" title={estadoTxt(s)+" su GSE de "+y}>{s===-1?"▼":s===1?"▲":"="}</span>}</td>;})}
+                            {fmt(d.prom)}{s!=null && <>
+                              {/* s31b: el glifo no viaja como caracter suelto al lector de pantalla:
+                                  aria-hidden, y la glosa de EST_EE con el anio en texto oculto. */}
+                              <span className="vt-gl" aria-hidden="true" title={estadoTxt(s)+" su GSE de "+y}>{s===-1?"▼":s===1?"▲":"="}</span>
+                              <span className="vt-sr">, {EST_EE[s===-1?"bajo":s===1?"sobre":"neutro"].lbl} en {y}</span></>}</td>;})}
                       </tr>)}</tbody>
                   </table></div>
                   <div className="vt-foot">{fmt(grp.items.length)}{grp.items.length===1?" fila":" filas"} · orden {orden==="nom"
