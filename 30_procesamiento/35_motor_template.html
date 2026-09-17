@@ -449,8 +449,20 @@ __FONTS_CSS__
   .pan-sub-h{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-h4);color:var(--tinta);margin:0 0 12px;}
   .pan-sub-note{font-family:var(--font-body);font-weight:var(--fw-regular);font-size:var(--fs-caption);color:var(--gris);}
   .pan-dist{display:flex;flex-direction:column;gap:11px;}
-  .pan-dist-row{display:grid;grid-template-columns:300px 1fr;align-items:center;gap:16px;}
-  @media(max-width:760px){.pan-dist-row{grid-template-columns:1fr;gap:5px;}}
+  /* s31c (revision de s31b, T2; decision del titular 2026-09-17): el rotulo del
+     indicador se ancla a la BARRA, no al bloque barra+tira+nota. La fila tiene tres
+     pistas (barra | tira externa | nota) y el contenedor .s100-wrap las hereda como
+     SUBGRID, de modo que rotulo y barra comparten la pista 1 (ambos centrados en ella,
+     cualquiera sea la altura del rotulo: uno o dos renglones) y la tira y la nota
+     cuelgan en las pistas 2 y 3 sin mover ese centro. Sin filas vacias de por medio:
+     gap de fila 0 (la tira y la nota traen su margin-top de 3px). Las alternativas
+     "rotulo al inicio con min-height de la barra" o "align-items:start" dejan 11 px
+     de desfase con rotulos de dos renglones (48 px), que son la mitad. */
+  .pan-dist-row{display:grid;grid-template-columns:300px 1fr;grid-template-rows:auto auto auto;align-items:center;gap:0 16px;}
+  .pan-dist-row > .s100-wrap{grid-column:2;grid-row:1/4;display:grid;grid-template-rows:subgrid;align-items:center;}
+  /* Una columna bajo 760 px: el contenedor vuelve a ser un bloque apilado bajo el rotulo
+     (mismo layout que antes de s31c). */
+  @media(max-width:760px){.pan-dist-row{grid-template-columns:1fr;grid-template-rows:auto;gap:5px;} .pan-dist-row > .s100-wrap{grid-column:1;grid-row:auto;display:block;}}
   .pan-dist-lab{display:flex;align-items:center;gap:9px;font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--tinta);}
   .pan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:14px;}
   /* Barra apilada 100% por estado vs GSE */
