@@ -11,7 +11,7 @@ sesion_abierta: false
 maquina: MacBook-Pro-de-Tomas.local
 commit_cierre: 1870019
 traspaso_vigente: traspaso_cierre_v29.md
-cierre_incompleto: la compuerta de repositorio (95_verificar_cierre.R) no se ejecutó en este cierre porque la sesión del asistente no tiene R; sus nueve invariantes quedan sin veredicto.
+cierre_incompleto: no
 insumos_verificados: 2026-09-17
 ventana_insumos: ./20_insumos
 ---
