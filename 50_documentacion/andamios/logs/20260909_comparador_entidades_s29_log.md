@@ -1703,3 +1703,292 @@ suman:
 - **El aviso de "aquí no se busca" depende de un placeholder** (§36.7). Si el titular
   quiere el remedio del hermano —no dibujar buscador en ese tab— hay que darle a
   `EntityModal` una prop para suprimirlo por tab. Es un encargo propio, chico.
+
+---
+
+## 39. Inventario de commits de s29i
+
+| # | Commit | Fase | Rutas |
+|---|---|---|---|
+| 38 | `ca1cdcd` | 1 — `feat(panorama): la entidad nacional disponible tambien en el selector de territorio` | plantilla |
+| 39 | `ed0d799` | 2 — `feat(entidades): dependencia por entidad en el modal, como el motor hermano` | plantilla |
+| 40 | `28a4de4` | 3 — `fix(comparador): la explicacion del pie se dice una vez, no en cada seccion` | plantilla |
+| 41 | `76be5ef` | 4 — `fix(motor): la tira externa se apila en vez de solaparse en anchos extremos` | plantilla |
+| 42 | `7a2b263` | 5 — `fix(motor): retira mayusculas sostenidas fuera de siglas` | plantilla |
+| 43 | `7377fc7` | 6 — `fix(motor): correcciones del panel adversarial de s29i` | plantilla |
+| 44 | `be9b05b` | 6 — `build(motor): regenera el motor con las correcciones de la revision` | `40_salidas/motor_idps.html` |
+| 45 | `8e01b92` | 7 — `deploy(docs): republica con las correcciones de la revision` | `docs/index.html` |
+| 46 | (este) | 7 — `docs(log): registro de s29i` | log + `ESTADO.md` + encargo |
+
+Rama `feat/contrato-contexto` y su log (`20260711_contrato_contexto_idps_log.md`, sin
+seguimiento en el árbol) **no se tocaron**.
+
+## 40. Qué se cambió
+
+s29i reúne los cuatro hallazgos de la revisión que el titular hizo sobre el motor
+publicado el 2026-09-16. Todo es plantilla: ninguna fase toca el pipeline ni el payload.
+
+**Fase 1 — la entidad nacional también en el panorama.** `TABS` gana el tab **Nacional**
+después de Región; `buildList` devuelve `[NACIONAL_OPT]` ahí; `onPick` acepta el `kind`;
+`unidades` gana la rama que **no filtra**, primera en la cadena para no caer por descarte
+en el `else` que captura región. Decisión declarada y reversible: con el territorio
+nacional **no se dibuja la grilla** —6.717 tarjetas no son lo que esa pantalla responde—
+y en su lugar va un aviso con el conteo del grupo; las barras por GSE sí se calculan,
+porque son conteo.
+
+**Fase 2 — dependencia por entidad.** Es la fase grande y la que sigue al hermano de
+cerca: la dependencia deja de ser un filtro global y pasa a ser **atributo de la
+entidad** (`terr.dep` en el panorama, `t.dep` en el comparador). El `<select>` vive
+dentro del modal y solo en Comuna, Región y Nacional. `rosterTerr` y `unidades` filtran
+con `continue`. La clave de unicidad pasa a `kind|cod|dep` (`keyEnt`), que es lo que
+permite comparar la misma comuna con dos dependencias. El aviso metodológico del SLEP se
+replica adaptado. El tab "Dependencia" del picker **se retira** (decisión declarada y
+reversible del encargo §3.7).
+
+**Fase 3 — el pie de sección.** La explicación general se dice una vez, en el bloque
+`.cmp-nota-ee` que ya existía bajo los chips; el pie de cada sección se queda con lo que
+cambia.
+
+**Fase 4 — la tira externa.** `.s100-ext` pasa de grid de tres columnas fijas a **flex
+con salto de línea**, con las posiciones sostenidas por márgenes automáticos.
+
+**Fase 5 — mayúsculas sostenidas.** Las siete reglas `text-transform:uppercase` pierden
+esa propiedad y conservan `letter-spacing` y peso.
+
+**Fase 6.** Panel adversarial, correcciones, build y auditoría. **Fase 7.** Despliegue,
+este registro y push.
+
+## 41. Chequeos de s29i (valores observados)
+
+### 41.1 El hermano, leído para la Fase 2
+
+Referencia vinculante del encargo: `slep_simce_adecuado/30_procesamiento/33_motor_template.html`.
+
+| Del hermano | En `slep_idps` |
+|---|---|
+| La dependencia es atributo de la entidad: `if (entity.depe2) { if (String(r.cod_depe2) !== String(entity.depe2)) return false; }` (1953 y 2106) | `if(t.dep && e.cod_depe2!==t.dep)continue;` en `rosterTerr`, y el gemelo en `unidades` |
+| `<select>` "Dependencia" dentro del modal, en Comuna, Región y Nacional (4040-4055) | Igual, vía cuatro props opt-in de `EntityModal` |
+| Primera opción "Todas las dependencias" (valor vacío) | Igual |
+| `SlepDisclaimer` cuando la dependencia es SLEP; siempre en el tab SLEP (3766) | Igual, con el texto adaptado a la serie 2014-2025 |
+| Código de la dependencia SLEP: `"5"` | **`"4"`** en este motor. No se escribe a mano: se **deriva** de `DATA.meta.depe2_labels` con `/slep/i`, para que el aviso siga al dato |
+
+El catálogo de este motor es `{1: Municipal, 2: Particular subvencionado, 3: Particular
+pagado, 4: SLEP}`. Si el encargo se hubiera seguido al pie (`dep === "5"`), el aviso no
+se habría mostrado nunca.
+
+### 41.2 Panel adversarial antes del build
+
+Cinco lentes (dependencia; nacional; presentación; reglas de detención; **cero
+agregación**) con dos refutadores por hallazgo. **Se cortó a la mitad por el límite de
+sesión: 16 de 33 agentes terminaron.** De los 10 hallazgos que quedaron marcados como
+confirmados, **3 llegaron sin verificación** (sus dos refutadores murieron) y se
+juzgaron a mano. Lo que se corrigió, en `7377fc7`:
+
+| Hallazgo | Por qué se acepta |
+|---|---|
+| El `<select>` quedaba **después** de la lista | En el hermano el modal confirma con un botón y el orden da igual; aquí el clic en la fila commitea, así que la dependencia debe fijarse antes. Bajo 340px de lista quedaba fuera de la caja en un portátil |
+| El ✕ de dos chips de la misma comuna tenía el mismo nombre accesible | Es justo el caso que el encargo §3 manda verificar |
+| `.help` seguía prometiendo la grilla a nivel nacional | La Fase 1 corrigió el sub-encabezado y no la explicación de arriba |
+| La cabecera de sección no pasaba por `fmt()` | El mismo número se leía "2343" arriba y "2.343" dos líneas más abajo |
+| `.cmp-noagg` decía "del territorio" | Desde s29i la dependencia es el segundo acotador |
+| El estado vacío del panorama no nombraba la dependencia | Es hoy la causa más probable del cero |
+| El comentario de `.s100-ext` afirmaba un invariante que el flex no conserva entero | Ver §41.5 |
+| Restos del tab retirado | Tres comentarios y el conteo por categoría de `DEPS_OPTS` |
+
+**Se declara NO corregido** (decisión del titular): al llegar al tope de 10 entidades,
+cambiar el selector deja **todas** las filas sin marcar —la clave es `kind|cod|dep`, como
+ordena el §3.4— y desde el modal no se puede desmarcar; la salida son los ✕ de los chips.
+
+### 41.3 Build y fidelidad (regla de detención 2 — no se dispara)
+
+`run_all(only = 35L)` en **4,2 s**; `grep -inE "warn|error|aviso|fail|problema"` sobre la
+salida completa: **ninguna coincidencia**. Bloque 7 idéntico: 16 regiones; 9.136 EE;
+91.596 unidades; 366.384 / 557.898 / 662.514 filas; 59,5 MB → 4,41 MB (7,4%); 5,1 MB HTML.
+
+```
+bytes JSON:  59.466.778  ==  59.466.778
+offsets que difieren: []
+SHA-256 (convención §8.2):  1e29c2b5be529e013f5afb98de323420e842a615b2e4f7a9cc5001ad1b55b5b6
+```
+
+Cero offsets, como en s29h. **Ninguna cifra se movió**: las cinco fases son plantilla.
+
+### 41.4 Verificación funcional (Chrome headless; consola limpia en todas las corridas)
+
+**Fase 1.** Picker territorial: `Comuna · SLEP · Región · Nacional · Establecimiento`.
+Con Chile, el banner da **343 comunas y 6.717 establecimientos** —del roster real del
+nivel y año, no del directorio (346 / 9.136)— y las cinco secciones muestran sus cuatro
+barras y el aviso en vez de la grilla (1.408 + 2.343 + 1.736 + 713 + 517 = **6.717**).
+Con una comuna, la grilla vuelve.
+
+**Fase 2.** El `<select>` aparece solo en Comuna, Región y Nacional; el aviso SLEP,
+siempre en el tab SLEP y además al elegir esa dependencia en los otros. En el panorama,
+"Región de Valparaíso · Municipal" da 32 comunas y 255 EE frente a 38 y 747 sin filtro, y
+el banner y el chip de selección lo dicen.
+
+**La verificación exigida por el encargo §3**, sobre el motor generado, en 4° básico 2025:
+
+| Entidad | Comunas | Establecimientos |
+|---|---|---|
+| Viña del Mar · todas | 1 | **109** |
+| Viña del Mar · Municipal | 0 | 0 |
+| Viña del Mar · Particular subvencionado | 1 | 47 |
+| Viña del Mar · Particular pagado | 1 | 23 |
+| Viña del Mar · SLEP | 1 | 39 |
+| | | 0 + 47 + 23 + 39 = **109** |
+
+Las cinco conviven como cinco filas distintas, cada una rotulada con su dependencia bajo
+el nombre. El **0 de Municipal no es un fallo**: los municipales de Viña ya fueron
+traspasados al SLEP, y eso es exactamente lo que el aviso metodológico advierte.
+
+**Fase 3.** La frase "Los establecimientos seleccionados aparecen únicamente en la
+sección de su propio grupo socioeconómico." pasa de **5 apariciones** (una por GSE
+visible) a **1**; sin establecimientos seleccionados no aparece ninguna, y el pie de cada
+sección empieza ahora por el nombre.
+
+### 41.5 La tira externa: el mecanismo real
+
+El síntoma de la captura no era que los tres ítems se pisaran **dentro** de la tira —eso
+da 0 en los dos motores, porque un grid nunca superpone sus pistas—, sino que la tira
+**desbordaba la celda** y caía sobre la vecina. Medido sobre el comparador poblado:
+
+| Ventana | Celda | Antes: desbordes / cruces entre celdas | Después | Líneas por tira |
+|---|---|---|---|---|
+| 1200px | 235px | 0 / 0 | 0 / 0 | 1 → 1 |
+| 768px | 127px | **63 / 55** | **0 / 0** | 1 → **3** |
+| 430px | 43px | 100 / 185 | 100 / **75** | 1 → **3** |
+| 375px | — | 100 / 213 | 100 / **112** | 1 → 3 |
+| 320px | — | 100 / 242 | 100 / **150** | 1 → 3 |
+
+A 768px el defecto **desaparece**: las tres etiquetas se apilan y dejan de salirse. Por
+debajo de ~70px de celda, **una sola** etiqueta ya no cabe, y `white-space:nowrap` es
+invariante (un número no se parte nunca): ahí el desborde es irreducible por CSS. La
+causa de fondo es otra y **queda como pendiente**: `.cmp-table` es `table-layout:fixed`
+con `width:100%` y sin `min-width`, así que la tabla se **comprime** en vez de dejar que
+`.cmp-tscroll` haga scroll; a 430px las columnas caen a 43px. En el panorama, donde la
+barra ocupa el ancho de la columna de contenido (230px a 320px de ventana), no hay
+desborde ni antes ni después.
+
+Lo que el flex **no** conserva del grid: con **dos** ítems, el del medio ya no cae en el
+centro del contenedor sino repartido entre los otros dos. Los extremos siguen anclados y
+el neutro solo sigue exactamente centrado. Es el precio de poder saltar de línea, y el
+comentario del CSS ya lo dice así.
+
+### 41.6 Mayúsculas sostenidas
+
+Las siete reglas pierden `text-transform:uppercase` y conservan `letter-spacing` y peso.
+Medido sobre el motor generado: **0 elementos** con `text-transform:uppercase` computado
+en las tres pantallas. Del texto fuente solo hacía falta corregir uno —el rótulo del chip
+de selección del panorama, escrito "dependencia" porque la versalita lo capitalizaba—; el
+barrido de literales en versalita dentro del JSX no encontró ninguno. `.ctl label` no
+tiene uso vivo (la clase `.ctl` no se usa en el JSX); se limpió igual. **Nota:** la regla
+de mayúsculas no está escrita en `POLITICA_PROYECTO.md`; su enunciado es el del encargo
+§6 y conviene subirlo al normativo.
+
+### 41.7 Auditoría de contraste
+
+Método de s29d–s29g (colores computados, fondo efectivo compuesto capa a capa, umbral 4,5
+/ 3,0), validado antes de usarlo: sobre el motor anterior reprodujo exactamente los
+valores que §30.4 dejó escritos (`.s100-seg span` 3,483 / 3,510 / 4,112; `.ee-gl` 3,374 /
+3,069; `.defn-title` 2,187 / 3,066 / 1,843; `.bar span` 3,531). Seis escenarios, con los
+tres nuevos de s29i:
+
+| Escenario | Nodos | Fallas |
+|---|---|---|
+| A · Panorama territorial | 718 | `.s100-seg span` (×38) — §3.4 |
+| **A2 · Panorama nacional** | 145 | `.s100-seg span` (×60) — §3.4 |
+| **A3 · Panorama región + dependencia** | 2.425 | `.s100-seg span` (×44) — §3.4 |
+| **D · Modal con selector y aviso SLEP** | 3.126 | `.s100-seg span` (×44) — §3.4 |
+| B · Comparador poblado (8 entidades, con dependencias) | 376 | `.s100-seg span` (×90) — §3.4 · `.ee-gl` (×8) — §3.5 |
+| C · Ficha | 430 | `.bar span` (×5) · `.defn-title` (×3) — §5.6 |
+
+**Ninguna falla nueva.** Los elementos que s29i añade —el rótulo y el `<select>` de
+dependencia, el aviso SLEP, el aviso de la grilla nacional, la sub-línea de dependencia
+de la fila— pasan todos.
+
+### 41.8 Regla de etiquetado de s29 — intacta
+
+| Ancho | Barras con dato | Dentro | En la tira | Cortadas | Duplicados |
+|---|---|---|---|---|---|
+| 1200px | 36 | 45 | 55 | **0** | **0** |
+| 768px | 36 | 5 | 95 | **0** | **0** |
+| 430px | 36 | 0 | 100 | **0** | **0** |
+| 375px | 36 | 0 | 100 | **0** | **0** |
+| 320px | 36 | 0 | 100 | **0** | **0** |
+
+Los 45/55 de 1200px y los 0/100 de 430px son los mismos de s29h.
+
+### 41.9 Despliegue (regla de detención 4 — no se dispara)
+
+`docs/index.html` es copia byte a byte de `40_salidas/motor_idps.html`: `cmp` sin
+diferencias, md5 **`5ac4a1b85559ac490df82dac7f07f272`** en ambos, **5.393.686 bytes**.
+Sustituye al de s29h (md5 `5ab60072…`, 5.385.578 bytes). Abierto desde `docs/`: consola
+limpia y las mismas cifras.
+
+### 41.10 Errores del asistente en s29i (regla 0.5)
+
+| # | Qué pasó | Cuándo se detectó | Efecto |
+|---|---|---|---|
+| 1 | Se aplicaron las Fases 3, 4 y 5 **antes** de commitear la 3, rompiendo el "commit atómico por fase" del contrato. | Al ir a commitear la Fase 3. | Ninguno en el repo: se restauró la plantilla a `HEAD` y se reaplicó cada fase con su commit. Costó una vuelta. |
+| 2 | El `<select>` de dependencia se puso **después** de la lista, copiando el orden visual del hermano sin advertir que aquí el clic en la fila confirma de inmediato. | Panel adversarial, antes del build. | Ninguno: corregido en `7377fc7`. |
+| 3 | La Fase 1 ajustó el sub-encabezado de la sección al territorio nacional pero dejó el `.help` de arriba prometiendo la grilla, y el conteo de la cabecera sin `fmt()`. | Panel adversarial. | Ninguno: corregido en `7377fc7`. |
+| 4 | El comentario de `.s100-ext` afirmaba que el flex conservaba entero el invariante de s29, y no lo conserva con dos ítems. | Panel adversarial. | Ninguno: el comentario ahora lo dice exacto. |
+
+**Nota de instrumentación.** (a) El panel se cortó por el límite de sesión (16 de 33
+agentes); tres hallazgos llegaron sin verificación y se juzgaron a mano, lo que conviene
+declarar antes que ocultar. (b) El auditor de contraste se validó contra los valores que
+§30.4 dejó escritos **antes** de usarlo para juzgar s29i. (c) El `.git/index.lock`
+obsoleto de s29h volvió a aparecer dos veces (0 bytes, sin proceso git vivo) y bloqueó
+commits; se retiró cada vez. Conviene mirar qué lo crea —probablemente la integración git
+del editor abierto sobre el repo—.
+
+## 42. Decisiones tomadas dentro del margen del encargo (s29i)
+
+1. **El código de la dependencia SLEP se deriva de la etiqueta**, no se fija a `"5"` como
+   decía el encargo: en este motor es `"4"`. Seguir el encargo al pie habría dejado el
+   aviso muerto.
+2. **El `<select>` va arriba de la lista**, al revés que el hermano, porque este modal
+   confirma con el clic en la fila (§41.2).
+3. **El banner del panorama pasa por `fmt()`**: con el territorio nacional el número
+   llega a cuatro cifras y se leía "6717". Lo mismo en la cabecera de sección.
+4. **`.cmp-noagg` nombra la entidad, no solo el territorio**, y el estado vacío nombra la
+   dependencia: desde s29i hay un segundo acotador y los textos que enuncian el
+   invariante tienen que decirlo.
+5. **El conteo por categoría de `DEPS_OPTS` se elimina**: era del directorio completo y,
+   junto a un territorio elegido, habría engañado.
+6. **Panel adversarial antes del build**, como en s29g y s29h, porque el encargo despliega
+   sin revisión previa del titular.
+7. **No se toca `.cmp-table`** para que la tabla haga scroll en vez de comprimirse, pese a
+   ser la causa de fondo del desborde a 430px: cambia el comportamiento responsive del
+   comparador y podría mover las cifras de la regla de etiquetado que el encargo manda
+   conservar. Va a pendientes.
+
+## 43. Pendientes tras s29i
+
+**Nuevo, pedido por el titular tras la revisión (encargo §9, fuera de alcance aquí):**
+
+- **P-EXPORTACION** — exportación tipo `slep_simce_adecuado`: botón "Exportar CSV" y
+  exportación de imagen del gráfico, con el selector de GSE al lado. Es funcionalidad
+  nueva, con su propio diseño y su propio encargo; el hermano es la referencia.
+
+**Nuevos, de esta sesión:**
+
+- **Tope + selector:** al llegar a 10 entidades, cambiar el selector de dependencia deja
+  todas las filas sin marcar y el modal no permite desmarcar (§41.2). Decisión de diseño
+  del titular; la alternativa es marcar las filas que ya están con otra dependencia.
+- **`.cmp-table` se comprime en vez de hacer scroll** (§41.5): a 430px las columnas caen a
+  43px y una sola etiqueta no cabe en la celda. Un `min-width` haría que `.cmp-tscroll`
+  sirviera de verdad.
+- **El aviso de dependencia actual solo se dispara con SLEP.** La otra cara de la misma
+  regla —una comuna cuyos municipales fueron traspasados muestra "Municipal · 0
+  establecimientos"— no tiene aviso.
+- **`NACIONAL_OPT.sub` anuncia 9.136 EE y 346 comunas** (directorio) y, al elegir Chile,
+  el banner dice 6.717 y 343 (roster del nivel y año). Las dos cifras son correctas y
+  miden cosas distintas, pero conviven a un clic de distancia.
+- **La regla de mayúsculas no está en `POLITICA_PROYECTO.md`** (§41.6): vive solo en el
+  encargo.
+
+**Heredados, sin cambio:** §5.6 de la decisión de contraste; P-VISTA-TERRITORIAL; hover
+`✕` a 4,11; §5.2 marca de base pequeña; re-etiquetado en vivo; tooltip "vs evaluación
+anterior"; las trece divergencias del modal con el hermano (§36.7); rama
+`feat/contrato-contexto`, no tocada.
