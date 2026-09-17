@@ -646,6 +646,10 @@ __FONTS_CSS__
      pastillas (.gse-filter) ocupa el 100% y baja a su propia linea, asi que el
      boton queda en la linea del rotulo, empujado al extremo. */
   .gse-filter-wrap .export-bar{margin-left:auto;}
+  /* Barra de exportacion de la ficha: primera fila de .ficha-card (que no tiene
+     padding propio; lo ponen sus hijos), alineada a la derecha como el
+     .section-actions del hermano en la cabecera de su panorama. */
+  .ficha-export{justify-content:flex-end;padding:11px 22px;background:var(--panel);border-bottom:1px solid var(--linea);}
 </style>
 </head>
 <body>
@@ -1329,6 +1333,15 @@ __FONTS_CSS__
         <EstabSearch onPick={onPickEE}/>
 
         <div className="ficha-card">
+          {/* s30: una sola barra para las dos vistas. El CSV es el registro del
+              establecimiento en este nivel (serie completa), no la foto de la vista
+              abierta: el nombre de archivo que fija el encargo no lleva año ni vista. */}
+          <div className="export-bar ficha-export">
+            <span className="export-bar-lab">Exportar</span>
+            <IconExport label="CSV de la serie" icon="download"
+              title="Descarga en CSV la serie de este establecimiento en el nivel seleccionado: los cuatro indicadores y sus dimensiones, año por año"
+              onExport={()=>descargarFichaCSV({rbd,grado,anios})}/>
+          </div>
           {isHist
             ? (
             <div className="hist-wrap">
@@ -1983,6 +1996,118 @@ __FONTS_CSS__
     descargarCSV(filas,"idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+".csv");
   }
 
+  // ===== Fase 3 (s30) — CSV del panorama territorial =====
+  // Una fila por establecimiento x indicador del territorio y nivel vigentes, con la
+  // dependencia y los GSE ya aplicados. Recorre `grupos` —el mismo arreglo, ya
+  // agrupado por GSE y ordenado por nombre, con el que la pantalla dibuja las
+  // secciones y las tarjetas—, de modo que el orden del archivo es el de la vista.
+  //
+  // A nivel NACIONAL el boton sigue disponible: la restriccion de s29i (no dibujar la
+  // grilla con 6.717 tarjetas) era de RENDER, no de datos. El archivo si puede traer
+  // esas filas; confirmarTamano avisa antes.
+  //
+  // Regla de columnas de toda la exportacion: cada columna de CODIGO va acompañada de
+  // su columna de etiqueta (`gse`/`gse_label`, `indicador`/`indicador_label`), porque
+  // la pantalla solo muestra etiquetas y un codigo suelto seria exportar algo que
+  // nadie ve. Es la misma forma que el encargo fija para el comparador.
+  const CSV_PAN_COLS=["rbd","establecimiento","comuna","dependencia","gse","gse_label",
+    "indicador","indicador_label","puntaje","estado_vs_gse","nivel","anio","preliminar"];
+
+  function filasPanoramaCSV({grupos,grado,agno}){
+    const nivel=DATA.meta.grados[grado]||grado;
+    const prelim=PRELIM.has(String(agno))?"1":"0";
+    const filas=[CSV_PAN_COLS];
+    grupos.forEach(grp=>{
+      const cod=grp.gse==="sin"?"":grp.gse;
+      const gl=GSE[grp.gse]||"sin clasificar";
+      grp.items.forEach(u=>{
+        const e=est[u.rbd], im=indOf(u.rbd,grado,agno);
+        DATA.indicadores.forEach(ind=>{
+          const d=im[ind.id];
+          // El estado vs GSE se LEE de sigdifgru y se escribe en palabras, igual que
+          // en la tarjeta y en la fila de establecimiento del comparador.
+          const st=(!d||d.prom==null)?null:EST_EE[d.sigdifgru===-1?"bajo":(d.sigdifgru===1?"sobre":"neutro")];
+          filas.push([u.rbd,nomEE(e),(e&&e.cod_com!=null)?comNom(e.cod_com):"",
+            (e&&e.cod_depe2!=null)?(DEPE[e.cod_depe2]||e.cod_depe2):"",
+            cod,gl,ind.id,ind.nombre,
+            st?numCSV(d.prom):"", st?st.txt:"sin dato", nivel,agno,prelim]);
+        });
+      });
+    });
+    return filas;
+  }
+
+  function descargarPanoramaCSV(args){
+    const filas=filasPanoramaCSV(args);
+    if(!confirmarTamano(filas.length-1,args.glosaTerr)) return;
+    // La dependencia entra en el NOMBRE cuando hay una: sin ella, "Region de
+    // Valparaiso" y "Region de Valparaiso acotada a Municipal" darian el mismo
+    // archivo, y son dos universos distintos.
+    descargarCSV(filas,"idps_panorama_"+slugArchivo(args.nomArchivoTerr)+
+      "_"+slugArchivo(args.grado)+"_"+args.agno+".csv");
+  }
+
+  // ===== Fase 3 (s30) — CSV de la ficha de establecimiento =====
+  // Una fila por año x indicador y por año x dimension, sobre el eje contiguo del
+  // grado recortado por familia (meta.primer_anio_familia: el indicador arranca en
+  // 2014, la dimension en 2018), igual que la Vista historica.
+  //
+  // Decision declarada y reversible: el archivo NO depende de la vista abierta. El
+  // nombre que fija el encargo —idps_ficha_<rbd>_<nivel>.csv— no lleva año ni vista,
+  // asi que el archivo es el REGISTRO del establecimiento en ese nivel y el toggle es
+  // una lente sobre el mismo dato. No se calcula nada nuevo: cada año es la misma
+  // lectura de indOf/dimOf que hace la Vista historica.
+  //
+  // Solo entran los años CON MEDICION. Un año de pandemia o sin evaluacion no es un
+  // dato ausente sino la ausencia de una medicion, y estas columnas no tienen donde
+  // decir el motivo; una fila vacia sin explicacion mentiria por omision. Queda
+  // anotado como pendiente (una columna `estado_anio` lo resolveria).
+  //
+  // La DIMENSION no tiene desvio vs GSE: dimOf trae prom/dif/sigdif pero no
+  // difgru/sigdifgru (invariante del motor, el desvio vs GSE solo existe a nivel
+  // indicador). La celda lo dice con todas sus letras en vez de quedar vacia, que se
+  // leeria como "no se pudo calcular". La subdimension no entra: es distribucion en
+  // niveles, no un puntaje.
+  const CSV_FICHA_COLS=["rbd","establecimiento","anio","familia","id","label",
+    "puntaje","estado_vs_gse","nivel","preliminar"];
+  const CSV_FICHA_NA="no aplica (solo a nivel indicador)";
+  // La comparacion vs GSE (difgru/sigdifgru) NO existe en toda la serie: la Agencia la
+  // publica desde 2024 (medido sobre el payload: en 4° basico, difgru es nulo en el
+  // 100% de las filas de 2014 a 2023). Sin este caso el CSV diria "sin diferencia" en
+  // diez años en los que no hay ninguna comparacion que informar — una afirmacion
+  // inventada sobre un dato que no existe. La Vista historica hace lo mismo: su
+  // tooltip solo dibuja la linea "vs GSE" si difgru!=null.
+  const CSV_SIN_CMP_GSE="la Agencia no publica la comparación vs GSE ese año";
+
+  function filasFichaCSV({rbd,grado,anios}){
+    const e=est[rbd];
+    const nivel=DATA.meta.grados[grado]||grado;
+    const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[grado])||(anios||[]).map(a=>({agno:a,estado:"con_dato"}));
+    const PAF=(DATA.meta.primer_anio_familia)||{};
+    const aniosDe=fam=>{const y0=PAF[fam];
+      return eje.filter(y=>y.estado==="con_dato"&&(y0==null||y.agno>=y0)).map(y=>y.agno);};
+    const aInd=aniosDe("indicador"), aDim=aniosDe("dimension");
+    const filas=[CSV_FICHA_COLS];
+    const fila=(a,fam,id,label,d,estado)=>filas.push([rbd,nomEE(e),a,fam,id,label,
+      (d&&d.prom!=null)?numCSV(d.prom):"", estado, nivel, PRELIM.has(String(a))?"1":"0"]);
+    DATA.indicadores.forEach(ind=>{
+      aInd.forEach(a=>{const d=indOf(rbd,grado,a)[ind.id];
+        const estado=(!d||d.prom==null) ? "sin dato"
+          : (d.difgru==null||d.sigdifgru==null) ? CSV_SIN_CMP_GSE
+          : EST_EE[d.sigdifgru===-1?"bajo":(d.sigdifgru===1?"sobre":"neutro")].txt;
+        fila(a,"indicador",ind.id,ind.nombre,d,estado);});
+      (dimsByInd[ind.id]||[]).forEach(dimo=>{
+        aDim.forEach(a=>fila(a,"dimension",dimo.id,dimo.nombre,dimOf(rbd,grado,a)[dimo.id],CSV_FICHA_NA));});
+    });
+    return filas;
+  }
+
+  function descargarFichaCSV(args){
+    const filas=filasFichaCSV(args);
+    if(!confirmarTamano(filas.length-1,"ficha del establecimiento")) return;
+    descargarCSV(filas,"idps_ficha_"+args.rbd+"_"+slugArchivo(args.grado)+".csv");
+  }
+
   // ===== Andamiaje de navegacion: 3 pantallas (rediseno Fase 1; completado en Fase 4) =====
   // Las 3 pantallas estan funcionales: territorio (panorama por GSE), ficha (todo
   // desplegado) y comparar (matriz territorios x GSE x indicador). Ya no quedan
@@ -2150,6 +2275,17 @@ __FONTS_CSS__
             <div className="gse-filter-wrap">
               <span className="gse-filter-lab">Grupo socioeconómico (GSE)</span>
               <span className="gse-filter-note">Muestra u oculta cada grupo; selecciona los que quieras, incluso todos.</span>
+              {/* s30: mismo lugar que en el comparador — al lado del segmentador de GSE. */}
+              <div className="export-bar">
+                <IconExport label="Exportar CSV" icon="download"
+                  disabled={unidades.length===0}
+                  title={unidades.length===0
+                    ? "No hay establecimientos que exportar con esta combinación"
+                    : "Descarga en CSV los "+fmt(unidades.length)+" establecimientos de esta vista, con su puntaje y su estado vs GSE en los cuatro indicadores"}
+                  onExport={()=>descargarPanoramaCSV({grupos,grado:panGrado,agno:panAgno,
+                    nomArchivoTerr:terrTxt+(depNom?" "+depNom:""),
+                    glosaTerr:terrTxt+(depNom?" · "+depNom:"")})}/>
+              </div>
               <div className="gse-filter">{DATA.meta.gse.map(g=>
                 <button key={g} className={"gfb"+(gseVis.has(g)?" on":"")} onClick={()=>toggleGse(g)} aria-pressed={gseVis.has(g)}>
                   <span className="gf-check" aria-hidden="true">{gseVis.has(g)?"✓":""}</span>{GSE[g]}</button>)}</div>
