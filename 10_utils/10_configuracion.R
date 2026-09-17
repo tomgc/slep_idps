@@ -165,6 +165,27 @@ GRADO_CICLO_TEXTO <- c(
 # El valor debe coincidir EXACTO con la columna 'grado' del parquet (2m/4b/6b/8b).
 GRADOS_MOTOR <- c("4b", "2m")
 
+# --- Vista historica del panorama territorial (s31, P-VISTA-TERRITORIAL) ----
+# Decision 50_documentacion/activa/decisiones/20260917_decision_vista_historica_territorial.md
+# (§4 y §5). La matriz establecimiento x anio tiñe cada celda del casi blanco al
+# color del indicador segun el puntaje PROPIO del establecimiento (cero
+# agregacion: la calibracion es un rango de referencia, no una cifra del
+# territorio). Ambas constantes se calculan/serializan en 35_generar_motor_html.R
+# y viajan en meta$vista_territorial; el template solo las pinta.
+#
+# Percentiles del pais (por nivel e indicador, todos los anios, sobre el prom
+# redondeado que viaja en el payload) entre los que se estira el color. No es
+# 0-100 porque casi todos los puntajes caen en una franja angosta (Autoestima 4b:
+# 65-84 entre p5 y p95) y con la escala completa todas las celdas tenian el mismo
+# tono; no son percentiles del territorio porque el mismo tono significaria cosas
+# distintas en cada territorio. Bajo p5 y sobre p95 el color se satura.
+VT_PERCENTILES_COLOR <- c(inf = 0.05, sup = 0.95)
+
+# Tinte minimo (fraccion del color del indicador) de una celda CON dato: reserva
+# el 6 % inicial de la rampa para que ninguna celda con puntaje quede tan blanca
+# como una celda sin resultado ("–" sobre blanco).
+VT_TINTE_MINIMO <- 0.06
+
 # --- Crosswalk de esquema por anio: texto (2022-2024) -> id numerico (2025) --
 # La Agencia migro el identificador de indicador/dimension/subdimension de
 # codigo de texto (ind/dim/sdim) a id numerico (id_indicador/id_dimension/
