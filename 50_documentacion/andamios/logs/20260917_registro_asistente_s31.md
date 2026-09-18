@@ -15,3 +15,4 @@ Fuente de la tabla §15 y de las fricciones (§16) del próximo traspaso (`SETTI
 - friccion: la escala absoluta de 0 a 100 no distinguía entre celdas → color calibrado a los percentiles 5 y 95 del país; la leyenda dice solo 0 a 100.
 - friccion: la leyenda de puntaje con la franja calibrada dentro de 0–100, y después con "≤65 / ≥84", no ayudaba y quedaba desalineada → panel de dos columnas con "0 [barra] 100".
 - friccion: el encabezado 2019–21 iba en vertical → horizontal en dos líneas.
+- friccion: poner la linea `/effort` al inicio del mensaje para Claude Code rompe el pedido (el resto del texto no llega como instruccion) → el modo de ejecucion viaja solo dentro del encargo (`EJECUCION:`), y el mensaje de entrega no lo repite. Contradice la regla 4 de §2.12 del patron de encargos: corresponde enmendar el kit.
