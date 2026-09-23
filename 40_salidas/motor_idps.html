@@ -8489,7 +8489,14 @@ AAABrwBBAPMAAA==) format('opentype');}
         if(e.shiftKey&&i===0){e.preventDefault(); f[f.length-1].focus();}
         else if(!e.shiftKey&&i===f.length-1){e.preventDefault(); f[0].focus();}};
       window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h);},[]);
-    useEffect(()=>()=>{if(origen&&origen!==document.body&&document.contains(origen)&&origen.focus)origen.focus();},[origen]);
+    useEffect(()=>()=>{if(!(origen&&origen!==document.body&&document.contains(origen)&&origen.focus))return;
+      origen.focus();
+      // s32e (R-11): la tecla que cerro el modal puede seguir apretada; su autorrepeticion
+      // caeria en el origen y lo reabriria. Se descartan las repeticiones de Enter y Espacio
+      // sobre el origen hasta que se suelte una tecla.
+      const trago=e=>{if(e.repeat&&(e.key==="Enter"||e.key===" ")&&e.target===origen){e.preventDefault();e.stopPropagation();}};
+      const fin=()=>{window.removeEventListener("keydown",trago,true);window.removeEventListener("keyup",fin,true);};
+      window.addEventListener("keydown",trago,true);window.addEventListener("keyup",fin,true);},[origen]);
     const list=buildList(tab,ql)||[];
     const placeholder=(searchPlaceholderFor&&searchPlaceholderFor(tab))||"Buscar…";
     const emptyText=(emptyTextFor&&emptyTextFor(tab,ql))||"Sin resultados";
