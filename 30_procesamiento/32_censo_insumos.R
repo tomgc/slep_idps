@@ -9,7 +9,7 @@
 #             presencia de las llaves de segmentacion (cod_grupo, cod_depe2).
 #             Produce el mapa de cobertura grado x anio x familia que alimenta
 #             el pipeline (P6).
-# Insumos   : 20_insumos/idps*.xlsx (27 tablas de datos; se excluyen glosas).
+# Insumos   : 20_insumos/idps*.xlsx (28 tablas de datos; se excluyen glosas).
 # Salidas   : 40_salidas/intermedios/censo_insumos.parquet (perfilado completo)
 #             40_salidas/intermedios/censo_insumos.md       (reporte legible)
 # Notas     : - La familia de "niveles" cambia de nombre por anio
