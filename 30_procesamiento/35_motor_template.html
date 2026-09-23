@@ -998,7 +998,10 @@ __FONTS_CSS__
     const r = ramp || {bajo:"var(--bajo)",medio:"var(--medio)",alto:"var(--alto)"};
     const segs=[["bajo",r.bajo],["medio",r.medio],["alto",r.alto]];
     return <div className="bar">{segs.map(([k,c])=>{const val=v[k];if(val==null||val===0)return null;
-      return <span key={k} style={{width:val+"%",background:c,color:_txtOn(c)}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val)+"%":""}</span>;})}</div>;
+      // s32g (T2, §5.6): la etiqueta toma el color de mayor contraste WCAG entre negro, --gris
+      // y blanco (vtTexto, la regla de §3.5); en el alto de Clima (#4c939a) el blanco daba 3,53
+      // y el negro da 5,95. Si el tono no es hex (rampa por defecto), hereda como antes.
+      return <span key={k} style={{width:val+"%",background:c,color:(c&&c[0]==='#')?vtTexto(c):undefined}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val)+"%":""}</span>;})}</div>;
   }
 
   // ===== Reparto de estado vs GSE (Fase 3 — CONTEO de EE, NO promedio) =====
@@ -1155,6 +1158,8 @@ __FONTS_CSS__
   // Color de texto legible (claro/oscuro) sobre un fill segun su luminancia: la
   // etiqueta de % dentro del segmento debe leerse tanto en bajo (claro) como en
   // alto (oscuro). El title de hover y la leyenda NO dependen de esto.
+  // s32g: SIN USO desde T2 (DistBar pasa a vtTexto). Se conserva por instruccion del
+  // encargo (no se borra codigo); si nadie lo retoma, puede retirarse (duda al titular).
   const _txtOn=c=>{ if(!c||c[0]!=='#') return undefined; const a=_hx(c);
     return (0.299*a[0]+0.587*a[1]+0.114*a[2])/255 < 0.55 ? '#fff' : '#2e2710'; };
 
@@ -2629,7 +2634,7 @@ __FONTS_CSS__
   const vtGris=()=>{ if(_vtGris) return _vtGris; let v=""; try{ v=tokenCSS("--gris"); }catch(e){}
     return (_vtGris=v||"#5C666E"); };
   // Contraste WCAG 2.1 (luminancia relativa con linealizacion sRGB), distinto de
-  // _txtOn (luminancia perceptual con umbral fijo, que sigue sirviendo a DistBar).
+  // _txtOn (luminancia perceptual con umbral fijo; sin uso desde s32g: DistBar usa vtTexto).
   const _lumWCAG=h=>{const c=_hx(h).map(x=>{x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);});
     return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];};
   const contrasteWCAG=(a,b)=>{const A=_lumWCAG(a),B=_lumWCAG(b);return (Math.max(A,B)+0.05)/(Math.min(A,B)+0.05);};
