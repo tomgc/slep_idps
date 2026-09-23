@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v29 (2026-09-17). **Total reconciliado: 156 cambios.**
+> **Versión:** consolidado a v30 (2026-09-23). **Total reconciliado: 160 cambios.**
 
 ---
 
@@ -74,7 +74,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 24 | v24 | 0 | — | Opus 4.8 | Administrativa: consolida backlog (v23/144), P-CSS-MUERTO, deploy (DEC-s24-1) |
 | 25 | v25 | 3 | 145–147 | Opus 4.8 | Datos + UI: cobertura histórica, valor media móvil, vs GSE en tooltip, señalética `·` |
 | 30 | v29 | 9 | 148–156 | Opus 5 | Comparador de entidades (nacional y establecimiento), contraste accesible en toda la interfaz y exportación de datos e imagen, todo desplegado |
-| **Total** | | **156** | **1–156** | | |
+| 31 | v30 | 4 | 157–160 | Opus 5 | Compuerta de repositorio ejecutada, vista histórica del panorama territorial y corrección del estado sin comparación publicada, todo desplegado |
+| **Total** | | **160** | **1–160** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -88,7 +89,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (actualizada a v29, sobre 156 cambios)
+## Clasificación temática (actualizada a v30, sobre 160 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -100,12 +101,12 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | Infraestructura y scaffold | 5 | 3% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
 | Gobernanza de datos | 5 | 3% | Verificación sensibilidad, decisión Rama A, depuración directorio, ignore, gitignore inventarios scratch |
 | Visualización / diseño — motor base/datos | 14 | 9% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
-| Visualización / diseño — rediseño UI | 56 | 36% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador), lote UI directo s20 (#121–130: leyenda redundante, comunas por SLEP, nivel seleccionado, nombre completo rcard, definición estática, leyenda subdim, preliminar/significancia, comparador nombre/Territorio), s21 (#131–133: polígono GSE en el radar, texto del bloque azul, leyenda duplicada), s22 (#135–140: alto de barras, leyenda media móvil, tope comparador 4→10, color sin-diferencia, señalética sigdif temporal, etiqueta externa segmentos finos) y s23 (#142–144: anclas del indicador en una fila, etiquetas del radar sin colisión, eliminación del rótulo "Mirada integral") y s25 (#145–147: valor de la media móvil en la vista histórica, distancia vs GSE en el tooltip de indicador, señalética «·» para años históricos sin comparación publicada) |
+| Visualización / diseño — rediseño UI | 57 | 36% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador), lote UI directo s20 (#121–130: leyenda redundante, comunas por SLEP, nivel seleccionado, nombre completo rcard, definición estática, leyenda subdim, preliminar/significancia, comparador nombre/Territorio), s21 (#131–133: polígono GSE en el radar, texto del bloque azul, leyenda duplicada), s22 (#135–140: alto de barras, leyenda media móvil, tope comparador 4→10, color sin-diferencia, señalética sigdif temporal, etiqueta externa segmentos finos) y s23 (#142–144: anclas del indicador en una fila, etiquetas del radar sin colisión, eliminación del rótulo "Mirada integral") y s25 (#145–147: valor de la media móvil en la vista histórica, distancia vs GSE en el tooltip de indicador, señalética «·» para años históricos sin comparación publicada) |
 | Perfilado / exploración de datos | 4 | 3% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
-| Limpieza / deuda técnica | 15 | 10% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108), tokenización tipográfica a 7 tokens --fs-* (P-TIPOGRAFIA, #120, s20), jerarquía `.axis-lab.b` por peso (#134, s22, cierra REVISAR s20) |
+| Limpieza / deuda técnica | 16 | 10% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108), tokenización tipográfica a 7 tokens --fs-* (P-TIPOGRAFIA, #120, s20), jerarquía `.axis-lab.b` por peso (#134, s22, cierra REVISAR s20) |
 | Documentación conceptual / contenido | 10 | 6% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta, texto "qué refleja un puntaje alto" por indicador (#141, s22, nivel indicador desde el corpus) |
-| Pipeline / motor (código productivo) | 7 | 4% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
-| Saneamiento / calidad de datos de presentación | 15 | 10% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
+| Pipeline / motor (código productivo) | 8 | 5% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
+| Saneamiento / calidad de datos de presentación | 16 | 10% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
 | Deploy / publicación | 9 | 6% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
 | Verificación / auditoría (independiente) | 6 | 4% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
 | Decisión / gobernanza de producto | 3 | 2% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
@@ -211,6 +212,12 @@ la explicación y la tira externa apilada (correcciones de defectos de #150/#151
 rótulo "territorio" → "entidad"; la reorganización de los tabs del modal (corrección de
 un error de especificación); los cinco despliegues a `docs/`; los logs, encargos,
 mockups y la decisión de contraste.
+
+- **Sesión 31** (2026-09-23): cambios **157–160** (detalle en v30 §4 y en los logs `20260917_vista_historica_territorial_s31_log.md`, `20260917_correcciones_revision_s31b_log.md` y `20260917_forma_y_despliegue_s31c_log.md`; cubre los encargos s31, s31b y s31c, sin traspaso intermedio). Compuerta de repositorio ejecutada, vista histórica del panorama territorial y corrección del estado sin comparación publicada, todo desplegado:
+- **#157** — **Compuerta de repositorio ejecutada por primera vez** (9/9) y `cierre_incompleto` de v29 saldado en `ESTADO.md`. Cierra el único pendiente marcado como bloqueante en el traspaso v29.
+- **#158** — **Vista histórica del panorama territorial** (P-VISTA-TERRITORIAL): selector Vista actual / Vista histórica; por sección de GSE, franja de reparto de estado en los años que lo publican y matriz de establecimiento × año con el puntaje propio de cada uno, color calibrado, orden por el último año y clic a la ficha. Sin agregación: el territorio sigue sin producir un puntaje propio.
+- **#159** — **El estado vs GSE sin comparación publicada deja de contarse como "sin diferencia"** en la barra del panorama, en la tarjeta y en la fila del comparador; la barra lo declara con "+N sin comparación publicada" y el CSV del comparador suma la columna `n_sin_comparacion`. Afectaba a 900 establecimientos del país en 4° básico 2025.
+- **#160** — **Calibración del color y años con estado, derivados en R** (`meta.vista_territorial`): percentiles 5 y 95 del país por nivel e indicador, años con `sigdifgru` publicado y tinte mínimo, con constantes nombradas en `10_utils/10_configuracion.R`.
 
 ---
 
@@ -459,3 +466,14 @@ mockups y la decisión de contraste.
   **156** (5+5+14+56+4+15+10+7+15+9+6+3+4+3); correlativo global (detalle cronológico,
   último #156) = **156**; fila Total del resumen estadístico = **156**; encabezado del
   archivo = v29/**156**. Los cuatro cuadran. Suma de porcentajes redondeados: 101%.
+
+## Delta del backlog (consolidación v30)
+
+> Integra **s31** (sesión 31; tres encargos autónomos s31, s31b y s31c bajo un solo traspaso, v30, sin traspaso intermedio). Verificado contra el detalle cronológico (último #156 a v29). Segundo cierre instrumentado del repositorio (`cierre_sesion_autonomo_cc_v15.md`).
+
+- **s31: +4 entradas** (157–160). Foco: compuerta de repositorio ejecutada, vista histórica del panorama territorial y corrección del estado sin comparación publicada, todo desplegado. Total 156 → **160**.
+- **Clasificación (reparto de autoría):** #157 → "Limpieza / deuda técnica"; #158 → "Visualización / diseño — rediseño UI"; #159 → "Saneamiento / calidad de datos de presentación"; #160 → "Pipeline / motor (código productivo)". "Limpieza / deuda técnica" 15 → **16**; "Visualización / diseño — rediseño UI" 56 → **57**; "Saneamiento / calidad de datos de presentación" 15 → **16**; "Pipeline / motor (código productivo)" 7 → **8**.
+- **Categorías nuevas:** ninguna.
+- **Reclasificaciones:** ninguna.
+- **Lectura:** La sesión rompe el patrón de las anteriores: por primera vez desde v21 la categoría de presentación aporta una sola entrada de cuatro, y el peso se reparte entre gobernanza del cierre, calidad del dato mostrado y pipeline. Lo que la caracteriza no es el volumen sino el método: dos revisiones independientes después del "terminado" encontraron siete defectos que la auditoría del propio ejecutor no vio, y el más grave de la sesión (el estado nulo contado como "sin diferencia") era un defecto del motor ya publicado, no del trabajo nuevo.
+- **Verificación de cuadre (cuatro totales):** suma de la columna N° de la tabla temática = **160** (5+5+14+57+4+16+10+8+16+9+6+3+4+3); correlativo global (detalle cronológico, último #160) = **160**; fila Total del resumen estadístico = **160**; encabezado del archivo = v30/**160**. Los cuatro cuadran. Suma de porcentajes redondeados: 102%.
