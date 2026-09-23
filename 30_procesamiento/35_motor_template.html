@@ -213,6 +213,7 @@ __FONTS_CSS__
   .check-row{display:flex;align-items:center;gap:10px;padding:7px 11px;cursor:pointer;border-bottom:1px solid var(--linea);}
   .check-row:last-child{border-bottom:0;}
   .check-row:hover{background:var(--cream-200);}
+  .check-row:focus-visible{outline:2px solid var(--foco);outline-offset:-2px;}
   .check-name{flex:1 1 auto;font-family:var(--font-body);font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--ink);}
   .check-region{flex:0 0 auto;font-size:var(--fs-caption);color:var(--gris);}
   .empty-state{padding:18px;text-align:center;color:var(--gris);font-size:var(--fs-body);}
@@ -1627,10 +1628,22 @@ __FONTS_CSS__
               {list.map(item=>{const key=keyEnt({kind:item.kind,cod:item.cod,dep:depEfectiva});
                 const checked=multiple&&selSet.has(key);
                 const dis=multiple&&!checked&&topeAlcanzado;
+                // s32 (T2; divergencia 13 de s29 §36.7): la fila se opera con Tab y Enter
+                // o Espacio. El hermano (slep_simce_adecuado, 33_motor_template.html) solo
+                // tiene teclado donde la fila envuelve un <input type="checkbox"> nativo
+                // (Region/SLEP, L4024-4030 y L4109-4115); sus filas de seleccion simple
+                // (L3979-3981, L4064-4065) son <label onClick> sin teclado. Aqui una sola
+                // clase de fila sirve a los dos modos, asi que la fila misma es el control.
+                // Una sola funcion para clic y teclado, para que no diverjan; la
+                // autorrepeticion de la tecla no conmuta (un checkbox nativo tampoco).
+                const elegir=()=>{if(dis)return; onSelect({...item,dep:depEfectiva});};
                 return (
                 <div key={key} className={"check-row"+(item.kind==="nacional"?" is-nac":"")+(checked?" is-checked":"")+(dis?" is-disabled":"")}
-                  role={multiple?"checkbox":undefined} aria-checked={multiple?checked:undefined}
-                  onClick={()=>{if(dis)return; onSelect({...item,dep:depEfectiva});}}>
+                  tabIndex={dis?-1:0}
+                  role={multiple?"checkbox":"button"} aria-checked={multiple?checked:undefined}
+                  aria-disabled={dis||undefined}
+                  onClick={elegir}
+                  onKeyDown={e=>{if(e.key!=="Enter"&&e.key!==" ")return; e.preventDefault(); if(!e.repeat) elegir();}}>
                   {multiple && <span className="check-box" aria-hidden="true">{checked?"✓":""}</span>}
                   <span className="check-name">{item.nom}</span>
                   <span className="check-region">{item.sub}</span>
