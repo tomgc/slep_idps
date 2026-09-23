@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup §5.6: texto sobre la paleta de indicador</title>
+<style>
+:root{--tinta:#23303a;--gris:#5C666E;--linea:#e4dcc6;--panel:#fffdf7;--cream:#FFF6E0;--azul:#0A3A5C;--foco:#0062A0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--tinta);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1060px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:22px;margin:0 0 6px;color:var(--azul)}
+.lead{color:var(--gris);margin:0 0 22px;max-width:820px}
+section{background:#fff;border:1px solid var(--linea);border-radius:10px;padding:18px 18px 12px;margin:0 0 20px}
+h2{font-size:17px;margin:0 0 4px}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:2px}
+.tag.dec{background:#FBE3E6;color:#CE112C}.tag.nod{background:#E2F0FB;color:#1E6EA9}
+.q{color:var(--gris);margin:0 0 12px;font-size:14px}
+table{width:100%;border-collapse:collapse}
+.wrap{overflow-x:auto}
+th{font-size:12px;text-align:left;color:var(--gris);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--linea);vertical-align:bottom}
+td{padding:10px 8px;border-bottom:1px solid #f1ecdd;vertical-align:top;font-size:13px}
+th b{color:var(--tinta);font-size:13px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;box-shadow:inset 0 0 0 1px rgba(35,48,58,.22)}
+.dt{font-weight:700;font-size:13px}
+.dt.bl{border-left:4px solid;padding-left:7px}
+.rt{font-size:12px;color:var(--gris);margin-top:3px;font-variant-numeric:tabular-nums}
+code{font-size:11px}
+.bar{display:flex;height:19px;border-radius:5px;overflow:hidden;border:1px solid var(--linea);background:#f4f1e8;min-width:220px}
+.bar span{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.rec{margin:10px 0 4px;padding:9px 12px;background:#f4f1e8;border-radius:7px;font-size:14px}
+.ybar{display:flex;gap:26px;align-items:flex-end;padding:8px 0}
+.yc{text-align:center}.yv{font-weight:800;font-size:13px}.yg{font-size:11px;font-weight:700;margin-left:3px}
+.yf{width:34px;border-radius:5px 5px 0 0;background:#3858A3;margin:4px auto 0}
+.tt{display:inline-block;background:#23303a;color:#fff;font-size:13px;padding:6px 9px;border-radius:5px;line-height:1.45}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+.lab{font-size:12px;font-weight:700;color:var(--gris);margin-bottom:4px}
+</style></head><body><main>
+<h1>§5.6: texto sobre la paleta de indicador</h1>
+<p class="lead">Cuatro superficies del motor no llegan a 4,5:1. Solo la primera necesita tu elección; las otras tres tienen arreglo sin tocar la paleta ni el diseño y se muestran para que veas el antes y el después. Ratios calculados con la fórmula WCAG 2.1 sobre los hex del motor.</p>
+
+<section>
+<h2>1. Título "¿Qué mide este indicador?"<span class="tag dec">eliges tú</span></h2>
+<p class="q">Hoy el título usa el color del indicador sobre blanco: Convivencia, Participación y Hábitos no se leen bien. Elige una columna.</p>
+<div class="wrap"><table>
+<tr><th>Indicador</th><th>Hoy</th><th><b>A.</b> Título en tinta</th><th><b>B.</b> Tinta + filete del color</th><th><b>C.</b> Tono oscuro por indicador</th></tr>
+<tr><td><span class="sw" style="background:#3858A3"></span>Autoestima</td>
+<td><div class="dt" style="color:#3858A3">¿Qué mide este indicador?</div><div class="rt">6,79 ✓</div></td>
+<td><div class="dt" style="color:#23303a">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt bl" style="color:#23303a;border-left-color:#3858A3">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt" style="color:#3858A3">¿Qué mide este indicador?</div><div class="rt">6,79 ✓ <code>#3858A3</code></div></td></tr><tr><td><span class="sw" style="background:#61BDC6"></span>Clima</td>
+<td><div class="dt" style="color:#61BDC6">¿Qué mide este indicador?</div><div class="rt">2,19 ✗</div></td>
+<td><div class="dt" style="color:#23303a">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt bl" style="color:#23303a;border-left-color:#61BDC6">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt" style="color:#407d83">¿Qué mide este indicador?</div><div class="rt">4,69 ✓ <code>#407d83</code></div></td></tr><tr><td><span class="sw" style="background:#4BA560"></span>Participación</td>
+<td><div class="dt" style="color:#4BA560">¿Qué mide este indicador?</div><div class="rt">3,07 ✗</div></td>
+<td><div class="dt" style="color:#23303a">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt bl" style="color:#23303a;border-left-color:#4BA560">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt" style="color:#3b824c">¿Qué mide este indicador?</div><div class="rt">4,68 ✓ <code>#3b824c</code></div></td></tr><tr><td><span class="sw" style="background:#AACB58"></span>Hábitos</td>
+<td><div class="dt" style="color:#AACB58">¿Qué mide este indicador?</div><div class="rt">1,84 ✗</div></td>
+<td><div class="dt" style="color:#23303a">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt bl" style="color:#23303a;border-left-color:#AACB58">¿Qué mide este indicador?</div><div class="rt">13,50 ✓</div></td>
+<td><div class="dt" style="color:#687c36">¿Qué mide este indicador?</div><div class="rt">4,64 ✓ <code>#687c36</code></div></td></tr>
+</table></div>
+<div class="rec"><b>Recomendación: B.</b> Cumple en los cuatro sin crear colores nuevos y conserva la señal del indicador junto al título. C obliga a sumar tres hex a la paleta del folleto, que es identidad de la Agencia.</div>
+</section>
+
+<section>
+<h2>2. Porcentajes dentro de la barra de niveles<span class="tag nod">sin decisión</span></h2>
+<p class="q">Hoy el texto elige entre blanco y café por luminancia y falla en el nivel alto de Convivencia (3,53). Con la regla que ya usa la vista histórica del panorama (el de mayor contraste entre negro, gris y blanco), los doce tonos cumplen.</p>
+<div class="wrap"><table>
+<tr><th>Indicador</th><th>Hoy</th><th>Con la regla del panorama</th></tr>
+<tr><td><span class="sw" style="background:#3858A3"></span>Autoestima</td><td><div class="bar"><span style="width:22%;background:#92a3cc;color:#2e2710">22%</span><span style="width:38%;background:#506cae;color:#ffffff">38%</span><span style="width:40%;background:#2c457f;color:#ffffff">40%</span></div><div class="rt">bajo 5,89 · medio 5,13 · alto 9,27</div></td><td><div class="bar"><span style="width:22%;background:#92a3cc;color:#000000">22%</span><span style="width:38%;background:#506cae;color:#ffffff">38%</span><span style="width:40%;background:#2c457f;color:#ffffff">40%</span></div><div class="rt">bajo 8,33 · medio 5,13 · alto 9,27</div></td></tr><tr><td><span class="sw" style="background:#61BDC6"></span>Clima</td><td><div class="bar"><span style="width:22%;background:#a8dbe0;color:#2e2710">22%</span><span style="width:38%;background:#74c5cd;color:#2e2710">38%</span><span style="width:40%;background:#4c939a;color:#ffffff">40%</span></div><div class="rt">bajo 9,81 · medio 7,50 · alto 3,53 ✗</div></td><td><div class="bar"><span style="width:22%;background:#a8dbe0;color:#000000">22%</span><span style="width:38%;background:#74c5cd;color:#000000">38%</span><span style="width:40%;background:#4c939a;color:#000000">40%</span></div><div class="rt">bajo 13,87 · medio 10,61 · alto 5,95</div></td></tr><tr><td><span class="sw" style="background:#4BA560"></span>Participación</td><td><div class="bar"><span style="width:22%;background:#9ccea8;color:#2e2710">22%</span><span style="width:38%;background:#61b073;color:#2e2710">38%</span><span style="width:40%;background:#3a814b;color:#ffffff">40%</span></div><div class="rt">bajo 8,35 · medio 5,63 · alto 4,75</div></td><td><div class="bar"><span style="width:22%;background:#9ccea8;color:#000000">22%</span><span style="width:38%;background:#61b073;color:#000000">38%</span><span style="width:40%;background:#3a814b;color:#ffffff">40%</span></div><div class="rt">bajo 11,81 · medio 7,97 · alto 4,75</div></td></tr><tr><td><span class="sw" style="background:#AACB58"></span>Hábitos</td><td><div class="bar"><span style="width:22%;background:#d0e2a3;color:#2e2710">22%</span><span style="width:38%;background:#b4d16c;color:#2e2710">38%</span><span style="width:40%;background:#859e45;color:#2e2710">40%</span></div><div class="rt">bajo 10,67 · medio 8,68 · alto 4,93</div></td><td><div class="bar"><span style="width:22%;background:#d0e2a3;color:#000000">22%</span><span style="width:38%;background:#b4d16c;color:#000000">38%</span><span style="width:40%;background:#859e45;color:#000000">40%</span></div><div class="rt">bajo 15,09 · medio 12,28 · alto 6,97</div></td></tr>
+</table></div>
+</section>
+
+<section>
+<h2>3. Glifos ▲ ▼ = de la vista histórica de la ficha<span class="tag nod">sin decisión</span></h2>
+<p class="q">Los glifos junto al puntaje usan el color de barra. Con los tokens de texto que ya existen (<code>--alerta-txt</code>, <code>--destaca-txt</code>, <code>--st-neutro-txt</code>) cumplen; el mismo arreglo aplica a la tendencia "▼ −8 · sig." del encabezado.</p>
+<div class="two">
+<div><div class="lab">Hoy: ▼ 3,78 · ▲ 3,20 · = 3,23</div><div class="ybar">
+<div class="yc"><span class="yv">85<span class="yg" style="color:#2A8FD9">▲</span></span><div class="yf" style="height:70px"></div></div>
+<div class="yc"><span class="yv">77<span class="yg" style="color:#EE2D49">▼</span></span><div class="yf" style="height:58px"></div></div>
+<div class="yc"><span class="yv">78<span class="yg" style="color:#7E8A99">=</span></span><div class="yf" style="height:60px"></div></div></div></div>
+<div><div class="lab">Con tokens de texto: ▼ 5,16 · ▲ 5,00 · = 5,06</div><div class="ybar">
+<div class="yc"><span class="yv">85<span class="yg" style="color:#1E6EA9">▲</span></span><div class="yf" style="height:70px"></div></div>
+<div class="yc"><span class="yv">77<span class="yg" style="color:#CE112C">▼</span></span><div class="yf" style="height:58px"></div></div>
+<div class="yc"><span class="yv">78<span class="yg" style="color:#5F6A78">=</span></span><div class="yf" style="height:60px"></div></div></div></div>
+</div>
+</section>
+
+<section>
+<h2>4. Línea "vs GSE" del tooltip<span class="tag nod">sin decisión</span></h2>
+<p class="q">Sobre el fondo oscuro del tooltip, el rojo y el azul de barra quedan bajo 4,5. El glifo y "sig." ya dicen el estado, así que basta con escribir la línea en blanco.</p>
+<div class="two">
+<div><div class="lab">Hoy: rojo 3,28 · azul 3,88</div><span class="tt"><b>Autoestima</b><br>2025: 77 (0–100)<br><span style="color:#EE2D49">vs GSE: ▼ −6 · sig.</span></span></div>
+<div><div class="lab">En blanco: 13,50</div><span class="tt"><b>Autoestima</b><br>2025: 77 (0–100)<br>vs GSE: ▼ −6 · sig.</span></div>
+</div>
+</section>
+</main></body></html>
