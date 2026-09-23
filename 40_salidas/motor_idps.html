@@ -8361,7 +8361,8 @@ AAABrwBBAPMAAA==) format('opentype');}
           {isHist
             ? (
             <div className="hist-wrap">
-              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, siguiendo una escala que va desde 0 (puntaje mínimo) hasta 100 (puntaje máximo). La significancia estadística es calculada e informada por la Agencia. El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia. Un año sin resultados no significa un resultado bajo sino que indica que no hubo medición o que esta no fue válida según los estándares fijados por la Agencia. En 2019, donde como cada año correspondía aplicar la medición en 4° básico y 2° medio, la Agencia informa que, debido a los incidentes en el país tras el 18 de octubre, la aplicación de 4° básico enfrentó alteraciones en varios establecimientos y la de 2° medio no pudo realizarse. En 2020 y 2021, la interrupción se debió a la pandemia del COVID-19. Si en un año se realizó la evaluación a nivel nacional pero el establecimiento seleccionado no contó con resultados válidos, aparecerá sin datos.<br/><span className="sw-line mm"></span> La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b>, calculado según los datos de las últimas tres aplicaciones con resultados válidos.</div>
+              {/* s32c: el asterisco solo se explica si algún año visible es preliminar (patrón de la nota de barras). */}
+              <div className="ficha-explain"><b>Vista histórica.</b> Puntaje por año de cada indicador y de sus dimensiones, siguiendo una escala que va desde 0 (puntaje mínimo) hasta 100 (puntaje máximo). La significancia estadística es calculada e informada por la Agencia. {anios.some(a=>PRELIM.has(String(a)))?"El signo * al lado del año indica el carácter preliminar de los resultados, según lo informado por la Agencia. ":""}Un año sin resultados no significa un resultado bajo sino que indica que no hubo medición o que esta no fue válida según los estándares fijados por la Agencia. En 2019, donde como cada año correspondía aplicar la medición en 4° básico y 2° medio, la Agencia informa que, debido a los incidentes en el país tras el 18 de octubre, la aplicación de 4° básico enfrentó alteraciones en varios establecimientos y la de 2° medio no pudo realizarse. En 2020 y 2021, la interrupción se debió a la pandemia del COVID-19. Si en un año se realizó la evaluación a nivel nacional pero el establecimiento seleccionado no contó con resultados válidos, aparecerá sin datos.<br/><span className="sw-line mm"></span> La <b>línea tenue</b> del color del indicador es el <b>promedio móvil</b>, calculado según los datos de las últimas tres aplicaciones con resultados válidos.</div>
               {DATA.indicadores.map(ind=>{const idims=dimsByInd[ind.id]||[]; const ipts=serieEje(indOf,rbd,grado,ind.id,ejeFam('indicador'));
                 return (
                 <section className="hist-ind" style={{"--ic":ind.color}} key={ind.id}>
@@ -9544,6 +9545,8 @@ AAABrwBBAPMAAA==) format('opentype');}
       .map(g=>({gse:g,items:ordenar(filas.filter(r=>(r.gse||"sin")===g))})).filter(x=>x.items.length>0);
     const nomGse=g=>g==="sin"?"Sin clasificar":(GSE[g]||g);
     const prelimY=y=>PRELIM.has(String(y));
+    // s32c: el asterisco solo se explica si algún año visible es preliminar (patrón de la nota de barras).
+    const hayPrelim=conDato.some(y=>y.preliminar||prelimY(y.agno));
     const estadoTxt=s=>s===-1?"bajo":s===1?"sobre":"sin diferencia con";
     return (
       <div>
@@ -9558,7 +9561,7 @@ AAABrwBBAPMAAA==) format('opentype');}
           <span className="vt-lab">Puntaje</span>
           <div className="vt-leg">
             <span title={"Escala de 0 a 100. El color se calibra entre "+dom[0]+" y "+dom[1]+" y se satura fuera de ese rango."}>0<span className="vt-leg-bar" style={{background:"linear-gradient(90deg,"+vtTinte(indSel.color,dom[0],dom,k0)+","+vtTinte(indSel.color,dom[1],dom,k0)+")"}}></span>100</span>
-            <span>– sin resultado</span><span><span className="vt-leg-gap"></span>sin medición nacional</span><span>* resultado preliminar</span>
+            <span>– sin resultado</span><span><span className="vt-leg-gap"></span>sin medición nacional</span>{hayPrelim && <span>* resultado preliminar</span>}
           </div>
         </div>
         {grupos.length===0 && <div className="empty">No hay establecimientos educacionales con datos en ningún año para esta combinación de territorio, nivel y GSE.</div>}
