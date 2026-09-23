@@ -823,6 +823,9 @@ __FONTS_CSS__
   const PRELIM=new Set((DATA.meta.anios_preliminar||[]).map(String));  // anios preliminares (del dato)
   const fmt=v=>(v==null||isNaN(v))?"—":Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
   const fmtSigned=v=>v==null?"—":(v>0?"+":"")+Number(v).toLocaleString("es-CL",{maximumFractionDigits:1});
+  // s32: todo conteo visible pasa por aquí (tres defectos de plural en tres sesiones).
+  const nEE=n=>fmt(n)+(n===1?" establecimiento":" establecimientos");
+  const nCom=n=>fmt(n)+(n===1?" comuna":" comunas");
   // Title Case en capa de presentacion para nombres ALLCAPS del dato (comuna, EE),
   // conservando siglas y bajando conectores. NO altera el parquet. JS toLowerCase/
   // toUpperCase son Unicode-aware (Ñ/tildes correctas) sin depender del locale.
@@ -1093,7 +1096,7 @@ __FONTS_CSS__
       {k:"sobre",c:"var(--destaca)",count:rep.sobre,lbl:"▲ sobre su GSE (significativo)"}]);
     // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
     // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
-    const aria="Distribución de "+rep.N+" establecimientos con comparación publicada: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
+    const aria="Distribución de "+nEE(rep.N)+" con comparación publicada: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
       +(sin>0?"; además "+sin+" con puntaje sin comparación publicada, fuera del 100 %":"");
     // REGLA UNICA de etiquetado (s29): dentro del segmento va SOLO el dato completo
     // "p% (n)", y solo si cabe entero con holgura. Lo que no cabe no se recorta ni se
@@ -1108,7 +1111,7 @@ __FONTS_CSS__
       return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
         title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{cabe&&<span>{full}</span>}</div>;});
     return (<div className="s100-wrap">
-      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+rep.N+" establecimientos con comparación publicada"}>{segs}</div>
+      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+nEE(rep.N)+" con comparación publicada"}>{segs}</div>
       {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
           completo no cupo dentro de la barra; cada uno con su glifo de estado, su
           color y su "p% (n)" entero. s29c: ese color ya no viaja inline; lo pone
@@ -1687,7 +1690,7 @@ __FONTS_CSS__
     // s29i: una sola fila, que no depende del texto buscado (igual que buildListCmp).
     if(tab==="nacional") return [NACIONAL_OPT];
     if(tab==="region") return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
-      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
+      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:nCom(COMUNAS_POR_REGION[r.cod]||0)}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
@@ -1751,7 +1754,7 @@ __FONTS_CSS__
   const NACIONAL_OPT=(()=>{const coms=new Set();let ee=0;
     DATA.establecimientos.forEach(e=>{ee++;if(e.cod_com!=null)coms.add(e.cod_com);});
     return {kind:"nacional",cod:"CL",nom:"Chile",
-            sub:"Nivel nacional · "+fmt(coms.size)+" comunas · "+fmt(ee)+" establecimientos"};})();
+            sub:"Nivel nacional · "+nCom(coms.size)+" · "+nEE(ee)};})();
   // s29h: el orden de los tabs es el del proyecto hermano slep_simce_adecuado (de
   // menor a mayor alcance), SIN "Grupo personalizado", categoria que este motor no
   // tiene. Con este orden el modal abre en Establecimiento, igual que el hermano.
@@ -1768,12 +1771,12 @@ __FONTS_CSS__
     if(tab==="establecimiento") return buildList("establecimiento",ql)
       .map(it=>({...it,sub:it.sub+" · GSE "+gseLbl(it.cod,grado,agno)}));
     if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
-      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:s.ncom+" comunas · "+s.ee+" establecimientos"}));
+      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:nCom(s.ncom)+" · "+nEE(s.ee)}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
     return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
-      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:(COMUNAS_POR_REGION[r.cod]||0)+" comunas"}));
+      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:nCom(COMUNAS_POR_REGION[r.cod]||0)}));
   }
   const cmpPlaceholderFor=tab=>tab==="nacional"?"Sin búsqueda: Chile es la única opción":tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar una región…";
 
@@ -1849,7 +1852,7 @@ __FONTS_CSS__
     // establecimiento => RBD y su GSE en el mismo (grado, año).
     const metaChip=useMemo(()=>{const m={};
       cmpTerrs.forEach((t,i)=>{const q=metas[i]||{ncom:0,nee:0};
-        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+fmt(q.ncom)+(q.ncom===1?" comuna":" comunas")+" · "+fmt(q.nee)+(q.nee===1?" establecimiento":" establecimientos");});
+        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee);});
       cmpEEs.forEach((t,i)=>{m[keyEnt(t)]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
@@ -2608,9 +2611,9 @@ __FONTS_CSS__
   }
   // "2024 y 2025" / "2023, 2024 y 2025": derivado del dato, nunca escrito a mano.
   const listaY=arr=>arr.length<=1?arr.join(""):arr.slice(0,-1).join(", ")+" y "+arr[arr.length-1];
-  // s31b (revision de s31, T3): "1 establecimiento", no "1 establecimientos". Mismo
-  // patron que el banner ("comuna"/"comunas") y el modal ("establecimiento(s)").
-  const nEE=n=>fmt(n)+(n===1?" establecimiento":" establecimientos");
+  // s31b (revision de s31, T3): "1 establecimiento", no "1 establecimientos". s32: nEE
+  // (y su par nCom) se declaran junto a fmt, al inicio del script: la IIFE NACIONAL_OPT
+  // los usa al cargar y aqui habrian caido en la TDZ.
 
   // Roster historico del territorio para un grado: por RBD, el GSE de cada anio del
   // roster (nulo si ese anio no traia GSE), el GSE vigente (ultimo anio con GSE no
@@ -2919,7 +2922,7 @@ __FONTS_CSS__
                 {/* s31: en la vista historica el banner dice la serie (primer-ultimo anio del
                     eje) y cuenta los EE con resultado en algun anio (roster de todos los anios).
                     s31c: el plural sale de nEE (s31b), como en el subtitulo de seccion. */}
-                <div className="pan-meta">{!esSlep && <>{fmt(panComunas)} {panComunas===1?"comuna":"comunas"} · </>}{isHistPan
+                <div className="pan-meta">{!esSlep && <>{nCom(panComunas)} · </>}{isHistPan
                   ? <>{nEE(nHist)} con resultado en algún año · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAnios[0]}–{panAgno}{PRELIM.has(String(panAgno))?"*":""}</>
                   : <>{nEE(unidades.length)} en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}</>}{depNom?" · dependencia: "+depNom:""}</div>
               </div>
@@ -2954,7 +2957,7 @@ __FONTS_CSS__
                   disabled={unidades.length===0}
                   title={unidades.length===0
                     ? "No hay establecimientos que exportar con esta combinación"
-                    : "Descarga en CSV los "+fmt(unidades.length)+" establecimientos de esta vista, con su puntaje y su estado vs GSE en los cuatro indicadores"}
+                    : "Descarga en CSV "+(unidades.length===1?"el establecimiento":"los "+nEE(unidades.length))+" de esta vista, con su puntaje y su estado vs GSE en los cuatro indicadores"}
                   onExport={()=>descargarPanoramaCSV({grupos,grado:panGrado,agno:panAgno,
                     gseSel:DATA.meta.gse.filter(g=>gseVis.has(g)),
                     nomArchivoTerr:terrTxt+(depNom?" "+depNom:""),
