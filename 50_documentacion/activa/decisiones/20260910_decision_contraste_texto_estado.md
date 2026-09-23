@@ -449,7 +449,7 @@ etiqueta es la de `.bar span` en `DistBar` (niveles de la subdimensión), no la 
 barra de dimensión, y ya lleva inversión por luminancia (`_txtOn`) que en ese tono no
 basta.
 
-### 5.6 Texto sobre un color de la paleta de INDICADOR — **BACKLOG, pide mockup y aprobación del titular**
+### 5.6 Texto sobre un color de la paleta de INDICADOR — **RESUELTO el 2026-09-23 (s32g)**
 
 *Abierta el 2026-09-16 (s29g) como reagrupación; el único hallazgo nuevo es el anexo
 del tooltip.* Tres pendientes que hasta aquí vivían en secciones distintas —§5.3 (b),
@@ -533,6 +533,49 @@ real. Para (4) en particular, si sacar la etiqueta de `DistBar` rompe la lectura
 barra de niveles, la alternativa honesta no es (b) —que ya está aplicada y no llega—
 sino **extender §3.4** con su mismo argumento: el valor está en el `title` del
 segmento (`"alto: 10%"`), y la etiqueta interna se acepta como redundante.
+
+
+#### Resuelto el 2026-09-23 (s32g)
+
+Mockup: `50_documentacion/andamios/diseno/detalles/mockup_contraste_paleta_indicador_s56.html`.
+Log con las mediciones: `50_documentacion/andamios/logs/20260923_contraste_paleta_indicador_s32g_log.md`.
+Todas las cifras, en navegador, con colores computados y fondo efectivo compuesto,
+fórmula de WCAG 2.1 (calibración 21,00 y 4,48).
+
+- **Título "¿Qué mide este indicador?" — opción B, elegida por el titular sobre el
+  mockup.** El texto pasa a `--tinta` y el color del indicador, a un filete vertical de
+  4 px a la izquierda (`border-left`, con el mismo `ind.color`; sin hex nuevos). El
+  título de dimensión ("Sobre esta dimensión"), que no llevaba color, queda igual.
+- **Etiqueta de `DistBar` — corrección de la premisa de (b).** Lo que decía esta
+  sección ("en `#4C939A` ningún color de texto alcanza 4,5; el mejor posible es 4,21")
+  midió `#2e2710`, el oscuro de `_txtOn`, y no el negro: **el negro da 5,95**. Por eso
+  la regla de mayor contraste de §3.5 (`vtTexto`: negro, `--gris` o blanco) resuelve la
+  etiqueta sin extender §3.4. `DistBar` pasa de `_txtOn` a `vtTexto`; `_txtOn` queda
+  sin uso (se conserva, anotado en el código).
+- **Glifos de la vista histórica y marca de tendencia.** `.ybar-sig.de/.al/.nt` y
+  `.hist-trend.de/.al/.nt` pasan a los tokens de texto `--destaca-txt`, `--alerta-txt` y
+  `--st-neutro-txt`: se pintan sobre fondo claro (el track `#f6f5f6` y la cabecera
+  blanca), no sobre las barras, porque la cifra va 19 px por encima de su barra. El
+  inventario del `:root` (§3.3) suma estos dos usos: quedan siete.
+- **Línea "vs GSE" del tooltip.** Deja de llevar el color de barra y hereda el blanco de
+  `.tt`; el estado lo dicen el glifo y "sig./n.s.". Tal como advertía el anexo, los
+  tokens `-txt` no servían sobre fondo oscuro; no hizo falta un cuarto juego de tokens.
+
+| Superficie (vista) | Antes | Después |
+|---|---|---|
+| `.defn-title` del indicador: Autoestima / Clima / Participación / Hábitos (actual) | 6,79 / 2,19 / 3,07 / 1,84 (texto en `ind.color` sobre `#ffffff`) | 13,50 en los cuatro (`#23303a`), con filete del color |
+| Etiqueta de `DistBar`, alto de Clima `#4c939a` (actual) | 3,53 (`#ffffff`) | 5,95 (`#000000`) |
+| Etiquetas de `DistBar` de una ficha (57) | mínimo 3,53; 5 bajo 4,5 | mínimo 4,74; 0 bajo 4,5 |
+| Los 12 tonos de `nivelRamp` con el color elegido | 11 de 12 ≥ 4,5 (Clima alto 3,53) | 12 de 12 ≥ 4,5 (mínimo 4,74, Participación alto con blanco; máximo 15,09) |
+| `.ybar-sig.al` / `.ybar-sig.nt` sobre el track `#f6f5f6` (histórica) | 3,79 / 3,24 | 5,18 / 5,07 |
+| `.hist-trend.nt` sobre `#ffffff` (histórica) | 3,51 | 5,50 |
+| Línea "vs GSE" del tooltip (clase neutra) sobre `#23303a` | 3,85 | 13,50 (`#ffffff`) |
+
+Las clases `.ybar-sig.de` y `.hist-trend.de/.al` no aparecían en la ficha medida; su
+contraste con los tokens nuevos se recalcula en la auditoría del mismo log (FASE R).
+Ninguna parte quedó congelada. Las paletas de estado y de indicador no cambiaron (md5
+de las declaraciones del `:root` igual antes y después) y ninguna cifra del dato cambió
+(hash del payload igual en todos los builds).
 
 ## 6. Reversión
 
