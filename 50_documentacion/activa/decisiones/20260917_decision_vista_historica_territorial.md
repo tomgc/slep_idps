@@ -68,3 +68,5 @@ Al revisar la franja apareció un defecto del motor publicado. `repartoInd` cuen
 - **Alternativa descartada:** un cuarto segmento rayado dentro de la barra. Agregaba una trama nueva a la codificación de estado y mezclaba en el 100 % casos sin estado.
 
 **Enmienda s32 (2026-09-23):** §3.5 distinguía mal el piso de la rampa (4,58:1) del mínimo sobre puntajes enteros (4,78:1); detectado en la revisión s31b (log L274).
+
+**Enmienda s32f (2026-09-23):** el rótulo 'sin comparación publicada' pasa a 'sin comparación válida' (decisión del titular: la Agencia informa sigdifgru solo cuando la comparación es válida), y la columna n_con_dato del CSV del comparador pasa a n_con_comparacion (D-1 de s31).
