@@ -1294,7 +1294,9 @@ __FONTS_CSS__
                             const gl=p.difgru>0?"▲":(p.difgru<0?"▼":"=");
                             const col=p.sigdifgru===1?"var(--destaca)":(p.sigdifgru===-1?"var(--alerta)":"var(--st-neutro)");
                             const sg=(p.sigdifgru===1||p.sigdifgru===-1)?"· sig.":"· n.s.";
-                            h += "<br><span style='color:"+col+"'>vs GSE: "+gl+" "+fmtSigned(p.difgru)+" "+sg+"</span>";
+                            // s32g: los tokens -txt son para fondo claro; sobre .tt el estado lo dicen el glifo y sig./n.s.
+                            // (la linea hereda el blanco de .tt; `col` ya no pinta el texto y queda sin uso aqui).
+                            h += "<br><span>vs GSE: "+gl+" "+fmtSigned(p.difgru)+" "+sg+"</span>";
                           }
                           return h;
                         })(),e)} onMouseLeave={hideTT}>
