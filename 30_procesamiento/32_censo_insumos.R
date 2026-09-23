@@ -194,7 +194,8 @@ con <- file(ruta_reporte, open = "w", encoding = "UTF-8")
 writeLines(c(
   "# Censo de insumos IDPS (P5)",
   "",
-  paste0("- Fecha: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S")),
+  # s32c: git registra cuando cambio el censo; el reloj ensuciaba el arbol en cada build (D-2 s32b).
+  "- Fecha: la registra git (el reporte no sella la hora del build)",
   paste0("- Archivos de datos perfilados: ", nrow(censo)),
   paste0("- Errores de lectura: ", sum(censo$error)),
   "",
