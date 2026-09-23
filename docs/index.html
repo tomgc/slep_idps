@@ -7839,7 +7839,7 @@ AAABrwBBAPMAAA==) format('opentype');}
           {al.bajo>0 && <span className="chip al" title="indicadores significativamente bajo su GSE">▼ {al.bajo} indicadores bajo su GSE</span>}
           {al.sobre>0 && <span className="chip de" title="indicadores significativamente sobre su GSE">▲ {al.sobre} indicadores sobre su GSE</span>}
           {al.cmp>0 && al.bajo===0 && al.sobre===0 && <span className="chip nt">≈ en su GSE</span>}
-          {al.dato>0 && al.cmp===0 && <span className="chip nt" title="Con puntaje, pero la Agencia no publica la comparación con su GSE para ningún indicador">· sin comparación publicada</span>}
+          {al.dato>0 && al.cmp===0 && <span className="chip nt" title="Con puntaje, pero sin comparación válida con su GSE en ningún indicador">· sin comparación válida</span>}
           {al.dato===0 && <span className="chip nt sup">sin dato</span>}
         </div>
         <span className="gc-go">ver más detalles →</span>
@@ -7955,12 +7955,12 @@ AAABrwBBAPMAAA==) format('opentype');}
     // descartada por el titular), y no entra en la regla de etiquetado de la barra.
     const sin=rep.sin||0;
     const notaSin = sin>0
-      ? <div className="s100-sin" title={"Establecimientos con puntaje cuya comparación con su GSE la Agencia no publica: "+fmt(sin)+". No entran en el 100 % de la barra."}>+{fmt(sin)} sin comparación publicada</div>
+      ? <div className="s100-sin" title={"Establecimientos con puntaje sin comparación válida con su GSE: "+fmt(sin)+". No entran en el 100 % de la barra."}>+{fmt(sin)} sin comparación válida</div>
       : null;
     // s31b: contenedor propio (.s100-wrap) en vez de Fragment: barra, tira externa y
     // nota quedan en la MISMA columna del grid del panorama (ver CSS de .s100-wrap).
     if(vacia) return (<div className="s100-wrap">
-      <div className="s100 s100-empty" role="img" aria-label={"Sin establecimientos con comparación publicada"+(sin>0?"; "+sin+" con puntaje sin comparación publicada":"")}><span className="s100-nd">sin dato</span></div>
+      <div className="s100 s100-empty" role="img" aria-label={"Sin establecimientos con comparación válida"+(sin>0?"; "+sin+" con puntaje sin comparación válida":"")}><span className="s100-nd">sin dato</span></div>
       {notaSin}
     </div>);
     const parts=pctRound([
@@ -7969,8 +7969,8 @@ AAABrwBBAPMAAA==) format('opentype');}
       {k:"sobre",c:"var(--destaca)",count:rep.sobre,lbl:"▲ sobre su GSE (significativo)"}]);
     // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
     // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
-    const aria="Distribución de "+nEE(rep.N)+" con comparación publicada: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
-      +(sin>0?"; además "+sin+" con puntaje sin comparación publicada, fuera del 100 %":"");
+    const aria="Distribución de "+nEE(rep.N)+" con comparación válida: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
+      +(sin>0?"; además "+sin+" con puntaje sin comparación válida, fuera del 100 %":"");
     // REGLA UNICA de etiquetado (s29): dentro del segmento va SOLO el dato completo
     // "p% (n)", y solo si cabe entero con holgura. Lo que no cabe no se recorta ni se
     // degrada a "p%" a secas: baja ENTERO a la tira externa. Asi nunca se lee un
@@ -7984,7 +7984,7 @@ AAABrwBBAPMAAA==) format('opentype');}
       return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
         title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{cabe&&<span>{full}</span>}</div>;});
     return (<div className="s100-wrap">
-      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+nEE(rep.N)+" con comparación publicada"}>{segs}</div>
+      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+nEE(rep.N)+" con comparación válida"}>{segs}</div>
       {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
           completo no cupo dentro de la barra; cada uno con su glifo de estado, su
           color y su "p% (n)" entero. s29c: ese color ya no viaja inline; lo pone
@@ -8733,7 +8733,7 @@ AAABrwBBAPMAAA==) format('opentype');}
                 sobre:{g:"▲",txt:"sobre su GSE",lbl:"Sobre su GSE (diferencia significativa)"},
                 // s31 (decision 20260917 §6): con puntaje y sigdifgru nulo no se afirma
                 // estado; misma señaletica "·" que la vista historica de la ficha (#147).
-                sin:{g:"·",txt:"sin comparación publicada",lbl:"Con puntaje; la Agencia no publica la comparación con su GSE"}};
+                sin:{g:"·",txt:"sin comparación válida",lbl:"Con puntaje; sin comparación válida con su GSE"}};
   function CeldaEE({d}){
     // prom nulo => "sin dato" en cursiva; jamas un cero ni un guion.
     if(!d||d.prom==null) return <span className="ee-nd">sin dato</span>;
@@ -8994,7 +8994,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   // al cubo neutro (eran 3.495 celdas EE x indicador en 4° basico 2025, el 13,3% de
   // las que tienen puntaje). Pantalla y CSV leen hoy la misma ausencia de la misma
   // forma; el CSV conserva su glosa propia (con "vs GSE") por continuidad de archivo.
-  const CSV_SIN_CMP_GSE="sin comparación vs GSE publicada";
+  const CSV_SIN_CMP_GSE="sin comparación válida vs GSE";
   function estadoVsGse(d){
     if(!d||d.prom==null) return "sin dato";
     if(d.difgru==null||d.sigdifgru==null) return CSV_SIN_CMP_GSE;
@@ -9042,13 +9042,13 @@ AAABrwBBAPMAAA==) format('opentype');}
   // Dos tipos de fila, distinguidas por la columna `tipo`, con el encabezado como
   // UNION de sus columnas: una fila de territorio deja vacias las de establecimiento
   // y al reves. Es un solo archivo porque es una sola pantalla.
-  // s31 (decision 20260917 §6): `n_con_dato` pasa a ser N = EE CON comparacion
-  // publicada (el 100 % de la barra) y se agrega `n_sin_comparacion` (con puntaje,
-  // sin sigdifgru), justo despues de `n_sobre`. El nombre `n_con_dato` se conserva
-  // por contrato aunque ya no describe "con puntaje": va como duda al titular.
+  // s31 (decision 20260917 §6): la columna del N pasa a ser N = EE CON comparacion
+  // valida (el 100 % de la barra) y se agrega `n_sin_comparacion` (con puntaje,
+  // sin sigdifgru), justo despues de `n_sobre`. s32f: renombrada de `n_con_dato` a
+  // `n_con_comparacion` por decision del titular (D-1 de s31).
   const CSV_CMP_COLS=["tipo","entidad","tipo_entidad","dependencia","rbd","comuna",
     "gse","gse_label","indicador","indicador_label",
-    "n_con_dato","n_bajo","n_neutro","n_sobre","n_sin_comparacion","pct_bajo","pct_neutro","pct_sobre",
+    "n_con_comparacion","n_bajo","n_neutro","n_sobre","n_sin_comparacion","pct_bajo","pct_neutro","pct_sobre",
     "puntaje","estado_vs_gse","nivel","anio","preliminar"];
 
   function filasComparadorCSV({cmpTerrs,cmpEEs,rosters,eeGse,visGse,grado,agno}){
