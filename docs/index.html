@@ -8454,6 +8454,11 @@ AAABrwBBAPMAAA==) format('opentype');}
   //   avisoFor -> (tab,dep) => nodo o null: el aviso metodologico del SLEP.
   // La dependencia elegida viaja EN el item que se entrega a onSelect, de modo que la
   // entidad nace ya acotada; el modal no la aplica por su cuenta.
+  // s32e: enfocables de la caja del modal, en orden de documento y calculados en el momento
+  // (la lista cambia con la pestaña, la búsqueda y el tope): controles no deshabilitados y
+  // elementos con tabIndex >= 0 que tienen cajas (visibles).
+  const _enfocablesModal=m=>[...m.querySelectorAll('button,input,select,textarea,a[href],[tabindex]')]
+    .filter(el=>!el.disabled&&el.tabIndex>=0&&el.getClientRects().length>0);
   function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia",
                         multiple=false,seleccionados=[],maxSel=null,onDone=null,
                         depOpts=null,depFor=null,depInicial="",avisoFor=null}){
@@ -8468,12 +8473,36 @@ AAABrwBBAPMAAA==) format('opentype');}
     const topeAlcanzado=multiple&&maxSel!=null&&seleccionados.length>=maxSel;
     useEffect(()=>{const h=e=>{if(e.key==="Escape")onCancel();};
       window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h);},[onCancel]);
+    // s32e: aria-modal=true promete que el foco no sale; aquí se cumple (D-2 de s32).
+    // Tab en el ultimo enfocable vuelve al primero y Shift+Tab en el primero va al ultimo; si
+    // el foco quedo fuera de la caja, la siguiente Tab lo trae de vuelta (al primero, o al
+    // ultimo con Shift). El origen (el boton que abrio el modal) se lee en el PRIMER render:
+    // el autoFocus del buscador se aplica en el commit, antes de los efectos, y un efecto
+    // veria ya el buscador. Al cerrar por cualquier via, si el origen sigue en el documento,
+    // recupera el foco. El hermano no maneja el foco en su modal (s32e, M7).
+    const modalRef=useRef(null);
+    const [origen]=useState(()=>document.activeElement);
+    useEffect(()=>{const h=e=>{if(e.key!=="Tab")return; const m=modalRef.current; if(!m)return;
+        const f=_enfocablesModal(m); if(!f.length)return;
+        const i=f.indexOf(document.activeElement);
+        if(i<0){e.preventDefault(); (e.shiftKey?f[f.length-1]:f[0]).focus(); return;}
+        if(e.shiftKey&&i===0){e.preventDefault(); f[f.length-1].focus();}
+        else if(!e.shiftKey&&i===f.length-1){e.preventDefault(); f[0].focus();}};
+      window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h);},[]);
+    useEffect(()=>()=>{if(!(origen&&origen!==document.body&&document.contains(origen)&&origen.focus))return;
+      origen.focus();
+      // s32e (R-11): la tecla que cerro el modal puede seguir apretada; su autorrepeticion
+      // caeria en el origen y lo reabriria. Se descartan las repeticiones de Enter y Espacio
+      // sobre el origen hasta que se suelte una tecla.
+      const trago=e=>{if(e.repeat&&(e.key==="Enter"||e.key===" ")&&e.target===origen){e.preventDefault();e.stopPropagation();}};
+      const fin=()=>{window.removeEventListener("keydown",trago,true);window.removeEventListener("keyup",fin,true);};
+      window.addEventListener("keydown",trago,true);window.addEventListener("keyup",fin,true);},[origen]);
     const list=buildList(tab,ql)||[];
     const placeholder=(searchPlaceholderFor&&searchPlaceholderFor(tab))||"Buscar…";
     const emptyText=(emptyTextFor&&emptyTextFor(tab,ql))||"Sin resultados";
     return (
       <div className="modal-backdrop" onClick={onCancel}>
-        <div className="modal" role="dialog" aria-modal="true" aria-label={title} onClick={e=>e.stopPropagation()}>
+        <div className="modal" ref={modalRef} role="dialog" aria-modal="true" aria-label={title} onClick={e=>e.stopPropagation()}>
           <div className="modal-header"><h2 className="modal-title">{title}</h2></div>
           <div className="modal-tabs">
             {tabs.map(([k,lbl])=>(
