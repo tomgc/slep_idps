@@ -40,8 +40,10 @@ __FONTS_CSS__
        (.s100-ext-it) y el texto de estado de la fila EE (.ee-st), de s29c, mas
        los chips del panorama (.chip.al/.chip.de), de s29e, las anclas de
        desvio vs GSE de la ficha (.ancla.al/.ancla.de), de s29f, y los spans
-       "▼ rojo" / "▲ azul" de la glosa .ficha-explain (inline en el JSX), de s29g.
-       Si se agrega un uso, se agrega aqui.
+       "▼ rojo" / "▲ azul" de la glosa .ficha-explain (inline en el JSX), de s29g,
+       y los glifos de la vista historica (.ybar-sig.de/.al/.nt) y la marca de
+       tendencia (.hist-trend.de/.al/.nt), de s32g (§5.6). Si se agrega un uso,
+       se agrega aqui.
        s29f (2026-09-11): --alerta-txt baja de #D2112D a #CE112C (H 351,3->351,4,
        S 85,0->84,8; solo luminosidad). Con #D2112D, sobre --alerta-bg daba 4,466 y
        no llegaba a AA; #CE112C da 4,606 ahi y 4,644 sobre --cream-200, el peor de
@@ -395,7 +397,7 @@ __FONTS_CSS__
   /* #13 (s22): glifo de significancia TEMPORAL (vs evaluacion anterior) junto al
      puntaje; direccion por signo de dif, color por sig (reusa clases de/al/nt). */
   .ybar-val .ybar-sig{font-size:var(--fs-overline);margin-left:3px;font-weight:var(--fw-bold);}
-  .ybar-sig.de{color:var(--destaca);} .ybar-sig.al{color:var(--alerta);} .ybar-sig.nt{color:var(--st-neutro);}
+  .ybar-sig.de{color:var(--destaca-txt);} .ybar-sig.al{color:var(--alerta-txt);} .ybar-sig.nt{color:var(--st-neutro-txt);}
   .ybar-yr{text-align:center;font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-bold);}
   .ybar-empty{align-self:center;margin:auto auto;font-size:var(--fs-overline);color:var(--gris);font-style:italic;}
   /* Año desactivado del eje contiguo (pandemia / no_eval): columna gris de ESTADO,
@@ -418,7 +420,7 @@ __FONTS_CSS__
   /* Marca de tendencia del ultimo año con dato vs la evaluacion anterior (leida) */
   .hist-trend{margin-left:auto;font-size:var(--fs-caption);font-weight:var(--fw-heavy);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
   .hist-trend.tiny{font-size:var(--fs-caption);font-weight:var(--fw-bold);}
-  .hist-trend.de{color:var(--destaca);} .hist-trend.al{color:var(--alerta);} .hist-trend.nt{color:var(--st-neutro);}
+  .hist-trend.de{color:var(--destaca-txt);} .hist-trend.al{color:var(--alerta-txt);} .hist-trend.nt{color:var(--st-neutro-txt);}
   .hist-trend .ht-ic{font-weight:var(--fw-heavy);}
   /* Valor de la media movil VIGENTE en la cabecera (texto suelto, no caja). El
      HistTrend ya lleva margin-left:auto y empuja el grupo a la derecha; la media
