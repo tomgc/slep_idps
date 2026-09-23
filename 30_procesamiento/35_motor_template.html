@@ -859,13 +859,14 @@ __FONTS_CSS__
   const hideTT=()=>{tt().style.display="none";};
 
   // ===== Definicion metodologica contextual (ESTATICA, s21 #10; del catalogo embebido).
-  // Titulo fijo en NEGRITA, en el color del indicador (prop color), sin toggle ni icono;
-  // la definicion queda SIEMPRE visible. Degrada: sin texto -> no renderiza bloque. =====
+  // Titulo fijo en NEGRITA, con un filete del color del indicador (prop color), sin toggle
+  // ni icono; la definicion queda SIEMPRE visible. Degrada: sin texto -> no renderiza bloque. =====
   function Definicion({texto, etiqueta, contexto, color}){
     if(!texto) return null;
     return (
       <div className={contexto?"defn-box defn-ctx":"defn-box"}>
-        <div className="defn-title" style={color?{color}:undefined}>{etiqueta||"¿Qué mide?"}</div>
+        {/* s32g: opción B de §5.6 (titular); el color del indicador pasa del texto al filete */}
+        <div className="defn-title" style={color?{borderLeft:"4px solid "+color,paddingLeft:7}:undefined}>{etiqueta||"¿Qué mide?"}</div>
         <div className="defn-text">{texto}</div>
       </div>);
   }
