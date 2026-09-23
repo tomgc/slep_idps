@@ -553,9 +553,10 @@ __FONTS_CSS__
     border-left:3px solid var(--foco);border-radius:var(--radius-2);}
   .cmp-invite{font-size:var(--fs-caption);color:var(--gris);font-style:italic;margin-top:10px;}
   .cmp-gse-ctl{margin:6px 0 12px;}
-  /* s32d: min-width = columna de entidad + 4 × ancho mínimo legible medido (M6); bajo eso, scroll en .cmp-tscroll.
+  /* s32d: min-width = columna de entidad + 4 × W_min; bajo eso, scroll en .cmp-tscroll. W_min 150 = 140 medido (M6)
+     + margen para fuentes de otros sistemas ("sobre su GSE" pedía 140,36 px; A-1 de s32d): 210 + 4 × 150 = 810.
      Mismo mecanismo que el hermano (.data-table con min-width dentro de .table-wrap con overflow, 33_motor_template.html L606-617). */
-  .cmp-table{width:100%;min-width:770px;border-collapse:collapse;table-layout:fixed;}
+  .cmp-table{width:100%;min-width:810px;border-collapse:collapse;table-layout:fixed;}
   .cmp-table th{text-align:center;font-size:var(--fs-caption);font-weight:var(--fw-bold);color:var(--gris);letter-spacing:.01em;padding:10px 12px;border-bottom:1px solid var(--linea);white-space:nowrap;}
   .cmp-table th.th-terr{text-align:right;width:210px;}
   .cmp-table th.th-ind{white-space:normal;}  /* #20 s21: nombre completo del indicador puede envolver (table-layout fixed reparte el ancho) */
