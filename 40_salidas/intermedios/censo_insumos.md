@@ -1,6 +1,6 @@
 # Censo de insumos IDPS (P5)
 
-- Fecha: 2026-09-23 16:32:17
+- Fecha: la registra git (el reporte no sella la hora del build)
 - Archivos de datos perfilados: 28
 - Errores de lectura: 0
 
