@@ -7586,6 +7586,8 @@ AAABrwBBAPMAAA==) format('opentype');}
   /* Panel de controles de la matriz: rotulo (140px) + contenido, tres filas. */
   .vt-ctl{display:grid;grid-template-columns:140px minmax(0,1fr);gap:12px 16px;align-items:center;margin:0 0 16px;padding:14px 16px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radius-3);box-shadow:var(--shadow-1);}
   .vt-lab{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-caption);color:var(--gris);}
+  /* s33e: la exportacion de la vista historica ocupa la ultima fila de .vt-ctl, a la derecha como en el panorama actual. */
+  .vt-ctl .export-bar{grid-column:1/-1;justify-content:flex-end;}
   .vt-ind-sel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
   .vt-ind-b{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--linea);border-radius:7px;padding:7px 12px;font:inherit;font-size:var(--fs-caption);font-weight:var(--fw-bold);line-height:1.25;color:var(--tinta);cursor:pointer;min-height:40px;}
   .vt-ind-b:hover{border-color:var(--foco);}
@@ -9175,6 +9177,10 @@ AAABrwBBAPMAAA==) format('opentype');}
   // nadie ve. Es la misma forma que el encargo fija para el comparador.
   const CSV_PAN_COLS=["rbd","establecimiento","comuna","dependencia","gse","gse_label",
     "indicador","indicador_label","puntaje","estado_vs_gse","nivel","anio","preliminar"];
+  // s33e: columnas de la vista historica. `gse_ultimo` es el GSE con el que la pantalla
+  // agrupa (el ultimo publicado); `gse_anio`, el de ese año, contra el que se mide su estado.
+  const CSV_HIST_COLS=["rbd","establecimiento","comuna","dependencia","gse_ultimo","gse_ultimo_label",
+    "anio","gse_anio","gse_anio_label","indicador","indicador_label","puntaje","estado_vs_gse","nivel","preliminar"];
 
   function filasPanoramaCSV({grupos,grado,agno}){
     const nivel=DATA.meta.grados[grado]||grado;
@@ -9207,10 +9213,53 @@ AAABrwBBAPMAAA==) format('opentype');}
     // ("Region de Valparaiso" frente a la misma region acotada a Municipal) y la
     // seleccion de GSE (los cinco grupos frente a solo Bajo). El sufijo de GSE se
     // omite cuando estan todos, que es el caso de apertura.
-    const gseSel=(args.gseSel||[]);
-    const sufGse=(gseSel.length&&gseSel.length<DATA.meta.gse.length)?"_gse_"+gseSel.join("_"):"";
     descargarCSV(filasPanoramaCSV(args),"idps_panorama_"+slugArchivo(args.nomArchivoTerr)+
-      "_"+slugArchivo(args.grado)+"_"+args.agno+sufGse+".csv");
+      "_"+slugArchivo(args.grado)+"_"+args.agno+sufijoGse(args.gseSel)+".csv");
+  }
+  // s33e: el sufijo sale de aqui para que el CSV de la vista historica use el mismo.
+  function sufijoGse(gseSel){
+    const s=(gseSel||[]);
+    return (s.length&&s.length<DATA.meta.gse.length)?"_gse_"+s.join("_"):"";
+  }
+
+  // s33e: CSV de la vista historica (pendiente 4 de v31). Recibe los mismos grupos y anios
+  // que dibuja PanoramaHistorico (regla de fidelidad de s30); una fila por EE, anio e indicador.
+  function filasHistoricoCSV({grupos,conDato,grado}){
+    const nivel=DATA.meta.grados[grado]||grado;
+    const filas=[CSV_HIST_COLS];
+    grupos.forEach(grp=>{
+      const cod=grp.gse==="sin"?"":grp.gse;
+      const gl=GSE[grp.gse]||"sin clasificar";
+      grp.items.forEach(r=>{
+        const e=est[r.rbd];
+        const com=(e&&e.cod_com!=null)?comNom(e.cod_com):"";
+        const dep=(e&&e.cod_depe2!=null)?(DEPE[e.cod_depe2]||e.cod_depe2):"";
+        conDato.forEach(y=>{
+          const im=r.porAnio[y.agno]||{};
+          // GSE de ese anio: "sin clasificar" si el roster lo trae sin GSE; vacio si el
+          // establecimiento no tiene fila ese anio (sin dato, como el "–" de la matriz).
+          const enRoster=Object.prototype.hasOwnProperty.call(r.anios,y.agno);
+          const gy=enRoster?r.anios[y.agno]:null;
+          const prelim=PRELIM.has(String(y.agno))?"1":"0";
+          DATA.indicadores.forEach(ind=>{
+            const d=im[ind.id];
+            filas.push([r.rbd,nomEE(e),com,dep,cod,gl,
+              y.agno,gy!=null?gy:"",gy!=null?(GSE[gy]||gy):(enRoster?"sin clasificar":""),
+              ind.id,ind.nombre,(d&&d.prom!=null)?numCSV(d.prom):"",estadoVsGse(d),nivel,prelim]);
+          });
+        });
+      });
+    });
+    return filas;
+  }
+
+  const nFilasHistorico=({grupos,conDato})=>
+    DATA.indicadores.length*conDato.length*grupos.reduce((a,g)=>a+g.items.length,0);
+
+  function descargarHistoricoCSV(args){
+    if(!confirmarTamano(nFilasHistorico(args),args.glosaTerr)) return;
+    descargarCSV(filasHistoricoCSV(args),"idps_panorama_historico_"+slugArchivo(args.nomArchivoTerr)+
+      "_"+slugArchivo(args.grado)+sufijoGse(args.gseSel)+".csv");
   }
 
   // ===== Fase 3 (s30) — CSV de la ficha de establecimiento =====
@@ -9600,7 +9649,7 @@ AAABrwBBAPMAAA==) format('opentype');}
     return out;
   }
 
-  function PanoramaHistorico({rosterHist,panGrado,gseVis,vtInd,onInd,orden,onOrden,esNacional,onSel}){
+  function PanoramaHistorico({rosterHist,panGrado,gseVis,vtInd,onInd,orden,onOrden,esNacional,onSel,gseSel,nomArchivoTerr,glosaTerr}){
     const VT=DATA.meta.vista_territorial||{};
     const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[panGrado])||[];
     const aniosEstado=(VT.anios_estado&&VT.anios_estado[panGrado])||[];
@@ -9629,6 +9678,8 @@ AAABrwBBAPMAAA==) format('opentype');}
     // s32c: el asterisco solo se explica si algún año visible es preliminar (patrón de la nota de barras).
     const hayPrelim=conDato.some(y=>y.preliminar||prelimY(y.agno));
     const estadoTxt=s=>s===-1?"bajo":s===1?"sobre":"sin diferencia con";
+    const nVis=grupos.reduce((a,g)=>a+g.items.length,0);
+    const sinFilas=nFilasHistorico({grupos,conDato})===0;
     return (
       <div>
         <div className="help"><b>Vista histórica del territorio, sin agregar.</b> Cada fila es un establecimiento con su propio puntaje en cada año; el territorio no produce un puntaje propio. Sobre cada grupo, cómo se reparten sus establecimientos por <b>estado vs su GSE</b> en los años en que la Agencia lo publica{aniosEstado.length?" ("+listaY(aniosEstado)+")":""}. Un año sin resultado no es un resultado bajo: indica que no hubo medición o que no fue válida.</div>
@@ -9643,6 +9694,14 @@ AAABrwBBAPMAAA==) format('opentype');}
           <div className="vt-leg">
             <span title={"Escala de 0 a 100. El color se calibra entre "+dom[0]+" y "+dom[1]+" y se satura fuera de ese rango."}>0<span className="vt-leg-bar" style={{background:"linear-gradient(90deg,"+vtTinte(indSel.color,dom[0],dom,k0)+","+vtTinte(indSel.color,dom[1],dom,k0)+")"}}></span>100</span>
             <span>– sin resultado</span><span><span className="vt-leg-gap"></span>sin medición nacional</span>{hayPrelim && <span>* resultado preliminar</span>}
+          </div>
+          <div className="export-bar">
+            <IconExport label="Exportar CSV" icon="download"
+              disabled={sinFilas}
+              title={sinFilas
+                ? "No hay establecimientos que exportar con esta combinación"
+                : "Descarga en CSV "+(nVis===1?"el establecimiento":"los "+nEE(nVis))+" de esta vista: una fila por establecimiento, año con medición e indicador, con su puntaje, su GSE de ese año y su estado vs GSE"}
+              onExport={()=>descargarHistoricoCSV({grupos,conDato,grado:panGrado,gseSel,nomArchivoTerr,glosaTerr})}/>
           </div>
         </div>
         {grupos.length===0 && <div className="empty">No hay establecimientos educacionales con datos en ningún año para esta combinación de territorio, nivel y GSE.</div>}
@@ -9920,7 +9979,8 @@ AAABrwBBAPMAAA==) format('opentype');}
               <span className="gse-filter-lab">Grupo socioeconómico (GSE)</span>
               <span className="gse-filter-note">Muestra u oculta cada grupo; selecciona los que quieras, incluso todos.</span>
               {/* s30: mismo lugar que en el comparador — al lado del segmentador de GSE.
-                  s31: en la vista historica la barra de exportacion NO se dibuja (decision §3.10). */}
+                  s31: en la vista historica la barra de exportacion NO se dibuja (decision §3.10);
+                  s33e: esa vista exporta con su propio boton, dentro de PanoramaHistorico. */}
               {!isHistPan && <div className="export-bar">
                 <IconExport label="Exportar CSV" icon="download"
                   disabled={unidades.length===0}
@@ -9942,7 +10002,10 @@ AAABrwBBAPMAAA==) format('opentype');}
 
             {isHistPan
               ? <PanoramaHistorico rosterHist={rosterHist} panGrado={panGrado} gseVis={gseVis} vtInd={vtInd} onInd={setVtInd}
-                  orden={vtOrden} onOrden={setVtOrden} esNacional={esNacional} onSel={irFicha}/>
+                  orden={vtOrden} onOrden={setVtOrden} esNacional={esNacional} onSel={irFicha}
+                  gseSel={DATA.meta.gse.filter(g=>gseVis.has(g))}
+                  nomArchivoTerr={terrTxt+(depNom?" "+depNom:"")}
+                  glosaTerr={terrTxt+(depNom?" · "+depNom:"")}/>
               : <>
             <div className="help"><b>Panorama del territorio sin agregar.</b> El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia){esNacional?". ":" y la grilla para abrir el Panorama IDPS de cada uno. "}Las barras son <b>% (n) de establecimientos, nunca un promedio</b>.</div>
             <div className="leyenda pan-state-leg">
