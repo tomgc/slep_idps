@@ -742,7 +742,8 @@ __FONTS_CSS__
   .vt-franja-foot{font-size:var(--fs-caption);color:var(--gris);margin-top:10px;}
   /* Matriz B: establecimiento x anio, sin agregar. Scroll horizontal SOLO dentro
      del contenedor (el body nunca desborda); primera columna fija. */
-  .vt-scroll{overflow-x:auto;border:1px solid var(--linea);border-radius:var(--radius-2);background:var(--paper);}
+  /* s33g: position relative hace que el overflow de .vt-scroll recorte los .vt-sr absolutos (A-1 de s33e, D-2 de s33f). */
+  .vt-scroll{position:relative;overflow-x:auto;border:1px solid var(--linea);border-radius:var(--radius-2);background:var(--paper);}
   table.vt-mx{border-collapse:separate;border-spacing:0;min-width:760px;width:100%;font-variant-numeric:tabular-nums;}
   /* Texto solo para el lector de pantalla (caption de la matriz y, desde s31b, la
      glosa del estado que acompana al glifo). */
