@@ -13,8 +13,11 @@
   Desplegado a `docs/` con gate visual del titular. **Enmendada el 2026-09-16
   (s29g):** se cierran §5.5 (1) y (3) con los tokens ya existentes; §5.5 (2) y (4) se
   agrupan con §5.3 (b) en la §5.6 como un solo problema de diseño —texto sobre color
-  de la paleta de INDICADOR—, que pide mockup. Redesplegado a `docs/`. Última
-  enmienda de la línea de contraste.
+  de la paleta de INDICADOR—, que pide mockup. Redesplegado a `docs/`. **Enmendada
+  el 2026-09-23 (s32g):** se resuelve la §5.6 con la opción B (título del indicador
+  en tinta con filete del color) y se amplía a siete el inventario de usos de los
+  tokens `-txt`. Desplegado a `docs/`. **Enmendada el 2026-09-24 (s33):** encabezado
+  de §5 al día; `_txtOn` retirado del motor.
 
 ---
 
@@ -187,7 +190,7 @@ El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generado
 encargo: métricas del bloque 7 del generador idénticas y payload JSON del motor
 byte-idéntico salvo `fecha_generacion`.
 
-## 5. Pendientes asociados (§5.1, §5.3 a/c, §5.4 y §5.5 1/3 resueltos; §5.2 y §5.6 abiertos)
+## 5. Pendientes asociados (§5.1, §5.3 a/c, §5.4, §5.5 1/3 y §5.6 resueltos; §5.2 abierto)
 
 ### 5.1 `--gris` accesible en todos los fondos — **RESUELTO el 2026-09-10 (s29d)**
 
