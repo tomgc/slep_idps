@@ -7073,6 +7073,10 @@ AAABrwBBAPMAAA==) format('opentype');}
   .modal{background:var(--paper);border-radius:var(--radius-3);width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 14px 44px rgba(10,58,92,.28);overflow:hidden;animation:modalLift 180ms cubic-bezier(.2,.7,.2,1);}
   .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--linea);}
   .modal-title{margin:0;font-family:var(--font-display);font-size:var(--fs-h4);font-weight:var(--fw-heavy);letter-spacing:-.005em;color:var(--azul);}
+  /* s33c: boton de cierre del encabezado, con la clase del hermano (icon-btn; divergencia 6 de s29 §36.7). */
+  .icon-btn{background:transparent;border:0;padding:6px;cursor:pointer;color:var(--gris);border-radius:var(--radius-1);display:inline-flex;align-items:center;justify-content:center;font-family:inherit;font-size:var(--fs-body);line-height:1;}
+  .icon-btn:hover{background:var(--cream-200);color:var(--tinta);}
+  .icon-btn:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   .modal-tabs{display:flex;padding:0 22px;border-bottom:1px solid var(--linea);flex-wrap:wrap;}
   .modal-tab{appearance:none;background:none;border:none;padding:12px 0;margin-right:24px;font-family:var(--font-body);font-weight:var(--fw-medium);font-size:var(--fs-body);color:var(--gris);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
   .modal-tab:hover{color:var(--tinta);}
@@ -7089,6 +7093,15 @@ AAABrwBBAPMAAA==) format('opentype');}
   .check-name{flex:1 1 auto;font-family:var(--font-body);font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--ink);}
   .check-region{flex:0 0 auto;font-size:var(--fs-caption);color:var(--gris);}
   .empty-state{padding:18px;text-align:center;color:var(--gris);font-size:var(--fs-body);}
+  /* s33c: en la pestaña sin buscador (Nacional) va este aviso en su lugar, como en el hermano. */
+  .modal-hint{margin:0 0 10px;color:var(--gris);font-size:var(--fs-body);}
+  /* s33c: con el tope alcanzado, franja para quitar desde el modal una entidad ya elegida (pendiente 8 de v31). */
+  .modal-sel{margin:0 0 10px;padding:8px 10px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radius-2);}
+  .modal-sel-lab{margin:0 0 6px;font-size:var(--fs-caption);font-weight:var(--fw-bold);color:var(--gris);}
+  .modal-sel-lista{display:flex;flex-wrap:wrap;gap:6px;}
+  .modal-sel-b{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--linea);background:var(--paper);border-radius:var(--radius-2);padding:3px 8px;font-family:inherit;font-size:var(--fs-caption);color:var(--tinta);cursor:pointer;}
+  .modal-sel-b:hover{border-color:var(--foco);}
+  .modal-sel-b:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--linea);background:var(--panel);}
   .estab-popup-btn{appearance:none;border:1px solid var(--border-2);background:var(--paper);padding:8px 14px;border-radius:var(--radius-2);font-family:var(--font-body);font-size:var(--fs-body);cursor:pointer;color:var(--ink);}
   .estab-popup-btn:hover{background:#f3f0e8;}
@@ -8466,7 +8479,8 @@ AAABrwBBAPMAAA==) format('opentype');}
     .filter(el=>!el.disabled&&el.tabIndex>=0&&el.getClientRects().length>0);
   function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia",
                         multiple=false,seleccionados=[],maxSel=null,onDone=null,
-                        depOpts=null,depFor=null,depInicial="",avisoFor=null,focoRespaldo=null}){
+                        depOpts=null,depFor=null,depInicial="",avisoFor=null,focoRespaldo=null,sinBuscadorFor=null,
+                        seleccionadosInfo=[]}){
     const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
     const [tab,setTab]=useState(tabInicial);
     const [q,setQ]=useState("");
@@ -8512,14 +8526,21 @@ AAABrwBBAPMAAA==) format('opentype');}
     return (
       <div className="modal-backdrop" onClick={onCancel}>
         <div className="modal" ref={modalRef} role="dialog" aria-modal="true" aria-label={title} onClick={e=>e.stopPropagation()}>
-          <div className="modal-header"><h2 className="modal-title">{title}</h2></div>
+          <div className="modal-header"><h2 className="modal-title">{title}</h2>
+            {/* s33c: cierre en el encabezado, como el hermano (su L3987: button.icon-btn con el icono x). En modo
+                multiple hace lo mismo que Listo, para no perder lo elegido; en modo simple, lo mismo que Cancelar. */}
+            <button type="button" className="icon-btn" aria-label="Cerrar" title="Cerrar" onClick={multiple?(onDone||onCancel):onCancel}>✕</button></div>
           <div className="modal-tabs">
             {tabs.map(([k,lbl])=>(
               <button key={k} className={"modal-tab"+(tab===k?" is-active":"")} onClick={()=>{setTab(k);setQ("");}}>{lbl}</button>))}
           </div>
           <div className="modal-body">
-            <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
-              style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>
+            {/* s33c: la pestaña sin busqueda (Nacional) no dibuja buscador, como el hermano (su pestaña Nacional
+                solo tiene un parrafo y el selector); en su lugar va el texto que antes era el placeholder. */}
+            {sinBuscadorFor&&sinBuscadorFor(tab)
+              ? <p className="modal-hint">{placeholder}</p>
+              : <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
+              style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>}
             {/* s29i: el selector va ARRIBA de la lista, al reves que en el hermano. Alli el
                 modal tiene boton de guardar y el orden visual da igual; aqui el clic en la
                 fila CONFIRMA de inmediato, asi que la dependencia tiene que verse y poder
@@ -8534,6 +8555,20 @@ AAABrwBBAPMAAA==) format('opentype');}
                 </select>
               </label>)}
             {avisoFor && avisoFor(tab,depEfectiva)}
+            {/* s33c (pendiente 8 de v31): con el tope alcanzado y otra dependencia en el selector, ninguna fila visible
+                queda marcada y no se podia quitar nada desde el modal (el hermano no tiene el caso: su seleccion es local
+                y por codigo, L3876-L3895 de su plantilla). La franja lista lo elegido; cada boton lo quita por su clave
+                kind|cod|dep (addTerr alterna) y el foco pasa al buscador, o a la pestaña activa, para no quedar en BODY. */}
+            {topeAlcanzado && seleccionadosInfo.length>0 && (
+              <div className="modal-sel">
+                <p className="modal-sel-lab">Llegaste al tope de {maxSel}. Quita una para agregar otra:</p>
+                <div className="modal-sel-lista">
+                  {seleccionadosInfo.map(s=>{const et=s.nom+(s.dep?" · "+(DEPE[s.dep]||s.dep):"");
+                    return <button type="button" key={keyEnt(s)} className="modal-sel-b" aria-label={"Quitar "+et} title={"Quitar "+et}
+                      onClick={()=>{const m=modalRef.current; const dest=m&&(m.querySelector(".input-search")||m.querySelector(".modal-tab.is-active"));
+                        onSelect(s); if(dest)dest.focus();}}>{et}<span aria-hidden="true"> ✕</span></button>;})}
+                </div>
+              </div>)}
             <div className="comuna-checklist" style={{maxHeight:340}}>
               {list.length===0 && <div className="empty-state">{emptyText}</div>}
               {list.map(item=>{const key=keyEnt({kind:item.kind,cod:item.cod,dep:depEfectiva});
@@ -8678,7 +8713,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   const NACIONAL_OPT=(()=>{const coms=new Set();let ee=0;
     DATA.establecimientos.forEach(e=>{ee++;if(e.cod_com!=null)coms.add(e.cod_com);});
     return {kind:"nacional",cod:"CL",nom:"Chile",
-            sub:"Nivel nacional · "+nCom(coms.size)+" · "+nEE(ee)};})();
+            sub:"Nivel nacional · "+nCom(coms.size)+" · "+nEE(ee)+" en el directorio"};})();
   // s29h: el orden de los tabs es el del proyecto hermano slep_simce_adecuado (de
   // menor a mayor alcance), SIN "Grupo personalizado", categoria que este motor no
   // tiene. Con este orden el modal abre en Establecimiento, igual que el hermano.
@@ -8695,7 +8730,7 @@ AAABrwBBAPMAAA==) format('opentype');}
     if(tab==="establecimiento") return buildList("establecimiento",ql)
       .map(it=>({...it,sub:it.sub+" · GSE "+gseLbl(it.cod,grado,agno)}));
     if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
-      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:nCom(s.ncom)+" · "+nEE(s.ee)}));
+      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:"Traspaso "+(s.anio!=null?s.anio:"—")+" · "+nCom(s.ncom)+" · "+nEE(s.ee)+" en el directorio"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
@@ -8774,9 +8809,10 @@ AAABrwBBAPMAAA==) format('opentype');}
     const eeGse=useMemo(()=>cmpEEs.map(t=>gseCod(t.cod,cmpGrado,agno)),[cmpEEs,cmpGrado,agno]);
     // Meta del chip por entidad: territorio => comunas · EE del roster real (D-s8-4);
     // establecimiento => RBD y su GSE en el mismo (grado, año).
+    // s33c: la fila cuenta el directorio y el chip el roster del nivel y año; cada texto nombra su universo (pendiente 3 de v31).
     const metaChip=useMemo(()=>{const m={};
       cmpTerrs.forEach((t,i)=>{const q=metas[i]||{ncom:0,nee:0};
-        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee);});
+        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee)+" con IDPS en "+DATA.meta.grados[cmpGrado]+" "+agno;});
       cmpEEs.forEach((t,i)=>{m[keyEnt(t)]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
@@ -9829,11 +9865,12 @@ AAABrwBBAPMAAA==) format('opentype');}
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}
             depOpts={DEPS_OPTS} depFor={DEP_TABS} depInicial={terr.dep||""} avisoFor={avisoDepFor}
-            focoRespaldo={()=>document.querySelector(".ficha-name")}/>}
+            focoRespaldo={()=>document.querySelector(".ficha-name")} sinBuscadorFor={tab=>tab==="nacional"}/>}
           {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} emptyTextFor={emptyTextFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
             depOpts={DEPS_OPTS} depFor={DEP_TABS} avisoFor={avisoDepFor}
             multiple={true} seleccionados={cmpTerr.map(keyEnt)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}
-            focoRespaldo={()=>document.querySelector(".cmp-add")||document.querySelector(".cmp-cl")}/>}
+            focoRespaldo={()=>document.querySelector(".cmp-add")||document.querySelector(".cmp-cl")} sinBuscadorFor={tab=>tab==="nacional"}
+            seleccionadosInfo={cmpTerr}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
