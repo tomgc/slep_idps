@@ -6974,6 +6974,8 @@ AAABrwBBAPMAAA==) format('opentype');}
   .screen-tab{appearance:none;background:none;border:none;padding:14px 18px;font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--fs-body-lg);color:var(--gris);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
   .screen-tab:hover{color:var(--tinta);}
   .screen-tab.is-active{color:var(--azul);border-bottom-color:var(--coral);}
+  /* s33d: bajo 480px la barra de pantallas no desborda la pagina (pendiente 6 de v31). */
+  @media (max-width:480px){ .app-nav-inner{padding:0 12px;} .screen-tab{padding:14px 12px;} .screen-tabs{overflow-x:auto;max-width:100%;} }
   /* Franja de picker territorial: persistente bajo el banner, visible en las 3 pantallas */
   .picker-strip{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;margin-bottom:14px;}
   .picker-strip .nav-sel{margin-top:0;}
@@ -7063,7 +7065,7 @@ AAABrwBBAPMAAA==) format('opentype');}
     border-radius:var(--radius-2);padding:4px 10px;font-size:var(--fs-caption);}
   .sel-chip .k{color:var(--gris);font-size:var(--fs-caption);letter-spacing:.04em;font-weight:var(--fw-bold);}
   .sel-chip button{border:0;background:none;color:var(--gris);cursor:pointer;font-size:var(--fs-caption);padding:0 0 0 2px;}
-  .sel-chip button:hover{color:var(--alerta);}
+  .sel-chip button:hover{color:var(--alerta-txt);}
   .sel-link{border:0;background:none;color:var(--foco);cursor:pointer;font-size:var(--fs-caption);font-family:inherit;text-decoration:underline;}
   /* --- EntityModal (selector portable, andamio; tokens del motor) --- */
   /* EntityModal alineado a la referencia (encabezado con borde, tabs subrayadas, filas densas con separador); logica intacta */
@@ -7423,7 +7425,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   .cmp-chip.is-nac{border-left:4px solid var(--azul);}
   .cmp-chip.is-ee{border-left:4px solid var(--foco);background:#F7FBFE;}
   .cmp-x{background:none;border:0;cursor:pointer;color:var(--gris);font-size:var(--fs-body);padding:0 0 0 2px;line-height:1;}
-  .cmp-x:hover{color:var(--alerta);}
+  .cmp-x:hover{color:var(--alerta-txt);}
   /* Item 10 (s19): boton agregar azul solido (forma del patron hermano, tokens IDPS)
      + reset (outline) al lado, visible solo con >=1 territorio. */
   .cmp-add{border:1px solid var(--azul);background:var(--azul);border-radius:var(--radius-2);color:#fff;font-weight:var(--fw-bold);font-size:var(--fs-body);padding:8px 14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
@@ -8501,6 +8503,9 @@ AAABrwBBAPMAAA==) format('opentype');}
     // recupera el foco. El hermano no maneja el foco en su modal (s32e, M7).
     const modalRef=useRef(null);
     const [origen]=useState(()=>document.activeElement);
+    // s33d: el buscador toma el foco solo al abrir el modal; al cambiar de pestana el foco queda en la pestana (A-6 de s33c).
+    const buscadorAlAbrir=useRef(true);
+    useEffect(()=>{buscadorAlAbrir.current=false;},[]);
     useEffect(()=>{const h=e=>{if(e.key!=="Tab")return; const m=modalRef.current; if(!m)return;
         const f=_enfocablesModal(m); if(!f.length)return;
         const i=f.indexOf(document.activeElement);
@@ -8539,7 +8544,7 @@ AAABrwBBAPMAAA==) format('opentype');}
                 solo tiene un parrafo y el selector); en su lugar va el texto que antes era el placeholder. */}
             {sinBuscadorFor&&sinBuscadorFor(tab)
               ? <p className="modal-hint">{placeholder}</p>
-              : <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
+              : <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={buscadorAlAbrir.current}
               style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>}
             {/* s29i: el selector va ARRIBA de la lista, al reves que en el hermano. Alli el
                 modal tiene boton de guardar y el orden visual da igual; aqui el clic en la
@@ -8812,7 +8817,7 @@ AAABrwBBAPMAAA==) format('opentype');}
     // s33c: la fila cuenta el directorio y el chip el roster del nivel y año; cada texto nombra su universo (pendiente 3 de v31).
     const metaChip=useMemo(()=>{const m={};
       cmpTerrs.forEach((t,i)=>{const q=metas[i]||{ncom:0,nee:0};
-        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee)+" con IDPS en "+DATA.meta.grados[cmpGrado]+" "+agno;});
+        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee)+" con IDPS en "+DATA.meta.grados[cmpGrado]+" "+agno+(PRELIM.has(String(agno))?" (preliminar)":"");});
       cmpEEs.forEach((t,i)=>{m[keyEnt(t)]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
