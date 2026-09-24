@@ -1945,7 +1945,7 @@ __FONTS_CSS__
     // s33c: la fila cuenta el directorio y el chip el roster del nivel y año; cada texto nombra su universo (pendiente 3 de v31).
     const metaChip=useMemo(()=>{const m={};
       cmpTerrs.forEach((t,i)=>{const q=metas[i]||{ncom:0,nee:0};
-        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee)+" con IDPS en "+DATA.meta.grados[cmpGrado]+" "+agno;});
+        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee)+" con IDPS en "+DATA.meta.grados[cmpGrado]+" "+agno+(PRELIM.has(String(agno))?" (preliminar)":"");});
       cmpEEs.forEach((t,i)=>{m[keyEnt(t)]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
