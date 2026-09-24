@@ -228,6 +228,13 @@ __FONTS_CSS__
   .empty-state{padding:18px;text-align:center;color:var(--gris);font-size:var(--fs-body);}
   /* s33c: en la pestaña sin buscador (Nacional) va este aviso en su lugar, como en el hermano. */
   .modal-hint{margin:0 0 10px;color:var(--gris);font-size:var(--fs-body);}
+  /* s33c: con el tope alcanzado, franja para quitar desde el modal una entidad ya elegida (pendiente 8 de v31). */
+  .modal-sel{margin:0 0 10px;padding:8px 10px;background:var(--panel);border:1px solid var(--linea);border-radius:var(--radius-2);}
+  .modal-sel-lab{margin:0 0 6px;font-size:var(--fs-caption);font-weight:var(--fw-bold);color:var(--gris);}
+  .modal-sel-lista{display:flex;flex-wrap:wrap;gap:6px;}
+  .modal-sel-b{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--linea);background:var(--paper);border-radius:var(--radius-2);padding:3px 8px;font-family:inherit;font-size:var(--fs-caption);color:var(--tinta);cursor:pointer;}
+  .modal-sel-b:hover{border-color:var(--foco);}
+  .modal-sel-b:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--linea);background:var(--panel);}
   .estab-popup-btn{appearance:none;border:1px solid var(--border-2);background:var(--paper);padding:8px 14px;border-radius:var(--radius-2);font-family:var(--font-body);font-size:var(--fs-body);cursor:pointer;color:var(--ink);}
   .estab-popup-btn:hover{background:#f3f0e8;}
@@ -1603,7 +1610,8 @@ __FONTS_CSS__
     .filter(el=>!el.disabled&&el.tabIndex>=0&&el.getClientRects().length>0);
   function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia",
                         multiple=false,seleccionados=[],maxSel=null,onDone=null,
-                        depOpts=null,depFor=null,depInicial="",avisoFor=null,focoRespaldo=null,sinBuscadorFor=null}){
+                        depOpts=null,depFor=null,depInicial="",avisoFor=null,focoRespaldo=null,sinBuscadorFor=null,
+                        seleccionadosInfo=[]}){
     const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
     const [tab,setTab]=useState(tabInicial);
     const [q,setQ]=useState("");
@@ -1678,6 +1686,20 @@ __FONTS_CSS__
                 </select>
               </label>)}
             {avisoFor && avisoFor(tab,depEfectiva)}
+            {/* s33c (pendiente 8 de v31): con el tope alcanzado y otra dependencia en el selector, ninguna fila visible
+                queda marcada y no se podia quitar nada desde el modal (el hermano no tiene el caso: su seleccion es local
+                y por codigo, L3876-L3895 de su plantilla). La franja lista lo elegido; cada boton lo quita por su clave
+                kind|cod|dep (addTerr alterna) y el foco pasa al buscador, o a la pestaña activa, para no quedar en BODY. */}
+            {topeAlcanzado && seleccionadosInfo.length>0 && (
+              <div className="modal-sel">
+                <p className="modal-sel-lab">Llegaste al tope de {maxSel}. Quita una para agregar otra:</p>
+                <div className="modal-sel-lista">
+                  {seleccionadosInfo.map(s=>{const et=s.nom+(s.dep?" · "+(DEPE[s.dep]||s.dep):"");
+                    return <button type="button" key={keyEnt(s)} className="modal-sel-b" aria-label={"Quitar "+et} title={"Quitar "+et}
+                      onClick={()=>{const m=modalRef.current; const dest=m&&(m.querySelector(".input-search")||m.querySelector(".modal-tab.is-active"));
+                        onSelect(s); if(dest)dest.focus();}}>{et}<span aria-hidden="true"> ✕</span></button>;})}
+                </div>
+              </div>)}
             <div className="comuna-checklist" style={{maxHeight:340}}>
               {list.length===0 && <div className="empty-state">{emptyText}</div>}
               {list.map(item=>{const key=keyEnt({kind:item.kind,cod:item.cod,dep:depEfectiva});
@@ -2978,7 +3000,8 @@ __FONTS_CSS__
           {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} emptyTextFor={emptyTextFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
             depOpts={DEPS_OPTS} depFor={DEP_TABS} avisoFor={avisoDepFor}
             multiple={true} seleccionados={cmpTerr.map(keyEnt)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}
-            focoRespaldo={()=>document.querySelector(".cmp-add")||document.querySelector(".cmp-cl")} sinBuscadorFor={tab=>tab==="nacional"}/>}
+            focoRespaldo={()=>document.querySelector(".cmp-add")||document.querySelector(".cmp-cl")} sinBuscadorFor={tab=>tab==="nacional"}
+            seleccionadosInfo={cmpTerr}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
