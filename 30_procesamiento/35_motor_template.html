@@ -1634,6 +1634,9 @@ __FONTS_CSS__
     // recupera el foco. El hermano no maneja el foco en su modal (s32e, M7).
     const modalRef=useRef(null);
     const [origen]=useState(()=>document.activeElement);
+    // s33d: el buscador toma el foco solo al abrir el modal; al cambiar de pestana el foco queda en la pestana (A-6 de s33c).
+    const buscadorAlAbrir=useRef(true);
+    useEffect(()=>{buscadorAlAbrir.current=false;},[]);
     useEffect(()=>{const h=e=>{if(e.key!=="Tab")return; const m=modalRef.current; if(!m)return;
         const f=_enfocablesModal(m); if(!f.length)return;
         const i=f.indexOf(document.activeElement);
@@ -1672,7 +1675,7 @@ __FONTS_CSS__
                 solo tiene un parrafo y el selector); en su lugar va el texto que antes era el placeholder. */}
             {sinBuscadorFor&&sinBuscadorFor(tab)
               ? <p className="modal-hint">{placeholder}</p>
-              : <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
+              : <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={buscadorAlAbrir.current}
               style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>}
             {/* s29i: el selector va ARRIBA de la lista, al reves que en el hermano. Alli el
                 modal tiene boton de guardar y el orden visual da igual; aqui el clic en la
