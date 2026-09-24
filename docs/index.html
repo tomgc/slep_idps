@@ -6907,8 +6907,10 @@ AAABrwBBAPMAAA==) format('opentype');}
        (.s100-ext-it) y el texto de estado de la fila EE (.ee-st), de s29c, mas
        los chips del panorama (.chip.al/.chip.de), de s29e, las anclas de
        desvio vs GSE de la ficha (.ancla.al/.ancla.de), de s29f, y los spans
-       "▼ rojo" / "▲ azul" de la glosa .ficha-explain (inline en el JSX), de s29g.
-       Si se agrega un uso, se agrega aqui.
+       "▼ rojo" / "▲ azul" de la glosa .ficha-explain (inline en el JSX), de s29g,
+       y los glifos de la vista historica (.ybar-sig.de/.al/.nt) y la marca de
+       tendencia (.hist-trend.de/.al/.nt), de s32g (§5.6). Si se agrega un uso,
+       se agrega aqui.
        s29f (2026-09-11): --alerta-txt baja de #D2112D a #CE112C (H 351,3->351,4,
        S 85,0->84,8; solo luminosidad). Con #D2112D, sobre --alerta-bg daba 4,466 y
        no llegaba a AA; #CE112C da 4,606 ahi y 4,644 sobre --cream-200, el peor de
@@ -7262,7 +7264,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   /* #13 (s22): glifo de significancia TEMPORAL (vs evaluacion anterior) junto al
      puntaje; direccion por signo de dif, color por sig (reusa clases de/al/nt). */
   .ybar-val .ybar-sig{font-size:var(--fs-overline);margin-left:3px;font-weight:var(--fw-bold);}
-  .ybar-sig.de{color:var(--destaca);} .ybar-sig.al{color:var(--alerta);} .ybar-sig.nt{color:var(--st-neutro);}
+  .ybar-sig.de{color:var(--destaca-txt);} .ybar-sig.al{color:var(--alerta-txt);} .ybar-sig.nt{color:var(--st-neutro-txt);}
   .ybar-yr{text-align:center;font-size:var(--fs-caption);color:var(--gris);font-weight:var(--fw-bold);}
   .ybar-empty{align-self:center;margin:auto auto;font-size:var(--fs-overline);color:var(--gris);font-style:italic;}
   /* Año desactivado del eje contiguo (pandemia / no_eval): columna gris de ESTADO,
@@ -7285,7 +7287,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   /* Marca de tendencia del ultimo año con dato vs la evaluacion anterior (leida) */
   .hist-trend{margin-left:auto;font-size:var(--fs-caption);font-weight:var(--fw-heavy);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
   .hist-trend.tiny{font-size:var(--fs-caption);font-weight:var(--fw-bold);}
-  .hist-trend.de{color:var(--destaca);} .hist-trend.al{color:var(--alerta);} .hist-trend.nt{color:var(--st-neutro);}
+  .hist-trend.de{color:var(--destaca-txt);} .hist-trend.al{color:var(--alerta-txt);} .hist-trend.nt{color:var(--st-neutro-txt);}
   .hist-trend .ht-ic{font-weight:var(--fw-heavy);}
   /* Valor de la media movil VIGENTE en la cabecera (texto suelto, no caja). El
      HistTrend ya lleva margin-left:auto y empuja el grupo a la derecha; la media
@@ -7728,13 +7730,14 @@ AAABrwBBAPMAAA==) format('opentype');}
   const hideTT=()=>{tt().style.display="none";};
 
   // ===== Definicion metodologica contextual (ESTATICA, s21 #10; del catalogo embebido).
-  // Titulo fijo en NEGRITA, en el color del indicador (prop color), sin toggle ni icono;
-  // la definicion queda SIEMPRE visible. Degrada: sin texto -> no renderiza bloque. =====
+  // Titulo fijo en NEGRITA, con un filete del color del indicador (prop color), sin toggle
+  // ni icono; la definicion queda SIEMPRE visible. Degrada: sin texto -> no renderiza bloque. =====
   function Definicion({texto, etiqueta, contexto, color}){
     if(!texto) return null;
     return (
       <div className={contexto?"defn-box defn-ctx":"defn-box"}>
-        <div className="defn-title" style={color?{color}:undefined}>{etiqueta||"¿Qué mide?"}</div>
+        {/* s32g: opción B de §5.6 (titular); el color del indicador pasa del texto al filete */}
+        <div className="defn-title" style={color?{borderLeft:"4px solid "+color,paddingLeft:7}:undefined}>{etiqueta||"¿Qué mide?"}</div>
         <div className="defn-text">{texto}</div>
       </div>);
   }
@@ -7866,7 +7869,10 @@ AAABrwBBAPMAAA==) format('opentype');}
     const r = ramp || {bajo:"var(--bajo)",medio:"var(--medio)",alto:"var(--alto)"};
     const segs=[["bajo",r.bajo],["medio",r.medio],["alto",r.alto]];
     return <div className="bar">{segs.map(([k,c])=>{const val=v[k];if(val==null||val===0)return null;
-      return <span key={k} style={{width:val+"%",background:c,color:_txtOn(c)}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val)+"%":""}</span>;})}</div>;
+      // s32g (T2, §5.6): la etiqueta toma el color de mayor contraste WCAG entre negro, --gris
+      // y blanco (vtTexto, la regla de §3.5); en el alto de Clima el blanco daba 3,53
+      // y el negro da 5,95. Si el tono no es hex (rampa por defecto), hereda como antes.
+      return <span key={k} style={{width:val+"%",background:c,color:(c&&c[0]==='#')?vtTexto(c):undefined}} title={k+": "+fmt(val)+"%"}>{val>=9?fmt(val)+"%":""}</span>;})}</div>;
   }
 
   // ===== Reparto de estado vs GSE (Fase 3 — CONTEO de EE, NO promedio) =====
@@ -8023,6 +8029,8 @@ AAABrwBBAPMAAA==) format('opentype');}
   // Color de texto legible (claro/oscuro) sobre un fill segun su luminancia: la
   // etiqueta de % dentro del segmento debe leerse tanto en bajo (claro) como en
   // alto (oscuro). El title de hover y la leyenda NO dependen de esto.
+  // s32g: SIN USO desde T2 (DistBar pasa a vtTexto). Se conserva por instruccion del
+  // encargo (no se borra codigo); si nadie lo retoma, puede retirarse (duda al titular).
   const _txtOn=c=>{ if(!c||c[0]!=='#') return undefined; const a=_hx(c);
     return (0.299*a[0]+0.587*a[1]+0.114*a[2])/255 < 0.55 ? '#fff' : '#2e2710'; };
 
@@ -8155,7 +8163,9 @@ AAABrwBBAPMAAA==) format('opentype');}
                             const gl=p.difgru>0?"▲":(p.difgru<0?"▼":"=");
                             const col=p.sigdifgru===1?"var(--destaca)":(p.sigdifgru===-1?"var(--alerta)":"var(--st-neutro)");
                             const sg=(p.sigdifgru===1||p.sigdifgru===-1)?"· sig.":"· n.s.";
-                            h += "<br><span style='color:"+col+"'>vs GSE: "+gl+" "+fmtSigned(p.difgru)+" "+sg+"</span>";
+                            // s32g: los tokens -txt son para fondo claro; sobre .tt el estado lo dicen el glifo y sig./n.s.
+                            // (la linea hereda el blanco de .tt; `col` ya no pinta el texto y queda sin uso aqui).
+                            h += "<br><span>vs GSE: "+gl+" "+fmtSigned(p.difgru)+" "+sg+"</span>";
                           }
                           return h;
                         })(),e)} onMouseLeave={hideTT}>
@@ -9497,7 +9507,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   const vtGris=()=>{ if(_vtGris) return _vtGris; let v=""; try{ v=tokenCSS("--gris"); }catch(e){}
     return (_vtGris=v||"#5C666E"); };
   // Contraste WCAG 2.1 (luminancia relativa con linealizacion sRGB), distinto de
-  // _txtOn (luminancia perceptual con umbral fijo, que sigue sirviendo a DistBar).
+  // _txtOn (luminancia perceptual con umbral fijo; sin uso desde s32g: DistBar usa vtTexto).
   const _lumWCAG=h=>{const c=_hx(h).map(x=>{x/=255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);});
     return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];};
   const contrasteWCAG=(a,b)=>{const A=_lumWCAG(a),B=_lumWCAG(b);return (Math.max(A,B)+0.05)/(Math.min(A,B)+0.05);};
