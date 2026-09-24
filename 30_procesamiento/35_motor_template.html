@@ -1826,7 +1826,7 @@ __FONTS_CSS__
     if(tab==="establecimiento") return buildList("establecimiento",ql)
       .map(it=>({...it,sub:it.sub+" · GSE "+gseLbl(it.cod,grado,agno)}));
     if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
-      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:nCom(s.ncom)+" · "+nEE(s.ee)+" en el directorio"}));
+      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:"Traspaso "+(s.anio!=null?s.anio:"—")+" · "+nCom(s.ncom)+" · "+nEE(s.ee)+" en el directorio"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
