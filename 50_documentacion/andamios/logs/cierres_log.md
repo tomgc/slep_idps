@@ -218,3 +218,100 @@ I4 — apariciones de magnitudes viejas (`156`, `v29`, `Sesión 30`, `56/156`), 
 - Escáner: `Rscript 00_escanear_proyecto.R`, exit 0 (con el aviso previo `renv out-of-sync` por `suitedoc`, pendiente #14 del backlog).
 - push: por publicar (al final de F9, junto con el commit del log y el de estado).
 
+
+## v31 — 2026-09-23
+
+Instrumento: cierre_sesion_autonomo_cc_v15.md | kit 63b3233
+
+**F0.0.** kit: sincronizado (`fetch` + `merge --ff-only`, sin trackeados sucios; lo hizo el PASO A
+de `/cierre` y se reutiliza). normativos: al día (POLITICA 5.8 = 5.8; SETTINGS v38 = v38).
+
+### Tabla de severidades
+
+| condicion | severidad | resultado |
+|---|---|---|
+| F0.0 kit sincronizado | ADVIERTE | pasa |
+| F0.0 normativos | REPARA | pasa (al día; sin copia) |
+| F0.1 `.git` y `traspasos/` | BLOQUEA | pasa |
+| F0.2 un solo paquete; cuatro delimitadores; cero placeholders | BLOQUEA | pasa (`paquete_cierre_v31.md`; `<inicio>` en el fragmento de código de §13 del traspaso y `PAT-NUEVO-<slug>` en `settings_version` son parámetros de autoría, no campos sin llenar) |
+| F0.2 campo derivado con valor | ADVIERTE | pasa (ninguno) |
+| F0.3 `raiz_proyecto` = `pwd` | BLOQUEA | pasa |
+| F0.4 correlativo triple (v31 = paquete = máx v30 + 1) | BLOQUEA | pasa |
+| F0.5 `n` = `backlog_entradas_nuevas` | BLOQUEA | pasa (9 = 9; patrón de entrada `- **#[0-9]+** —`) |
+| F0.5 numeración provisional contigua | BLOQUEA | pasa (161→169) |
+| F0.5 desplazamiento `k` | REPARA | no aplica: `U` = 160, `k` = 0 |
+| F0.5 formato de entrada = último bloque en disco | ADVIERTE | pasa (bullet `- **#NNN** —`, igual al de #157–160) |
+| F0.5 `sesion_nueva` = última en disco + 1 | ADVIERTE | pasa (32 = 31 + 1) |
+| F0.5 `fecha_cierre` = fecha de la máquina | ADVIERTE | pasa (2026-09-23) |
+| F0.5 referencias cruzadas al rango provisional | ADVIERTE | no aplica (`k` = 0) |
+| F0.5 `sello_escaner`, `escaner` | BLOQUEA | pasa (`regenerar`; `00_escanear_proyecto.R`) |
+| F0.5 `push_autorizado` | BLOQUEA | pasa (`si`) |
+| F0.5bis `reparto` (9 líneas = provisionales; categorías; control positivo) | BLOQUEA | pasa: 161, 163, 164, 168 → Saneamiento / calidad de datos de presentación; 162, 166, 167, 169 → Visualización / diseño — rediseño UI; 165 → Limpieza / deuda técnica; las 3 existen en disco; `categorias_nuevas: ninguna`; `reclasificaciones: ninguna` |
+| F0.5ter `recuento_tematico: vigente` | REPARA | no aplica; medido: suma N en disco 160 = `U` |
+| F0.6 `settings_version` = kit | BLOQUEA | pasa (línea íntegra de v38) |
+| F0.6 `compuerta_dudas: 4 registradas` | BLOQUEA | pasa (sección presente, 4 filas) |
+| F0.7 árbol limpio en lo que el cierre escribe | BLOQUEA | pasa |
+| F0.7bis sucio fuera (lista para F7.1) | BLOQUEA | pasa; lista vacía: árbol limpio salvo el propio paquete (la carpeta vacía `Claude outputs/` no existe para git) |
+| F0.8 `commit_cierre` y `maquina` = `<<EJECUTOR>>` | BLOQUEA | pasa |
+| F2 encabezados estructurales únicos | BLOQUEA | pasa: `Detalle cronológico`, `Resumen estadístico por sesión`, `Clasificación temática` 1 vez cada uno; `Delta del backlog`: criterio de v29/v30 (sección nueva `## Delta del backlog (consolidación v31)`, misma grafía que las 10 anteriores) |
+| F2 fila del resumen | REPARA | pasa: compuesta por el ejecutor antes de `**Total**`: `\| 32 \| v31 \| 9 \| 161–169 \| Opus 5.5 \| … \|`; Total 160 → 169, `1–160` → `1–169`; Modelo según "Modo real" de los logs s32–s32g |
+| F2 encabezado de sesión | REPARA | pasa: compuesto desde la grafía de la Sesión 31: `- **Sesión 32** (2026-09-23): cambios **161–169** (detalle en v31 §4 y en los logs …). <foco>:` |
+| F3 catálogo aplicable sin disparo | ADVIERTE | pasa (R1, R11, R12 dispararon) |
+| F3 cifras sin rótulo | ADVIERTE | pasa (ninguna nueva) |
+| F4 I1 | BLOQUEA | pasa |
+| F4 I2 | BLOQUEA | pasa (28 filas de datos suman 169) |
+| F4 I2bis | BLOQUEA | pasa (N = 169; % suma 100; 161–169 una vez cada una; sin N < 0) |
+| F4 I3 | BLOQUEA | pasa (27 + 1 = 28) |
+| F4 I4 | ADVIERTE | advertencia: apariciones de magnitudes viejas, todas clasificadas históricas (abajo) |
+| F4 I5 | ADVIERTE | advertencia: el TRASPASO §5 dice "Nueve entradas nuevas (#161–169)" (autoría; se lista, no se reescribe) |
+| F4 I6 | BLOQUEA | pasa (0 RUT, 0 OneDrive, 0 credenciales, 0 coautoría, 0 placeholders vivos; también sobre el diff staged de F7.2) |
+| F4 I7 | BLOQUEA | pasa (tras archivar v30, un solo vigente: v31) |
+| F7.1 staging sin rutas excluidas | BLOQUEA | no aplica: lista de F0.7bis vacía |
+| F7.2 staging sin rutas excluidas | BLOQUEA | pasa: 7 rutas (traspaso nuevo, traspaso archivado, backlog, 4 del escáner); sin `ESTADO.md`, sin el paquete |
+| F8 distribución | BLOQUEA | pasa (TRASPASO, ESTADO con marcadores y BACKLOG_ENTRADAS byte a byte, `k` = 0); paquete eliminado |
+
+renumeracion: sin desplazamiento (`U` = 160; provisionales 161→169; `k` = 0).
+
+### Rótulos (F3) — disparos de este cierre = catálogo aplicable del siguiente
+
+| ID | rótulo | disparos | resultado |
+|---|---|---|---|
+| R1 | encabezado: "Total reconciliado: N cambios" | 1 | 160 → 169 |
+| R11 | encabezado: "consolidado a vNN (fecha)" | 1 | v30 (2026-09-23) → v31 (2026-09-23) |
+| R12 | título y tabla de Clasificación temática | 8 | título "actualizada a v31, sobre 169 cambios"; 7 filas con N y/o % recalculados |
+| catálogo no aplicable (cero disparos) | R2, R3, R4, R5, R6, R7, R8, R9, R10, R13 | (10 de 13) | sin cambio respecto del cierre anterior |
+
+cifra sin rotulo: ninguna nueva (las mismas cifras históricas legítimas de v14–v30, sin tocar).
+
+### Invariantes (F4)
+
+I1 pasa (148–169 contiguos sin duplicados en la grafía vigente; 1–147 verificados en cierres previos) · I2 pasa (169) · I2bis pasa (N 169, % 100) · I3 pasa (28) · I4 advertencia · I5 advertencia · I6 pasa · I7 pasa.
+
+I4 — apariciones de magnitudes viejas (`160`, `v30`, `Sesión 31`, `57/…`), todas clasificadas históricas legítimas: fila v30 del Resumen; bullet de la Sesión 31 del Detalle; sección `Delta del backlog (consolidación v30)` entera (append-only); y las citas deliberadas dentro del delta v31 nuevo ("Total 160 → 169", "último #160 a v30", "16 → 20", "57 → 61", "16 → 17"), que son el "antes" del cuadre.
+
+### Clasificación temática resultante (recuento vigente)
+
+| Categoría | N° | % |
+|---|---|---|
+| Infraestructura y scaffold | 5 | 3% |
+| Gobernanza de datos | 5 | 3% |
+| Visualización / diseño — motor base/datos | 14 | 8% |
+| Visualización / diseño — rediseño UI | 61 | 36% |
+| Perfilado / exploración de datos | 4 | 2% |
+| Limpieza / deuda técnica | 17 | 10% |
+| Documentación conceptual / contenido | 10 | 6% |
+| Pipeline / motor (código productivo) | 8 | 5% |
+| Saneamiento / calidad de datos de presentación | 20 | 12% |
+| Deploy / publicación | 9 | 5% |
+| Verificación / auditoría (independiente) | 6 | 4% |
+| Decisión / gobernanza de producto | 3 | 2% |
+| Documentación de proyecto (suite/política) | 4 | 2% |
+| Exportación de datos | 3 | 2% |
+| **Suma** | **169** | 100% |
+
+### Commits
+
+- hash de trabajo: ninguno (árbol limpio salvo el paquete al abrir el cierre; F0.7bis dio lista vacía).
+- hash de documentación: `714e309` — `docs(cierre): traspaso v31 y backlog de sesion` — 7 rutas: `traspasos/traspaso_cierre_v31.md` (nuevo), `traspasos/archivo/traspaso_cierre_v30.md` (`git mv`), `activa/backlog_acumulativo.md`, `estructura/` (snapshot `20260923_231626_estructura.{md,txt}` nuevo, aliases `estructura_actual.{md,txt}`, poda de `20260917_104346_estructura.{md,txt}`; escáner: 34 carpetas, 333 archivos).
+- Escáner: `Rscript 00_escanear_proyecto.R`, exit 0.
+- push: por publicar (al final de F9, junto con el commit del log y el de estado).
