@@ -216,6 +216,8 @@ __FONTS_CSS__
   .check-row:last-child{border-bottom:0;}
   .check-row:hover{background:var(--cream-200);}
   .check-row:focus-visible{outline:2px solid var(--foco);outline-offset:-2px;}
+  /* s33: respaldo del foco al cerrar EntityModal cuando su boton de origen ya no existe (A-1 de s32e). */
+  .ficha-name:focus-visible,.cmp-cl:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   .check-name{flex:1 1 auto;font-family:var(--font-body);font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--ink);}
   .check-region{flex:0 0 auto;font-size:var(--fs-caption);color:var(--gris);}
   .empty-state{padding:18px;text-align:center;color:var(--gris);font-size:var(--fs-body);}
@@ -1451,7 +1453,7 @@ __FONTS_CSS__
             en la Vista historica). Bajo el banner, el buscador de EE (#19). */}
         <div className="ficha-bar">
           <div className="ficha-id">
-            <div className="ficha-name">{e&&e.nom?nomEE(e):rbd}<span className="ficha-rbd">RBD {rbd}</span></div>
+            <div className="ficha-name" tabIndex={-1}>{e&&e.nom?nomEE(e):rbd}<span className="ficha-rbd">RBD {rbd}</span></div>
             <div className="ficha-meta">{terrFicha(e)} · {DEPE[e?.cod_depe2]||"—"} · GSE {gseLbl(rbd,grado,agno)} · {DATA.meta.grados[grado]} · {agno}{PRELIM.has(String(agno))?" (preliminar)":""}</div>
           </div>
           <div className="ficha-tools">
@@ -1594,7 +1596,7 @@ __FONTS_CSS__
     .filter(el=>!el.disabled&&el.tabIndex>=0&&el.getClientRects().length>0);
   function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia",
                         multiple=false,seleccionados=[],maxSel=null,onDone=null,
-                        depOpts=null,depFor=null,depInicial="",avisoFor=null}){
+                        depOpts=null,depFor=null,depInicial="",avisoFor=null,focoRespaldo=null}){
     const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
     const [tab,setTab]=useState(tabInicial);
     const [q,setQ]=useState("");
@@ -1622,12 +1624,16 @@ __FONTS_CSS__
         if(e.shiftKey&&i===0){e.preventDefault(); f[f.length-1].focus();}
         else if(!e.shiftKey&&i===f.length-1){e.preventDefault(); f[0].focus();}};
       window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h);},[]);
-    useEffect(()=>()=>{if(!(origen&&origen!==document.body&&document.contains(origen)&&origen.focus))return;
-      origen.focus();
+    useEffect(()=>()=>{let destino=origen;
+      if(!(origen&&origen!==document.body&&document.contains(origen)&&origen.focus)){
+        // s33: si el origen ya no existe (tope del comparador, salto a la ficha), el foco va al respaldo que declara quien abre el modal (A-1 de s32e).
+        destino=focoRespaldo?focoRespaldo():null;
+        if(!(destino&&document.contains(destino)&&destino.focus))return;}
+      destino.focus();
       // s32e (R-11): la tecla que cerro el modal puede seguir apretada; su autorrepeticion
       // caeria en el origen y lo reabriria. Se descartan las repeticiones de Enter y Espacio
-      // sobre el origen hasta que se suelte una tecla.
-      const trago=e=>{if(e.repeat&&(e.key==="Enter"||e.key===" ")&&e.target===origen){e.preventDefault();e.stopPropagation();}};
+      // sobre el destino del foco (el origen o el respaldo) hasta que se suelte una tecla.
+      const trago=e=>{if(e.repeat&&(e.key==="Enter"||e.key===" ")&&e.target===destino){e.preventDefault();e.stopPropagation();}};
       const fin=()=>{window.removeEventListener("keydown",trago,true);window.removeEventListener("keyup",fin,true);};
       window.addEventListener("keydown",trago,true);window.addEventListener("keyup",fin,true);},[origen]);
     const list=buildList(tab,ql)||[];
@@ -1931,7 +1937,7 @@ __FONTS_CSS__
         <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda de entidad reparte el <b>100% de los establecimientos</b> de esa entidad (en ese GSE e indicador, y en su dependencia cuando se eligió una) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes. Las filas de <b>establecimiento</b> son un caso único: muestran su estado, no un reparto.</div>
 
         <div className="cmp-controls">
-          <span className="cmp-cl">Entidades a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
+          <span className="cmp-cl" tabIndex={-1}>Entidades a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
           <div className="cmp-chips">
             {cmpOrden.map(t=>{const key=keyEnt(t), esEE=t.kind==="establecimiento";
               return (
@@ -2952,10 +2958,12 @@ __FONTS_CSS__
 
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}
-            depOpts={DEPS_OPTS} depFor={DEP_TABS} depInicial={terr.dep||""} avisoFor={avisoDepFor}/>}
+            depOpts={DEPS_OPTS} depFor={DEP_TABS} depInicial={terr.dep||""} avisoFor={avisoDepFor}
+            focoRespaldo={()=>document.querySelector(".ficha-name")}/>}
           {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} emptyTextFor={emptyTextFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
             depOpts={DEPS_OPTS} depFor={DEP_TABS} avisoFor={avisoDepFor}
-            multiple={true} seleccionados={cmpTerr.map(keyEnt)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}/>}
+            multiple={true} seleccionados={cmpTerr.map(keyEnt)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}
+            focoRespaldo={()=>document.querySelector(".cmp-add")||document.querySelector(".cmp-cl")}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
