@@ -6975,7 +6975,7 @@ AAABrwBBAPMAAA==) format('opentype');}
   .screen-tab:hover{color:var(--tinta);}
   .screen-tab.is-active{color:var(--azul);border-bottom-color:var(--coral);}
   /* s33d: bajo 480px la barra de pantallas no desborda la pagina (pendiente 6 de v31). */
-  @media (max-width:480px){ .app-nav-inner{padding:0 12px;} .screen-tab{padding:14px 12px;} .screen-tabs{overflow-x:auto;max-width:100%;} }
+  @media (max-width:480px){ .app-nav-inner{padding:0 12px;} .screen-tab{padding:14px 12px;white-space:normal;text-align:left;} .screen-tabs{overflow-x:auto;max-width:100%;} }
   /* Franja de picker territorial: persistente bajo el banner, visible en las 3 pantallas */
   .picker-strip{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;margin-bottom:14px;}
   .picker-strip .nav-sel{margin-top:0;}
@@ -9258,8 +9258,10 @@ AAABrwBBAPMAAA==) format('opentype');}
 
   function descargarHistoricoCSV(args){
     if(!confirmarTamano(nFilasHistorico(args),args.glosaTerr)) return;
+    // s33f: "Sin clasificar" no entra en sufijoGse (no esta en DATA.meta.gse); si la vista
+    // tiene ese grupo y esta oculto, el universo cambia y el nombre lo marca.
     descargarCSV(filasHistoricoCSV(args),"idps_panorama_historico_"+slugArchivo(args.nomArchivoTerr)+
-      "_"+slugArchivo(args.grado)+sufijoGse(args.gseSel)+".csv");
+      "_"+slugArchivo(args.grado)+sufijoGse(args.gseSel)+(args.sinExcluido?"_sin_clasificar_excluido":"")+".csv");
   }
 
   // ===== Fase 3 (s30) — CSV de la ficha de establecimiento =====
@@ -9649,7 +9651,7 @@ AAABrwBBAPMAAA==) format('opentype');}
     return out;
   }
 
-  function PanoramaHistorico({rosterHist,panGrado,gseVis,vtInd,onInd,orden,onOrden,esNacional,onSel,gseSel,nomArchivoTerr,glosaTerr}){
+  function PanoramaHistorico({rosterHist,panGrado,gseVis,vtInd,onInd,orden,onOrden,esNacional,onSel,gseSel,nomArchivoTerr,glosaTerr,haySinGse}){
     const VT=DATA.meta.vista_territorial||{};
     const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[panGrado])||[];
     const aniosEstado=(VT.anios_estado&&VT.anios_estado[panGrado])||[];
@@ -9701,7 +9703,8 @@ AAABrwBBAPMAAA==) format('opentype');}
               title={sinFilas
                 ? "No hay establecimientos que exportar con esta combinación"
                 : "Descarga en CSV "+(nVis===1?"el establecimiento":"los "+nEE(nVis))+" de esta vista: una fila por establecimiento, año con medición e indicador, con su puntaje, su GSE de ese año y su estado vs GSE"}
-              onExport={()=>descargarHistoricoCSV({grupos,conDato,grado:panGrado,gseSel,nomArchivoTerr,glosaTerr})}/>
+              onExport={()=>descargarHistoricoCSV({grupos,conDato,grado:panGrado,gseSel,nomArchivoTerr,glosaTerr,
+                sinExcluido:!!haySinGse&&!gseVis.has("sin")})}/>
           </div>
         </div>
         {grupos.length===0 && <div className="empty">No hay establecimientos educacionales con datos en ningún año para esta combinación de territorio, nivel y GSE.</div>}
@@ -10005,7 +10008,7 @@ AAABrwBBAPMAAA==) format('opentype');}
                   orden={vtOrden} onOrden={setVtOrden} esNacional={esNacional} onSel={irFicha}
                   gseSel={DATA.meta.gse.filter(g=>gseVis.has(g))}
                   nomArchivoTerr={terrTxt+(depNom?" "+depNom:"")}
-                  glosaTerr={terrTxt+(depNom?" · "+depNom:"")}/>
+                  glosaTerr={terrTxt+(depNom?" · "+depNom:"")} haySinGse={haySinGse}/>
               : <>
             <div className="help"><b>Panorama del territorio sin agregar.</b> El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia){esNacional?". ":" y la grilla para abrir el Panorama IDPS de cada uno. "}Las barras son <b>% (n) de establecimientos, nunca un promedio</b>.</div>
             <div className="leyenda pan-state-leg">
