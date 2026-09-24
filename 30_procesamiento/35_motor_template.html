@@ -206,6 +206,10 @@ __FONTS_CSS__
   .modal{background:var(--paper);border-radius:var(--radius-3);width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 14px 44px rgba(10,58,92,.28);overflow:hidden;animation:modalLift 180ms cubic-bezier(.2,.7,.2,1);}
   .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--linea);}
   .modal-title{margin:0;font-family:var(--font-display);font-size:var(--fs-h4);font-weight:var(--fw-heavy);letter-spacing:-.005em;color:var(--azul);}
+  /* s33c: boton de cierre del encabezado, con la clase del hermano (icon-btn; divergencia 6 de s29 §36.7). */
+  .icon-btn{background:transparent;border:0;padding:6px;cursor:pointer;color:var(--gris);border-radius:var(--radius-1);display:inline-flex;align-items:center;justify-content:center;font-family:inherit;font-size:var(--fs-body);line-height:1;}
+  .icon-btn:hover{background:var(--cream-200);color:var(--tinta);}
+  .icon-btn:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   .modal-tabs{display:flex;padding:0 22px;border-bottom:1px solid var(--linea);flex-wrap:wrap;}
   .modal-tab{appearance:none;background:none;border:none;padding:12px 0;margin-right:24px;font-family:var(--font-body);font-weight:var(--fw-medium);font-size:var(--fs-body);color:var(--gris);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
   .modal-tab:hover{color:var(--tinta);}
@@ -1643,7 +1647,10 @@ __FONTS_CSS__
     return (
       <div className="modal-backdrop" onClick={onCancel}>
         <div className="modal" ref={modalRef} role="dialog" aria-modal="true" aria-label={title} onClick={e=>e.stopPropagation()}>
-          <div className="modal-header"><h2 className="modal-title">{title}</h2></div>
+          <div className="modal-header"><h2 className="modal-title">{title}</h2>
+            {/* s33c: cierre en el encabezado, como el hermano (su L3987: button.icon-btn con el icono x). En modo
+                multiple hace lo mismo que Listo, para no perder lo elegido; en modo simple, lo mismo que Cancelar. */}
+            <button type="button" className="icon-btn" aria-label="Cerrar" title="Cerrar" onClick={multiple?(onDone||onCancel):onCancel}>✕</button></div>
           <div className="modal-tabs">
             {tabs.map(([k,lbl])=>(
               <button key={k} className={"modal-tab"+(tab===k?" is-active":"")} onClick={()=>{setTab(k);setQ("");}}>{lbl}</button>))}
