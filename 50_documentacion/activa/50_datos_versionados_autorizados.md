@@ -34,6 +34,7 @@ Qué contienen los datos versionados:
 20_insumos/*/*/*                   # historico/glosas/, auxiliares/referencias_idps/
 40_salidas/intermedios/*           # parquet derivados del pipeline (reproducibilidad del build)
 renv/settings.json                 # configuracion de renv, no es dato
+40_salidas/publico/contexto_idps.parquet  # contrato de contexto (paso 36, rama feat/contrato-contexto): derivado de planillas publicas, nivel establecimiento (s33l)
 ```
 
 ## Límite
