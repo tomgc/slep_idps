@@ -7092,8 +7092,9 @@ AAABrwBBAPMAAA==) format('opentype');}
   /* s33: respaldo del foco al cerrar EntityModal cuando su boton de origen ya no existe (A-1 de s32e); s33b: en la ficha el anillo va en crema porque la barra es azul oscuro (A-2 de s33). */
   .cmp-cl:focus-visible{outline:2px solid var(--foco);outline-offset:2px;}
   .ficha-name:focus-visible{outline:2px solid var(--cream);outline-offset:2px;}
-  .check-name{flex:1 1 auto;font-family:var(--font-body);font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--ink);}
-  .check-region{flex:0 0 auto;font-size:var(--fs-caption);color:var(--gris);}
+  /* s33i: el sub cede ancho y la fila nunca supera la lista (gate visual de s33g). */
+  .check-name{flex:0 1 auto;min-width:0;font-family:var(--font-body);font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--ink);}
+  .check-region{flex:1 1 0;text-align:right;font-size:var(--fs-caption);color:var(--gris);}
   .empty-state{padding:18px;text-align:center;color:var(--gris);font-size:var(--fs-body);}
   /* s33c: en la pestaña sin buscador (Nacional) va este aviso en su lugar, como en el hermano. */
   .modal-hint{margin:0 0 10px;color:var(--gris);font-size:var(--fs-body);}
