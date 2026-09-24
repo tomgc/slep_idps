@@ -70,3 +70,5 @@ Al revisar la franja apareció un defecto del motor publicado. `repartoInd` cuen
 **Enmienda s32 (2026-09-23):** §3.5 distinguía mal el piso de la rampa (4,58:1) del mínimo sobre puntajes enteros (4,78:1); detectado en la revisión s31b (log L274).
 
 **Enmienda s32f (2026-09-23):** el rótulo 'sin comparación publicada' pasa a 'sin comparación válida' (decisión del titular: la Agencia informa sigdifgru solo cuando la comparación es válida), y la columna n_con_dato del CSV del comparador pasa a n_con_comparacion (D-1 de s31).
+
+**Enmienda s33e (2026-09-24):** la vista histórica se exporta con su propio botón dentro de la vista (una fila por establecimiento, año e indicador, con el GSE de ese año y el último); el punto 10 de §3 queda superado. Decisión del titular en la sesión 33.
