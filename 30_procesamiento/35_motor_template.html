@@ -1809,7 +1809,7 @@ __FONTS_CSS__
   const NACIONAL_OPT=(()=>{const coms=new Set();let ee=0;
     DATA.establecimientos.forEach(e=>{ee++;if(e.cod_com!=null)coms.add(e.cod_com);});
     return {kind:"nacional",cod:"CL",nom:"Chile",
-            sub:"Nivel nacional · "+nCom(coms.size)+" · "+nEE(ee)};})();
+            sub:"Nivel nacional · "+nCom(coms.size)+" · "+nEE(ee)+" en el directorio"};})();
   // s29h: el orden de los tabs es el del proyecto hermano slep_simce_adecuado (de
   // menor a mayor alcance), SIN "Grupo personalizado", categoria que este motor no
   // tiene. Con este orden el modal abre en Establecimiento, igual que el hermano.
@@ -1826,7 +1826,7 @@ __FONTS_CSS__
     if(tab==="establecimiento") return buildList("establecimiento",ql)
       .map(it=>({...it,sub:it.sub+" · GSE "+gseLbl(it.cod,grado,agno)}));
     if(tab==="slep") return SLEPS_OPTS.filter(s=>!ql||String(s.nom).toLowerCase().includes(ql))
-      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:nCom(s.ncom)+" · "+nEE(s.ee)}));
+      .map(s=>({kind:"slep",cod:s.cod,nom:"SLEP "+s.nom,sub:nCom(s.ncom)+" · "+nEE(s.ee)+" en el directorio"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
@@ -1905,9 +1905,10 @@ __FONTS_CSS__
     const eeGse=useMemo(()=>cmpEEs.map(t=>gseCod(t.cod,cmpGrado,agno)),[cmpEEs,cmpGrado,agno]);
     // Meta del chip por entidad: territorio => comunas · EE del roster real (D-s8-4);
     // establecimiento => RBD y su GSE en el mismo (grado, año).
+    // s33c: la fila cuenta el directorio y el chip el roster del nivel y año; cada texto nombra su universo (pendiente 3 de v31).
     const metaChip=useMemo(()=>{const m={};
       cmpTerrs.forEach((t,i)=>{const q=metas[i]||{ncom:0,nee:0};
-        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee);});
+        m[keyEnt(t)]=(t.dep?(DEPE[t.dep]||t.dep)+" · ":"")+nCom(q.ncom)+" · "+nEE(q.nee)+" con IDPS en "+DATA.meta.grados[cmpGrado]+" "+agno;});
       cmpEEs.forEach((t,i)=>{m[keyEnt(t)]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
