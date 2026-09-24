@@ -226,6 +226,8 @@ __FONTS_CSS__
   .check-name{flex:1 1 auto;font-family:var(--font-body);font-size:var(--fs-body);font-weight:var(--fw-medium);color:var(--ink);}
   .check-region{flex:0 0 auto;font-size:var(--fs-caption);color:var(--gris);}
   .empty-state{padding:18px;text-align:center;color:var(--gris);font-size:var(--fs-body);}
+  /* s33c: en la pestaña sin buscador (Nacional) va este aviso en su lugar, como en el hermano. */
+  .modal-hint{margin:0 0 10px;color:var(--gris);font-size:var(--fs-body);}
   .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--linea);background:var(--panel);}
   .estab-popup-btn{appearance:none;border:1px solid var(--border-2);background:var(--paper);padding:8px 14px;border-radius:var(--radius-2);font-family:var(--font-body);font-size:var(--fs-body);cursor:pointer;color:var(--ink);}
   .estab-popup-btn:hover{background:#f3f0e8;}
@@ -1601,7 +1603,7 @@ __FONTS_CSS__
     .filter(el=>!el.disabled&&el.tabIndex>=0&&el.getClientRects().length>0);
   function EntityModal({onSelect,onCancel,tabs,buildList,searchPlaceholderFor=null,emptyTextFor=null,title="Seleccionar territorio o dependencia",
                         multiple=false,seleccionados=[],maxSel=null,onDone=null,
-                        depOpts=null,depFor=null,depInicial="",avisoFor=null,focoRespaldo=null}){
+                        depOpts=null,depFor=null,depInicial="",avisoFor=null,focoRespaldo=null,sinBuscadorFor=null}){
     const tabInicial=tabs&&tabs.length?tabs[0][0]:"region";
     const [tab,setTab]=useState(tabInicial);
     const [q,setQ]=useState("");
@@ -1656,8 +1658,12 @@ __FONTS_CSS__
               <button key={k} className={"modal-tab"+(tab===k?" is-active":"")} onClick={()=>{setTab(k);setQ("");}}>{lbl}</button>))}
           </div>
           <div className="modal-body">
-            <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
-              style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>
+            {/* s33c: la pestaña sin busqueda (Nacional) no dibuja buscador, como el hermano (su pestaña Nacional
+                solo tiene un parrafo y el selector); en su lugar va el texto que antes era el placeholder. */}
+            {sinBuscadorFor&&sinBuscadorFor(tab)
+              ? <p className="modal-hint">{placeholder}</p>
+              : <input className="input-search" placeholder={placeholder} value={q} onChange={e=>setQ(e.target.value)} autoFocus={true}
+              style={{width:"100%",padding:"8px 10px",marginBottom:10,border:"1px solid var(--border-2)",borderRadius:"var(--radius-2)",fontFamily:"var(--font-body)",fontSize:"var(--fs-body)"}}/>}
             {/* s29i: el selector va ARRIBA de la lista, al reves que en el hermano. Alli el
                 modal tiene boton de guardar y el orden visual da igual; aqui el clic en la
                 fila CONFIRMA de inmediato, asi que la dependencia tiene que verse y poder
@@ -2968,11 +2974,11 @@ __FONTS_CSS__
         <div className="wrap">
           {modalOpen && <EntityModal tabs={TABS} buildList={buildList} searchPlaceholderFor={searchPlaceholderFor} emptyTextFor={emptyTextFor} onSelect={onPick} onCancel={()=>setModalOpen(false)}
             depOpts={DEPS_OPTS} depFor={DEP_TABS} depInicial={terr.dep||""} avisoFor={avisoDepFor}
-            focoRespaldo={()=>document.querySelector(".ficha-name")}/>}
+            focoRespaldo={()=>document.querySelector(".ficha-name")} sinBuscadorFor={tab=>tab==="nacional"}/>}
           {cmpModalOpen && <EntityModal tabs={TABS_CMP} buildList={(tab,ql)=>buildListCmp(tab,ql,cmpGrado,agnoCmp)} searchPlaceholderFor={cmpPlaceholderFor} emptyTextFor={emptyTextFor} title="Agregar entidad a la comparación" onSelect={addTerr} onCancel={()=>setCmpModalOpen(false)}
             depOpts={DEPS_OPTS} depFor={DEP_TABS} avisoFor={avisoDepFor}
             multiple={true} seleccionados={cmpTerr.map(keyEnt)} maxSel={CMP_MAX_TERR} onDone={()=>setCmpModalOpen(false)}
-            focoRespaldo={()=>document.querySelector(".cmp-add")||document.querySelector(".cmp-cl")}/>}
+            focoRespaldo={()=>document.querySelector(".cmp-add")||document.querySelector(".cmp-cl")} sinBuscadorFor={tab=>tab==="nacional"}/>}
 
           {/* Router de pantalla. Sin cifra agregada: el territorio acota, no promedia. */}
           {pantalla==="comparar" && <Comparador cmpTerr={cmpTerr} cmpGrado={cmpGrado} agnoCmp={agnoCmp} cmpGseVis={cmpGseVis} grados={grados}
