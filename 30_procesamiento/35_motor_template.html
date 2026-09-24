@@ -1285,10 +1285,9 @@ __FONTS_CSS__
                             : "<br><span style='opacity:.6'>sin media móvil (extremo de la serie)</span>";
                           if(gse && p.difgru!=null){
                             const gl=p.difgru>0?"▲":(p.difgru<0?"▼":"=");
-                            const col=p.sigdifgru===1?"var(--destaca)":(p.sigdifgru===-1?"var(--alerta)":"var(--st-neutro)");
                             const sg=(p.sigdifgru===1||p.sigdifgru===-1)?"· sig.":"· n.s.";
                             // s32g: los tokens -txt son para fondo claro; sobre .tt el estado lo dicen el glifo y sig./n.s.
-                            // (la linea hereda el blanco de .tt; `col` ya no pinta el texto y queda sin uso aqui).
+                            // (la linea hereda el blanco de .tt).
                             h += "<br><span>vs GSE: "+gl+" "+fmtSigned(p.difgru)+" "+sg+"</span>";
                           }
                           return h;
