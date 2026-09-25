@@ -1,17 +1,10 @@
-# Estructura actual — slep_idps
+ESCANEO DE ESTRUCTURA — s33o_ord
+Raiz   : /private/tmp/s33o_ord
+Fecha  : 2026-09-25 13:45:19
+Totales: 32 carpetas, 350 archivos
+Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
-- **Raiz:** `/Users/tomgc/Projects/slep_idps`
-- **Fecha:** 2026-09-23 12:02:20
-- **Totales:** 33 carpetas, 317 archivos
-- **Nota:** todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
-
-## Arbol
-
-```
-slep_idps/
-├── .claude/
-│   ├── launch.json  (712)
-│   └── settings.local.json  (88)
+s33o_ord/
 ├── 10_utils/
 │   ├── 10_configuracion.R  (11.7K)
 │   ├── 10_locale.R  (8.91K)
@@ -37,16 +30,15 @@ slep_idps/
 │   │   ├── caracterizacion_establecimientos.xlsx  (16.5K)
 │   │   ├── diccionario_territorios.xlsx  (16.8K)
 │   │   ├── directorio_oficial_ee_publico.csv  (3.42M)
-│   │   ├── directorio_oficial_ee.csv  (3.6M)
 │   │   ├── glosas_directorio_oficial_ee.pdf  (457K)
 │   │   ├── idps2m2023_GLOSAS_rbd_publico_final.xlsx  (38.2K)
 │   │   ├── idps2m2024_GLOSAS_web_final.xlsx  (34K)
-│   │   ├── idps2m2025_GLOSAS_web_preliminar.xlsx  (34.4K)
+│   │   ├── idps2m2025_GLOSAS_web_final.xlsx  (34.4K)
 │   │   ├── idps4b2023_GLOSAS_rbd_publico_final.xlsx  (37.5K)
 │   │   ├── idps4b2024_GLOSAS_web_final.xlsx  (34K)
-│   │   ├── idps4b2025_GLOSAS_web_preliminar.xlsx  (34.4K)
+│   │   ├── idps4b2025_GLOSAS_web_final.xlsx  (34.4K)
 │   │   ├── idps6b2024_GLOSAS_web_final.xlsx  (34K)
-│   │   ├── idps8b2025_GLOSAS_web_preliminar.xlsx  (34.3K)
+│   │   ├── idps8b2025_GLOSAS_web_final.xlsx  (34.4K)
 │   │   ├── listado_slep_2026.xlsx  (55.5K)
 │   │   ├── rex_1440.pdf  (995K)
 │   │   └── rex_1459.pdf  (3.16M)
@@ -76,7 +68,6 @@ slep_idps/
 │   │   ├── idps8b2015_rbd_historico.xls  (576K)
 │   │   ├── idps8b2017_rbd_historico.xlsx  (703K)
 │   │   └── idps8b2019_rbd_historico.xlsx  (626K)
-│   ├── .DS_Store  (8K)
 │   ├── .gitkeep  (0)
 │   ├── idps2m2022_rbd_dim_final.xlsx  (2M)
 │   ├── idps2m2022_rbd_final.xlsx  (659K)
@@ -84,12 +75,12 @@ slep_idps/
 │   ├── idps2m2023_niveles_final.xlsx  (3.44M)
 │   ├── idps2m2023_rbd_dim_final.xlsx  (1.99M)
 │   ├── idps2m2023_rbd_final.xlsx  (735K)
-│   ├── idps2m2024_rbd_dim_final.xlsx  (2.01M)
-│   ├── idps2m2024_rbd_final.xlsx  (1.06M)
-│   ├── idps2m2024_rbd_niveles_final.xlsx  (3.35M)
-│   ├── idps2m2025_rbd_dim_preliminar.xlsx  (2.2M)
-│   ├── idps2m2025_rbd_preliminar.xlsx  (976K)
-│   ├── idps2m2025_rbd_subdim_niveles_preliminar.xlsx  (3.2M)
+│   ├── idps2M2024_rbd_dim_final.xlsx  (2.01M)
+│   ├── idps2M2024_rbd_final.xlsx  (1.06M)
+│   ├── idps2M2024_rbd_niveles_final.xlsx  (3.35M)
+│   ├── idps2m2025_rbd_dim_final.xlsx  (2.66M)
+│   ├── idps2m2025_rbd_final.xlsx  (1.15M)
+│   ├── idps2m2025_rbd_subdim_niveles_final.xlsx  (3.87M)
 │   ├── idps4b2022_rbd_dim_final.xlsx  (4.78M)
 │   ├── idps4b2022_rbd_final.xlsx  (1.53M)
 │   ├── idps4b2022_rbd_glosa_publica_final.xlsx  (33K)
@@ -99,38 +90,34 @@ slep_idps/
 │   ├── idps4b2024_rbd_dim_final.xlsx  (5.65M)
 │   ├── idps4b2024_rbd_final.xlsx  (2.45M)
 │   ├── idps4b2024_rbd_niveles_final.xlsx  (9.03M)
-│   ├── idps4b2025_rbd_dim_preliminar.xlsx  (5.08M)
-│   ├── idps4b2025_rbd_preliminar.xlsx  (2.09M)
-│   ├── idps4b2025_rbd_subdim_niveles_preliminar.xlsx  (7.01M)
-│   ├── idps6b2024_rbd_dim_preliminar.xlsx  (4.7M)
-│   ├── idps6b2024_rbd_niveles_preliminar.xlsx  (7.42M)
-│   ├── idps6b2024_rbd_preliminar.xlsx  (2.41M)
-│   ├── idps8b2025_rbd_dim_preliminar.xlsx  (4.38M)
-│   ├── idps8b2025_rbd_preliminar.xlsx  (1.88M)
-│   └── idps8b2025_rbd_subdim_niveles_preliminar.xlsx  (6.18M)
+│   ├── idps4b2025_rbd_dim_final.xlsx  (6.12M)
+│   ├── idps4b2025_rbd_final.xlsx  (2.52M)
+│   ├── idps4b2025_rbd_subdim_niveles_final.xlsx  (8.4M)
+│   ├── idps6B2024_rbd_dim_preliminar.xlsx  (4.7M)
+│   ├── idps6B2024_rbd_niveles_preliminar.xlsx  (7.42M)
+│   ├── idps6B2024_rbd_preliminar.xlsx  (2.41M)
+│   ├── idps8b2025_rbd_dim_final.xlsx  (4.38M)
+│   ├── idps8b2025_rbd_final.xlsx  (1.88M)
+│   └── idps8b2025_rbd_subdim_niveles_final.xlsx  (6.18M)
 ├── 30_procesamiento/
 │   ├── .gitkeep  (0)
 │   ├── 31_depurar_directorio_oficial.R  (3.55K)
-│   ├── 32_censo_insumos.R  (9.37K)
+│   ├── 32_censo_insumos.R  (9.47K)
 │   ├── 33_construir_catalogos.R  (15.2K)
 │   ├── 34_leer_normalizar_idps.R  (26.6K)
 │   ├── 35_generar_motor_html.R  (36.1K)
-│   └── 35_motor_template.html  (222K)
+│   └── 35_motor_template.html  (236K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
-│   │   ├── catalogo_idps.parquet  (42.2K)
-│   │   ├── censo_insumos.md  (3.58K)
-│   │   ├── censo_insumos.parquet  (7.23K)
+│   │   ├── catalogo_idps.parquet  (42.1K)
+│   │   ├── censo_insumos.md  (3.89K)
+│   │   ├── censo_insumos.parquet  (7.26K)
 │   │   ├── comunas_chile.parquet  (7.18K)
-│   │   ├── diagnostico_historico_idps.md  (82.2K)
 │   │   ├── establecimientos_chile.parquet  (260K)
 │   │   ├── idps_largo.parquet  (13M)
-│   │   ├── inventario_historico_idps.parquet  (5.63K)
-│   │   ├── inventario_universo_idps.parquet  (6.57K)
 │   │   └── sleps_chile.parquet  (58.7K)
-│   ├── .DS_Store  (6K)
-│   └── motor_idps.html  (5.21M)
+│   └── motor_idps.html  (5.22M)
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
@@ -141,10 +128,13 @@ slep_idps/
 │   │   │   ├── 20260622_decision_paleta_indicadores.md  (3.95K)
 │   │   │   ├── 20260624_decision_poligono_gse_radar.md  (7.55K)
 │   │   │   ├── 20260625_decision_cobertura_historico_idps.md  (4.62K)
-│   │   │   ├── 20260910_decision_contraste_texto_estado.md  (33.1K)
-│   │   │   └── 20260917_decision_vista_historica_territorial.md  (8.54K)
+│   │   │   ├── 20260910_decision_contraste_texto_estado.md  (36.4K)
+│   │   │   └── 20260917_decision_vista_historica_territorial.md  (9.33K)
 │   │   ├── encargos/
 │   │   │   ├── encargo_ajustes_motor_s14.md  (15.4K)
+│   │   │   ├── encargo_claude_code_idps_accesibilidad_responsive_s33d.md  (19.6K)
+│   │   │   ├── encargo_claude_code_idps_ajustes_angosto_s33f.md  (18.3K)
+│   │   │   ├── encargo_claude_code_idps_anillo_ficha_s33b.md  (18.4K)
 │   │   │   ├── encargo_claude_code_idps_batch_a_s22.md  (11.5K)
 │   │   │   ├── encargo_claude_code_idps_batch_b1_s22.md  (11K)
 │   │   │   ├── encargo_claude_code_idps_batch_b2_s22.md  (11.1K)
@@ -155,48 +145,66 @@ slep_idps/
 │   │   │   ├── encargo_claude_code_idps_cobertura_historica.md  (11.5K)
 │   │   │   ├── encargo_claude_code_idps_comparador_entidades_s29.md  (12.4K)
 │   │   │   ├── encargo_claude_code_idps_comparador_s19.md  (11.5K)
+│   │   │   ├── encargo_claude_code_idps_conteos_teclado_enmienda_s32.md  (26.2K)
+│   │   │   ├── encargo_claude_code_idps_contraste_paleta_indicador_s32g.md  (17.8K)
 │   │   │   ├── encargo_claude_code_idps_contraste_texto_estado_s29c.md  (7.57K)
 │   │   │   ├── encargo_claude_code_idps_correcciones_revision_s29i.md  (11.6K)
 │   │   │   ├── encargo_claude_code_idps_correcciones_revision_s31b.md  (11.8K)
+│   │   │   ├── encargo_claude_code_idps_csv_historico_s33e.md  (20.1K)
+│   │   │   ├── encargo_claude_code_idps_despliegue_s33h.md  (9.02K)
 │   │   │   ├── encargo_claude_code_idps_diagnostico_historico.md  (23K)
 │   │   │   ├── encargo_claude_code_idps_display_fidelity.md  (7.66K)
 │   │   │   ├── encargo_claude_code_idps_exportacion_s30.md  (7.03K)
 │   │   │   ├── encargo_claude_code_idps_ficha_contraste_final_s29g.md  (6.93K)
+│   │   │   ├── encargo_claude_code_idps_filas_modal_s33i.md  (14.9K)
 │   │   │   ├── encargo_claude_code_idps_fix_fantasma.md  (6.32K)
+│   │   │   ├── encargo_claude_code_idps_foco_modal_s32e.md  (15.5K)
 │   │   │   ├── encargo_claude_code_idps_forma_y_despliegue_s31c.md  (10.3K)
 │   │   │   ├── encargo_claude_code_idps_gris_accesible_s29d.md  (7.73K)
+│   │   │   ├── encargo_claude_code_idps_infraestructura_s33j.md  (10.7K)
 │   │   │   ├── encargo_claude_code_idps_integracion_historico.md  (25.9K)
+│   │   │   ├── encargo_claude_code_idps_leyendas_censo_despliegue_s32c.md  (17.1K)
+│   │   │   ├── encargo_claude_code_idps_limpieza_foco_respaldo_s33.md  (26.1K)
+│   │   │   ├── encargo_claude_code_idps_matriz_hermanos_s33n.md  (15.2K)
 │   │   │   ├── encargo_claude_code_idps_mmovil_s19.md  (10.4K)
+│   │   │   ├── encargo_claude_code_idps_modal_comparador_s33c.md  (22.8K)
 │   │   │   ├── encargo_claude_code_idps_motor_historico.md  (15.8K)
 │   │   │   ├── encargo_claude_code_idps_organizacion.md  (21.2K)
 │   │   │   ├── encargo_claude_code_idps_paleta.md  (12.8K)
 │   │   │   ├── encargo_claude_code_idps_pestana_slep_selector.md  (14.5K)
+│   │   │   ├── encargo_claude_code_idps_preparacion_decisiones_s33m.md  (16.2K)
 │   │   │   ├── encargo_claude_code_idps_producto_deploy.md  (14K)
+│   │   │   ├── encargo_claude_code_idps_rama_contexto_s33l.md  (11.7K)
 │   │   │   ├── encargo_claude_code_idps_reanudar_exportacion_s30b.md  (7.22K)
 │   │   │   ├── encargo_claude_code_idps_tab_nacional_s29h.md  (6.15K)
+│   │   │   ├── encargo_claude_code_idps_tabla_comparador_scroll_s32d.md  (15.4K)
+│   │   │   ├── encargo_claude_code_idps_teclado_territorio_definitivos_2025_s32b.md  (22.1K)
 │   │   │   ├── encargo_claude_code_idps_uiux_s19_fase123.md  (14.7K)
 │   │   │   ├── encargo_claude_code_idps_verificacion_integracion_historico.md  (16.4K)
 │   │   │   ├── encargo_claude_code_idps_verificacion_valores_historico.md  (12.3K)
+│   │   │   ├── encargo_claude_code_idps_vista_historica_ancho_s33g.md  (15K)
 │   │   │   ├── encargo_claude_code_idps_vista_historica_barras.md  (16.2K)
 │   │   │   ├── encargo_claude_code_idps_vista_historica_territorial_s31.md  (30K)
 │   │   │   └── encargo_paleta_v2_s15.md  (20.6K)
 │   │   ├── prototipos/
 │   │   │   └── idps_radar_prototipo.jsx  (12.9K)
-│   │   ├── .DS_Store  (8K)
-│   │   ├── 50_datos_versionados_autorizados.md  (2.18K)
+│   │   ├── 50_datos_versionados_autorizados.md  (2.34K)
 │   │   ├── 50_locale_utf8.md  (2.06K)
-│   │   ├── backlog_acumulativo.md  (52.2K)
+│   │   ├── backlog_acumulativo.md  (60.8K)
 │   │   ├── censo_universo_idps.md  (117K)
-│   │   ├── ESTADO.md  (1.89K)
-│   │   ├── POLITICA_PROYECTO.md  (42.8K)
+│   │   ├── ESTADO.md  (1.12K)
 │   │   ├── prompt_nuevo_proyecto_idps.md  (9.73K)
-│   │   ├── resena_slep_idps.md  (9.94K)
-│   │   └── SETTINGS_Y_PROMPTS_OPERACIONALES.md  (119K)
+│   │   └── resena_slep_idps.md  (9.94K)
 │   ├── andamios/
 │   │   ├── diseno/
 │   │   │   ├── detalles/
+│   │   │   │   ├── 20260924_diagnostico_base_pequena.md  (12.7K)
+│   │   │   │   ├── 20260924_diagnostico_base_pequena.R  (19.2K)
+│   │   │   │   ├── 20260924_diagnostico_exportacion_imagen.md  (15.3K)
 │   │   │   │   ├── mockup_comparador_ee_nacional.html  (36.9K)
 │   │   │   │   ├── mockup_contraste_estados.html  (18.5K)
+│   │   │   │   ├── mockup_contraste_paleta_indicador_s56.html  (11K)
+│   │   │   │   ├── mockup_exportacion_imagen_s33m.html  (29.7K)
 │   │   │   │   ├── mockup_vista_historica_territorial.html  (78.4K)
 │   │   │   │   └── mockups_promedio_movil.html  (11.9K)
 │   │   │   ├── entity_modal/
@@ -213,7 +221,6 @@ slep_idps/
 │   │   │   │   │   └── MuseoSans-300.otf  (61.5K)
 │   │   │   │   ├── screenshots/
 │   │   │   │   │   └── dual-default.png  (39.2K)
-│   │   │   │   ├── .DS_Store  (8K)
 │   │   │   │   ├── idps-app.jsx  (18K)
 │   │   │   │   ├── idps-charts.jsx  (19.9K)
 │   │   │   │   ├── idps-controls.jsx  (16.3K)
@@ -221,17 +228,16 @@ slep_idps/
 │   │   │   │   ├── Motor IDPS.html  (28.6K)
 │   │   │   │   ├── PROMPT.md  (9.01K)
 │   │   │   │   └── slep_idps_fuente_completa.md  (100K)
-│   │   │   ├── rediseno_3pantallas/
-│   │   │   │   ├── img/
-│   │   │   │   │   ├── 01-territorial.png  (36K)
-│   │   │   │   │   ├── 02-ficha.png  (42.6K)
-│   │   │   │   │   ├── 03-comparar.png  (42.2K)
-│   │   │   │   │   └── 04-historica.png  (43K)
-│   │   │   │   ├── Handout IDPS.html  (23.9K)
-│   │   │   │   ├── idps-demo.js  (34K)
-│   │   │   │   ├── PROMPT para Claude.md  (7K)
-│   │   │   │   └── Propuesta IDPS.html  (28K)
-│   │   │   └── .DS_Store  (10K)
+│   │   │   └── rediseno_3pantallas/
+│   │   │       ├── img/
+│   │   │       │   ├── 01-territorial.png  (36K)
+│   │   │       │   ├── 02-ficha.png  (42.6K)
+│   │   │       │   ├── 03-comparar.png  (42.2K)
+│   │   │       │   └── 04-historica.png  (43K)
+│   │   │       ├── Handout IDPS.html  (23.9K)
+│   │   │       ├── idps-demo.js  (34K)
+│   │   │       ├── PROMPT para Claude.md  (7K)
+│   │   │       └── Propuesta IDPS.html  (28K)
 │   │   ├── logs/
 │   │   │   ├── 20260619_sesion6_encargo2_log.md  (23.5K)
 │   │   │   ├── 20260620_auditoria_fidelidad_p3.md  (22.5K)
@@ -282,18 +288,40 @@ slep_idps/
 │   │   │   ├── 20260917_forma_y_despliegue_s31c_log.md  (45.7K)
 │   │   │   ├── 20260917_registro_asistente_s31.md  (2.17K)
 │   │   │   ├── 20260917_vista_historica_territorial_s31_log.md  (55K)
-│   │   │   └── cierres_log.md  (10.3K)
-│   │   ├── .DS_Store  (8K)
+│   │   │   ├── 20260923_conteos_teclado_enmienda_s32_log.md  (84.5K)
+│   │   │   ├── 20260923_contraste_paleta_indicador_s32g_log.md  (53.8K)
+│   │   │   ├── 20260923_foco_modal_s32e_log.md  (43.1K)
+│   │   │   ├── 20260923_leyendas_censo_despliegue_s32c_log.md  (43.6K)
+│   │   │   ├── 20260923_registro_asistente_s32.md  (5.52K)
+│   │   │   ├── 20260923_sin_comparacion_valida_s32f_log.md  (5.36K)
+│   │   │   ├── 20260923_tabla_comparador_scroll_s32d_log.md  (40.7K)
+│   │   │   ├── 20260923_teclado_territorio_definitivos_2025_s32b_log.md  (64.5K)
+│   │   │   ├── 20260924_accesibilidad_responsive_s33d_log.md  (70.3K)
+│   │   │   ├── 20260924_ajustes_angosto_s33f_log.md  (96.7K)
+│   │   │   ├── 20260924_anillo_ficha_s33b_log.md  (50.2K)
+│   │   │   ├── 20260924_csv_historico_s33e_log.md  (75.9K)
+│   │   │   ├── 20260924_despliegue_s33h_log.md  (24.1K)
+│   │   │   ├── 20260924_filas_modal_s33i_log.md  (64.5K)
+│   │   │   ├── 20260924_infraestructura_s33j_log.md  (28.7K)
+│   │   │   ├── 20260924_limpieza_foco_respaldo_s33_log.md  (77.3K)
+│   │   │   ├── 20260924_matriz_hermanos_s33n_log.md  (72.3K)
+│   │   │   ├── 20260924_modal_comparador_s33c_log.md  (87.6K)
+│   │   │   ├── 20260924_preparacion_decisiones_s33m_log.md  (77K)
+│   │   │   ├── 20260924_rama_contexto_s33l_log.md  (36.7K)
+│   │   │   ├── 20260924_registro_asistente_s33.md  (9.03K)
+│   │   │   ├── 20260924_vista_historica_ancho_s33g_log.md  (56.3K)
+│   │   │   └── cierres_log.md  (26.7K)
 │   │   ├── .gitkeep  (0)
-│   │   └── paquete_cierre_v30.md  (32.5K)
+│   │   ├── 20260924_matriz_patrones_motores.md  (45.7K)
+│   │   └── 20260924_propuesta_ordenacion_repositorio.md  (13K)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260704_222011_estructura.md  (18.3K)
-│   │   ├── 20260704_222011_estructura.txt  (18.4K)
-│   │   ├── 20260917_104346_estructura.md  (19.9K)
-│   │   ├── 20260917_104346_estructura.txt  (20K)
-│   │   ├── estructura_actual.md  (19.9K)
-│   │   └── estructura_actual.txt  (20K)
+│   │   ├── 20260923_120220_estructura.md  (20.9K)
+│   │   ├── 20260923_120220_estructura.txt  (21K)
+│   │   ├── 20260923_231626_estructura.md  (22.2K)
+│   │   ├── 20260923_231626_estructura.txt  (22.3K)
+│   │   ├── estructura_actual.md  (22.2K)
+│   │   └── estructura_actual.txt  (22.3K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -312,75 +340,71 @@ slep_idps/
 │   │   ├── documentacion_proyecto_slep_idps_standalone.html  (438K)
 │   │   ├── documentar.R  (44.7K)
 │   │   └── suite_estilos.css  (21.7K)
-│   ├── traspasos/
-│   │   ├── archivo/
-│   │   │   ├── traspaso_cierre_v01.md  (16.4K)
-│   │   │   ├── traspaso_cierre_v02.md  (22.8K)
-│   │   │   ├── traspaso_cierre_v03.md  (23.9K)
-│   │   │   ├── traspaso_cierre_v04.md  (26.2K)
-│   │   │   ├── traspaso_cierre_v05.md  (33.8K)
-│   │   │   ├── traspaso_cierre_v06.md  (15.7K)
-│   │   │   ├── traspaso_cierre_v07.md  (30.3K)
-│   │   │   ├── traspaso_cierre_v08.md  (24.9K)
-│   │   │   ├── traspaso_cierre_v09.md  (27.3K)
-│   │   │   ├── traspaso_cierre_v10.md  (25.9K)
-│   │   │   ├── traspaso_cierre_v11.md  (20.4K)
-│   │   │   ├── traspaso_cierre_v12.md  (26K)
-│   │   │   ├── traspaso_cierre_v13.md  (19.6K)
-│   │   │   ├── traspaso_cierre_v14.md  (32.4K)
-│   │   │   ├── traspaso_cierre_v15.md  (27.6K)
-│   │   │   ├── traspaso_cierre_v16.md  (25.6K)
-│   │   │   ├── traspaso_cierre_v17.md  (20.2K)
-│   │   │   ├── traspaso_cierre_v18.md  (17.6K)
-│   │   │   ├── traspaso_cierre_v19.md  (15K)
-│   │   │   ├── traspaso_cierre_v20.md  (20.2K)
-│   │   │   ├── traspaso_cierre_v21.md  (21.5K)
-│   │   │   ├── traspaso_cierre_v22.md  (30.3K)
-│   │   │   ├── traspaso_cierre_v23.md  (21.3K)
-│   │   │   ├── traspaso_cierre_v24.md  (19.6K)
-│   │   │   ├── traspaso_cierre_v25.md  (22.6K)
-│   │   │   ├── traspaso_cierre_v26.md  (26.9K)
-│   │   │   ├── traspaso_cierre_v27.md  (1.84K)
-│   │   │   └── traspaso_cierre_v28.md  (2.65K)
-│   │   ├── .gitkeep  (0)
-│   │   └── traspaso_cierre_v29.md  (23.3K)
-│   └── .DS_Store  (10K)
+│   └── traspasos/
+│       ├── archivo/
+│       │   ├── traspaso_cierre_v01.md  (16.4K)
+│       │   ├── traspaso_cierre_v02.md  (22.8K)
+│       │   ├── traspaso_cierre_v03.md  (23.9K)
+│       │   ├── traspaso_cierre_v04.md  (26.2K)
+│       │   ├── traspaso_cierre_v05.md  (33.8K)
+│       │   ├── traspaso_cierre_v06.md  (15.7K)
+│       │   ├── traspaso_cierre_v07.md  (30.3K)
+│       │   ├── traspaso_cierre_v08.md  (24.9K)
+│       │   ├── traspaso_cierre_v09.md  (27.3K)
+│       │   ├── traspaso_cierre_v10.md  (25.9K)
+│       │   ├── traspaso_cierre_v11.md  (20.4K)
+│       │   ├── traspaso_cierre_v12.md  (26K)
+│       │   ├── traspaso_cierre_v13.md  (19.6K)
+│       │   ├── traspaso_cierre_v14.md  (32.4K)
+│       │   ├── traspaso_cierre_v15.md  (27.6K)
+│       │   ├── traspaso_cierre_v16.md  (25.6K)
+│       │   ├── traspaso_cierre_v17.md  (20.2K)
+│       │   ├── traspaso_cierre_v18.md  (17.6K)
+│       │   ├── traspaso_cierre_v19.md  (15K)
+│       │   ├── traspaso_cierre_v20.md  (20.2K)
+│       │   ├── traspaso_cierre_v21.md  (21.5K)
+│       │   ├── traspaso_cierre_v22.md  (30.3K)
+│       │   ├── traspaso_cierre_v23.md  (21.3K)
+│       │   ├── traspaso_cierre_v24.md  (19.6K)
+│       │   ├── traspaso_cierre_v25.md  (22.6K)
+│       │   ├── traspaso_cierre_v26.md  (26.9K)
+│       │   ├── traspaso_cierre_v27.md  (1.84K)
+│       │   ├── traspaso_cierre_v28.md  (2.65K)
+│       │   ├── traspaso_cierre_v29.md  (23.3K)
+│       │   └── traspaso_cierre_v30.md  (28K)
+│       ├── .gitkeep  (0)
+│       └── traspaso_cierre_v31.md  (29.9K)
 ├── docs/
-│   └── index.html  (5.21M)
+│   └── index.html  (5.22M)
 ├── tests/
 │   └── .gitkeep  (0)
-├── .DS_Store  (16K)
 ├── .gitignore  (2.22K)
+├── .renvignore  (140)
 ├── .Renviron.example  (1.85K)
 ├── .Rprofile  (26)
 ├── 00_build.R  (6.91K)
-├── 00_escanear_proyecto.R  (9.73K)
-├── CLAUDE.md  (9.02K)
+├── 00_escanear_proyecto.R  (9.92K)
 ├── README.md  (3.92K)
 ├── renv.lock  (76.8K)
 └── slep_idps.Rproj  (195)
-```
 
-## Conteo por extension
-
-| Extension | Archivos |
-|---|---|
-| md | 144 |
-| xlsx | 54 |
-| (sin extension) | 18 |
-| html | 14 |
-| otf | 13 |
-| pdf | 13 |
-| r | 12 |
-| xls | 11 |
-| parquet | 8 |
-| png | 8 |
-| jsx | 5 |
-| js | 4 |
-| json | 3 |
-| txt | 3 |
-| css | 2 |
-| csv | 2 |
-| example | 1 |
-| lock | 1 |
-| rproj | 1 |
+Conteo por extension:
+  md                 186
+  xlsx               54
+  html               16
+  otf                13
+  pdf                13
+  r                  13
+  (sin extension)    11
+  xls                11
+  png                8
+  parquet            6
+  jsx                5
+  js                 4
+  txt                3
+  css                2
+  csv                1
+  example            1
+  json               1
+  lock               1
+  rproj              1

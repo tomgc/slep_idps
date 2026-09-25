@@ -62,7 +62,9 @@ EXCLUIR_ARCHIVO <- TRUE
 # tiene valor historico acumulativo como los traspasos.
 RETENER_SNAPSHOTS <- 2L
 
-DIRS_EXCLUIR <- c(".git", "renv", ".Rproj.user")
+# Dependencias y entornos que no son el proyecto (POLITICA §7.2; ordenacion,
+# bloque 4: E-1 y E-2). Si existieran, los totales medirian una dependencia.
+DIRS_EXCLUIR <- c(".git", "renv", ".Rproj.user", "node_modules", "packrat", "venv", ".quarto")
 if (EXCLUIR_ARCHIVO) DIRS_EXCLUIR <- c(DIRS_EXCLUIR, "_archivo")
 
 # Nota: en este proyecto todos los datos son publicos (Agencia de Calidad de
