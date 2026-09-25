@@ -860,6 +860,10 @@ __FONTS_CSS__
   // s32: todo conteo visible pasa por aquí (tres defectos de plural en tres sesiones).
   const nEE=n=>fmt(n)+(n===1?" establecimiento":" establecimientos");
   const nCom=n=>fmt(n)+(n===1?" comuna":" comunas");
+  // s33o T2: plural de indicadores (matriz s33n, fila 1): el chip de la tarjeta decia "1 indicadores".
+  // nSub cubre la cadena de subdimensiones de la ficha, que hoy nunca vale 1 pero seguia a mano.
+  const nInd=n=>fmt(n)+(n===1?" indicador":" indicadores");
+  const nSub=n=>fmt(n)+(n===1?" subdimensión":" subdimensiones");
   // Title Case en capa de presentacion para nombres ALLCAPS del dato (comuna, EE),
   // conservando siglas y bajando conectores. NO altera el parquet. JS toLowerCase/
   // toUpperCase son Unicode-aware (Ñ/tildes correctas) sin depender del locale.
@@ -952,7 +956,10 @@ __FONTS_CSS__
 
   // ===== Ancla (vs GSE / vs año anterior): numero + significancia + color =====
   function Ancla({tipo,dif,sig}){
-    if(dif==null) return <div className="ancla"><span className="k">{tipo}</span><span className="sup">sin dato</span></div>;
+    // s33o T2 (matriz s33n, §6): sin difgru, "vs su GSE" dice "sin comparación válida", la misma forma del chip y
+    // de la barra. Ese caso solo llega desde la tarjeta del radar de la ficha, que se dibuja con puntaje (el panel del
+    // indicador omite el ancla sin difgru). "vs año anterior" sin dif sigue en "sin dato".
+    if(dif==null) return <div className="ancla"><span className="k">{tipo}</span><span className="sup">{tipo==="vs su GSE"?"sin comparación válida":"sin dato"}</span></div>;
     const significativo = sig!=null && sig!==0;
     let cls="", arr="=";
     if(dif>0){arr="▲"; cls=significativo?"de":"";}
@@ -998,8 +1005,8 @@ __FONTS_CSS__
         <div className="meta">{est[rbd]?comNom(est[rbd].cod_com):""} · {DEPE[e?.cod_depe2]||"—"}</div>
         <Radar axes={axes} size={168} showLabels={false} showValues={true}/>
         <div className="alerts">
-          {al.bajo>0 && <span className="chip al" title="indicadores significativamente bajo su GSE">▼ {al.bajo} indicadores bajo su GSE</span>}
-          {al.sobre>0 && <span className="chip de" title="indicadores significativamente sobre su GSE">▲ {al.sobre} indicadores sobre su GSE</span>}
+          {al.bajo>0 && <span className="chip al" title={nInd(al.bajo)+" significativamente bajo su GSE"}>▼ {nInd(al.bajo)} bajo su GSE</span>}
+          {al.sobre>0 && <span className="chip de" title={nInd(al.sobre)+" significativamente sobre su GSE"}>▲ {nInd(al.sobre)} sobre su GSE</span>}
           {al.cmp>0 && al.bajo===0 && al.sobre===0 && <span className="chip nt">≈ en su GSE</span>}
           {al.dato>0 && al.cmp===0 && <span className="chip nt" title="Con puntaje, pero sin comparación válida con su GSE en ningún indicador">· sin comparación válida</span>}
           {al.dato===0 && <span className="chip nt sup">sin dato</span>}
@@ -1419,7 +1426,7 @@ __FONTS_CSS__
           <span className="indp-dot" style={{background:ind.color}}></span>
           <div className="indp-tt">
             <div className="indp-name">{ind.nombre}</div>
-            <div className="indp-sub">{dims.length} {dims.length===1?"dimensión":"dimensiones"}{nSubs>0?" · "+nSubs+" subdimensiones":""}</div>
+            <div className="indp-sub">{dims.length} {dims.length===1?"dimensión":"dimensiones"}{nSubs>0?" · "+nSub(nSubs):""}</div>
           </div>
           <div className="indp-score">{d&&d.prom!=null?fmt(d.prom):<span className="sup" style={{fontSize:"var(--fs-body-lg)"}}>sin dato</span>}{d&&d.prom!=null&&<span className="u">/100</span>}</div>
         </header>
@@ -1805,7 +1812,7 @@ __FONTS_CSS__
     // s29i: una sola fila, que no depende del texto buscado (igual que buildListCmp).
     if(tab==="nacional") return [NACIONAL_OPT];
     if(tab==="region") return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
-      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:nCom(COMUNAS_POR_REGION[r.cod]||0)}));
+      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:nCom(COMUNAS_POR_REGION[r.cod]||0)+" en el directorio"}));
     if(tab==="comuna") return DATA.comunas.filter(c=>!ql||c.nom.toLowerCase().includes(ql))
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
@@ -1891,7 +1898,7 @@ __FONTS_CSS__
       .sort((a,b)=>a.nom.localeCompare(b.nom))
       .map(c=>({kind:"comuna",cod:c.cod,nom:tc(c.nom)+(FOCO.has(c.cod)?" ★":""),sub:regNom(c.cod_reg)}));
     return DATA.regiones.filter(r=>!ql||r.nom.toLowerCase().includes(ql))
-      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:nCom(COMUNAS_POR_REGION[r.cod]||0)}));
+      .map(r=>({kind:"region",cod:r.cod,nom:r.nom,sub:nCom(COMUNAS_POR_REGION[r.cod]||0)+" en el directorio"}));
   }
   const cmpPlaceholderFor=tab=>tab==="nacional"?"Sin búsqueda: Chile es la única opción":tab==="slep"?"Buscar un SLEP…":tab==="comuna"?"Buscar una comuna…":tab==="establecimiento"?"Buscar por nombre o RBD…":"Buscar una región…";
 
@@ -2312,8 +2319,10 @@ __FONTS_CSS__
 
   function descargarComparadorCSV(args){
     if(!confirmarTamano(nFilasComparador(args),"comparación de entidades")) return;
+    // s33o T2 (matriz s33n, fila 16): los GSE ocultos cambian el universo, asi que el nombre lleva el mismo
+    // sufijo que el panorama y la vista historica (se omite con los cinco). Las entidades siguen fuera (s29 §48.5).
     descargarCSV(filasComparadorCSV(args),
-      "idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+".csv");
+      "idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+sufijoGse(args.visGse)+".csv");
   }
 
   // ===== Fase 3 (s30) — CSV del panorama territorial =====
