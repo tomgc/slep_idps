@@ -1136,10 +1136,30 @@ __FONTS_CSS__
   // archivo (la exportacion del comparador, SVG) pintan lo que devuelve y ninguno decide por su cuenta, asi que no pueden
   // contar cosas distintas. Lo unico que cambia entre destinos es medir(texto, rol): el ancho del texto con la fuente del
   // destino (en pantalla, la efectiva de ".s100-seg span", la de medirTexto). Rol "seg": la etiqueta dentro del segmento.
+  // s33s T2: el SVG no parte lineas (el HTML si: .s100-ext con flex-wrap y .s100-sin con el salto normal). Con anchoLinea,
+  // que solo pasa el archivo, trazarBarra reparte tambien la tira y la nota en lineas con la medicion del destino (roles
+  // "ext" y "nota"): la tira item por item, con el gap de 8 px de .s100-ext y sin partir nunca un item (un numero no se
+  // parte); la nota por palabras, sin separar "N = n*" ni el "+k" de su texto.
+  const GAP_TIRA=8;
+  function _cortarTrazado(t,anchoLinea,medir){
+    if(anchoLinea==null) return t;
+    const lineas=[]; let actual=[], usado=0;
+    t.externos.forEach((e,i)=>{ const w=medir(e.texto,"ext"), n=actual.length?usado+GAP_TIRA+w:w;
+      if(actual.length && n>anchoLinea){ lineas.push(actual); actual=[{i,ancho:w}]; usado=w; }
+      else { actual.push({i,ancho:w}); usado=n; } });
+    if(actual.length) lineas.push(actual);
+    t.lineasTira=lineas;
+    if(t.nota){ const u=[]; if(t.nota.texto) u.push(t.nota.texto);
+      if(t.nota.sin){ const p=t.nota.sin.split(" "); if(t.nota.sep) p[0]=t.nota.sep.trim()+" "+p[0]; u.push.apply(u,p); }
+      const ls=[]; let l="";
+      u.forEach(x=>{ const c=l?l+" "+x:x; if(l && medir(c,"nota")>anchoLinea){ ls.push(l); l=x; } else l=c; });
+      if(l) ls.push(l); t.nota.lineas=ls; }
+    return t;
+  }
   const GLIFO_ESTADO={bajo:"▼",neutro:"=",sobre:"▲"};
   // Base pequeña (s33o T1): un solo predicado para la marca de la barra y para la nota al pie del comparador.
   const esBasePequena=N=>N>=1 && N<BASE_PEQUENA_U;
-  function trazarBarra({rep,conN,ancho,medir}){
+  function trazarBarra({rep,conN,ancho,medir,anchoLinea}){
     const N=rep.N, sin=rep.sin||0;
     // s31 (decision 20260917 §6): los EE con puntaje y sin comparacion publicada (rep.sin) quedan FUERA del 100 % y se
     // declaran en una nota bajo la barra (y bajo la tira externa, si la hay), tambien con N=0. Es texto en --gris y
@@ -1160,8 +1180,8 @@ __FONTS_CSS__
       ? {tipo:"n",texto:"N = "+fmt(N)+(basePeq?"*":""),piezas:["N = ",fmt(N),basePeq?"*":""],sep:sin>0?" · ":null,
          sin:sin>0?textoSin:null,piezasSin:sin>0?piezasSin:null,tituloSin:sin>0?tituloSin:null}
       : (sin>0 ? {tipo:"sin",texto:null,piezas:null,sep:null,sin:textoSin,piezasSin,tituloSin} : null);
-    if(N===0) return {vacia:true,N,sin,basePeq,nota,textoVacio:"sin dato",title:null,segmentos:[],externos:[],
-      aria:"Sin establecimientos con comparación válida"+(sin>0?"; "+sin+" con puntaje sin comparación válida":"")};
+    if(N===0) return _cortarTrazado({vacia:true,N,sin,basePeq,nota,textoVacio:"sin dato",title:null,segmentos:[],externos:[],
+      aria:"Sin establecimientos con comparación válida"+(sin>0?"; "+sin+" con puntaje sin comparación válida":"")},anchoLinea,medir);
     const parts=pctRound([
       {k:"bajo",token:"--alerta",tokenTxt:"--alerta-txt",ancla:"izq",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
       {k:"neutro",token:"--st-neutro",tokenTxt:"--st-neutro-txt",ancla:"centro",count:rep.neutro,lbl:"= sin diferencia significativa"},
@@ -1184,8 +1204,8 @@ __FONTS_CSS__
       segmentos.push({k:s.k,token:s.token,p:s.p,ancho:w,title,etiqueta:cabe?full:null});
       if(!cabe) externos.push({k:s.k,clase:"s100-ext-it ext-"+s.k,tokenTxt:s.tokenTxt,ancla:s.ancla,title,texto:GLIFO_ESTADO[s.k]+" "+full,
         piezas:[GLIFO_ESTADO[s.k]," ",String(s.p),"% (",fmt(s.count),")"]});});
-    return {vacia:false,N,sin,basePeq,nota,textoVacio:null,segmentos,externos,aria,
-      title:"100% = "+nEE(N)+" con comparación válida"+(basePeq?" · "+avisoBasePeq:"")};
+    return _cortarTrazado({vacia:false,N,sin,basePeq,nota,textoVacio:null,segmentos,externos,aria,
+      title:"100% = "+nEE(N)+" con comparación válida"+(basePeq?" · "+avisoBasePeq:"")},anchoLinea,medir);
   }
 
   // Barra apilada 100% por estado vs GSE. Colores de ESTADO del motor
@@ -1995,10 +2015,26 @@ __FONTS_CSS__
                 // s31 (decision 20260917 §6): con puntaje y sigdifgru nulo no se afirma
                 // estado; misma señaletica "·" que la vista historica de la ficha (#147).
                 sin:{g:"·",txt:"sin comparación válida",lbl:"Con puntaje; sin comparación válida con su GSE"}};
+  // s33s T2: la clave de estado de la celda de establecimiento, en una funcion que usan la pantalla (CeldaEE) y la
+  // imagen del comparador: "nd" sin puntaje; si no, la que dice sigdifgru ("sin" cuando es nulo).
+  const claveEstadoEE=d=>(!d||d.prom==null)?"nd":d.sigdifgru===-1?"bajo":d.sigdifgru===1?"sobre":d.sigdifgru===0?"neutro":"sin";
+  // s33s T2: textos de la fila que comparten la tabla y la imagen: la linea bajo el nombre de un territorio (referencia
+  // nacional y dependencia) y la de un establecimiento (RBD y comuna).
+  const subEntidadCmp=t=>[t.kind==="nacional"?"referencia nacional":null,t.dep?(DEPE[t.dep]||t.dep):null].filter(Boolean).join(" · ");
+  // La pantalla pinta estos textos en las mismas piezas que su JSX anterior (Chrome da forma al texto por nodo del DOM, y
+  // unir las piezas mueve el interletrado); la imagen usa el texto unido.
+  const piezasEECmp=t=>{const e=est[t.cod]; return ["RBD ",t.cod,(e&&e.cod_com!=null)?" · "+comNom(e.cod_com):""];};
+  const subEECmp=t=>piezasEECmp(t).join("");
+  // s33s T2: la leyenda de estados y la nota de base pequeña del comparador, una sola vez para la tabla y la imagen.
+  const LEYENDA_ESTADO=[{k:"bajo",token:"--alerta",txt:"▼ bajo su GSE"},{k:"neutro",token:"--st-neutro",txt:"= sin diferencia"},
+    {k:"sobre",token:"--destaca",txt:"▲ sobre su GSE"}];
+  const PIEZAS_NOTA_BP=["* Base pequeña: menos de ",BASE_PEQUENA_U," establecimientos con comparación válida. Con tan pocos, un solo establecimiento mueve el reparto en 20 puntos o más."];
+  const TXT_NOTA_BP=PIEZAS_NOTA_BP.join("");
   function CeldaEE({d}){
     // prom nulo => "sin dato" en cursiva; jamas un cero ni un guion.
-    if(!d||d.prom==null) return <span className="ee-nd">sin dato</span>;
-    const k=d.sigdifgru===-1?"bajo":d.sigdifgru===1?"sobre":d.sigdifgru===0?"neutro":"sin", st=EST_EE[k];
+    const k=claveEstadoEE(d);
+    if(k==="nd") return <span className="ee-nd">sin dato</span>;
+    const st=EST_EE[k];
     return (
       <div className="ee-cell">
         <span className={"ee-gl "+k} title={st.lbl} aria-hidden="true">{st.g}</span>
@@ -2050,6 +2086,9 @@ __FONTS_CSS__
     // no arma el CSV, solo pregunta si alguna fila caeria dentro.
     const sinQueExportar=visGse.length===0 ||
       (cmpTerrs.length===0 && !cmpEEs.some((t,i)=>visGse.indexOf(eeGse[i])>=0));
+    // s33s T2: los mismos arreglos con los que se dibuja la tabla, para el CSV y para la imagen (regla de fidelidad de s30).
+    const argsExport={cmpTerrs,cmpEEs,rosters,eeGse,visGse,grado:cmpGrado,agno};
+    const tituloSinExportar="Agrega al menos una entidad y deja visible al menos un grupo socioeconómico";
     return (
       <div>
         <div className="cmp-chrome">
@@ -2105,9 +2144,23 @@ __FONTS_CSS__
             <IconExport label="Exportar CSV" icon="download"
               disabled={sinQueExportar}
               title={sinQueExportar
-                ? "Agrega al menos una entidad y deja visible al menos un grupo socioeconómico"
+                ? tituloSinExportar
                 : "Descarga en CSV lo que muestra esta comparación: las entidades elegidas, el nivel, el año vigente y los GSE visibles"}
-              onExport={()=>descargarComparadorCSV({cmpTerrs,cmpEEs,rosters,eeGse,visGse,grado:cmpGrado,agno})}/>
+              onExport={()=>descargarComparadorCSV(argsExport)}/>
+            {/* s33s T2: la imagen de la misma comparación, con la forma de la exportación del radar de la ficha y
+                deshabilitada en los mismos casos que el CSV. */}
+            <IconExport label="Imagen SVG" icon="chart"
+              disabled={sinQueExportar}
+              title={sinQueExportar
+                ? tituloSinExportar
+                : "Descarga esta comparación como imagen SVG (vectorial, sin límite de tamaño): las entidades elegidas, el nivel, el año vigente y los GSE visibles"}
+              onExport={()=>exportarComparadorSVG(argsExport)}/>
+            <IconExport label="Imagen PNG" icon="image"
+              disabled={sinQueExportar}
+              title={sinQueExportar
+                ? tituloSinExportar
+                : "Descarga esta comparación como imagen PNG a 2x (si es demasiado grande para el navegador, avisa y ofrece el SVG)"}
+              onExport={()=>exportarComparadorPNG(argsExport)}/>
           </div>
           <div className="gse-filter">{DATA.meta.gse.map(g=>
             <button key={g} className={"gfb"+(cmpGseVis.has(g)?" on":"")} onClick={()=>onToggleGse(g)} aria-pressed={cmpGseVis.has(g)}>
@@ -2115,9 +2168,7 @@ __FONTS_CSS__
         </div>
 
         <div className="leyenda pan-state-leg">
-          <span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span>
-          <span><i style={{background:"var(--st-neutro)"}}></i>= sin diferencia</span>
-          <span><i style={{background:"var(--destaca)"}}></i>▲ sobre su GSE</span>
+          {LEYENDA_ESTADO.map(e=><span key={e.k}><i style={{background:"var("+e.token+")"}}></i>{e.txt}</span>)}
         </div>
 
         {cmpTerr.length===0
@@ -2143,17 +2194,17 @@ __FONTS_CSS__
                           {/* s29i: la fila lleva su dependencia bajo el nombre. Sin ella, dos
                               filas de la misma comuna con dependencias distintas se leerian iguales. */}
                           <td className="td-terr"><span className="td-tn">{t.nom}</span>
-                            {(t.kind==="nacional"||t.dep) && <span className="td-ee-rbd">{[t.kind==="nacional"?"referencia nacional":null,t.dep?(DEPE[t.dep]||t.dep):null].filter(Boolean).join(" · ")}</span>}</td>
+                            {(t.kind==="nacional"||t.dep) && <span className="td-ee-rbd">{subEntidadCmp(t)}</span>}</td>
                           {DATA.indicadores.map(ind=>{const items=rosters[ti].filter(u=>u.gse===g);
                             return <td key={ind.id}><StackedBar rep={repartoInd(items,ind.id,cmpGrado,agno)} conN/></td>;})}
                         </tr>))}
-                      {eeAqui.map((t,k)=>{const dind=indOf(t.cod,cmpGrado,agno), e=est[t.cod];
+                      {eeAqui.map((t,k)=>{const dind=indOf(t.cod,cmpGrado,agno);
                         return (
                         <tr key={keyEnt(t)} className={"row-ee"+(k===0?" row-ee-first":"")}>
                           <td className="td-terr">
                             <span className="td-ee-k">Establecimiento</span>
                             <span className="td-tn">{t.nom}</span>
-                            <span className="td-ee-rbd">RBD {t.cod}{e&&e.cod_com!=null?" · "+comNom(e.cod_com):""}</span></td>
+                            <span className="td-ee-rbd">{piezasEECmp(t)}</span></td>
                           {DATA.indicadores.map(ind=><td key={ind.id}><CeldaEE d={dind[ind.id]}/></td>)}
                         </tr>);})}
                     </tbody>
@@ -2163,7 +2214,7 @@ __FONTS_CSS__
                 {eeOtros.length>0 && <div className="gse-sec-foot">{eeOtros.map((x,k)=>(
                   <React.Fragment key={keyEnt(x.t)}>{k>0?"; ":""}<b>{x.t.nom}</b>{x.gse?" (GSE "+(GSE[x.gse]||x.gse)+")":""} {ubic(x)}</React.Fragment>))}.</div>}
               </section>);})}
-        {hayBasePeq && <div className="cmp-nota-bp">* Base pequeña: menos de {BASE_PEQUENA_U} establecimientos con comparación válida. Con tan pocos, un solo establecimiento mueve el reparto en 20 puntos o más.</div>}
+        {hayBasePeq && <div className="cmp-nota-bp">{PIEZAS_NOTA_BP}</div>}
       </div>);
   }
 
@@ -2375,8 +2426,12 @@ __FONTS_CSS__
     if(!confirmarTamano(nFilasComparador(args),"comparación de entidades")) return;
     // s33o T2 (matriz s33n, fila 16): los GSE ocultos cambian el universo, asi que el nombre lleva el mismo
     // sufijo que el panorama y la vista historica (se omite con los cinco). Las entidades siguen fuera (s29 §48.5).
-    descargarCSV(filasComparadorCSV(args),
-      "idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+sufijoGse(args.visGse)+".csv");
+    descargarCSV(filasComparadorCSV(args),baseArchivoComparador(args)+".csv");
+  }
+  // s33s T2: nombre base de los archivos del comparador (decision de exportacion de imagen §4: el del CSV, y la imagen
+  // con .svg o .png).
+  function baseArchivoComparador(args){
+    return "idps_comparador_"+slugArchivo(args.grado)+"_"+args.agno+sufijoGse(args.visGse);
   }
 
   // ===== Fase 3 (s30) — CSV del panorama territorial =====
@@ -2558,6 +2613,8 @@ __FONTS_CSS__
   // codigo (33_motor_template.html ~3067) es la contraria: un solo dibujante que
   // recibe un <g> de destino, para que pantalla y export no puedan separarse. Eso es
   // un rediseño de StackedBar, no un añadido: encargo propio.
+  // s33s (parte A1 de la decision 20260925_decision_exportacion_imagen.md): resuelto para el COMPARADOR con el trazado
+  // unico (trazarBarra decide, la pantalla y construirSvgComparador pintan). El panorama queda para la parte A2.
 
   // Pila de fuentes del SVG exportado. Las OTF de marca (gobCL, Museo Sans) van
   // embebidas en el HTML como @font-face; un SVG suelto —y sobre todo un SVG
@@ -2783,6 +2840,230 @@ __FONTS_CSS__
     if(!r){alert(SIN_RADAR); return;}
     rasterizarSvgAPng(r);
   }
+
+  // ===== s33s T2 — imagen (SVG y PNG) del comparador =====
+  // Testigo de despliegue: "s33s: exportación del comparador". Decision 20260925_decision_exportacion_imagen.md §4 (A1):
+  // trazado unico, pila del sistema (SVG_FUENTE), techo del PNG con aviso (el de rasterizarSvgAPng, como el radar) y el
+  // nombre del CSV con la extension de cada formato. Regla de fidelidad de s30: construirSvgComparador recibe los MISMOS
+  // arreglos con los que Comparador dibuja la tabla (cmpTerrs, cmpEEs, rosters, eeGse, visGse) y los recorre en el mismo
+  // orden. Cada barra se pinta desde trazarBarra con medir sobre SVG_FUENTE: las reglas son las de la pantalla con las
+  // metricas del archivo (una etiqueta puede ir dentro en pantalla y en la tira en el archivo, nunca a medias); la fila de
+  // establecimiento, desde claveEstadoEE, como CeldaEE. El SVG no parte lineas: cada texto se mide ANTES de ubicarlo y se
+  // parte por palabras dentro de su celda. Cuerpos, pesos y colores se leen del CSS vigente con una sonda oculta que arma
+  // el mismo marcado del comparador (incluidos los fondos que el CSS da en literal): aqui no se escribe ninguno.
+  // Universo de las cifras de la imagen: el texto de la banda .cmp-noagg de la pantalla, mas lo que en pantalla dicen el
+  // title de la barra y la nota al pie (que N es el 100 % de la barra y que el "+k" queda fuera).
+  const TXT_UNIVERSO_CMP="No se promedia ni se agrega. Cada celda de entidad reparte el 100% de los establecimientos de esa entidad (en ese GSE e indicador, y en su dependencia cuando se eligió una) en tres estados vs su propio GSE. Es % (n) de establecimientos, no una media de puntajes. N es el número de establecimientos con comparación válida con su GSE (el 100 % de la barra); los que tienen puntaje sin comparación válida se cuentan aparte (+k), fuera del 100 %. Las filas de establecimiento son un caso único: muestran su estado, no un reparto.";
+  const _SONDA_CMP='<div class="gse-sec"><div class="gse-sec-h"><span class="gse-sec-name">x</span><span class="gse-sec-sub">x</span></div>'+
+    '<table class="cmp-table"><thead><tr><th class="th-terr">x</th><th class="th-ind">x</th></tr></thead><tbody>'+
+    '<tr class="row-nac"><td class="td-terr"><span class="td-tn">x</span><span class="td-ee-rbd">x</span></td>'+
+    '<td><div class="s100-wrap"><div class="s100"><div class="s100-seg"><span>x</span></div></div>'+
+    '<div class="s100-ext"><span class="s100-ext-it ext-bajo">x</span></div><div class="s100-sin">x</div></div>'+
+    '<div class="s100 s100-empty"><span class="s100-nd">x</span></div></td></tr>'+
+    '<tr class="row-ee row-ee-first"><td class="td-terr"><span class="td-ee-k">x</span><span class="td-tn">x</span></td>'+
+    '<td><div class="ee-cell"><span class="ee-gl bajo">x</span><span class="ee-gl neutro">x</span><span class="ee-gl sobre">x</span>'+
+    '<span class="ee-gl sin">x</span><span class="ee-val"><span class="ee-pt">x</span><span class="ee-st bajo">x</span>'+
+    '<span class="ee-st neutro">x</span><span class="ee-st sobre">x</span><span class="ee-st sin">x</span></span></div>'+
+    '<span class="ee-nd">x</span></td></tr></tbody></table></div>'+
+    '<div class="leyenda pan-state-leg"><span>x</span></div><div class="cmp-nota-bp">x</div>';
+  function _estilosComparador(){
+    const host=document.createElement("div");
+    host.style.cssText="position:absolute;left:-99999px;top:0;width:1150px;visibility:hidden;";
+    host.innerHTML=_SONDA_CMP; document.body.appendChild(host);
+    const q=s=>host.querySelector(s);
+    const rol=s=>{const cs=getComputedStyle(q(s)); return {px:parseFloat(cs.fontSize),peso:cs.fontWeight,estilo:cs.fontStyle,color:cs.color};};
+    const fondo=s=>getComputedStyle(q(s)).backgroundColor;
+    const borde=s=>getComputedStyle(q(s)).borderTopColor;
+    const gl=k=>Object.assign(rol(".ee-gl."+k),{fondo:fondo(".ee-gl."+k),borde:borde(".ee-gl."+k),
+      diam:parseFloat(getComputedStyle(q(".ee-gl."+k)).width),trazo:parseFloat(getComputedStyle(q(".ee-gl."+k)).borderTopWidth)});
+    const E={gseNom:rol(".gse-sec-name"),gseSub:rol(".gse-sec-sub"),gseBanda:fondo(".gse-sec-h"),
+      th:rol(".th-ind"),thEnt:rol(".th-terr"),ent:rol(".row-nac .td-tn"),entSub:rol(".td-ee-rbd"),eeK:rol(".td-ee-k"),eeNom:rol(".row-ee .td-tn"),
+      seg:rol(".s100-seg span"),ext:rol(".s100-ext-it"),nota:rol(".s100-sin"),nd:rol(".s100-nd"),
+      barraFondo:fondo(".s100"),barraBorde:borde(".s100"),
+      eePt:rol(".ee-pt"),eeNd:rol(".ee-nd"),
+      eeSt:{bajo:rol(".ee-st.bajo"),neutro:rol(".ee-st.neutro"),sobre:rol(".ee-st.sobre"),sin:rol(".ee-st.sin")},
+      eeGl:{bajo:gl("bajo"),neutro:gl("neutro"),sobre:gl("sobre"),sin:gl("sin")},
+      filaNac:fondo(".row-nac td"),filaEE:fondo(".row-ee td"),bordeEE:borde(".row-ee-first td"),
+      ley:rol(".leyenda"),notaBp:rol(".cmp-nota-bp")};
+    document.body.removeChild(host); return E;
+  }
+  // Un fondo transparente (rgba con alfa 0) no se dibuja.
+  const _pinta=c=>!!c && c!=="transparent" && !/^rgba\([^)]*,\s*0\)$/.test(c);
+
+  function construirSvgComparador({cmpTerrs,cmpEEs,rosters,eeGse,visGse,grado,agno}){
+    const E=_estilosComparador();
+    // Geometria del archivo, en px. Ancho = el del comparador en una ventana de 1.280 px (1.150): columna de entidad
+    // de 190 y cuatro columnas de 210 separadas por 18; la barra mide 26 de alto, como .s100.
+    const PAD=24, W_ENT=190, W_COL=210, GAP=18, BAR_H=26, PAD_Y=10, RAD=parseFloat(tokenCSS("--radius-2"))||0;
+    const LH=1.25, BASE=0.97;   // alto de linea y posicion de la linea base, en em, de todo texto del archivo
+    const totalW=PAD*2+W_ENT+4*(GAP+W_COL), anchoUtil=totalW-PAD*2;
+    const xCol=i=>PAD+W_ENT+GAP+i*(W_COL+GAP);
+    // Los textos de la columna de entidad van alineados a la derecha con 2 px de margen interior: el trazo de algunas
+    // letras (la tilde de una "í" final) sale un poco de su avance.
+    const X_ENT=PAD+W_ENT-2, W_ENT_TXT=W_ENT-2;
+    const px=n=>parseFloat(tokenCSS(n));
+    const R=(tam,peso,color)=>({px:tam,peso,estilo:"normal",color});
+    const CEJA=R(px("--fs-overline"),tokenCSS("--fw-bold"),tokenCSS("--gris"));
+    const TIT=R(px("--fs-h3"),tokenCSS("--fw-heavy"),tokenCSS("--azul"));
+    const PIE=R(px("--fs-overline"),tokenCSS("--fw-regular"),tokenCSS("--gris"));
+    const COL_LINEA=tokenCSS("--linea");
+    const med=(t,r)=>{ _ctxMed.font=(r.estilo==="italic"?"italic ":"")+r.peso+" "+r.px+"px "+SVG_FUENTE;
+      return _ctxMed.measureText(String(t)).width; };
+    const ROL={seg:E.seg,ext:E.ext,nota:E.nota};
+    const medirArchivo=(t,rol)=>med(t,ROL[rol]);
+    const lh=r=>r.px*LH;
+    // Parte por palabras para que cada linea quepa en `ancho`; una palabra sola que no cabe se recorta con "…".
+    const partir=(txt,ancho,r)=>{ const ls=[]; let l="";
+      String(txt).split(" ").forEach(w=>{ const c=l?l+" "+w:w; if(l && med(c,r)>ancho){ ls.push(l); l=w; } else l=c; });
+      if(l) ls.push(l);
+      return ls.map(x=>{ if(med(x,r)<=ancho) return x; let y=x; while(y.length>1 && med(y+"…",r)>ancho) y=y.slice(0,-1); return y+"…"; }); };
+    // Cada texto se registra con la celda de la que no puede salir (la usa la verificacion, con getBBox).
+    const celdas=new Map();
+    const txt=(padre,s,x,yTop,r,caja,opc)=>{ const o=opc||{};
+      const at={x:x.toFixed(2),y:(yTop+r.px*BASE).toFixed(2),"font-family":SVG_FUENTE,"font-size":r.px,"font-weight":r.peso};
+      if(r.estilo==="italic") at["font-style"]="italic";
+      if(o.anchor) at["text-anchor"]=o.anchor;
+      const n=svgTxt(s,at,padre); _ponColor(n,"fill",o.color||r.color); celdas.set(n,caja); return n; };
+    const lineas=(padre,ls,x,yTop,r,caja,opc)=>{ ls.forEach((l,i)=>txt(padre,l,x,yTop+i*lh(r),r,caja,opc)); return ls.length*lh(r); };
+    const rect=(padre,at,fill)=>{ const n=svgEl("rect",at,padre); if(fill) _ponColor(n,"fill",fill); return n; };
+    const raya=(padre,x1,y1,x2,y2,color,grosor)=>svgEl("line",{x1,y1,x2,y2,stroke:color,"stroke-width":grosor},padre);
+    const titulo=(nodo,s)=>{ svgEl("title",{},nodo).textContent=s; };
+
+    const root=svgEl("svg",{width:totalW});
+    const fondo=rect(root,{x:0,y:0,width:totalW},tokenCSS("--panel"));
+    let y=PAD;
+    const bloque=(ls,r)=>{ const h=ls.length*lh(r); lineas(root,ls,PAD,y,r,{x:PAD,y,w:anchoUtil,h}); y+=h; };
+
+    // Cabecera: quien, que, nivel y año, y el universo de cada cifra (el de la banda .cmp-noagg de la pantalla).
+    const nivel=DATA.meta.grados[grado]||grado;
+    bloque([(SLEP_FOCO_NOM?"SLEP "+SLEP_FOCO_NOM+" · ":"")+"Comparador IDPS"],CEJA); y+=4;
+    bloque(partir("Comparación entre territorios · "+nivel+" · "+agno+(PRELIM.has(String(agno))?" (preliminar)":""),anchoUtil,TIT),TIT); y+=6;
+    bloque(partir(TXT_UNIVERSO_CMP,anchoUtil,E.notaBp),E.notaBp);
+    if(visGse.length<DATA.meta.gse.length)
+      bloque(partir("Grupos socioeconómicos visibles: "+visGse.map(g=>GSE[g]||g).join(" · ")+". Los demás están ocultos en el segmentador.",anchoUtil,E.notaBp),E.notaBp);
+    y+=10;
+    // Leyenda de estados (la misma de la pantalla: LEYENDA_ESTADO).
+    { let lx=PAD; const h=lh(E.ley), cL={x:PAD,y,w:anchoUtil,h}, sw=10;
+      LEYENDA_ESTADO.forEach(e=>{ rect(root,{x:lx,y:y+(h-sw)/2,width:sw,height:sw,rx:2},tokenCSS(e.token));
+        txt(root,e.txt,lx+sw+4,y,E.ley,cL); lx+=sw+4+med(e.txt,E.ley)+14; });
+      y+=h+14; }
+
+    const trazar=rep=>trazarBarra({rep,conN:true,ancho:W_COL-2,medir:medirArchivo,anchoLinea:W_COL});
+    const altoBarra=t=>BAR_H+(t.externos.length?3+t.lineasTira.length*lh(E.ext)+(t.lineasTira.length-1)*2:0)
+      +(t.nota?3+t.nota.lineas.length*lh(E.nota):0);
+    let nClip=0, hayBasePeq=false;
+    // Una barra: lo que decide trazarBarra, pintado con rect y text. `celda`: la caja de la columna en la fila.
+    const pintarBarra=(x,yb,t,celda)=>{
+      const b=svgEl("g",{},root); titulo(b,t.title||t.aria); svgEl("desc",{},b).textContent=t.aria;
+      rect(b,{x:x+0.5,y:yb+0.5,width:W_COL-1,height:BAR_H-1,rx:RAD},E.barraFondo);
+      if(t.vacia){ txt(b,t.textoVacio,x+W_COL/2,yb+(BAR_H-lh(E.nd))/2,E.nd,{x,y:yb,w:W_COL,h:BAR_H},{anchor:"middle"}); }
+      else {
+        const id="cmp-barra-"+(nClip++), cp=svgEl("clipPath",{id},b);
+        svgEl("rect",{x:x+1,y:yb+1,width:W_COL-2,height:BAR_H-2,rx:Math.max(0,RAD-1)},cp);
+        const s=svgEl("g",{"clip-path":"url(#"+id+")"},b); let cx=x+1;
+        t.segmentos.forEach(sg=>{ const r=rect(s,{x:cx.toFixed(2),y:yb+1,width:sg.ancho.toFixed(2),height:BAR_H-2},tokenCSS(sg.token)); titulo(r,sg.title);
+          if(sg.etiqueta) txt(s,sg.etiqueta,cx+sg.ancho/2,yb+(BAR_H-lh(E.seg))/2,E.seg,{x:cx,y:yb+1,w:sg.ancho,h:BAR_H-2},{anchor:"middle"});
+          cx+=sg.ancho; });
+      }
+      svgEl("rect",{x:x+0.5,y:yb+0.5,width:W_COL-1,height:BAR_H-1,rx:RAD,fill:"none",stroke:E.barraBorde,"stroke-width":1},b);
+      let yy=yb+BAR_H;
+      if(t.externos.length){ yy+=3;
+        t.lineasTira.forEach((ln,li)=>{ if(li>0) yy+=2;
+          // Como .s100-ext: margenes automaticos segun el ancla de cada item (bajo empuja a su derecha, sobre a su
+          // izquierda, el neutro a los dos lados), con el gap de la tira entre items.
+          const libre=W_COL-ln.reduce((a,it)=>a+it.ancho,0)-GAP_TIRA*(ln.length-1);
+          const autos=ln.reduce((a,it)=>a+(t.externos[it.i].ancla==="centro"?2:1),0), q=Math.max(0,libre)/autos;
+          let lx=x;
+          ln.forEach(it=>{ const e=t.externos[it.i]; if(e.ancla!=="izq") lx+=q;
+            const gi=svgEl("g",{},b); titulo(gi,e.title); txt(gi,e.texto,lx,yy,E.ext,celda,{color:tokenCSS(e.tokenTxt)});
+            lx+=it.ancho+GAP_TIRA; if(e.ancla!=="der") lx+=q; });
+          yy+=lh(E.ext); }); }
+      if(t.nota){ yy+=3; const gn=svgEl("g",{},b); if(t.nota.tituloSin) titulo(gn,t.nota.tituloSin);
+        yy+=lineas(gn,t.nota.lineas,x,yy,E.nota,celda); }
+    };
+    // Celda de establecimiento: lo que decide claveEstadoEE, pintado como CeldaEE (glifo, puntaje y estado).
+    const pintarEE=(x,yc,d,celda)=>{
+      const k=claveEstadoEE(d);
+      if(k==="nd"){ txt(root,"sin dato",x+W_COL/2,yc-lh(E.eeNd)/2,E.eeNd,celda,{anchor:"middle"}); return; }
+      const st=EST_EE[k], G=E.eeGl[k], S=E.eeSt[k], anchoTxt=W_COL-G.diam-9;
+      const stL=partir(st.txt,anchoTxt,S), pt=fmt(d.prom);
+      const wTxt=Math.max(med(pt,E.eePt),...stL.map(l=>med(l,S))), hTxt=lh(E.eePt)+stL.length*lh(S);
+      const x0=x+(W_COL-(G.diam+9+wTxt))/2;
+      const gg=svgEl("g",{},root); titulo(gg,st.lbl);
+      const c=svgEl("circle",{cx:x0+G.diam/2,cy:yc,r:(G.diam-G.trazo)/2,"stroke-width":G.trazo},gg);
+      _ponColor(c,"fill",G.fondo); _ponColor(c,"stroke",G.borde);
+      txt(gg,st.g,x0+G.diam/2,yc-lh(G)/2,G,celda,{anchor:"middle"});
+      txt(root,pt,x0+G.diam+9,yc-hTxt/2,E.eePt,celda);
+      lineas(root,stL,x0+G.diam+9,yc-hTxt/2+lh(E.eePt),S,celda);
+    };
+
+    visGse.forEach((g,gi)=>{
+      if(gi>0) y+=16;
+      // Banda del grupo (.gse-sec-h): nombre y "Grupo socioeconómico" en la misma linea base.
+      const hB=Math.round(lh(E.gseNom)+22), cB={x:PAD,y,w:anchoUtil,h:hB}, nomG=GSE[g]||"sin clasificar", yN=y+(hB-lh(E.gseNom))/2;
+      rect(root,{x:PAD,y,width:anchoUtil,height:hB},E.gseBanda);
+      txt(root,nomG,PAD+18,yN,E.gseNom,cB);
+      txt(root,"Grupo socioeconómico",PAD+18+med(nomG,E.gseNom)+10,yN+(E.gseNom.px-E.gseSub.px)*BASE,E.gseSub,cB);
+      y+=hB;
+      // Encabezado: "Entidad" y los cuatro indicadores con su muestra de color (paleta de indicadores, del payload).
+      const cab=DATA.indicadores.map(ind=>partir(ind.nombre,W_COL-15,E.th));
+      const hC=Math.max(...cab.map(l=>l.length))*lh(E.th)+16;
+      txt(root,"Entidad",X_ENT,y+(hC-lh(E.thEnt))/2,E.thEnt,{x:PAD,y,w:W_ENT,h:hC},{anchor:"end"});
+      DATA.indicadores.forEach((ind,i)=>{ const ls=cab[i], x=xCol(i), cC={x,y,w:W_COL,h:hC}, y0=y+(hC-ls.length*lh(E.th))/2;
+        ls.forEach((l,li)=>{ const w=med(l,E.th)+(li===0?15:0), x0=x+(W_COL-w)/2;
+          if(li===0){ rect(root,{x:x0,y:y0+(lh(E.th)-9)/2,width:9,height:9,rx:2},ind.color); txt(root,l,x0+15,y0,E.th,cC); }
+          else txt(root,l,x+W_COL/2,y0+li*lh(E.th),E.th,cC,{anchor:"middle"}); }); });
+      y+=hC; raya(root,PAD,y,PAD+anchoUtil,y,COL_LINEA,1);
+      // Filas de territorio: un trazado por indicador, con repartoInd sobre los mismos rosters que la tabla.
+      cmpTerrs.forEach((t,ti)=>{
+        const items=rosters[ti].filter(u=>u.gse===g);
+        const trs=DATA.indicadores.map(ind=>trazar(repartoInd(items,ind.id,grado,agno)));
+        if(trs.some(tr=>tr.basePeq)) hayBasePeq=true;
+        const nomL=partir(t.nom,W_ENT_TXT,E.ent), sub=subEntidadCmp(t), subL=sub?partir(sub,W_ENT_TXT,E.entSub):[];
+        const hE=nomL.length*lh(E.ent)+(subL.length?2+subL.length*lh(E.entSub):0);
+        const hF=Math.max(hE,...trs.map(altoBarra))+2*PAD_Y;
+        if(t.kind==="nacional" && _pinta(E.filaNac)) rect(root,{x:PAD,y,width:anchoUtil,height:hF},E.filaNac);
+        const cE={x:PAD,y,w:W_ENT,h:hF}, yE=y+(hF-hE)/2;
+        lineas(root,nomL,X_ENT,yE,E.ent,cE,{anchor:"end"});
+        lineas(root,subL,X_ENT,yE+nomL.length*lh(E.ent)+2,E.entSub,cE,{anchor:"end"});
+        trs.forEach((tr,i)=>{ const h=altoBarra(tr); pintarBarra(xCol(i),y+(hF-h)/2,tr,{x:xCol(i),y,w:W_COL,h:hF}); });
+        y+=hF; raya(root,PAD,y,PAD+anchoUtil,y,COL_LINEA,t.kind==="nacional"?2:1);
+      });
+      // Filas de establecimiento: solo los de ESTE GSE, como en la tabla.
+      cmpEEs.forEach((t,i)=>{ if(eeGse[i]!==g) return;
+        const dind=indOf(t.cod,grado,agno), primero=cmpEEs.findIndex((u,j)=>eeGse[j]===g)===i;
+        const nomL=partir(t.nom,W_ENT_TXT,E.eeNom), subL=partir(subEECmp(t),W_ENT_TXT,E.entSub);
+        const hE=lh(E.eeK)+2+nomL.length*lh(E.eeNom)+2+subL.length*lh(E.entSub);
+        const hCel=DATA.indicadores.map(ind=>{ const d=dind[ind.id], k=claveEstadoEE(d); if(k==="nd") return lh(E.eeNd);
+          const S=E.eeSt[k]; return Math.max(E.eeGl[k].diam,lh(E.eePt)+partir(EST_EE[k].txt,W_COL-E.eeGl[k].diam-9,S).length*lh(S)); });
+        const hF=Math.max(hE,...hCel)+2*PAD_Y;
+        if(_pinta(E.filaEE)) rect(root,{x:PAD,y,width:anchoUtil,height:hF},E.filaEE);
+        if(primero) raya(root,PAD,y+1,PAD+anchoUtil,y+1,E.bordeEE,2);
+        const cE={x:PAD,y,w:W_ENT,h:hF}, yE=y+(hF-hE)/2;
+        txt(root,"Establecimiento",X_ENT,yE,E.eeK,cE,{anchor:"end"});
+        lineas(root,nomL,X_ENT,yE+lh(E.eeK)+2,E.eeNom,cE,{anchor:"end"});
+        lineas(root,subL,X_ENT,yE+lh(E.eeK)+2+nomL.length*lh(E.eeNom)+2,E.entSub,cE,{anchor:"end"});
+        DATA.indicadores.forEach((ind,j)=>pintarEE(xCol(j),y+hF/2,dind[ind.id],{x:xCol(j),y,w:W_COL,h:hF}));
+        y+=hF; raya(root,PAD,y,PAD+anchoUtil,y,COL_LINEA,1);
+      });
+    });
+    // Nota de base pequeña: solo si alguna barra del archivo quedo marcada (lo dice trazarBarra).
+    if(hayBasePeq){ y+=14; bloque(partir(TXT_NOTA_BP,anchoUtil,E.notaBp),E.notaBp); }
+    // Pie: fuente del dato y del motor, con la fecha de exportacion (como el del radar).
+    y+=16; raya(root,PAD,y,PAD+anchoUtil,y,COL_LINEA,1); y+=8;
+    bloque(partir("Indicadores de Desarrollo Personal y Social · Agencia de Calidad de la Educación",anchoUtil,PIE),PIE);
+    bloque(partir((SLEP_FOCO_NOM?"Motor IDPS · SLEP "+SLEP_FOCO_NOM+" · ":"Motor IDPS · ")+"Exportado el "+
+      new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"}),anchoUtil,PIE),PIE);
+    const totalH=Math.ceil(y+PAD);
+    root.setAttribute("height",totalH); root.setAttribute("viewBox","0 0 "+totalW+" "+totalH); fondo.setAttribute("height",totalH);
+    const cajas=Array.from(root.querySelectorAll("text")).map(n=>celdas.get(n)||null);
+    return {svgStr:new XMLSerializer().serializeToString(root),totalW,totalH,fnameBase:baseArchivoComparador({grado,agno,visGse}),cajas};
+  }
+  function exportarComparadorSVG(args){
+    const r=construirSvgComparador(args);
+    descargarBlob(new Blob([r.svgStr],{type:"image/svg+xml;charset=utf-8"}),r.fnameBase+".svg");
+  }
+  function exportarComparadorPNG(args){ rasterizarSvgAPng(construirSvgComparador(args)); }
 
   // ===== s31 — Vista historica del panorama territorial (P-VISTA-TERRITORIAL) =====
   // Decision 50_documentacion/activa/decisiones/20260917_decision_vista_historica_territorial.md;
