@@ -17,7 +17,8 @@
   el 2026-09-23 (s32g):** se resuelve la §5.6 con la opción B (título del indicador
   en tinta con filete del color) y se amplía a siete el inventario de usos de los
   tokens `-txt`. Desplegado a `docs/`. **Enmendada el 2026-09-24 (s33):** encabezado
-  de §5 al día; `_txtOn` retirado del motor.
+  de §5 al día; `_txtOn` retirado del motor. **Enmendada el 2026-09-25 (s33o):** se cierra la §5.2
+  con `20260925_decision_base_pequena.md` (u = 5, N junto a cada barra, solo el comparador).
 
 ---
 
@@ -190,7 +191,7 @@ El cambio es 100 % color de texto. No toca el pipeline (31–34), ni el generado
 encargo: métricas del bloque 7 del generador idénticas y payload JSON del motor
 byte-idéntico salvo `fecha_generacion`.
 
-## 5. Pendientes asociados (§5.1, §5.3 a/c, §5.4, §5.5 1/3 y §5.6 resueltos; §5.2 abierto)
+## 5. Pendientes asociados (§5.1 a §5.6 resueltos)
 
 ### 5.1 `--gris` accesible en todos los fondos — **RESUELTO el 2026-09-10 (s29d)**
 
@@ -268,6 +269,10 @@ decir ya cumplía. El fondo `#D4E4F1` y el ratio 3,53 sí son reales, pero corre
 contenedor `.estab-opt` está en `:hover`. El cambio lo corrige igual, a 4,51.
 
 ### 5.2 Marca de "base pequeña"
+
+**RESUELTO el 2026-09-25 (s33o):** el titular fijó el umbral y la forma en
+`20260925_decision_base_pequena.md` (u = 5, marca con `1 ≤ N < 5`, N de cada barra junto
+a la barra, solo en el comparador, N = 0 sin cambio). El texto de abajo queda como registro.
 
 La marca de **"base pequeña"** (sección 4 del mockup) queda al backlog. Son dos piezas:
 el N de la fila en esa sección bajo el nombre de la entidad —hoy ese dato solo vive en
