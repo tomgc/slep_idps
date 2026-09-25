@@ -1128,9 +1128,73 @@ __FONTS_CSS__
   window.addEventListener("beforeprint",()=>{document.documentElement.classList.add("imprimiendo");_remedirBarras();});
   window.addEventListener("afterprint",()=>{document.documentElement.classList.remove("imprimiendo");_remedirBarras();});
 
+  // ===== s33s: trazado único de la barra apilada (decisión 20260925_decision_exportacion_imagen.md §4, parte A1) =====
+  // Testigo de despliegue: "s33s: trazado único". trazarBarra es una funcion PURA que toma TODAS las decisiones de la
+  // barra de estado vs GSE: los anchos (pctRound), que etiqueta "p% (n)" cabe dentro de su segmento (regla unica de s29,
+  // con la holgura HOLGURA_FULL), la tira externa y su orden, "sin dato", la nota de los EE sin comparacion, el N y el
+  // asterisco de base pequeña (conN, solo el comparador), los title y el aria-label. La pantalla (StackedBar, HTML) y el
+  // archivo (la exportacion del comparador, SVG) pintan lo que devuelve y ninguno decide por su cuenta, asi que no pueden
+  // contar cosas distintas. Lo unico que cambia entre destinos es medir(texto, rol): el ancho del texto con la fuente del
+  // destino (en pantalla, la efectiva de ".s100-seg span", la de medirTexto). Rol "seg": la etiqueta dentro del segmento.
+  const GLIFO_ESTADO={bajo:"▼",neutro:"=",sobre:"▲"};
+  // Base pequeña (s33o T1): un solo predicado para la marca de la barra y para la nota al pie del comparador.
+  const esBasePequena=N=>N>=1 && N<BASE_PEQUENA_U;
+  function trazarBarra({rep,conN,ancho,medir}){
+    const N=rep.N, sin=rep.sin||0;
+    // s31 (decision 20260917 §6): los EE con puntaje y sin comparacion publicada (rep.sin) quedan FUERA del 100 % y se
+    // declaran en una nota bajo la barra (y bajo la tira externa, si la hay), tambien con N=0. Es texto en --gris y
+    // --fs-overline: no es un cuarto segmento ni una trama nueva (alternativa descartada por el titular), y no entra en
+    // la regla de etiquetado de la barra.
+    const tituloSin="Establecimientos con puntaje sin comparación válida con su GSE: "+fmt(sin)+". No entran en el 100 % de la barra.";
+    const textoSin="+"+fmt(sin)+" sin comparación válida";
+    // s33o T1: base pequeña. Con conN (solo la celda del comparador) y N >= 1, "N = n" en la linea y el estilo de la
+    // nota s100-sin, compartiendo linea con ella si hay "sin"; con N < u, asterisco. N = 0 no cambia (rama de "sin dato").
+    // Sin color ni opacidad nuevos.
+    const basePeq=!!conN && esBasePequena(N);
+    const avisoBasePeq="base pequeña: menos de "+BASE_PEQUENA_U+" establecimientos con comparación válida";
+    // Cada texto va tambien en PIEZAS, las mismas en que el JSX anterior lo partia: Chrome da forma al texto por nodo del
+    // DOM (el interletrado entre "4" y "%" no se aplica entre dos nodos), asi que la pantalla pinta las piezas y queda
+    // igual al pixel; el archivo usa el texto entero.
+    const piezasSin=["+",fmt(sin)," sin comparación válida"];
+    const nota=(conN && N>=1)
+      ? {tipo:"n",texto:"N = "+fmt(N)+(basePeq?"*":""),piezas:["N = ",fmt(N),basePeq?"*":""],sep:sin>0?" · ":null,
+         sin:sin>0?textoSin:null,piezasSin:sin>0?piezasSin:null,tituloSin:sin>0?tituloSin:null}
+      : (sin>0 ? {tipo:"sin",texto:null,piezas:null,sep:null,sin:textoSin,piezasSin,tituloSin} : null);
+    if(N===0) return {vacia:true,N,sin,basePeq,nota,textoVacio:"sin dato",title:null,segmentos:[],externos:[],
+      aria:"Sin establecimientos con comparación válida"+(sin>0?"; "+sin+" con puntaje sin comparación válida":"")};
+    const parts=pctRound([
+      {k:"bajo",token:"--alerta",tokenTxt:"--alerta-txt",ancla:"izq",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
+      {k:"neutro",token:"--st-neutro",tokenTxt:"--st-neutro-txt",ancla:"centro",count:rep.neutro,lbl:"= sin diferencia significativa"},
+      {k:"sobre",token:"--destaca",tokenTxt:"--destaca-txt",ancla:"der",count:rep.sobre,lbl:"▲ sobre su GSE (significativo)"}]);
+    // a11y: la distribucion completa se expone como TEXTO (no solo color) en el aria-label del contenedor; los
+    // segmentos quedan ocultos al lector de pantalla.
+    const aria="Distribución de "+nEE(N)+" con comparación válida: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
+      +(sin>0?"; además "+sin+" con puntaje sin comparación válida, fuera del 100 %":"")
+      +(basePeq?"; "+avisoBasePeq:"");
+    // REGLA UNICA de etiquetado (s29): dentro del segmento va SOLO el dato completo "p% (n)", y solo si cabe entero con
+    // holgura. Lo que no cabe no se recorta ni se degrada a "p%" a secas: baja ENTERO a la tira externa, con su glifo de
+    // estado y en el orden bajo | neutro | sobre. Asi nunca se lee un numero a medias (invariante 4) ni el mismo
+    // porcentaje dentro y fuera (inv. 5). Cada item de la tira se ancla a su sector (bajo a la izquierda, neutro al
+    // centro, sobre a la derecha); en pantalla lo hacen las clases ext-* (ver .s100-ext-it).
+    const segmentos=[], externos=[];
+    parts.forEach(s=>{ if(s.p===0) return;
+      const full=s.p+"% ("+fmt(s.count)+")", w=ancho*s.p/100;
+      const cabe=medir(full,"seg")+HOLGURA_FULL<=w;
+      const title=s.lbl+": "+s.count+" de "+N+" ("+s.p+"%)";
+      segmentos.push({k:s.k,token:s.token,p:s.p,ancho:w,title,etiqueta:cabe?full:null});
+      if(!cabe) externos.push({k:s.k,clase:"s100-ext-it ext-"+s.k,tokenTxt:s.tokenTxt,ancla:s.ancla,title,texto:GLIFO_ESTADO[s.k]+" "+full,
+        piezas:[GLIFO_ESTADO[s.k]," ",String(s.p),"% (",fmt(s.count),")"]});});
+    return {vacia:false,N,sin,basePeq,nota,textoVacio:null,segmentos,externos,aria,
+      title:"100% = "+nEE(N)+" con comparación válida"+(basePeq?" · "+avisoBasePeq:"")};
+  }
+
   // Barra apilada 100% por estado vs GSE. Colores de ESTADO del motor
   // (alerta/gris/destaca), DISTINTOS de la paleta de 4 indicadores (invariante).
   // Significancia comunicada por texto (en el title de cada segmento).
+  // s33s: pinta en HTML lo que decide trazarBarra, con el mismo DOM, las mismas clases y los mismos nodos de texto de
+  // antes (las piezas). Lo propio del componente es solo medir: el ancho real de la barra (que pasa a trazarBarra) y el
+  // repintado cuando cambia.
+  const medirPantalla=(txt,rol)=>medirTexto(txt);   // la pantalla solo pide el rol "seg"
   function StackedBar({rep,conN}){
     // s29: el ancho REAL de la barra vive en estado; el ResizeObserver compartido lo
     // actualiza cuando cambia el ancho de la columna (ventana, scroll horizontal,
@@ -1145,62 +1209,27 @@ __FONTS_CSS__
     // Repintado cuando las OTF embebidas terminan de cargar (cambia el ancho del texto).
     useEffect(()=>{const fn=()=>setFuenteVer(v=>v+1); _fuenteSubs.add(fn);
       return ()=>{_fuenteSubs.delete(fn);};},[]);
-    // s31 (decision 20260917 §6): los EE con puntaje y sin comparacion publicada
-    // (rep.sin) quedan FUERA del 100 % y se declaran en una nota bajo la barra (y
-    // bajo la tira externa, si la hay), tambien con N=0. Es texto en --gris y
-    // --fs-overline: no es un cuarto segmento ni una trama nueva (alternativa
-    // descartada por el titular), y no entra en la regla de etiquetado de la barra.
-    const sin=rep.sin||0;
-    const tituloSin="Establecimientos con puntaje sin comparación válida con su GSE: "+fmt(sin)+". No entran en el 100 % de la barra.";
-    const notaSin = sin>0
-      ? <div className="s100-sin" title={tituloSin}>+{fmt(sin)} sin comparación válida</div>
-      : null;
-    // s33o T1: base pequeña. Con conN (solo la celda del comparador) y N >= 1, "N = n" en la linea
-    // y el estilo de la nota s100-sin, compartiendo linea con ella si hay "sin"; con N < u, asterisco.
-    // N = 0 no cambia (rama de "sin dato"). Sin color ni opacidad nuevos.
-    const basePeq=!!conN && rep.N>=1 && rep.N<BASE_PEQUENA_U;
-    const avisoBasePeq="base pequeña: menos de "+BASE_PEQUENA_U+" establecimientos con comparación válida";
-    const notaN = (conN && rep.N>=1)
-      ? <div className="s100-sin s100-n">N = {fmt(rep.N)}{basePeq?"*":""}{sin>0 && <> · <span title={tituloSin}>+{fmt(sin)} sin comparación válida</span></>}</div>
-      : null;
+    const t=trazarBarra({rep,conN,ancho,medir:medirPantalla});
+    const nota=!t.nota ? null : (t.nota.tipo==="n"
+      ? <div className="s100-sin s100-n">{t.nota.piezas}{t.nota.sin && <>{t.nota.sep}<span title={t.nota.tituloSin}>{t.nota.piezasSin}</span></>}</div>
+      : <div className="s100-sin" title={t.nota.tituloSin}>{t.nota.piezasSin}</div>);
     // s31b: contenedor propio (.s100-wrap) en vez de Fragment: barra, tira externa y
     // nota quedan en la MISMA columna del grid del panorama (ver CSS de .s100-wrap).
-    if(vacia) return (<div className="s100-wrap">
-      <div className="s100 s100-empty" role="img" aria-label={"Sin establecimientos con comparación válida"+(sin>0?"; "+sin+" con puntaje sin comparación válida":"")}><span className="s100-nd">sin dato</span></div>
-      {notaSin}
+    if(t.vacia) return (<div className="s100-wrap">
+      <div className="s100 s100-empty" role="img" aria-label={t.aria}><span className="s100-nd">{t.textoVacio}</span></div>
+      {nota}
     </div>);
-    const parts=pctRound([
-      {k:"bajo",c:"var(--alerta)",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
-      {k:"neutro",c:"var(--st-neutro)",count:rep.neutro,lbl:"= sin diferencia significativa"},
-      {k:"sobre",c:"var(--destaca)",count:rep.sobre,lbl:"▲ sobre su GSE (significativo)"}]);
-    // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
-    // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
-    const aria="Distribución de "+nEE(rep.N)+" con comparación válida: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
-      +(sin>0?"; además "+sin+" con puntaje sin comparación válida, fuera del 100 %":"")
-      +(basePeq?"; "+avisoBasePeq:"");
-    // REGLA UNICA de etiquetado (s29): dentro del segmento va SOLO el dato completo
-    // "p% (n)", y solo si cabe entero con holgura. Lo que no cabe no se recorta ni se
-    // degrada a "p%" a secas: baja ENTERO a la tira externa. Asi nunca se lee un
-    // numero a medias (invariante 4) ni el mismo porcentaje dentro y fuera (inv. 5).
-    const gl={bajo:"▼",neutro:"=",sobre:"▲"};
-    const fuera=[];
-    const segs=parts.map(s=>{ if(s.p===0) return null;
-      const full=s.p+"% ("+fmt(s.count)+")";
-      const cabe=medirTexto(full)+HOLGURA_FULL<=ancho*s.p/100;
-      if(!cabe) fuera.push(s);
-      return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
-        title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{cabe&&<span>{full}</span>}</div>;});
     return (<div className="s100-wrap">
-      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+nEE(rep.N)+" con comparación válida"+(basePeq?" · "+avisoBasePeq:"")}>{segs}</div>
+      <div className="s100" ref={barRef} role="img" aria-label={t.aria} title={t.title}>{t.segmentos.map(s=>
+        <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:"var("+s.token+")"}}
+          title={s.title}>{s.etiqueta&&<span>{s.etiqueta}</span>}</div>)}</div>
       {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
           completo no cupo dentro de la barra; cada uno con su glifo de estado, su
           color y su "p% (n)" entero. s29c: ese color ya no viaja inline; lo pone
-          la clase ext-* con el token de TEXTO del estado. El grid la alinea al
-          sector correspondiente: bajo | neutro | sobre. */}
-      {fuera.length>0 && <div className="s100-ext">{fuera.map(s=>
-        <span key={s.k} className={"s100-ext-it ext-"+s.k}
-          title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}% ({fmt(s.count)})</span>)}</div>}
-      {notaN||notaSin}
+          la clase ext-* con el token de TEXTO del estado. */}
+      {t.externos.length>0 && <div className="s100-ext">{t.externos.map(e=>
+        <span key={e.k} className={e.clase} title={e.title}>{e.piezas}</span>)}</div>}
+      {nota}
     </div>);
   }
 
@@ -2007,7 +2036,7 @@ __FONTS_CSS__
     // s33o T1: la nota al pie de base pequeña se dibuja solo si alguna barra visible queda marcada.
     // Recorre las mismas celdas que la tabla (territorios x GSE visibles x indicadores, con repartoInd).
     const hayBasePeq=useMemo(()=>visGse.some(g=>cmpTerrs.some((t,ti)=>{const items=rosters[ti].filter(u=>u.gse===g);
-      return DATA.indicadores.some(ind=>{const r=repartoInd(items,ind.id,cmpGrado,agno);return r.N>=1&&r.N<BASE_PEQUENA_U;});})),
+      return DATA.indicadores.some(ind=>{const r=repartoInd(items,ind.id,cmpGrado,agno);return esBasePequena(r.N);});})),
       [visGse.join(","),cmpTerrs,rosters,cmpGrado,agno]);
     // s29b: EE que no caen en ninguna seccion visible. Se avisa UNA vez arriba;
     // el pie de cada seccion queda solo con los que si estan en otra seccion.
