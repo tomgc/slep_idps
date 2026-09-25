@@ -816,15 +816,11 @@ __FONTS_CSS__
   <div id="root"></div>
   <div class="tt" id="tt"></div>
 
-  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"
-          integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z"
-          crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"
-          integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1"
-          crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
-          integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
-          crossorigin="anonymous"></script>
+  <!-- s33q: sin red. React 18.3.1 y ReactDOM 18.3.1 van en linea desde 10_utils/ (verificados por su sha384,
+       el mismo SRI que se usaba con unpkg); el bloque JSX de la app (abajo) lo transpila 35_generar_motor_html.R
+       con V8 y el HTML publicado no pide nada a la red (metodo D31-1 de slep_simce_adecuado). -->
+  <script>__REACT_INLINE__</script>
+  <script>__REACTDOM_INLINE__</script>
   <script>__D3_INLINE__</script>
   <script>__PAKO_INLINE__</script>
   <script>

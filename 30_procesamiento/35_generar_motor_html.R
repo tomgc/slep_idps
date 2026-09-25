@@ -5,7 +5,8 @@
 # Proposito: Genera el motor HTML autocontenido (producto final) a partir de
 #            idps_largo y los catalogos. Replica el mecanismo del madre
 #            slep_simce_adecuado (JSON -> gzip -> base64 -> placeholders; D3 y
-#            pako inline; React por CDN con SRI; fuentes de marca embebidas),
+#            pako inline; fuentes de marca embebidas; desde s33q, React y ReactDOM
+#            inline y el JSX transpilado aqui con V8: el HTML no pide nada a la red),
 #            sobre el MODELO NUEVO (sin agregacion territorial): el dato viaja por
 #            establecimiento-grado; territorio y GSE son navegacion/etiqueta,
 #            nunca cifra agregada; la comparacion (difgru/sigdifgru y dif/sigdif) se
@@ -20,7 +21,8 @@
 #
 # Insumos  : 40_salidas/intermedios/idps_largo.parquet, catalogo_idps.parquet,
 #            comunas_chile.parquet, sleps_chile.parquet
-#            30_procesamiento/35_motor_template.html, 10_utils/{d3,pako}.min.js
+#            30_procesamiento/35_motor_template.html, 10_utils/{d3,pako}.min.js,
+#            10_utils/{react,react-dom}.production.min.js y 10_utils/babel.min.js (s33q)
 #            50_documentacion/andamios/diseno/motor_idps/fonts/*.otf (solo lectura)
 # Salida   : 40_salidas/motor_idps.html
 #
@@ -569,7 +571,104 @@ fonts_css <- vapply(fuentes, function(ft) {
 # ============================================================================
 # Bloque 6 — Plantilla + libs inline; reemplazo de placeholders
 # ============================================================================
-message("[5] Plantilla, D3 y pako...")
+# s33q: sin red. Metodo D31-1 del hermano slep_simce_adecuado (su decision
+# 20260923_decision_transpilacion_en_build.md y el bloque 3b de su 33_generar_html.R):
+# React y ReactDOM viajan inline; el bloque <script type="text/babel"> de la plantilla
+# se transpila aqui con Babel standalone dentro del paquete R V8 y se publica como
+# <script> normal. Babel no viaja al HTML. La plantilla se sigue editando como JSX.
+for (paquete in c("V8", "openssl")) {
+  if (!requireNamespace(paquete, quietly = TRUE)) {
+    stop("Falta el paquete ", paquete, " (transpilacion del JSX en el build, s33q). ",
+         "Instalar con: renv::install(\"", paquete, "\")")
+  }
+}
+
+# Dependencias JavaScript vendorizadas en 10_utils/. El sha384 (base64) es el mismo
+# SRI que la plantilla declaraba contra unpkg.com hasta s33p: si el archivo en disco
+# no lo reproduce, el build se detiene. La URL solo sirve para volver a descargarlo a
+# mano; el build no usa la red.
+VENDOR_JS <- list(
+  react = list(
+    ruta = here::here("10_utils", "react.production.min.js"),
+    sri  = "DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z",
+    url  = "https://unpkg.com/react@18.3.1/umd/react.production.min.js"
+  ),
+  reactdom = list(
+    ruta = here::here("10_utils", "react-dom.production.min.js"),
+    sri  = "gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1",
+    url  = "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"
+  ),
+  babel = list(
+    ruta = here::here("10_utils", "babel.min.js"),
+    sri  = "m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y",
+    url  = "https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+  )
+)
+
+# Ancla del unico bloque de la app. Presets iguales a los que Babel usaba en el
+# navegador (env, react), con runtime "classic" fijado: el automatico emite _jsx(),
+# que el motor inline no resuelve (A34 de slep_categoria_desempeno).
+ANCLA_JSX_APERTURA <- '<script type="text/babel" data-presets="env,react">'
+ANCLA_JSX_CIERRE   <- "</script>"
+OPCIONES_BABEL <- paste0(
+  "{presets: ['env', ['react', {runtime: 'classic'}]], ",
+  "sourceType: 'script', comments: true, compact: false}"
+)
+
+# Lee un archivo de texto completo como una sola cadena UTF-8.
+leer_texto <- function(ruta) {
+  paste(readLines(ruta, encoding = "UTF-8", warn = FALSE), collapse = "\n")
+}
+
+# Verifica que el archivo exista y que su sha384 sea el declarado.
+verificar_vendor <- function(dep) {
+  if (!file.exists(dep$ruta)) {
+    stop("No existe ", dep$ruta, "\n  Descargar con: curl -fsSL ", dep$url,
+         " -o ", fs::path_rel(dep$ruta, here::here()))
+  }
+  con <- file(dep$ruta, open = "rb")
+  on.exit(close(con))
+  sri <- openssl::base64_encode(openssl::sha384(con))
+  if (!identical(sri, dep$sri)) {
+    stop("sha384 inesperado en ", dep$ruta, "\n  esperado: ", dep$sri,
+         "\n  obtenido: ", sri)
+  }
+  invisible(TRUE)
+}
+
+# Transpila JSX a JavaScript con Babel standalone dentro de V8. Se detiene si la
+# salida no es JavaScript valido o conserva rastros del runtime automatico.
+transpilar_jsx <- function(jsx, babel_code) {
+  ctx <- V8::v8()
+  ctx$eval(babel_code)
+  ctx$assign("fuente_jsx", jsx)
+  ctx$eval(paste0("var salida_babel = Babel.transform(fuente_jsx, ",
+                  OPCIONES_BABEL, ").code;"))
+  salida <- ctx$get("salida_babel")
+  if (!isTRUE(ctx$validate(salida))) {
+    stop("La salida de Babel no es JavaScript valido.")
+  }
+  if (grepl("_jsx(", salida, fixed = TRUE) ||
+      grepl("react/jsx-runtime", salida, fixed = TRUE)) {
+    stop("La salida usa el runtime automatico de JSX; se esperaba classic.")
+  }
+  salida
+}
+
+# Reemplazo literal de un marcador que aparece exactamente una vez (como
+# reemplazar_literal() del hermano): sub() interpreta la barra invertida del
+# reemplazo, y React y la app transpilada traen barras invertidas.
+reemplazar_literal <- function(texto, marcador, valor) {
+  pos <- gregexpr(marcador, texto, fixed = TRUE)[[1]]
+  if (length(pos) != 1L || pos[1] < 0) {
+    stop("El marcador debe aparecer exactamente una vez: ", marcador,
+         " (apariciones: ", sum(pos > 0), ")")
+  }
+  paste0(substr(texto, 1L, pos - 1L), valor,
+         substr(texto, pos + nchar(marcador), nchar(texto)))
+}
+
+message("[5] Plantilla, D3, pako y dependencias vendorizadas...")
 plantilla_path <- here::here("30_procesamiento", "35_motor_template.html")
 d3_path   <- here::here("10_utils", "d3.min.js")
 pako_path <- here::here("10_utils", "pako.min.js")
@@ -577,21 +676,50 @@ for (p in c(plantilla_path, d3_path, pako_path)) if (!file.exists(p)) stop("Falt
 plantilla <- paste(readLines(plantilla_path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
 d3_code   <- paste(readLines(d3_path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
 pako_code <- paste(readLines(pako_path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
-for (ph in c("__FONTS_CSS__", "__D3_INLINE__", "__PAKO_INLINE__", "__JSON_DATA__"))
+for (ph in c("__FONTS_CSS__", "__D3_INLINE__", "__PAKO_INLINE__", "__JSON_DATA__",
+             "__REACT_INLINE__", "__REACTDOM_INLINE__"))
   if (!grepl(ph, plantilla, fixed = TRUE)) stop("La plantilla no contiene ", ph)
+
+invisible(lapply(VENDOR_JS, verificar_vendor))
+react_code    <- leer_texto(VENDOR_JS$react$ruta)
+reactdom_code <- leer_texto(VENDOR_JS$reactdom$ruta)
+babel_code    <- leer_texto(VENDOR_JS$babel$ruta)
+
+message("[5b] Transpilando el JSX de la plantilla con V8 (s33q)...")
+ini_jsx <- gregexpr(ANCLA_JSX_APERTURA, plantilla, fixed = TRUE)[[1]]
+if (length(ini_jsx) != 1L || ini_jsx[1] < 0) {
+  stop("La plantilla debe contener una sola vez: ", ANCLA_JSX_APERTURA)
+}
+cuerpo_desde <- ini_jsx[1] + nchar(ANCLA_JSX_APERTURA)
+resto        <- substr(plantilla, cuerpo_desde, nchar(plantilla))
+fin_rel      <- regexpr(ANCLA_JSX_CIERRE, resto, fixed = TRUE)
+if (fin_rel < 0) stop("El bloque JSX de la plantilla no tiene cierre.")
+app_jsx <- substr(resto, 1L, fin_rel - 1L)
+app_js  <- transpilar_jsx(app_jsx, babel_code)
+plantilla <- paste0(
+  substr(plantilla, 1L, ini_jsx[1] - 1L),
+  "<script>\n", app_js, "\n  ",
+  substr(resto, fin_rel, nchar(resto))
+)
+message(sprintf("    React:     %d caracteres", nchar(react_code)))
+message(sprintf("    ReactDOM:  %d caracteres", nchar(reactdom_code)))
+message(sprintf("    App JSX:   %d caracteres -> JS %d caracteres", nchar(app_jsx), nchar(app_js)))
 
 message("[6] Construyendo HTML final...")
 html <- sub("__FONTS_CSS__",   fonts_css, plantilla, fixed = TRUE)
 html <- sub("__D3_INLINE__",   d3_code,   html,      fixed = TRUE)
 html <- sub("__PAKO_INLINE__", pako_code, html,      fixed = TRUE)
 html <- sub("__JSON_DATA__",   json_b64,  html,      fixed = TRUE)
+html <- reemplazar_literal(html, "__REACT_INLINE__",    react_code)
+html <- reemplazar_literal(html, "__REACTDOM_INLINE__", reactdom_code)
 
 ruta_salida <- here::here("40_salidas", "motor_idps.html")
 con <- file(ruta_salida, open = "wb", encoding = "UTF-8")
 writeBin(charToRaw(enc2utf8(html)), con); close(con)
 tamano_kb <- file.info(ruta_salida)$size / 1024
 n_roster <- roster_lst$rows; n_est <- nrow(establecimientos_lst); n_reg <- nrow(regiones_lst)
-rm(json_str, json_gzip, json_b64, html, d3_code, pako_code, plantilla, fonts_css); gc(verbose = FALSE)
+rm(json_str, json_gzip, json_b64, html, d3_code, pako_code, plantilla, fonts_css,
+   react_code, reactdom_code, babel_code, app_jsx, app_js, resto); gc(verbose = FALSE)
 
 
 # ============================================================================
