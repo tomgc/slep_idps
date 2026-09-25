@@ -573,6 +573,9 @@ __FONTS_CSS__
     padding:9px 12px;background:var(--panel);border:1px solid var(--linea);
     border-left:3px solid var(--foco);border-radius:var(--radius-2);}
   .cmp-invite{font-size:var(--fs-caption);color:var(--gris);font-style:italic;margin-top:10px;}
+  /* s33o T1: base pequeña. Nota al pie del comparador que explica el asterisco del N de las barras;
+     texto de interfaz en --gris, como las demas notas del comparador; sin color de estado. */
+  .cmp-nota-bp{font-size:var(--fs-caption);color:var(--gris);line-height:1.5;margin-top:14px;}
   .cmp-gse-ctl{margin:6px 0 12px;}
   /* s32d: min-width = columna de entidad + 4 × W_min; bajo eso, scroll en .cmp-tscroll. W_min 150 = 140 medido (M6)
      + margen para fuentes de otros sistemas ("sobre su GSE" pedía 140,36 px; A-1 de s32d): 210 + 4 × 150 = 810.
@@ -841,6 +844,9 @@ __FONTS_CSS__
   // referenciada en los 5 lugares (maxSel, contador, guard del boton, guard de addTerr
   // y textos cmp-invite) para que una proxima subida no vuelva a desincronizarse.
   const CMP_MAX_TERR=10;
+  // s33o T1: base pequeña (decisión 20260925_decision_base_pequena.md). Solo en el comparador: cada barra
+  // muestra su N (EE con comparación válida) y, con 1 <= N < BASE_PEQUENA_U, un asterisco explicado al pie.
+  const BASE_PEQUENA_U=5;
   // Foco de apertura: SLEP Costa Central (cod del SLEP en el dato; sus
   // establecimientos tienen cod_slep === SLEP_FOCO). Es el ESTADO inicial de
   // navegacion, no un filtro fijo: el usuario lo cambia con EntityModal.
@@ -1093,7 +1099,7 @@ __FONTS_CSS__
   // Barra apilada 100% por estado vs GSE. Colores de ESTADO del motor
   // (alerta/gris/destaca), DISTINTOS de la paleta de 4 indicadores (invariante).
   // Significancia comunicada por texto (en el title de cada segmento).
-  function StackedBar({rep}){
+  function StackedBar({rep,conN}){
     // s29: el ancho REAL de la barra vive en estado; el ResizeObserver compartido lo
     // actualiza cuando cambia el ancho de la columna (ventana, scroll horizontal,
     // alta/baja de entidades). Los hooks van antes del retorno de "sin dato".
@@ -1113,8 +1119,17 @@ __FONTS_CSS__
     // --fs-overline: no es un cuarto segmento ni una trama nueva (alternativa
     // descartada por el titular), y no entra en la regla de etiquetado de la barra.
     const sin=rep.sin||0;
+    const tituloSin="Establecimientos con puntaje sin comparación válida con su GSE: "+fmt(sin)+". No entran en el 100 % de la barra.";
     const notaSin = sin>0
-      ? <div className="s100-sin" title={"Establecimientos con puntaje sin comparación válida con su GSE: "+fmt(sin)+". No entran en el 100 % de la barra."}>+{fmt(sin)} sin comparación válida</div>
+      ? <div className="s100-sin" title={tituloSin}>+{fmt(sin)} sin comparación válida</div>
+      : null;
+    // s33o T1: base pequeña. Con conN (solo la celda del comparador) y N >= 1, "N = n" en la linea
+    // y el estilo de la nota s100-sin, compartiendo linea con ella si hay "sin"; con N < u, asterisco.
+    // N = 0 no cambia (rama de "sin dato"). Sin color ni opacidad nuevos.
+    const basePeq=!!conN && rep.N>=1 && rep.N<BASE_PEQUENA_U;
+    const avisoBasePeq="base pequeña: menos de "+BASE_PEQUENA_U+" establecimientos con comparación válida";
+    const notaN = (conN && rep.N>=1)
+      ? <div className="s100-sin s100-n">N = {fmt(rep.N)}{basePeq?"*":""}{sin>0 && <> · <span title={tituloSin}>+{fmt(sin)} sin comparación válida</span></>}</div>
       : null;
     // s31b: contenedor propio (.s100-wrap) en vez de Fragment: barra, tira externa y
     // nota quedan en la MISMA columna del grid del panorama (ver CSS de .s100-wrap).
@@ -1129,7 +1144,8 @@ __FONTS_CSS__
     // a11y: la distribucion completa se expone como TEXTO (no solo color) en el
     // aria-label del contenedor; los segmentos quedan ocultos al lector de pantalla.
     const aria="Distribución de "+nEE(rep.N)+" con comparación válida: "+parts.map(s=>s.lbl+" "+s.count+" ("+s.p+"%)").join("; ")
-      +(sin>0?"; además "+sin+" con puntaje sin comparación válida, fuera del 100 %":"");
+      +(sin>0?"; además "+sin+" con puntaje sin comparación válida, fuera del 100 %":"")
+      +(basePeq?"; "+avisoBasePeq:"");
     // REGLA UNICA de etiquetado (s29): dentro del segmento va SOLO el dato completo
     // "p% (n)", y solo si cabe entero con holgura. Lo que no cabe no se recorta ni se
     // degrada a "p%" a secas: baja ENTERO a la tira externa. Asi nunca se lee un
@@ -1143,7 +1159,7 @@ __FONTS_CSS__
       return <div key={s.k} className="s100-seg" aria-hidden="true" style={{width:s.p+"%",background:s.c}}
         title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{cabe&&<span>{full}</span>}</div>;});
     return (<div className="s100-wrap">
-      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+nEE(rep.N)+" con comparación válida"}>{segs}</div>
+      <div className="s100" ref={barRef} role="img" aria-label={aria} title={"100% = "+nEE(rep.N)+" con comparación válida"+(basePeq?" · "+avisoBasePeq:"")}>{segs}</div>
       {/* #18 (s22, reescrito en s29): tira externa para TODO segmento cuyo dato
           completo no cupo dentro de la barra; cada uno con su glifo de estado, su
           color y su "p% (n)" entero. s29c: ese color ya no viaja inline; lo pone
@@ -1152,7 +1168,7 @@ __FONTS_CSS__
       {fuera.length>0 && <div className="s100-ext">{fuera.map(s=>
         <span key={s.k} className={"s100-ext-it ext-"+s.k}
           title={s.lbl+": "+s.count+" de "+rep.N+" ("+s.p+"%)"}>{gl[s.k]} {s.p}% ({fmt(s.count)})</span>)}</div>}
-      {notaSin}
+      {notaN||notaSin}
     </div>);
   }
 
@@ -1956,6 +1972,11 @@ __FONTS_CSS__
       cmpEEs.forEach((t,i)=>{m[keyEnt(t)]="RBD "+t.cod+" · GSE "+(eeGse[i]?(GSE[eeGse[i]]||eeGse[i]):"—");});
       return m;},[cmpTerrs,metas,cmpEEs,eeGse]);
     const visGse=DATA.meta.gse.filter(g=>cmpGseVis.has(g));
+    // s33o T1: la nota al pie de base pequeña se dibuja solo si alguna barra visible queda marcada.
+    // Recorre las mismas celdas que la tabla (territorios x GSE visibles x indicadores, con repartoInd).
+    const hayBasePeq=useMemo(()=>visGse.some(g=>cmpTerrs.some((t,ti)=>{const items=rosters[ti].filter(u=>u.gse===g);
+      return DATA.indicadores.some(ind=>{const r=repartoInd(items,ind.id,cmpGrado,agno);return r.N>=1&&r.N<BASE_PEQUENA_U;});})),
+      [visGse.join(","),cmpTerrs,rosters,cmpGrado,agno]);
     // s29b: EE que no caen en ninguna seccion visible. Se avisa UNA vez arriba;
     // el pie de cada seccion queda solo con los que si estan en otra seccion.
     const eeSinUbicar=cmpEEs.map((t,i)=>({t,gse:eeGse[i]})).filter(x=>!x.gse||visGse.indexOf(x.gse)<0);
@@ -2063,7 +2084,7 @@ __FONTS_CSS__
                           <td className="td-terr"><span className="td-tn">{t.nom}</span>
                             {(t.kind==="nacional"||t.dep) && <span className="td-ee-rbd">{[t.kind==="nacional"?"referencia nacional":null,t.dep?(DEPE[t.dep]||t.dep):null].filter(Boolean).join(" · ")}</span>}</td>
                           {DATA.indicadores.map(ind=>{const items=rosters[ti].filter(u=>u.gse===g);
-                            return <td key={ind.id}><StackedBar rep={repartoInd(items,ind.id,cmpGrado,agno)}/></td>;})}
+                            return <td key={ind.id}><StackedBar rep={repartoInd(items,ind.id,cmpGrado,agno)} conN/></td>;})}
                         </tr>))}
                       {eeAqui.map((t,k)=>{const dind=indOf(t.cod,cmpGrado,agno), e=est[t.cod];
                         return (
@@ -2081,6 +2102,7 @@ __FONTS_CSS__
                 {eeOtros.length>0 && <div className="gse-sec-foot">{eeOtros.map((x,k)=>(
                   <React.Fragment key={keyEnt(x.t)}>{k>0?"; ":""}<b>{x.t.nom}</b>{x.gse?" (GSE "+(GSE[x.gse]||x.gse)+")":""} {ubic(x)}</React.Fragment>))}.</div>}
               </section>);})}
+        {hayBasePeq && <div className="cmp-nota-bp">* Base pequeña: menos de {BASE_PEQUENA_U} establecimientos con comparación válida. Con tan pocos, un solo establecimiento mueve el reparto en 20 puntos o más.</div>}
       </div>);
   }
 
