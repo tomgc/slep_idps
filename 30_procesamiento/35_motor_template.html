@@ -1128,6 +1128,42 @@ __FONTS_CSS__
   window.addEventListener("beforeprint",()=>{document.documentElement.classList.add("imprimiendo");_remedirBarras();});
   window.addEventListener("afterprint",()=>{document.documentElement.classList.remove("imprimiendo");_remedirBarras();});
 
+  // ===== s33t: rótulos compartidos entre la pantalla y sus imágenes (D-1 de s33s) =====
+  // Testigo de despliegue: "s33t: rótulos compartidos". Cada rótulo que la pantalla escribe y que su imagen exportada
+  // (SVG y PNG) repite vive aquí una sola vez: la pantalla y el constructor del archivo lo leen de este lugar y no pueden
+  // decir cosas distintas. Los textos que la pantalla pinta en varios nodos van como PIEZAS, en el mismo reparto que tenía
+  // su JSX (Chrome da forma al texto por nodo del DOM: s33s); el archivo usa el texto unido (textoPiezas).
+  const ROT={
+    sinDato:"sin dato",
+    sinClasificar:"sin clasificar",
+    entidad:"Entidad",
+    grupoSE:"Grupo socioeconómico",
+    establecimiento:"Establecimiento",
+    cmpTitulo:"Comparación entre territorios",
+    cmpCeja:"Comparador IDPS",
+    prelimParen:" (preliminar)",
+    nBarra:"N es el número de establecimientos con comparación válida con su GSE (el 100 % de la barra); los que tienen puntaje sin comparación válida se cuentan aparte (+k), fuera del 100 %.",
+    pieFuente:"Indicadores de Desarrollo Personal y Social · Agencia de Calidad de la Educación",
+    pieMotor:"Motor IDPS",
+    pieExportado:"Exportado el "};
+  // Texto unido de unas piezas: cadenas, números y {b:texto} (lo que la pantalla pinta en negrita).
+  const _esNegrita=x=>x!==null && typeof x==="object";
+  const textoPiezas=p=>p.map(x=>_esNegrita(x)?(x.b!=null?String(x.b):""):(x==null||x===false?"":String(x))).join("");
+  // Piezas a hijos de React: cada cadena o número, un nodo de texto; cada {b}, un <b> (el reparto del JSX escrito a mano).
+  const pintarPiezas=p=>p.map((x,i)=>_esNegrita(x)?<b key={i}>{x.b}</b>:x);
+  // Nombre del grupo socioeconómico de una sección: su etiqueta o "sin clasificar".
+  const nombreGse=g=>GSE[g]||ROT.sinClasificar;
+  // Comparador: ceja, banda "no se promedia" (en piezas), título de la imagen y aviso de GSE ocultos.
+  const cejaComparador=()=>(SLEP_FOCO_NOM?"SLEP "+SLEP_FOCO_NOM+" · ":"")+ROT.cmpCeja;
+  const NOAGG_CMP=[{b:"No se promedia ni se agrega."}," Cada celda de entidad reparte el ",{b:"100% de los establecimientos"},
+    " de esa entidad (en ese GSE e indicador, y en su dependencia cuando se eligió una) en tres estados vs su propio GSE. Es ",{b:"% (n)"},
+    " de establecimientos, no una media de puntajes. Las filas de ",{b:"establecimiento"}," son un caso único: muestran su estado, no un reparto."];
+  const tituloComparadorExport=(grado,agno)=>ROT.cmpTitulo+" · "+(DATA.meta.grados[grado]||grado)+" · "+agno+(PRELIM.has(String(agno))?ROT.prelimParen:"");
+  const txtGseVisibles=visGse=>"Grupos socioeconómicos visibles: "+visGse.map(g=>GSE[g]||g).join(" · ")+". Los demás están ocultos en el segmentador.";
+  // Pie de las imágenes exportadas: la fuente del dato y el motor con la fecha de exportación, en dos líneas.
+  const piePaginaExport=()=>[ROT.pieFuente,(SLEP_FOCO_NOM?ROT.pieMotor+" · SLEP "+SLEP_FOCO_NOM+" · ":ROT.pieMotor+" · ")+ROT.pieExportado+
+    new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"})];
+
   // ===== s33s: trazado único de la barra apilada (decisión 20260925_decision_exportacion_imagen.md §4, parte A1) =====
   // Testigo de despliegue: "s33s: trazado único". trazarBarra es una funcion PURA que toma TODAS las decisiones de la
   // barra de estado vs GSE: los anchos (pctRound), que etiqueta "p% (n)" cabe dentro de su segmento (regla unica de s29,
@@ -1180,7 +1216,7 @@ __FONTS_CSS__
       ? {tipo:"n",texto:"N = "+fmt(N)+(basePeq?"*":""),piezas:["N = ",fmt(N),basePeq?"*":""],sep:sin>0?" · ":null,
          sin:sin>0?textoSin:null,piezasSin:sin>0?piezasSin:null,tituloSin:sin>0?tituloSin:null}
       : (sin>0 ? {tipo:"sin",texto:null,piezas:null,sep:null,sin:textoSin,piezasSin,tituloSin} : null);
-    if(N===0) return _cortarTrazado({vacia:true,N,sin,basePeq,nota,textoVacio:"sin dato",title:null,segmentos:[],externos:[],
+    if(N===0) return _cortarTrazado({vacia:true,N,sin,basePeq,nota,textoVacio:ROT.sinDato,title:null,segmentos:[],externos:[],
       aria:"Sin establecimientos con comparación válida"+(sin>0?"; "+sin+" con puntaje sin comparación válida":"")},anchoLinea,medir);
     const parts=pctRound([
       {k:"bajo",token:"--alerta",tokenTxt:"--alerta-txt",ancla:"izq",count:rep.bajo,lbl:"▼ bajo su GSE (significativo)"},
@@ -2033,7 +2069,7 @@ __FONTS_CSS__
   function CeldaEE({d}){
     // prom nulo => "sin dato" en cursiva; jamas un cero ni un guion.
     const k=claveEstadoEE(d);
-    if(k==="nd") return <span className="ee-nd">sin dato</span>;
+    if(k==="nd") return <span className="ee-nd">{ROT.sinDato}</span>;
     const st=EST_EE[k];
     return (
       <div className="ee-cell">
@@ -2094,14 +2130,14 @@ __FONTS_CSS__
         <div className="cmp-chrome">
           <div className="cmp-bar">
             <div className="cmp-bar-tt">
-              <span className="cmp-eyebrow">{(SLEP_FOCO_NOM?"SLEP "+SLEP_FOCO_NOM+" · ":"")+"Comparador IDPS"}</span>
-              <h3 className="cmp-title"><b>Comparación entre territorios</b> <span className="cmp-title-sub">por nivel y GSE</span></h3>
+              <span className="cmp-eyebrow">{cejaComparador()}</span>
+              <h3 className="cmp-title"><b>{ROT.cmpTitulo}</b> <span className="cmp-title-sub">por nivel y GSE</span></h3>
             </div>
             <div className="nivelsel"><span className="nivelsel-lab">Nivel</span>
               <div className="seg-lvl big">{grados.map(g=><button key={g} className={"lvl-b"+(g===cmpGrado?" on":"")} onClick={()=>onNivel(g)}>{DATA.meta.grados[g]}</button>)}</div></div>
           </div>
         </div>
-        <div className="cmp-noagg"><b>No se promedia ni se agrega.</b> Cada celda de entidad reparte el <b>100% de los establecimientos</b> de esa entidad (en ese GSE e indicador, y en su dependencia cuando se eligió una) en tres estados vs su propio GSE. Es <b>% (n)</b> de establecimientos, no una media de puntajes. Las filas de <b>establecimiento</b> son un caso único: muestran su estado, no un reparto.</div>
+        <div className="cmp-noagg">{pintarPiezas(NOAGG_CMP)}</div>
 
         <div className="cmp-controls">
           <span className="cmp-cl" tabIndex={-1}>Entidades a comparar · {cmpTerr.length} de {CMP_MAX_TERR}</span>
@@ -2184,10 +2220,10 @@ __FONTS_CSS__
               const ubic=x=>visGse.indexOf(x.gse)>gi?"se muestra más abajo":"se muestra más arriba";
               return (
               <section className="gse-sec" key={g}>
-                <div className="gse-sec-h"><span className="gse-sec-name">{GSE[g]||"sin clasificar"}</span><span className="gse-sec-sub">Grupo socioeconómico</span></div>
+                <div className="gse-sec-h"><span className="gse-sec-name">{nombreGse(g)}</span><span className="gse-sec-sub">{ROT.grupoSE}</span></div>
                 <div className="cmp-tscroll">
                   <table className="cmp-table">
-                    <thead><tr><th className="th-terr">Entidad</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
+                    <thead><tr><th className="th-terr">{ROT.entidad}</th>{DATA.indicadores.map(i=><th key={i.id} className="th-ind"><span className="th-sw" style={{background:i.color}}></span>{i.nombre}</th>)}</tr></thead>
                     <tbody>
                       {cmpTerrs.map((t,ti)=>(
                         <tr key={keyEnt(t)} className={t.kind==="nacional"?"row-nac":undefined}>
@@ -2202,7 +2238,7 @@ __FONTS_CSS__
                         return (
                         <tr key={keyEnt(t)} className={"row-ee"+(k===0?" row-ee-first":"")}>
                           <td className="td-terr">
-                            <span className="td-ee-k">Establecimiento</span>
+                            <span className="td-ee-k">{ROT.establecimiento}</span>
                             <span className="td-tn">{t.nom}</span>
                             <span className="td-ee-rbd">{piezasEECmp(t)}</span></td>
                           {DATA.indicadores.map(ind=><td key={ind.id}><CeldaEE d={dind[ind.id]}/></td>)}
@@ -2853,7 +2889,8 @@ __FONTS_CSS__
   // el mismo marcado del comparador (incluidos los fondos que el CSS da en literal): aqui no se escribe ninguno.
   // Universo de las cifras de la imagen: el texto de la banda .cmp-noagg de la pantalla, mas lo que en pantalla dicen el
   // title de la barra y la nota al pie (que N es el 100 % de la barra y que el "+k" queda fuera).
-  const TXT_UNIVERSO_CMP="No se promedia ni se agrega. Cada celda de entidad reparte el 100% de los establecimientos de esa entidad (en ese GSE e indicador, y en su dependencia cuando se eligió una) en tres estados vs su propio GSE. Es % (n) de establecimientos, no una media de puntajes. N es el número de establecimientos con comparación válida con su GSE (el 100 % de la barra); los que tienen puntaje sin comparación válida se cuentan aparte (+k), fuera del 100 %. Las filas de establecimiento son un caso único: muestran su estado, no un reparto.";
+  // s33t T1: sale de la banda de la pantalla (NOAGG_CMP) con la definición de N (ROT.nBarra) tras "no una media de puntajes.".
+  const TXT_UNIVERSO_CMP=textoPiezas(NOAGG_CMP).replace("no una media de puntajes. ","no una media de puntajes. "+ROT.nBarra+" ");
   const _SONDA_CMP='<div class="gse-sec"><div class="gse-sec-h"><span class="gse-sec-name">x</span><span class="gse-sec-sub">x</span></div>'+
     '<table class="cmp-table"><thead><tr><th class="th-terr">x</th><th class="th-ind">x</th></tr></thead><tbody>'+
     '<tr class="row-nac"><td class="td-terr"><span class="td-tn">x</span><span class="td-ee-rbd">x</span></td>'+
@@ -2935,12 +2972,11 @@ __FONTS_CSS__
     const bloque=(ls,r)=>{ const h=ls.length*lh(r); lineas(root,ls,PAD,y,r,{x:PAD,y,w:anchoUtil,h}); y+=h; };
 
     // Cabecera: quien, que, nivel y año, y el universo de cada cifra (el de la banda .cmp-noagg de la pantalla).
-    const nivel=DATA.meta.grados[grado]||grado;
-    bloque([(SLEP_FOCO_NOM?"SLEP "+SLEP_FOCO_NOM+" · ":"")+"Comparador IDPS"],CEJA); y+=4;
-    bloque(partir("Comparación entre territorios · "+nivel+" · "+agno+(PRELIM.has(String(agno))?" (preliminar)":""),anchoUtil,TIT),TIT); y+=6;
+    bloque([cejaComparador()],CEJA); y+=4;
+    bloque(partir(tituloComparadorExport(grado,agno),anchoUtil,TIT),TIT); y+=6;
     bloque(partir(TXT_UNIVERSO_CMP,anchoUtil,E.notaBp),E.notaBp);
     if(visGse.length<DATA.meta.gse.length)
-      bloque(partir("Grupos socioeconómicos visibles: "+visGse.map(g=>GSE[g]||g).join(" · ")+". Los demás están ocultos en el segmentador.",anchoUtil,E.notaBp),E.notaBp);
+      bloque(partir(txtGseVisibles(visGse),anchoUtil,E.notaBp),E.notaBp);
     y+=10;
     // Leyenda de estados (la misma de la pantalla: LEYENDA_ESTADO).
     { let lx=PAD; const h=lh(E.ley), cL={x:PAD,y,w:anchoUtil,h}, sw=10;
@@ -2984,7 +3020,7 @@ __FONTS_CSS__
     // Celda de establecimiento: lo que decide claveEstadoEE, pintado como CeldaEE (glifo, puntaje y estado).
     const pintarEE=(x,yc,d,celda)=>{
       const k=claveEstadoEE(d);
-      if(k==="nd"){ txt(root,"sin dato",x+W_COL/2,yc-lh(E.eeNd)/2,E.eeNd,celda,{anchor:"middle"}); return; }
+      if(k==="nd"){ txt(root,ROT.sinDato,x+W_COL/2,yc-lh(E.eeNd)/2,E.eeNd,celda,{anchor:"middle"}); return; }
       const st=EST_EE[k], G=E.eeGl[k], S=E.eeSt[k], anchoTxt=W_COL-G.diam-9;
       const stL=partir(st.txt,anchoTxt,S), pt=fmt(d.prom);
       const wTxt=Math.max(med(pt,E.eePt),...stL.map(l=>med(l,S))), hTxt=lh(E.eePt)+stL.length*lh(S);
@@ -3000,15 +3036,15 @@ __FONTS_CSS__
     visGse.forEach((g,gi)=>{
       if(gi>0) y+=16;
       // Banda del grupo (.gse-sec-h): nombre y "Grupo socioeconómico" en la misma linea base.
-      const hB=Math.round(lh(E.gseNom)+22), cB={x:PAD,y,w:anchoUtil,h:hB}, nomG=GSE[g]||"sin clasificar", yN=y+(hB-lh(E.gseNom))/2;
+      const hB=Math.round(lh(E.gseNom)+22), cB={x:PAD,y,w:anchoUtil,h:hB}, nomG=nombreGse(g), yN=y+(hB-lh(E.gseNom))/2;
       rect(root,{x:PAD,y,width:anchoUtil,height:hB},E.gseBanda);
       txt(root,nomG,PAD+18,yN,E.gseNom,cB);
-      txt(root,"Grupo socioeconómico",PAD+18+med(nomG,E.gseNom)+10,yN+(E.gseNom.px-E.gseSub.px)*BASE,E.gseSub,cB);
+      txt(root,ROT.grupoSE,PAD+18+med(nomG,E.gseNom)+10,yN+(E.gseNom.px-E.gseSub.px)*BASE,E.gseSub,cB);
       y+=hB;
       // Encabezado: "Entidad" y los cuatro indicadores con su muestra de color (paleta de indicadores, del payload).
       const cab=DATA.indicadores.map(ind=>partir(ind.nombre,W_COL-15,E.th));
       const hC=Math.max(...cab.map(l=>l.length))*lh(E.th)+16;
-      txt(root,"Entidad",X_ENT,y+(hC-lh(E.thEnt))/2,E.thEnt,{x:PAD,y,w:W_ENT,h:hC},{anchor:"end"});
+      txt(root,ROT.entidad,X_ENT,y+(hC-lh(E.thEnt))/2,E.thEnt,{x:PAD,y,w:W_ENT,h:hC},{anchor:"end"});
       DATA.indicadores.forEach((ind,i)=>{ const ls=cab[i], x=xCol(i), cC={x,y,w:W_COL,h:hC}, y0=y+(hC-ls.length*lh(E.th))/2;
         ls.forEach((l,li)=>{ const w=med(l,E.th)+(li===0?15:0), x0=x+(W_COL-w)/2;
           if(li===0){ rect(root,{x:x0,y:y0+(lh(E.th)-9)/2,width:9,height:9,rx:2},ind.color); txt(root,l,x0+15,y0,E.th,cC); }
@@ -3040,7 +3076,7 @@ __FONTS_CSS__
         if(_pinta(E.filaEE)) rect(root,{x:PAD,y,width:anchoUtil,height:hF},E.filaEE);
         if(primero) raya(root,PAD,y+1,PAD+anchoUtil,y+1,E.bordeEE,2);
         const cE={x:PAD,y,w:W_ENT,h:hF}, yE=y+(hF-hE)/2;
-        txt(root,"Establecimiento",X_ENT,yE,E.eeK,cE,{anchor:"end"});
+        txt(root,ROT.establecimiento,X_ENT,yE,E.eeK,cE,{anchor:"end"});
         lineas(root,nomL,X_ENT,yE+lh(E.eeK)+2,E.eeNom,cE,{anchor:"end"});
         lineas(root,subL,X_ENT,yE+lh(E.eeK)+2+nomL.length*lh(E.eeNom)+2,E.entSub,cE,{anchor:"end"});
         DATA.indicadores.forEach((ind,j)=>pintarEE(xCol(j),y+hF/2,dind[ind.id],{x:xCol(j),y,w:W_COL,h:hF}));
@@ -3051,9 +3087,7 @@ __FONTS_CSS__
     if(hayBasePeq){ y+=14; bloque(partir(TXT_NOTA_BP,anchoUtil,E.notaBp),E.notaBp); }
     // Pie: fuente del dato y del motor, con la fecha de exportacion (como el del radar).
     y+=16; raya(root,PAD,y,PAD+anchoUtil,y,COL_LINEA,1); y+=8;
-    bloque(partir("Indicadores de Desarrollo Personal y Social · Agencia de Calidad de la Educación",anchoUtil,PIE),PIE);
-    bloque(partir((SLEP_FOCO_NOM?"Motor IDPS · SLEP "+SLEP_FOCO_NOM+" · ":"Motor IDPS · ")+"Exportado el "+
-      new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"}),anchoUtil,PIE),PIE);
+    piePaginaExport().forEach(l=>bloque(partir(l,anchoUtil,PIE),PIE));
     const totalH=Math.ceil(y+PAD);
     root.setAttribute("height",totalH); root.setAttribute("viewBox","0 0 "+totalW+" "+totalH); fondo.setAttribute("height",totalH);
     const cajas=Array.from(root.querySelectorAll("text")).map(n=>celdas.get(n)||null);
