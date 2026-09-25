@@ -783,6 +783,26 @@ __FONTS_CSS__
     .vt-franja-cell::before{content:attr(data-yr);display:block;font-size:var(--fs-overline);color:var(--gris);font-weight:var(--fw-bold);}
     .vt-mx tbody th.vt-c-ee{min-width:170px;}
   }
+  /* s33o T3: impresión (decisión 20260925_decision_exportacion_imagen.md, alternativa C). Rige solo al
+     imprimir: A4 horizontal con márgenes de 12 mm (unos 1.032 px útiles, donde cabe la tabla del comparador
+     de 810 px). Se oculta lo que es navegación, pestaña, control, botón, buscador o modal; barras, muestras y
+     glifos conservan su color aunque la impresión no traiga los fondos; un bloque de GSE, una fila del
+     comparador o una tarjeta no se parten entre hojas; los contenedores con scroll horizontal se abren. */
+  @page{size:A4 landscape;margin:12mm;}
+  /* Entre beforeprint y afterprint (clase .imprimiendo, ver _remedirBarras) la pantalla toma el ancho util de
+     la hoja y el mismo .wrap de la impresion, para que las barras se re-midan al ancho con que se imprimen. */
+  html.imprimiendo body{width:1032px;}
+  html.imprimiendo .wrap{max-width:none;padding:0;}
+  @media print{
+    body{background:var(--paper);}
+    .app-nav,.tt,.modal-backdrop,.export-bar,.gse-filter-wrap,.picker-bar,.pan-nivel,.ficha-tools,.estab-search-wrap,
+    .vt-ctl,.cmp-bar .nivelsel,.cmp-x,.cmp-add,.cmp-reset,.sel-chip button,.sel-link,.nav-trigger,.icon-btn{display:none !important;}
+    header.app,header.app *,#root,#root *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .wrap{max-width:none;padding:0;}
+    .gse-sec,.cmp-table tr,.pan-dist-row,.card,.rcard,.vt-franja,.cmp-chip,.sel-chip{break-inside:avoid;}
+    :focus,:focus-visible{outline:none !important;}
+    .cmp-tscroll,.vt-scroll{overflow:visible !important;}
+  }
 </style>
 </head>
 <body>
@@ -1102,6 +1122,15 @@ __FONTS_CSS__
     : null;
   function observar(el,cb){ if(!el)return; _obsBarra.set(el,cb); if(_roBarra)_roBarra.observe(el); }
   function desobservar(el){ if(!el)return; _obsBarra.delete(el); if(_roBarra)_roBarra.unobserve(el); }
+  // s33o T3: impresión. El navegador arma la hoja sin correr el ResizeObserver, y las etiquetas "p% (n)"
+  // quedarían medidas al ancho de la pantalla (medido: 13 no caben en un comparador de 10 entidades). En
+  // beforeprint la pagina toma el ancho util de la hoja (A4 horizontal con 12 mm: 1.032 px) y las barras se
+  // re-miden con los mismos callbacks del observador, pintando en el acto; en afterprint se vuelve atras.
+  // La regla unica de etiquetado de s29 no cambia: lo que no cabe baja entero a la tira externa.
+  function _remedirBarras(){ const f=()=>_obsBarra.forEach((cb,el)=>cb(el.clientWidth));
+    if(typeof ReactDOM!=="undefined"&&ReactDOM.flushSync) ReactDOM.flushSync(f); else f(); }
+  window.addEventListener("beforeprint",()=>{document.documentElement.classList.add("imprimiendo");_remedirBarras();});
+  window.addEventListener("afterprint",()=>{document.documentElement.classList.remove("imprimiendo");_remedirBarras();});
 
   // Barra apilada 100% por estado vs GSE. Colores de ESTADO del motor
   // (alerta/gris/destaca), DISTINTOS de la paleta de 4 indicadores (invariante).
