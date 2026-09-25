@@ -15,7 +15,8 @@
 #
 # Insumos  : 40_salidas/intermedios/idps_largo.parquet (paso 34; NO se modifica).
 #            10_utils/10_configuracion.R (INDICADOR_LABELS -> eje_etiqueta).
-# Salidas  : 40_salidas/publico/contexto_idps.parquet (escritura atomica).
+# Salidas  : 40_salidas/publico/contexto_idps.parquet (escritura atomica; solo
+#            si cambio el contenido, sin contar periodo ni fecha_calculo: s33r).
 #
 # Invariantes respetados (🔒):
 #   - Banderas sigdif/sigdifgru leidas VERBATIM (34:273-275); aqui NO se
@@ -52,8 +53,12 @@ instalar_si_falta(c("here", "fs", "dplyr", "arrow", "rprojroot"))
 PROYECTO_ORIGEN   <- "slep_idps"     # contrato §3 col 12
 ESCALA_IDPS       <- "idps_prom"     # contrato §5 (puntaje del indicador 0-100)
 VERSION_CONTRATO  <- "contexto_v1"   # contrato §3 col 15 / §9
-PERIODO_CORRIDA   <- "2026-07"       # AAAA-MM de esta corrida (contrato §3 col 13)
 FAMILIA_ALCANCE   <- "indicador"     # contrato §8: la senal vs-GSE es solo indicador
+
+# periodo = "periodo de la corrida que genero el parquet, formato AAAA-MM"
+# (contrato §3 col 13): se deriva de la fecha de corrida, no se escribe a mano
+# (D-2 de s33q; s33r).
+PERIODO_CORRIDA   <- format(Sys.Date(), "%Y-%m")
 
 # Orden EXACTO de las 15 columnas (contrato §3). No alterar.
 COLS_CONTRATO <- c(
@@ -61,6 +66,11 @@ COLS_CONTRATO <- c(
   "valor", "desvio_gse", "mejora_sobre_gse", "mejora_ano_ano",
   "cod_grupo", "proyecto_origen", "periodo", "fecha_calculo", "version_contrato"
 )
+
+# Metadatos de la corrida (contrato §3 cols 13 y 14) y llave natural (§3). Un
+# parquet que solo difiere en los metadatos NO se reescribe (s33r).
+COLS_METADATOS_CORRIDA <- c("periodo", "fecha_calculo")
+LLAVE_CONTRATO         <- c("rbd", "anio", "eje", "segmento")
 
 # Ruta de salida (centralizada; contrato §10).
 dir_publico <- ruta_salidas("publico")
@@ -83,6 +93,25 @@ escribir_parquet_atomico <- function(df, ruta_final) {
 # Mapea una bandera tri-estado {-1,0,1,NA} al booleano de mejora del contrato:
 # TRUE solo si == 1; 0, -1 y NA -> FALSE. Idioma que NO propaga NA (contrato §6).
 bandera_a_mejora <- function(x) !is.na(x) & x == 1L
+
+# Contenido del contrato sin los metadatos de la corrida: data frame base
+# ordenado por la llave natural, sin nombres de fila.
+sin_metadatos_corrida <- function(df) {
+  df <- as.data.frame(df)[, setdiff(COLS_CONTRATO, COLS_METADATOS_CORRIDA)]
+  df <- df[do.call(order, unname(as.list(df[, LLAVE_CONTRATO]))), ]
+  rownames(df) <- NULL
+  df
+}
+
+# TRUE si el parquet vigente trae las 15 columnas del contrato, en su orden, y
+# el mismo contenido que `nuevo` salvo periodo y fecha_calculo (identical()
+# estricto). Si no existe o no se puede leer: FALSE, y se escribe como siempre.
+contenido_sin_cambios <- function(ruta, nuevo) {
+  if (!fs::file_exists(ruta)) return(FALSE)
+  previo <- tryCatch(arrow::read_parquet(ruta), error = function(e) NULL)
+  if (is.null(previo) || !identical(names(previo), COLS_CONTRATO)) return(FALSE)
+  identical(sin_metadatos_corrida(previo), sin_metadatos_corrida(nuevo))
+}
 
 
 # ============================================================================
@@ -153,10 +182,19 @@ stopifnot(
     !any(duplicated(contexto[, c("rbd", "anio", "eje", "segmento")]))
 )
 
-# --- Escritura atomica (contrato §10) ---------------------------------------
-escribir_parquet_atomico(contexto, RUTA_SALIDA)
+# --- Escritura atomica (contrato §10), solo si cambio el contenido (s33r) ----
+# Si el contenido es el mismo, el archivo vigente se conserva con sus metadatos
+# (periodo y fecha_calculo dicen cuando se genero ese contenido) y el build no
+# ensucia el arbol.
+if (contenido_sin_cambios(RUTA_SALIDA, contexto)) {
+  message(sprintf(
+    "[36_contexto] Contenido sin cambios (salvo periodo y fecha_calculo): se conserva %s; no se reescribe.",
+    fs::path_rel(RUTA_SALIDA, here::here())))
+} else {
+  escribir_parquet_atomico(contexto, RUTA_SALIDA)
 
-log_msg(sprintf("OK: %d filas x %d columnas en %s.",
-                nrow(contexto), ncol(contexto),
-                fs::path_rel(RUTA_SALIDA, here::here())),
-        "INFO", "36_contexto")
+  log_msg(sprintf("OK: %d filas x %d columnas en %s.",
+                  nrow(contexto), ncol(contexto),
+                  fs::path_rel(RUTA_SALIDA, here::here())),
+          "INFO", "36_contexto")
+}
