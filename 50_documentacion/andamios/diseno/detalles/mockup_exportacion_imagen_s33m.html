@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exportación de imagen: tres alternativas</title>
+<!--
+  Mockup de s33m (T2, pendiente 7 / P-EXPORTACION-IMAGEN). Autocontenido: sin librerías, sin fuentes externas y sin
+  ninguna referencia de red. Datos: conteos de territorio (SLEP Costa Central, 4° básico, año más reciente) tomados de
+  la réplica en R de T1 (50_documentacion/andamios/diseno/detalles/20260924_diagnostico_base_pequena.R); no hay datos
+  de establecimientos. El diagnóstico que acompaña este mockup es 20260924_diagnostico_exportacion_imagen.md.
+  Este archivo no recomienda una alternativa: la decisión es del titular.
+-->
+<style id="estilos">
+  :root{
+    /* Tokens copiados del :root del motor (35_motor_template.html): paleta de ESTADO y sus -txt, tinta y fondos. */
+    --azul:#0A3A5C; --tinta:#23303a; --gris:#5C666E; --linea:#e4dcc6; --panel:#fffdf7; --paper:#ffffff;
+    --cream:#FFF6E0; --cream-200:#f4e9cc;
+    --alerta:#EE2D49; --st-neutro:#7E8A99; --destaca:#2A8FD9;
+    --alerta-txt:#CE112C; --st-neutro-txt:#5F6A78; --destaca-txt:#1E6EA9;
+    /* Paleta de los 4 indicadores (INDICADOR_COLORS de 35_generar_motor_html.R). */
+    --ind1:#3858A3; --ind2:#61BDC6; --ind3:#4BA560; --ind4:#AACB58;
+    /* El motor usa Museo Sans y gobCL embebidas; el mockup usa la pila del sistema (la misma del SVG exportado del motor). */
+    --fuente:system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--tinta);font-family:var(--fuente);font-size:14px;line-height:1.45;}
+  .cab{max-width:1320px;margin:0 auto;padding:24px 16px 8px;}
+  .cab h1{margin:0 0 6px;font-size:22px;color:var(--azul);line-height:1.25;}
+  .cab p{margin:6px 0;max-width:980px;}
+  .cab .nota{color:var(--gris);font-size:13px;}
+  .alts{max-width:1320px;margin:0 auto;padding:8px 16px 16px;display:grid;gap:16px;grid-template-columns:1fr;}
+  @media (min-width:2000px){ .alts{max-width:none;grid-template-columns:repeat(3,minmax(0,1fr));} .alts .par{grid-template-columns:1fr;} }
+  .alt{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:16px;min-width:0;}
+  .alt h2{margin:0;font-size:18px;color:var(--azul);}
+  .alt-sub{margin:4px 0 12px;color:var(--gris);}
+  .par{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,580px),1fr));}
+  .bloque{min-width:0;}
+  .bloque-h{font-weight:700;font-size:13px;letter-spacing:.04em;color:var(--gris);margin-bottom:6px;}
+  .marco{background:var(--paper);border:1px solid var(--linea);border-radius:8px;padding:10px;overflow-x:auto;}
+  .acciones{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+  .acciones button{appearance:none;border:1px solid var(--azul);background:var(--paper);color:var(--azul);font:600 13px var(--fuente);padding:6px 12px;border-radius:6px;cursor:pointer;}
+  .acciones button:hover{background:var(--cream);}
+  .acciones button:focus-visible{outline:2px solid var(--azul);outline-offset:2px;}
+  .salida img{display:block;max-width:100%;height:auto;}
+  .estado{margin:6px 0 0;font-size:12.5px;color:var(--gris);}
+  .estado b{color:var(--tinta);}
+  .estado .mal{color:var(--alerta-txt);font-weight:700;}
+  #a-pantalla{display:block;width:100%;max-width:560px;height:auto;}
+  .resumen{max-width:1320px;margin:0 auto;padding:0 16px 32px;}
+  .resumen h2{font-size:18px;color:var(--azul);margin:8px 0;}
+  .resumen .tscroll{overflow-x:auto;}
+  .resumen table{border-collapse:collapse;width:100%;min-width:720px;background:var(--paper);font-size:13px;}
+  .resumen th,.resumen td{border:1px solid var(--linea);padding:8px;text-align:left;vertical-align:top;}
+  .resumen th{background:var(--cream-200);}
+
+  /* ===== La sección del comparador en HTML (pantalla de B y de C; así dibuja hoy el motor) ===== */
+  .seccion{width:560px;background:var(--paper);color:var(--tinta);font-family:var(--fuente);}
+  .sec-tit{font-size:15px;color:var(--azul);}
+  .sec-sub{font-size:12px;color:var(--gris);margin-top:2px;}
+  .leyenda{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0 10px;font-size:12px;}
+  .leyenda span{display:inline-flex;align-items:center;gap:5px;}
+  .leyenda i{display:inline-block;width:12px;height:12px;border-radius:2px;}
+  .fila-h,.fila{display:grid;grid-template-columns:112px repeat(4,104px);column-gap:8px;align-items:start;}
+  .fila-h{font-size:12px;font-weight:700;color:var(--gris);padding-bottom:6px;border-bottom:1.5px solid var(--linea);}
+  .fila-h .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;}
+  .gse-bloque{padding-top:8px;}
+  .gse-h{font-size:13px;font-weight:700;margin-bottom:4px;}
+  .gse-h span{font-weight:400;color:var(--gris);}
+  .c-ent{font-size:12.5px;font-weight:600;padding-top:5px;}
+  .s100{display:flex;height:26px;border-radius:3px;overflow:hidden;border:1px solid var(--linea);background:var(--cream-200);}
+  .s100-seg{display:flex;align-items:center;justify-content:center;min-width:0;}
+  .s100-seg span{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;}
+  .s100-empty{align-items:center;justify-content:center;}
+  .s100-nd{font-size:12px;color:var(--gris);font-style:italic;}
+  .s100-ext{display:flex;flex-wrap:wrap;gap:0 8px;margin-top:2px;font-size:11px;font-weight:700;line-height:1.3;}
+  .ext-bajo{color:var(--alerta-txt);} .ext-neutro{color:var(--st-neutro-txt);} .ext-sobre{color:var(--destaca-txt);}
+  .s100-sin{font-size:11px;color:var(--gris);margin-top:1px;}
+  .pie{margin-top:12px;padding-top:6px;border-top:1px solid var(--linea);font-size:11px;color:var(--gris);}
+
+  /* ===== C: la hoja de impresión (vista previa) ===== */
+  .hoja{position:relative;width:100%;max-width:560px;aspect-ratio:210/297;background:#fff;border:1px solid var(--linea);box-shadow:0 2px 8px rgba(0,0,0,.12);overflow:hidden;margin:0 auto;}
+  .hoja-in{position:absolute;left:0;top:0;width:794px;height:1123px;transform-origin:0 0;padding:45px;}
+
+  /* ===== C: reglas de impresión (lo que la alternativa C agregaría al motor) ===== */
+  @page{size:A4;margin:12mm;}
+  @media print{
+    body{background:#fff;}
+    .no-print{display:none !important;}
+    .alts,.alt,.par,.bloque,.marco{display:block;border:0;border-radius:0;padding:0;margin:0;background:#fff;box-shadow:none;overflow:visible;max-width:none;}
+    .s100,.s100-seg,.leyenda i,.fila-h .sw{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .gse-bloque{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<!-- Elemento SVG en línea: de él se toma el espacio de nombres SVG (namespaceURI) sin escribir su URI en este archivo. -->
+<svg id="ns-svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"></svg>
+
+<header class="cab no-print">
+  <h1>Exportación de imagen del comparador: tres alternativas</h1>
+  <p>Una sección del comparador (una entidad, cinco GSE, cuatro indicadores) dibujada con cada alternativa, y a su lado el archivo que produce. Datos: <b id="datos-ref"></b>, conteos por GSE e indicador de la réplica de T1 (sin datos de establecimientos).</p>
+  <p class="nota">Tipografía del sistema en las tres columnas; el motor usa Museo Sans y gobCL embebidas (ver el diagnóstico, alternativa B). Los botones descargan archivos reales generados en este navegador. Este mockup no recomienda: presenta las tres para que el titular elija mirando.</p>
+</header>
+
+<main class="alts">
+  <section class="alt no-print" id="alt-a" aria-labelledby="h-a">
+    <h2 id="h-a">A · Redibujar en SVG</h2>
+    <p class="alt-sub">Un solo dibujante: la misma función (<code>dibujarSeccionEnGrupo</code>) dibuja la pantalla y la imagen, como el panorama del proyecto hermano.</p>
+    <div class="par">
+      <div class="bloque">
+        <div class="bloque-h">En pantalla (SVG)</div>
+        <div class="marco">
+          <div class="sec-tit" id="a-tit"></div>
+          <div class="sec-sub">Reparto de establecimientos por estado vs su GSE · % (n)</div>
+          <div class="leyenda" data-leyenda></div>
+          <svg id="a-pantalla" role="img" aria-labelledby="a-tit"></svg>
+        </div>
+      </div>
+      <div class="bloque">
+        <div class="bloque-h">Archivo que produce (PNG a 2x, desde el mismo SVG)</div>
+        <div class="acciones"><button type="button" id="a-svg">Descargar SVG</button><button type="button" id="a-png">Descargar PNG</button></div>
+        <div class="marco salida"><img id="a-img" alt="Imagen exportada con la alternativa A"></div>
+        <p class="estado" id="a-estado">Generando…</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt no-print" id="alt-b" aria-labelledby="h-b">
+    <h2 id="h-b">B · HTML en pantalla, imagen con foreignObject</h2>
+    <p class="alt-sub">La pantalla no cambia (HTML, como hoy). Al exportar, se clona la sección con sus estilos calculados dentro de un <code>&lt;foreignObject&gt;</code> de un SVG, y de ese SVG sale el PNG.</p>
+    <div class="par">
+      <div class="bloque">
+        <div class="bloque-h">En pantalla (HTML, como el motor hoy)</div>
+        <div class="marco"><div id="b-pantalla"></div></div>
+      </div>
+      <div class="bloque">
+        <div class="bloque-h">Archivo que produce (PNG a 2x, desde el SVG con foreignObject)</div>
+        <div class="acciones"><button type="button" id="b-svg">Descargar SVG</button><button type="button" id="b-png">Descargar PNG</button></div>
+        <div class="marco salida"><img id="b-img" alt="Imagen exportada con la alternativa B"></div>
+        <p class="estado" id="b-estado">Generando…</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="alt-c" aria-labelledby="h-c">
+    <h2 id="h-c" class="no-print">C · Sin imagen: impresión limpia</h2>
+    <p class="alt-sub no-print">No se exporta imagen. Reglas <code>@media print</code> para que "Imprimir → Guardar como PDF" deje una hoja con la sección, sin menús ni botones, con los colores de las barras.</p>
+    <div class="par">
+      <div class="bloque">
+        <div class="bloque-h no-print">En pantalla (HTML, como el motor hoy)</div>
+        <div class="marco"><div id="c-imprimible"></div></div>
+      </div>
+      <div class="bloque no-print">
+        <div class="bloque-h">Archivo que produce (PDF desde el diálogo de impresión; vista previa de la hoja A4)</div>
+        <div class="acciones"><button type="button" id="c-print">Imprimir o guardar como PDF</button></div>
+        <div class="marco salida"><div class="hoja" id="c-hoja"><div class="hoja-in" id="c-hoja-in"></div></div></div>
+        <p class="estado" id="c-estado">La hoja se arma con las mismas reglas de impresión de este archivo.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section class="resumen no-print" aria-labelledby="h-r">
+  <h2 id="h-r">Qué implica cada una en el motor</h2>
+  <div class="tscroll"><table>
+    <thead><tr><th>Alternativa</th><th>Qué cambia en el motor</th><th>Riesgo para la pantalla actual</th><th>Qué produce</th></tr></thead>
+    <tbody>
+      <tr><td><b>A</b> · SVG</td><td>Se reescribe <code>StackedBar</code> (barra, regla de etiquetado, tira externa, nota "sin") como dibujante SVG que recibe un <code>&lt;g&gt;</code>; exportador nuevo del comparador y del panorama.</td><td>Alto: <code>StackedBar</code> dibuja el comparador, el panorama (Vista actual) y la franja de la vista histórica.</td><td>SVG editable y PNG, iguales a la pantalla por construcción.</td></tr>
+      <tr><td><b>B</b> · foreignObject</td><td>Solo un exportador nuevo (clonar con estilos, envolver, rasterizar); la pantalla no se toca.</td><td>Bajo sobre la pantalla; el riesgo está en la imagen (tipografía, SVG que otros programas no dibujan, navegadores).</td><td>PNG; el SVG solo se ve bien en navegadores.</td></tr>
+      <tr><td><b>C</b> · impresión</td><td>Un bloque <code>@media print</code> (y, si se quiere, un botón que llame a imprimir).</td><td>Nulo sobre la pantalla (las reglas solo rigen al imprimir).</td><td>PDF del navegador; no hay imagen para pegar en una presentación.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<script>
+// Datos generados en R por /tmp/s33m_t2_datos.R desde la réplica de T1 (no se editan a mano).
+const DATOS = {"entidad":"SLEP Costa Central","nivel":"4° básico","agno":2025,"gse":["Bajo","Medio bajo","Medio","Medio alto","Alto"],"indicadores":["Autoestima Académica y Motivación Escolar","Clima de Convivencia Escolar","Participación y Formación Ciudadana","Hábitos de Vida Saludable"],"celdas":[[{"bajo":6,"neutro":3,"sobre":1,"sin":0},{"bajo":6,"neutro":2,"sobre":2,"sin":0},{"bajo":5,"neutro":4,"sobre":1,"sin":0},{"bajo":4,"neutro":5,"sobre":1,"sin":0}],[{"bajo":4,"neutro":15,"sobre":2,"sin":0},{"bajo":9,"neutro":10,"sobre":2,"sin":0},{"bajo":6,"neutro":10,"sobre":5,"sin":0},{"bajo":8,"neutro":10,"sobre":3,"sin":0}],[{"bajo":9,"neutro":15,"sobre":2,"sin":2},{"bajo":11,"neutro":13,"sobre":1,"sin":2},{"bajo":10,"neutro":12,"sobre":4,"sin":2},{"bajo":10,"neutro":15,"sobre":1,"sin":2}],[{"bajo":0,"neutro":1,"sobre":0,"sin":0},{"bajo":0,"neutro":0,"sobre":1,"sin":0},{"bajo":0,"neutro":1,"sobre":0,"sin":0},{"bajo":0,"neutro":1,"sobre":0,"sin":0}],[{"bajo":0,"neutro":0,"sobre":0,"sin":0},{"bajo":0,"neutro":0,"sobre":0,"sin":0},{"bajo":0,"neutro":0,"sobre":0,"sin":0},{"bajo":0,"neutro":0,"sobre":0,"sin":0}]]};
+(function () {
+  "use strict";
+  // ---------------------------------------------------------------------------
+  // Constantes de la sección (idénticas para A, B y C: mismo ancho, mismas decisiones de etiquetado).
+  // ---------------------------------------------------------------------------
+  const ANCHO = 560, ENT_W = 112, GAP = 8, BAR_W = (ANCHO - ENT_W - 4 * GAP) / 4, BAR_H = 26, HOLGURA = 12;
+  const IND_CORTO = ["Autoestima", "Convivencia", "Participación", "Hábitos"];
+  const SVG_NS = document.getElementById("ns-svg").namespaceURI;           // sin escribir el URI en el archivo
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const FUENTE = css("--fuente");
+  const EST = [
+    { k: "bajo", g: "▼", tok: "--alerta", txt: "--alerta-txt", lbl: "▼ bajo su GSE" },
+    { k: "neutro", g: "=", tok: "--st-neutro", txt: "--st-neutro-txt", lbl: "= sin diferencia" },
+    { k: "sobre", g: "▲", tok: "--destaca", txt: "--destaca-txt", lbl: "▲ sobre su GSE" }];
+  const fmt = n => Number(n).toLocaleString("es-CL");
+  const nEE = n => fmt(n) + (n === 1 ? " establecimiento" : " establecimientos");
+  const titulo = "Comparador IDPS · " + DATOS.entidad + " · " + DATOS.nivel + " " + DATOS.agno;
+  const pieTxt = "Fuente: Agencia de Calidad de la Educación, IDPS · conteos de territorio · mockup s33m";
+
+  // Medición real del texto (canvas), como la regla de etiquetado de s29 del motor.
+  const ctx = document.createElement("canvas").getContext("2d");
+  const medir = (t, peso, px) => { ctx.font = peso + " " + px + "px " + FUENTE; return ctx.measureText(t).width; };
+
+  // repartoInd + pctRound del motor: N = bajo + neutro + sobre; 'sin' queda fuera del 100 %.
+  function reparto(c) {
+    const N = c.bajo + c.neutro + c.sobre;
+    const partes = EST.map(e => ({ ...e, count: c[e.k], raw: N ? c[e.k] / N * 100 : 0 }));
+    partes.forEach(p => { p.p = Math.floor(p.raw); });
+    let rem = 100 - partes.reduce((a, p) => a + p.p, 0);
+    const orden = [...partes].sort((a, b) => (b.raw - b.p) - (a.raw - a.p));
+    for (let i = 0; N && i < rem; i++) orden[i % orden.length].p++;
+    // Regla única de etiquetado: "p% (n)" dentro solo si cabe entero con holgura; si no, baja entero a la tira externa.
+    partes.forEach(p => { p.full = p.p + "% (" + fmt(p.count) + ")"; p.cabe = medir(p.full, 700, 12) + HOLGURA <= BAR_W * p.p / 100; });
+    return { N, sin: c.sin, partes };
+  }
+
+  // ---------------------------------------------------------------------------
+  // A · Dibujante SVG único: recibe un <g> de destino y devuelve la altura usada.
+  //     Lo usan la pantalla (a-pantalla) y el exportador (construirSvgA).
+  // ---------------------------------------------------------------------------
+  const el = (tag, at, padre) => { const n = document.createElementNS(SVG_NS, tag); Object.keys(at || {}).forEach(k => n.setAttribute(k, at[k])); if (padre) padre.appendChild(n); return n; };
+  const tx = (t, at, padre) => { const n = el("text", Object.assign({ "font-family": FUENTE }, at), padre); n.textContent = t; return n; };
+  // El SVG no parte líneas solo (el HTML sí): el dibujante mide y parte por palabras. Devuelve las líneas.
+  function partir(t, peso, px, ancho) { const out = []; let l = "";
+    t.split(" ").forEach(w => { const c = l ? l + " " + w : w; if (l && medir(c, peso, px) > ancho) { out.push(l); l = w; } else l = c; });
+    if (l) out.push(l); return out; }
+  function txLineas(lineas, at, dy, padre) { const n = tx("", at, padre);
+    lineas.forEach((l, i) => { const s = el("tspan", { x: at.x, dy: i === 0 ? 0 : dy }, n); s.textContent = l; }); return n; }
+  function barraSvg(g, x, y, c, id) {
+    const r = reparto(c), b = el("g", { transform: "translate(" + x + "," + y + ")" }, g);
+    el("title", {}, b).textContent = r.N === 0 ? "Sin establecimientos con comparación válida" : "100% = " + nEE(r.N) + " con comparación válida";
+    let h = BAR_H;
+    if (r.N === 0) {
+      el("rect", { x: 0.5, y: 0.5, width: BAR_W - 1, height: BAR_H - 1, rx: 3, fill: css("--cream-200"), stroke: css("--linea") }, b);
+      tx("sin dato", { x: BAR_W / 2, y: BAR_H / 2 + 4, "text-anchor": "middle", "font-size": 12, "font-style": "italic", fill: css("--gris") }, b);
+    } else {
+      const clip = el("clipPath", { id: id }, b); el("rect", { x: 0, y: 0, width: BAR_W, height: BAR_H, rx: 3 }, clip);
+      const s = el("g", { "clip-path": "url(#" + id + ")" }, b); let cx = 0; const fuera = [];
+      r.partes.forEach(p => { if (p.p === 0) return; const w = BAR_W * p.p / 100;
+        el("rect", { x: cx, y: 0, width: w, height: BAR_H, fill: css(p.tok) }, s);
+        if (p.cabe) tx(p.full, { x: cx + w / 2, y: BAR_H / 2 + 4, "text-anchor": "middle", "font-size": 12, "font-weight": 700, fill: "#ffffff" }, s); else fuera.push(p);
+        cx += w; });
+      el("rect", { x: 0.5, y: 0.5, width: BAR_W - 1, height: BAR_H - 1, rx: 3, fill: "none", stroke: css("--linea") }, b);
+      let lx = 0, ly = BAR_H + 13;
+      fuera.forEach(p => { const t = p.g + " " + p.full, w = medir(t, 700, 11);
+        if (lx > 0 && lx + w > BAR_W) { lx = 0; ly += 14; }
+        tx(t, { x: lx, y: ly, "font-size": 11, "font-weight": 700, fill: css(p.txt) }, b); lx += w + 8; });
+      if (fuera.length) h = ly + 3;
+    }
+    if (r.sin > 0) { const ls = partir("+" + fmt(r.sin) + " sin comparación válida", 400, 11, BAR_W);
+      txLineas(ls, { x: 0, y: h + 13, "font-size": 11, fill: css("--gris") }, 14, b); h += 13 + 14 * (ls.length - 1) + 3; }
+    return h;
+  }
+  function dibujarSeccionEnGrupo(g, d, pref) {
+    let y = 12;
+    tx("Entidad", { x: 0, y: y, "font-size": 12, "font-weight": 700, fill: css("--gris") }, g);
+    IND_CORTO.forEach((n, i) => { const x = ENT_W + GAP + i * (BAR_W + GAP);
+      el("rect", { x: x, y: y - 9, width: 9, height: 9, rx: 2, fill: css("--ind" + (i + 1)) }, g);
+      tx(n, { x: x + 13, y: y, "font-size": 12, "font-weight": 700, fill: css("--gris") }, g); });
+    y += 7; el("line", { x1: 0, y1: y, x2: ANCHO, y2: y, stroke: css("--linea"), "stroke-width": 1.5 }, g);
+    d.gse.forEach((gs, gi) => {
+      y += 22; const t = tx(gs, { x: 0, y: y, "font-size": 13, "font-weight": 700, fill: css("--tinta") }, g);
+      const ts = el("tspan", { "font-weight": 400, fill: css("--gris") }, t); ts.textContent = " · grupo socioeconómico";
+      y += 8; const le = partir(d.entidad, 600, 12.5, ENT_W - 4);
+      txLineas(le, { x: 0, y: y + 17, "font-size": 12.5, "font-weight": 600, fill: css("--tinta") }, 16, g);
+      let alto = Math.max(BAR_H, 17 + 16 * (le.length - 1) + 4);
+      d.celdas[gi].forEach((c, i) => { alto = Math.max(alto, barraSvg(g, ENT_W + GAP + i * (BAR_W + GAP), y, c, pref + "-" + gi + "-" + i)); });
+      y += alto;
+    });
+    return y + 4;
+  }
+  function construirSvgA() {
+    const PAD = 20, CAB = 74, PIE = 34, g0 = el("g", {});
+    const hSec = dibujarSeccionEnGrupo(g0, DATOS, "ax");
+    const W = ANCHO + 2 * PAD, H = Math.ceil(CAB + hSec + PIE);
+    const root = el("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H });
+    el("rect", { x: 0, y: 0, width: W, height: H, fill: css("--paper") }, root);
+    tx(titulo, { x: PAD, y: 30, "font-size": 15, "font-weight": 700, fill: css("--azul") }, root);
+    tx("Reparto de establecimientos por estado vs su GSE · % (n)", { x: PAD, y: 48, "font-size": 12, fill: css("--gris") }, root);
+    let lx = PAD; EST.forEach(e => { el("rect", { x: lx, y: 57, width: 12, height: 12, rx: 2, fill: css(e.tok) }, root);
+      tx(e.lbl, { x: lx + 17, y: 67, "font-size": 12, fill: css("--tinta") }, root); lx += 17 + medir(e.lbl, 400, 12) + 14; });
+    g0.setAttribute("transform", "translate(" + PAD + "," + CAB + ")"); root.appendChild(g0);
+    el("line", { x1: PAD, y1: H - PIE + 6, x2: W - PAD, y2: H - PIE + 6, stroke: css("--linea") }, root);
+    tx(pieTxt, { x: PAD, y: H - 12, "font-size": 11, fill: css("--gris") }, root);
+    return { svgStr: new XMLSerializer().serializeToString(root), W, H };
+  }
+
+  // ---------------------------------------------------------------------------
+  // B y C · La sección en HTML (así dibuja hoy el motor: divs con width en %).
+  // ---------------------------------------------------------------------------
+  const h = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+  function barraHtml(c) {
+    const r = reparto(c), w = h("div", "s100-wrap");
+    if (r.N === 0) { const b = h("div", "s100 s100-empty"); b.setAttribute("role", "img"); b.setAttribute("aria-label", "Sin establecimientos con comparación válida");
+      b.appendChild(h("span", "s100-nd", "sin dato")); w.appendChild(b); }
+    else { const b = h("div", "s100"), fuera = [];
+      b.setAttribute("role", "img"); b.setAttribute("title", "100% = " + nEE(r.N) + " con comparación válida");
+      b.setAttribute("aria-label", "Distribución de " + nEE(r.N) + " con comparación válida: " + r.partes.map(p => p.lbl + " " + p.count + " (" + p.p + "%)").join("; "));
+      r.partes.forEach(p => { if (p.p === 0) return; const s = h("div", "s100-seg"); s.style.width = p.p + "%"; s.style.background = "var(" + p.tok + ")"; s.setAttribute("aria-hidden", "true");
+        if (p.cabe) s.appendChild(h("span", null, p.full)); else fuera.push(p); b.appendChild(s); });
+      w.appendChild(b);
+      if (fuera.length) { const e = h("div", "s100-ext"); fuera.forEach(p => e.appendChild(h("span", "ext-" + p.k, p.g + " " + p.full))); w.appendChild(e); } }
+    if (r.sin > 0) w.appendChild(h("div", "s100-sin", "+" + fmt(r.sin) + " sin comparación válida"));
+    return w;
+  }
+  function llenarLeyenda(n) { EST.forEach(e => { const s = h("span"); const i = h("i"); i.style.background = "var(" + e.tok + ")"; s.appendChild(i); s.appendChild(document.createTextNode(e.lbl)); n.appendChild(s); }); }
+  function seccionHtml(d) {
+    const s = h("div", "seccion");
+    const t = h("div", "sec-tit"); t.appendChild(h("b", null, "Comparador IDPS")); t.appendChild(document.createTextNode(" · " + d.entidad + " · " + d.nivel + " " + d.agno)); s.appendChild(t);
+    s.appendChild(h("div", "sec-sub", "Reparto de establecimientos por estado vs su GSE · % (n)"));
+    const l = h("div", "leyenda"); llenarLeyenda(l); s.appendChild(l);
+    const fh = h("div", "fila-h"); fh.appendChild(h("div", "c-ent", "Entidad"));
+    IND_CORTO.forEach((n, i) => { const c = h("div", "c-ind"); const sw = h("span", "sw"); sw.style.background = "var(--ind" + (i + 1) + ")"; c.appendChild(sw); c.appendChild(document.createTextNode(n)); fh.appendChild(c); });
+    s.appendChild(fh);
+    d.gse.forEach((gs, gi) => { const b = h("div", "gse-bloque"); const gh = h("div", "gse-h", gs); gh.appendChild(h("span", null, " · grupo socioeconómico")); b.appendChild(gh);
+      const f = h("div", "fila"); f.appendChild(h("div", "c-ent", d.entidad)); d.celdas[gi].forEach(c => { const cc = h("div", "c-bar"); cc.appendChild(barraHtml(c)); f.appendChild(cc); }); b.appendChild(f); s.appendChild(b); });
+    s.appendChild(h("div", "pie", pieTxt));
+    return s;
+  }
+
+  // B · Clonar con estilos calculados y envolver en <foreignObject>.
+  const PROPS = ["display", "position", "box-sizing", "width", "height", "min-width", "margin-top", "margin-right", "margin-bottom", "margin-left",
+    "padding-top", "padding-right", "padding-bottom", "padding-left", "border-top", "border-right", "border-bottom", "border-left", "border-radius",
+    "background-color", "color", "font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "text-align",
+    "white-space", "overflow", "flex-wrap", "flex-direction", "align-items", "justify-content", "column-gap", "row-gap",
+    "grid-template-columns", "vertical-align", "opacity"];
+  function clonarConEstilos(vivo) {
+    const copia = vivo.cloneNode(true), av = [vivo, ...vivo.querySelectorAll("*")], ac = [copia, ...copia.querySelectorAll("*")];
+    av.forEach((n, i) => { const cs = getComputedStyle(n); ac[i].setAttribute("style", PROPS.map(p => p + ":" + cs.getPropertyValue(p)).join(";")); ac[i].removeAttribute("class"); });
+    return copia;
+  }
+  function construirSvgB(nodo) {
+    const W = Math.ceil(nodo.offsetWidth) + 40, H = Math.ceil(nodo.offsetHeight) + 40;
+    const root = el("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H });
+    el("rect", { x: 0, y: 0, width: W, height: H, fill: css("--paper") }, root);
+    const fo = el("foreignObject", { x: 20, y: 20, width: W - 40, height: H - 40 }, root);
+    fo.appendChild(clonarConEstilos(nodo));
+    return { svgStr: new XMLSerializer().serializeToString(root), W, H };
+  }
+
+  // Rasterizador común (patrón del motor y del hermano: SVG -> <img> -> canvas 2x -> PNG).
+  const ESCALA = 2;
+  function rasterizar(svgStr, W, H, via) {
+    return new Promise((ok, mal) => {
+      const img = new Image();
+      const url = via === "data" ? "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgStr) : URL.createObjectURL(new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" }));
+      img.onload = () => { try { const cv = document.createElement("canvas"); cv.width = W * ESCALA; cv.height = H * ESCALA;
+          const c = cv.getContext("2d"); c.scale(ESCALA, ESCALA); c.drawImage(img, 0, 0, W, H);
+          cv.toBlob(b => { if (via !== "data") URL.revokeObjectURL(url); b ? ok(b) : mal(new Error("toBlob devolvió null")); }, "image/png");
+        } catch (e) { if (via !== "data") URL.revokeObjectURL(url); mal(e); } };
+      img.onerror = () => { if (via !== "data") URL.revokeObjectURL(url); mal(new Error("el navegador no pudo cargar el SVG como imagen")); };
+      img.src = url;
+    });
+  }
+  async function aPng(svgStr, W, H) {
+    try { return { blob: await rasterizar(svgStr, W, H, "blob"), via: "URL blob" }; }
+    catch (e1) { try { return { blob: await rasterizar(svgStr, W, H, "data"), via: "URL data (tras fallar la URL blob: " + e1.message + ")" }; }
+      catch (e2) { return { error: e1.name + ": " + e1.message + " | " + e2.name + ": " + e2.message }; } }
+  }
+  function descargar(blob, nombre) { const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = nombre; a.click(); setTimeout(() => URL.revokeObjectURL(u), 0); }
+  const kb = n => (n / 1024).toLocaleString("es-CL", { maximumFractionDigits: 1 }) + " KB";
+
+  async function prepararSalida(clave, construir, nombre) {
+    const est = document.getElementById(clave + "-estado"), img = document.getElementById(clave + "-img");
+    const r = construir(), svgBlob = new Blob([r.svgStr], { type: "image/svg+xml;charset=utf-8" });
+    const png = await aPng(r.svgStr, r.W, r.H);
+    document.getElementById(clave + "-svg").onclick = () => descargar(svgBlob, nombre + ".svg");
+    const bPng = document.getElementById(clave + "-png");
+    if (png.blob) { img.src = URL.createObjectURL(png.blob); bPng.onclick = () => descargar(png.blob, nombre + ".png");
+      est.innerHTML = "<b>SVG</b> " + kb(svgBlob.size) + " · <b>PNG</b> 2x " + kb(png.blob.size) + " (" + r.W * ESCALA + " × " + r.H * ESCALA + " px) · rasterizado por " + png.via + ".";
+    } else { img.src = URL.createObjectURL(svgBlob); bPng.disabled = true;
+      est.innerHTML = "<b>SVG</b> " + kb(svgBlob.size) + " (vista previa del SVG) · <span class=\"mal\">PNG no generado: " + png.error + "</span>"; }
+    return { clave, svg: svgBlob.size, png: png.blob ? png.blob.size : null, via: png.via || null, error: png.error || null, W: r.W, H: r.H };
+  }
+
+  // C · Vista previa de la hoja: la misma sección, en una hoja A4 (794 × 1123 px a 96 ppp, márgenes de 12 mm).
+  function ajustarHoja() { const hoja = document.getElementById("c-hoja"), inn = document.getElementById("c-hoja-in"); inn.style.transform = "scale(" + (hoja.clientWidth / 794) + ")"; }
+
+  // ---------------------------------------------------------------------------
+  // Montaje
+  // ---------------------------------------------------------------------------
+  document.getElementById("datos-ref").textContent = DATOS.entidad + ", " + DATOS.nivel + " " + DATOS.agno;
+  document.getElementById("a-tit").textContent = titulo;
+  document.querySelectorAll("[data-leyenda]").forEach(llenarLeyenda);
+  const svgA = document.getElementById("a-pantalla"), gA = el("g", {}, svgA), hA = dibujarSeccionEnGrupo(gA, DATOS, "ap");
+  svgA.setAttribute("viewBox", "0 0 " + ANCHO + " " + Math.ceil(hA)); svgA.setAttribute("width", ANCHO);
+  const secB = seccionHtml(DATOS); document.getElementById("b-pantalla").appendChild(secB);
+  document.getElementById("c-imprimible").appendChild(seccionHtml(DATOS));
+  document.getElementById("c-hoja-in").appendChild(seccionHtml(DATOS));
+  ajustarHoja(); window.addEventListener("resize", ajustarHoja);
+  document.getElementById("c-print").onclick = () => window.print();
+  window.__listo = Promise.all([prepararSalida("a", construirSvgA, "mockup_s33m_A"), prepararSalida("b", () => construirSvgB(secB), "mockup_s33m_B")]);
+})();
+</script>
+</body>
+</html>
