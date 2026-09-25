@@ -398,3 +398,7 @@ obtenido: control `RUT 1 | RBD con número 1`; LOG `RUT 0 | RBD con número 0`; 
 ## Cierre
 
 Encargo s33n cerrado: matriz entregada y auditada (APROBADO CON ADVERTENCIAS, 0/1/3), hermanos intactos por este encargo, 9 de 9 Opus usados, 27 dudas con pregunta cerrada para el titular.
+
+## Adenda de cierre: push retenido
+
+- `git -C /Users/tomgc/Projects/slep_idps push origin main` (ejecutado solo, tras `174cf1e`, con porcelain vacío y `HEAD..origin/main` = 0) **no se ejecutó**: lo denegó el clasificador de permisos del modo automático de Claude Code ("Out-of-Place Publication"). No se intentó ninguna otra vía. Quedan **locales** los commits `085e147`, `30ecfa8`, `52966df`, `174cf1e` y este `docs(log)`; `origin/main` sigue en `d41e31a`. **Queda al titular:** `git -C /Users/tomgc/Projects/slep_idps push origin main` (en esta sesión, `! git -C /Users/tomgc/Projects/slep_idps push origin main`).
