@@ -16,7 +16,8 @@
 # Insumos  : 40_salidas/intermedios/idps_largo.parquet (paso 34; NO se modifica).
 #            10_utils/10_configuracion.R (INDICADOR_LABELS -> eje_etiqueta).
 # Salidas  : 40_salidas/publico/contexto_idps.parquet (escritura atomica; solo
-#            si cambio el contenido, sin contar periodo ni fecha_calculo: s33r).
+#            si cambio el contenido, sin contar periodo ni fecha_calculo: s33r;
+#            o siempre, con IDPS_CONTEXTO_FORZAR=1 en el entorno: s33t).
 #
 # Invariantes respetados (🔒):
 #   - Banderas sigdif/sigdifgru leidas VERBATIM (34:273-275); aqui NO se
@@ -55,10 +56,19 @@ ESCALA_IDPS       <- "idps_prom"     # contrato §5 (puntaje del indicador 0-100
 VERSION_CONTRATO  <- "contexto_v1"   # contrato §3 col 15 / §9
 FAMILIA_ALCANCE   <- "indicador"     # contrato §8: la senal vs-GSE es solo indicador
 
-# periodo = "periodo de la corrida que genero el parquet, formato AAAA-MM"
-# (contrato §3 col 13): se deriva de la fecha de corrida, no se escribe a mano
-# (D-2 de s33q; s33r).
-PERIODO_CORRIDA   <- format(Sys.Date(), "%Y-%m")
+# Fecha de la corrida, leida UNA sola vez (D-2 de s33r): de ella salen periodo
+# ("periodo de la corrida que genero el parquet, formato AAAA-MM", contrato §3
+# col 13; se deriva, no se escribe a mano: D-2 de s33q, s33r) y fecha_calculo
+# (§3 col 14). Asi las dos no pueden quedar en meses distintos si la corrida
+# cruza la medianoche de un fin de mes.
+FECHA_CORRIDA     <- Sys.Date()
+PERIODO_CORRIDA   <- format(FECHA_CORRIDA, "%Y-%m")
+
+# Escritura forzada (D-1 de s33r): con IDPS_CONTEXTO_FORZAR=1 en el entorno, el
+# parquet se reescribe aunque su contenido no haya cambiado, para renovar
+# periodo y fecha_calculo (contrato §3 cols 13 y 14). Sin la variable rige la
+# regla de s33r: solo se reescribe si cambio el contenido.
+FORZAR_ESCRITURA  <- identical(Sys.getenv("IDPS_CONTEXTO_FORZAR"), "1")
 
 # Orden EXACTO de las 15 columnas (contrato §3). No alterar.
 COLS_CONTRATO <- c(
@@ -151,7 +161,7 @@ contexto <- base_ind |>
     cod_grupo        = as.character(cod_grupo),
     proyecto_origen  = PROYECTO_ORIGEN,
     periodo          = PERIODO_CORRIDA,
-    fecha_calculo    = Sys.Date(),
+    fecha_calculo    = FECHA_CORRIDA,
     version_contrato = VERSION_CONTRATO
   )
 
@@ -185,12 +195,20 @@ stopifnot(
 # --- Escritura atomica (contrato §10), solo si cambio el contenido (s33r) ----
 # Si el contenido es el mismo, el archivo vigente se conserva con sus metadatos
 # (periodo y fecha_calculo dicen cuando se genero ese contenido) y el build no
-# ensucia el arbol.
-if (contenido_sin_cambios(RUTA_SALIDA, contexto)) {
+# ensucia el arbol; con IDPS_CONTEXTO_FORZAR=1 se reescribe igual (s33t).
+sin_cambios <- contenido_sin_cambios(RUTA_SALIDA, contexto)
+if (sin_cambios && !FORZAR_ESCRITURA) {
   message(sprintf(
     "[36_contexto] Contenido sin cambios (salvo periodo y fecha_calculo): se conserva %s; no se reescribe.",
     fs::path_rel(RUTA_SALIDA, here::here())))
 } else {
+  if (FORZAR_ESCRITURA) {
+    message(sprintf(
+      "[36_contexto] IDPS_CONTEXTO_FORZAR=1: se reescribe %s (contenido sin periodo ni fecha_calculo: %s; periodo %s, fecha_calculo %s).",
+      fs::path_rel(RUTA_SALIDA, here::here()),
+      if (sin_cambios) "igual al vigente" else "distinto del vigente",
+      PERIODO_CORRIDA, format(FECHA_CORRIDA)))
+  }
   escribir_parquet_atomico(contexto, RUTA_SALIDA)
 
   log_msg(sprintf("OK: %d filas x %d columnas en %s.",
