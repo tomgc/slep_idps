@@ -1164,6 +1164,42 @@ __FONTS_CSS__
   const piePaginaExport=()=>[ROT.pieFuente,(SLEP_FOCO_NOM?ROT.pieMotor+" · SLEP "+SLEP_FOCO_NOM+" · ":ROT.pieMotor+" · ")+ROT.pieExportado+
     new Date().toLocaleDateString("es-CL",{day:"2-digit",month:"long",year:"numeric"})];
 
+  // s33t T2: rótulos del panorama (vista actual y franja de la vista histórica), en el mismo lugar.
+  Object.assign(ROT,{
+    panCeja:"Panorama territorial",
+    subGsePan:" · grupo socioeconómico",
+    distPan:"Distribución por estado vs su GSE",
+    cienBarra:"El 100 % de cada barra son los establecimientos con comparación válida con su GSE; los que tienen puntaje sin comparación válida se cuentan aparte (+k), fuera del 100 %.",
+    franjaTit:"Estado vs su GSE, por año",
+    sinEstadoNivel:"La Agencia no publica el estado vs GSE en ningún año de este nivel.",
+    antesEstado:": la Agencia no publicó el estado vs GSE. ",
+    franjaPie:"En cada año, el estado de un establecimiento se mide contra el GSE que tenía ese año.",
+    sinClasificarMay:"Sin clasificar",
+    subGseUlt:"GSE de su último año con GSE publicado",
+    subSinGse:"sin GSE publicado en ningún año",
+    prelimNota:"* resultado preliminar"});
+  const cejaPanorama=()=>(SLEP_FOCO_NOM?"SLEP "+SLEP_FOCO_NOM+" · ":"")+ROT.panCeja;
+  // Línea de metadatos del panorama (.pan-meta), en las piezas de su JSX; vista actual o histórica.
+  const piezasMetaPan=({esSlep,nComunas,hist,n,grado,nGseVis,anioIni,agno,depNom})=>
+    (!esSlep?[nCom(nComunas)," · "]:[]).concat(hist
+      ? [nEE(n)," con resultado en algún año · ",DATA.meta.grados[grado]," · ",nGseVis," de ",DATA.meta.gse.length," GSE · ",anioIni,"–",agno,PRELIM.has(String(agno))?"*":""]
+      : [nEE(n)," en el nivel seleccionado · ",DATA.meta.grados[grado]," · ",nGseVis," de ",DATA.meta.gse.length," GSE · ",agno,PRELIM.has(String(agno))?ROT.prelimParen:""],
+      [depNom?" · dependencia: "+depNom:""]);
+  // Ayuda de la vista actual (.help), en piezas; con o sin la frase de la grilla (la imagen no lleva la grilla).
+  const helpPanorama=conGrilla=>[{b:"Panorama del territorio sin agregar."}," El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por ",{b:"estado vs su GSE"}," (leído de la Agencia)",
+    conGrilla?" y la grilla para abrir el Panorama IDPS de cada uno. ":". ","Las barras son ",{b:"% (n) de establecimientos, nunca un promedio"},"."];
+  // Universo de la franja de la vista histórica en la imagen (la pantalla lo dice en su ayuda, junto a la matriz).
+  const txtFranjaUniverso=aniosEstado=>"Sobre cada grupo, cómo se reparten sus establecimientos por estado vs su GSE en los años en que la Agencia lo publica"+
+    (aniosEstado.length?" ("+listaY(aniosEstado)+")":"")+". Las barras son % (n) de establecimientos, nunca un promedio. "+ROT.cienBarra;
+  // Secciones por GSE: nombre (la vista histórica tiene su propio grupo "Sin clasificar") y línea bajo el nombre, en piezas.
+  const nombreGseHist=g=>g==="sin"?ROT.sinClasificarMay:(GSE[g]||g);
+  const piezasSubGsePan=n=>[nEE(n),ROT.subGsePan];
+  const piezasSubGseHist=(g,n)=>[nEE(n)," · ",g==="sin"?ROT.subSinGse:ROT.subGseUlt];
+  // Franja: el año de cada columna (con "*" si es preliminar), su pie y los establecimientos de un grupo con fila ese año.
+  const piezasAnioFranja=y=>[y,PRELIM.has(String(y))?"*":""];
+  const piezasPieFranja=antesEstado=>[antesEstado?antesEstado+ROT.antesEstado:"",ROT.franjaPie];
+  const itemsFranja=(items,y)=>items.filter(r=>Object.prototype.hasOwnProperty.call(r.anios,y));
+
   // ===== s33s: trazado único de la barra apilada (decisión 20260925_decision_exportacion_imagen.md §4, parte A1) =====
   // Testigo de despliegue: "s33s: trazado único". trazarBarra es una funcion PURA que toma TODAS las decisiones de la
   // barra de estado vs GSE: los anchos (pctRound), que etiqueta "p% (n)" cabe dentro de su segmento (regla unica de s29,
@@ -2522,8 +2558,11 @@ __FONTS_CSS__
     // ("Region de Valparaiso" frente a la misma region acotada a Municipal) y la
     // seleccion de GSE (los cinco grupos frente a solo Bajo). El sufijo de GSE se
     // omite cuando estan todos, que es el caso de apertura.
-    descargarCSV(filasPanoramaCSV(args),"idps_panorama_"+slugArchivo(args.nomArchivoTerr)+
-      "_"+slugArchivo(args.grado)+"_"+args.agno+sufijoGse(args.gseSel)+".csv");
+    descargarCSV(filasPanoramaCSV(args),baseArchivoPanorama(args)+".csv");
+  }
+  // s33t T2: nombre base de los archivos del panorama, vista actual (el CSV y la imagen, con .svg o .png).
+  function baseArchivoPanorama(args){
+    return "idps_panorama_"+slugArchivo(args.nomArchivoTerr)+"_"+slugArchivo(args.grado)+"_"+args.agno+sufijoGse(args.gseSel);
   }
   // s33e: el sufijo sale de aqui para que el CSV de la vista historica use el mismo.
   function sufijoGse(gseSel){
@@ -2569,8 +2608,12 @@ __FONTS_CSS__
     if(!confirmarTamano(nFilasHistorico(args),args.glosaTerr)) return;
     // s33f: "Sin clasificar" no entra en sufijoGse (no esta en DATA.meta.gse); si la vista
     // tiene ese grupo y esta oculto, el universo cambia y el nombre lo marca.
-    descargarCSV(filasHistoricoCSV(args),"idps_panorama_historico_"+slugArchivo(args.nomArchivoTerr)+
-      "_"+slugArchivo(args.grado)+sufijoGse(args.gseSel)+(args.sinExcluido?"_sin_clasificar_excluido":"")+".csv");
+    descargarCSV(filasHistoricoCSV(args),baseArchivoHistorico(args)+".csv");
+  }
+  // s33t T2: nombre base de los archivos de la vista historica (el CSV y la imagen, con .svg o .png).
+  function baseArchivoHistorico(args){
+    return "idps_panorama_historico_"+slugArchivo(args.nomArchivoTerr)+"_"+slugArchivo(args.grado)+sufijoGse(args.gseSel)+
+      (args.sinExcluido?"_sin_clasificar_excluido":"");
   }
 
   // ===== Fase 3 (s30) — CSV de la ficha de establecimiento =====
@@ -2877,6 +2920,77 @@ __FONTS_CSS__
     rasterizarSvgAPng(r);
   }
 
+  // ===== s33t T2: herramientas comunes de las imágenes SVG (comparador y panorama) =====
+  // Testigo de despliegue: "s33t: exportación del panorama". Lo que vivía dentro de construirSvgComparador (medir con la
+  // fuente del archivo, partir por palabras, ubicar cada texto en su celda, pintar una barra desde trazarBarra, la leyenda)
+  // pasa aquí sin cambios para que las tres imágenes lo compartan; el SVG del comparador sale igual (PRUEBAS e de s33t).
+  const SVG_LH=1.25, SVG_BASE=0.97, SVG_BAR_H=26;   // alto de linea y linea base (em) de todo texto; alto de la barra (.s100)
+  function _herramientasSvg(E){
+    const med=(t,r)=>{ _ctxMed.font=(r.estilo==="italic"?"italic ":"")+r.peso+" "+r.px+"px "+SVG_FUENTE;
+      return _ctxMed.measureText(String(t)).width; };
+    const ROL={seg:E.seg,ext:E.ext,nota:E.nota};
+    const medirArchivo=(t,rol)=>med(t,ROL[rol]);
+    const lh=r=>r.px*SVG_LH;
+    // Parte por palabras para que cada linea quepa en `ancho`; una palabra sola que no cabe se recorta con "…".
+    const partir=(txt,ancho,r)=>{ const ls=[]; let l="";
+      String(txt).split(" ").forEach(w=>{ const c=l?l+" "+w:w; if(l && med(c,r)>ancho){ ls.push(l); l=w; } else l=c; });
+      if(l) ls.push(l);
+      return ls.map(x=>{ if(med(x,r)<=ancho) return x; let y=x; while(y.length>1 && med(y+"…",r)>ancho) y=y.slice(0,-1); return y+"…"; }); };
+    // Cada texto se registra con la celda de la que no puede salir (la usa la verificacion, con getBBox).
+    const celdas=new Map();
+    const txt=(padre,s,x,yTop,r,caja,opc)=>{ const o=opc||{};
+      const at={x:x.toFixed(2),y:(yTop+r.px*SVG_BASE).toFixed(2),"font-family":SVG_FUENTE,"font-size":r.px,"font-weight":r.peso};
+      if(r.estilo==="italic") at["font-style"]="italic";
+      if(o.anchor) at["text-anchor"]=o.anchor;
+      const n=svgTxt(s,at,padre); _ponColor(n,"fill",o.color||r.color); celdas.set(n,caja); return n; };
+    const lineas=(padre,ls,x,yTop,r,caja,opc)=>{ ls.forEach((l,i)=>txt(padre,l,x,yTop+i*lh(r),r,caja,opc)); return ls.length*lh(r); };
+    const rect=(padre,at,fill)=>{ const n=svgEl("rect",at,padre); if(fill) _ponColor(n,"fill",fill); return n; };
+    const raya=(padre,x1,y1,x2,y2,color,grosor)=>svgEl("line",{x1,y1,x2,y2,stroke:color,"stroke-width":grosor},padre);
+    const titulo=(nodo,s)=>{ svgEl("title",{},nodo).textContent=s; };
+    return {med,medirArchivo,lh,partir,celdas,txt,lineas,rect,raya,titulo};
+  }
+  // Alto que ocupa una barra con su tira y su nota (lo que decidio trazarBarra).
+  const _altoBarraSvg=(H,E,t)=>SVG_BAR_H+(t.externos.length?3+t.lineasTira.length*H.lh(E.ext)+(t.lineasTira.length-1)*2:0)
+    +(t.nota?3+t.nota.lineas.length*H.lh(E.nota):0);
+  // Una barra: lo que decide trazarBarra, pintado con rect y text. `celda`: la caja de la columna en la fila; `W`: el
+  // ancho exterior de la barra; `nuevoId`: el id del recorte (solo las barras con segmentos lo piden).
+  function _pintarBarraSvg(H,E,padre,x,yb,t,celda,W,nuevoId){
+    const {txt,lineas,rect,titulo,lh}=H, BAR_H=SVG_BAR_H, RAD=parseFloat(tokenCSS("--radius-2"))||0;
+    const b=svgEl("g",{},padre); titulo(b,t.title||t.aria); svgEl("desc",{},b).textContent=t.aria;
+    rect(b,{x:x+0.5,y:yb+0.5,width:W-1,height:BAR_H-1,rx:RAD},E.barraFondo);
+    if(t.vacia){ txt(b,t.textoVacio,x+W/2,yb+(BAR_H-lh(E.nd))/2,E.nd,{x,y:yb,w:W,h:BAR_H},{anchor:"middle"}); }
+    else {
+      const id=nuevoId(), cp=svgEl("clipPath",{id},b);
+      svgEl("rect",{x:x+1,y:yb+1,width:W-2,height:BAR_H-2,rx:Math.max(0,RAD-1)},cp);
+      const s=svgEl("g",{"clip-path":"url(#"+id+")"},b); let cx=x+1;
+      t.segmentos.forEach(sg=>{ const r=rect(s,{x:cx.toFixed(2),y:yb+1,width:sg.ancho.toFixed(2),height:BAR_H-2},tokenCSS(sg.token)); titulo(r,sg.title);
+        if(sg.etiqueta) txt(s,sg.etiqueta,cx+sg.ancho/2,yb+(BAR_H-lh(E.seg))/2,E.seg,{x:cx,y:yb+1,w:sg.ancho,h:BAR_H-2},{anchor:"middle"});
+        cx+=sg.ancho; });
+    }
+    svgEl("rect",{x:x+0.5,y:yb+0.5,width:W-1,height:BAR_H-1,rx:RAD,fill:"none",stroke:E.barraBorde,"stroke-width":1},b);
+    let yy=yb+BAR_H;
+    if(t.externos.length){ yy+=3;
+      t.lineasTira.forEach((ln,li)=>{ if(li>0) yy+=2;
+        // Como .s100-ext: margenes automaticos segun el ancla de cada item (bajo empuja a su derecha, sobre a su
+        // izquierda, el neutro a los dos lados), con el gap de la tira entre items.
+        const libre=W-ln.reduce((a,it)=>a+it.ancho,0)-GAP_TIRA*(ln.length-1);
+        const autos=ln.reduce((a,it)=>a+(t.externos[it.i].ancla==="centro"?2:1),0), q=Math.max(0,libre)/autos;
+        let lx=x;
+        ln.forEach(it=>{ const e=t.externos[it.i]; if(e.ancla!=="izq") lx+=q;
+          const gi=svgEl("g",{},b); titulo(gi,e.title); txt(gi,e.texto,lx,yy,E.ext,celda,{color:tokenCSS(e.tokenTxt)});
+          lx+=it.ancho+GAP_TIRA; if(e.ancla!=="der") lx+=q; });
+        yy+=lh(E.ext); }); }
+    if(t.nota){ yy+=3; const gn=svgEl("g",{},b); if(t.nota.tituloSin) titulo(gn,t.nota.tituloSin);
+      yy+=lineas(gn,t.nota.lineas,x,yy,E.nota,celda); }
+  }
+  // Leyenda de estados (la misma de la pantalla: LEYENDA_ESTADO); devuelve el alto que ocupa.
+  function _leyendaSvg(H,E,padre,x,y,w){
+    const {lh,rect,txt,med}=H; let lx=x; const h=lh(E.ley), cL={x,y,w,h}, sw=10;
+    LEYENDA_ESTADO.forEach(e=>{ rect(padre,{x:lx,y:y+(h-sw)/2,width:sw,height:sw,rx:2},tokenCSS(e.token));
+      txt(padre,e.txt,lx+sw+4,y,E.ley,cL); lx+=sw+4+med(e.txt,E.ley)+14; });
+    return h+14;
+  }
+
   // ===== s33s T2 — imagen (SVG y PNG) del comparador =====
   // Testigo de despliegue: "s33s: exportación del comparador". Decision 20260925_decision_exportacion_imagen.md §4 (A1):
   // trazado unico, pila del sistema (SVG_FUENTE), techo del PNG con aviso (el de rasterizarSvgAPng, como el radar) y el
@@ -2931,8 +3045,8 @@ __FONTS_CSS__
     const E=_estilosComparador();
     // Geometria del archivo, en px. Ancho = el del comparador en una ventana de 1.280 px (1.150): columna de entidad
     // de 190 y cuatro columnas de 210 separadas por 18; la barra mide 26 de alto, como .s100.
-    const PAD=24, W_ENT=190, W_COL=210, GAP=18, BAR_H=26, PAD_Y=10, RAD=parseFloat(tokenCSS("--radius-2"))||0;
-    const LH=1.25, BASE=0.97;   // alto de linea y posicion de la linea base, en em, de todo texto del archivo
+    const PAD=24, W_ENT=190, W_COL=210, GAP=18, PAD_Y=10;
+    const BASE=SVG_BASE;   // posicion de la linea base, en em, de todo texto del archivo (alto de linea: SVG_LH)
     const totalW=PAD*2+W_ENT+4*(GAP+W_COL), anchoUtil=totalW-PAD*2;
     const xCol=i=>PAD+W_ENT+GAP+i*(W_COL+GAP);
     // Los textos de la columna de entidad van alineados a la derecha con 2 px de margen interior: el trazo de algunas
@@ -2944,27 +3058,7 @@ __FONTS_CSS__
     const TIT=R(px("--fs-h3"),tokenCSS("--fw-heavy"),tokenCSS("--azul"));
     const PIE=R(px("--fs-overline"),tokenCSS("--fw-regular"),tokenCSS("--gris"));
     const COL_LINEA=tokenCSS("--linea");
-    const med=(t,r)=>{ _ctxMed.font=(r.estilo==="italic"?"italic ":"")+r.peso+" "+r.px+"px "+SVG_FUENTE;
-      return _ctxMed.measureText(String(t)).width; };
-    const ROL={seg:E.seg,ext:E.ext,nota:E.nota};
-    const medirArchivo=(t,rol)=>med(t,ROL[rol]);
-    const lh=r=>r.px*LH;
-    // Parte por palabras para que cada linea quepa en `ancho`; una palabra sola que no cabe se recorta con "…".
-    const partir=(txt,ancho,r)=>{ const ls=[]; let l="";
-      String(txt).split(" ").forEach(w=>{ const c=l?l+" "+w:w; if(l && med(c,r)>ancho){ ls.push(l); l=w; } else l=c; });
-      if(l) ls.push(l);
-      return ls.map(x=>{ if(med(x,r)<=ancho) return x; let y=x; while(y.length>1 && med(y+"…",r)>ancho) y=y.slice(0,-1); return y+"…"; }); };
-    // Cada texto se registra con la celda de la que no puede salir (la usa la verificacion, con getBBox).
-    const celdas=new Map();
-    const txt=(padre,s,x,yTop,r,caja,opc)=>{ const o=opc||{};
-      const at={x:x.toFixed(2),y:(yTop+r.px*BASE).toFixed(2),"font-family":SVG_FUENTE,"font-size":r.px,"font-weight":r.peso};
-      if(r.estilo==="italic") at["font-style"]="italic";
-      if(o.anchor) at["text-anchor"]=o.anchor;
-      const n=svgTxt(s,at,padre); _ponColor(n,"fill",o.color||r.color); celdas.set(n,caja); return n; };
-    const lineas=(padre,ls,x,yTop,r,caja,opc)=>{ ls.forEach((l,i)=>txt(padre,l,x,yTop+i*lh(r),r,caja,opc)); return ls.length*lh(r); };
-    const rect=(padre,at,fill)=>{ const n=svgEl("rect",at,padre); if(fill) _ponColor(n,"fill",fill); return n; };
-    const raya=(padre,x1,y1,x2,y2,color,grosor)=>svgEl("line",{x1,y1,x2,y2,stroke:color,"stroke-width":grosor},padre);
-    const titulo=(nodo,s)=>{ svgEl("title",{},nodo).textContent=s; };
+    const H=_herramientasSvg(E), {med,medirArchivo,lh,partir,celdas,txt,lineas,rect,raya,titulo}=H;
 
     const root=svgEl("svg",{width:totalW});
     const fondo=rect(root,{x:0,y:0,width:totalW},tokenCSS("--panel"));
@@ -2979,44 +3073,13 @@ __FONTS_CSS__
       bloque(partir(txtGseVisibles(visGse),anchoUtil,E.notaBp),E.notaBp);
     y+=10;
     // Leyenda de estados (la misma de la pantalla: LEYENDA_ESTADO).
-    { let lx=PAD; const h=lh(E.ley), cL={x:PAD,y,w:anchoUtil,h}, sw=10;
-      LEYENDA_ESTADO.forEach(e=>{ rect(root,{x:lx,y:y+(h-sw)/2,width:sw,height:sw,rx:2},tokenCSS(e.token));
-        txt(root,e.txt,lx+sw+4,y,E.ley,cL); lx+=sw+4+med(e.txt,E.ley)+14; });
-      y+=h+14; }
+    y+=_leyendaSvg(H,E,root,PAD,y,anchoUtil);
 
     const trazar=rep=>trazarBarra({rep,conN:true,ancho:W_COL-2,medir:medirArchivo,anchoLinea:W_COL});
-    const altoBarra=t=>BAR_H+(t.externos.length?3+t.lineasTira.length*lh(E.ext)+(t.lineasTira.length-1)*2:0)
-      +(t.nota?3+t.nota.lineas.length*lh(E.nota):0);
+    const altoBarra=t=>_altoBarraSvg(H,E,t);
     let nClip=0, hayBasePeq=false;
-    // Una barra: lo que decide trazarBarra, pintado con rect y text. `celda`: la caja de la columna en la fila.
-    const pintarBarra=(x,yb,t,celda)=>{
-      const b=svgEl("g",{},root); titulo(b,t.title||t.aria); svgEl("desc",{},b).textContent=t.aria;
-      rect(b,{x:x+0.5,y:yb+0.5,width:W_COL-1,height:BAR_H-1,rx:RAD},E.barraFondo);
-      if(t.vacia){ txt(b,t.textoVacio,x+W_COL/2,yb+(BAR_H-lh(E.nd))/2,E.nd,{x,y:yb,w:W_COL,h:BAR_H},{anchor:"middle"}); }
-      else {
-        const id="cmp-barra-"+(nClip++), cp=svgEl("clipPath",{id},b);
-        svgEl("rect",{x:x+1,y:yb+1,width:W_COL-2,height:BAR_H-2,rx:Math.max(0,RAD-1)},cp);
-        const s=svgEl("g",{"clip-path":"url(#"+id+")"},b); let cx=x+1;
-        t.segmentos.forEach(sg=>{ const r=rect(s,{x:cx.toFixed(2),y:yb+1,width:sg.ancho.toFixed(2),height:BAR_H-2},tokenCSS(sg.token)); titulo(r,sg.title);
-          if(sg.etiqueta) txt(s,sg.etiqueta,cx+sg.ancho/2,yb+(BAR_H-lh(E.seg))/2,E.seg,{x:cx,y:yb+1,w:sg.ancho,h:BAR_H-2},{anchor:"middle"});
-          cx+=sg.ancho; });
-      }
-      svgEl("rect",{x:x+0.5,y:yb+0.5,width:W_COL-1,height:BAR_H-1,rx:RAD,fill:"none",stroke:E.barraBorde,"stroke-width":1},b);
-      let yy=yb+BAR_H;
-      if(t.externos.length){ yy+=3;
-        t.lineasTira.forEach((ln,li)=>{ if(li>0) yy+=2;
-          // Como .s100-ext: margenes automaticos segun el ancla de cada item (bajo empuja a su derecha, sobre a su
-          // izquierda, el neutro a los dos lados), con el gap de la tira entre items.
-          const libre=W_COL-ln.reduce((a,it)=>a+it.ancho,0)-GAP_TIRA*(ln.length-1);
-          const autos=ln.reduce((a,it)=>a+(t.externos[it.i].ancla==="centro"?2:1),0), q=Math.max(0,libre)/autos;
-          let lx=x;
-          ln.forEach(it=>{ const e=t.externos[it.i]; if(e.ancla!=="izq") lx+=q;
-            const gi=svgEl("g",{},b); titulo(gi,e.title); txt(gi,e.texto,lx,yy,E.ext,celda,{color:tokenCSS(e.tokenTxt)});
-            lx+=it.ancho+GAP_TIRA; if(e.ancla!=="der") lx+=q; });
-          yy+=lh(E.ext); }); }
-      if(t.nota){ yy+=3; const gn=svgEl("g",{},b); if(t.nota.tituloSin) titulo(gn,t.nota.tituloSin);
-        yy+=lineas(gn,t.nota.lineas,x,yy,E.nota,celda); }
-    };
+    // Una barra: lo que decide trazarBarra, pintado por _pintarBarraSvg. `celda`: la caja de la columna en la fila.
+    const pintarBarra=(x,yb,t,celda)=>_pintarBarraSvg(H,E,root,x,yb,t,celda,W_COL,()=>"cmp-barra-"+(nClip++));
     // Celda de establecimiento: lo que decide claveEstadoEE, pintado como CeldaEE (glifo, puntaje y estado).
     const pintarEE=(x,yc,d,celda)=>{
       const k=claveEstadoEE(d);
@@ -3098,6 +3161,146 @@ __FONTS_CSS__
     descargarBlob(new Blob([r.svgStr],{type:"image/svg+xml;charset=utf-8"}),r.fnameBase+".svg");
   }
   function exportarComparadorPNG(args){ rasterizarSvgAPng(construirSvgComparador(args)); }
+
+  // ===== s33t T2 — imagen (SVG y PNG) del panorama (parte A2 de la decisión de exportación) =====
+  // Decision 20260925_decision_exportacion_imagen.md §4 (A2): franjas por GSE de la vista actual, sin la grilla de
+  // tarjetas (es navegacion), y franja de la vista historica, sin la matriz. Regla de fidelidad de s30: cada constructor
+  // recibe los MISMOS arreglos con los que la pantalla dibuja (grupos; en la historica, tambien sus años con estado) y
+  // los recorre en el mismo orden; cada barra sale de trazarBarra con medir sobre SVG_FUENTE y cada rotulo, de ROT y de
+  // las funciones de piezas de la pantalla. Cuerpos, pesos y colores, del CSS vigente con una sonda oculta.
+  const _SONDA_PAN='<div class="gse-sec pan-sec"><div class="gse-sec-h"><span class="gse-sec-name">x</span><span class="gse-sec-sub">x</span></div>'+
+    '<div class="pan-gse-body"><div class="pan-sub-h">x</div><div class="pan-dist"><div class="pan-dist-row"><div class="pan-dist-lab"><span class="sw"></span>x</div>'+
+    '<div class="s100-wrap"><div class="s100"><div class="s100-seg"><span>x</span></div></div><div class="s100-ext"><span class="s100-ext-it ext-bajo">x</span></div>'+
+    '<div class="s100-sin">x</div></div></div></div><div class="vt-franja"><div class="vt-franja-yr hdr">x</div><div class="vt-franja-lab">x</div></div>'+
+    '<div class="vt-franja-foot">x</div><div class="nota">x</div><div class="s100 s100-empty"><span class="s100-nd">x</span></div></div></div>'+
+    '<div class="leyenda pan-state-leg"><span>x</span></div><div class="cmp-nota-bp">x</div>';
+  function _estilosPanorama(){
+    const host=document.createElement("div");
+    host.style.cssText="position:absolute;left:-99999px;top:0;width:1150px;visibility:hidden;";
+    host.innerHTML=_SONDA_PAN; document.body.appendChild(host);
+    const q=s=>host.querySelector(s);
+    const rol=s=>{const cs=getComputedStyle(q(s)); return {px:parseFloat(cs.fontSize),peso:cs.fontWeight,estilo:cs.fontStyle,color:cs.color};};
+    const fondo=s=>getComputedStyle(q(s)).backgroundColor;
+    const borde=s=>getComputedStyle(q(s)).borderTopColor;
+    const sw=getComputedStyle(q(".pan-dist-lab .sw"));
+    const E={gseNom:rol(".gse-sec-name"),gseSub:rol(".gse-sec-sub"),gseBanda:fondo(".gse-sec-h"),subH:rol(".pan-sub-h"),
+      lab:rol(".pan-dist-lab"),sw:parseFloat(sw.width),swRad:parseFloat(sw.borderTopLeftRadius)||0,
+      seg:rol(".s100-seg span"),ext:rol(".s100-ext-it"),nota:rol(".s100-sin"),nd:rol(".s100-nd"),
+      barraFondo:fondo(".s100"),barraBorde:borde(".s100"),
+      yr:rol(".vt-franja-yr"),franjaLab:rol(".vt-franja-lab"),foot:rol(".vt-franja-foot"),notaGris:rol(".nota"),
+      ley:rol(".leyenda"),notaBp:rol(".cmp-nota-bp")};
+    document.body.removeChild(host); return E;
+  }
+  // Cabecera comun de las dos imagenes del panorama: ceja, territorio (.pan-name), comunas del SLEP (.pan-comunas), la
+  // linea de metadatos (.pan-meta, en sus piezas), el universo y la leyenda. Devuelve la y siguiente.
+  function _cabeceraPanoramaSvg(H,E,root,PAD,y,anchoUtil,cab,universo){
+    const {lh,partir,lineas}=H, px=n=>parseFloat(tokenCSS(n)), R=(tam,peso,color)=>({px:tam,peso,estilo:"normal",color});
+    const CEJA=R(px("--fs-overline"),tokenCSS("--fw-bold"),tokenCSS("--gris")), TIT=R(px("--fs-h3"),tokenCSS("--fw-heavy"),tokenCSS("--azul"));
+    const bloque=(ls,r)=>{ const h=ls.length*lh(r); lineas(root,ls,PAD,y,r,{x:PAD,y,w:anchoUtil,h}); y+=h; };
+    bloque([cejaPanorama()],CEJA); y+=4;
+    bloque(partir(cab.terrTxt,anchoUtil,TIT),TIT);
+    if(cab.comunas) bloque(partir(cab.comunas,anchoUtil,E.notaBp),E.notaBp);
+    bloque(partir(textoPiezas(cab.meta),anchoUtil,E.notaBp),E.notaBp); y+=6;
+    bloque(partir(universo,anchoUtil,E.notaBp),E.notaBp); y+=10;
+    return y+_leyendaSvg(H,E,root,PAD,y,anchoUtil);
+  }
+  // Banda de una seccion de GSE (.gse-sec-h): nombre y linea bajo el nombre en la misma linea base. Devuelve su alto.
+  function _bandaGseSvg(H,E,root,PAD,y,anchoUtil,nom,sub){
+    const {lh,med,rect,txt}=H, hB=Math.round(lh(E.gseNom)+22), cB={x:PAD,y,w:anchoUtil,h:hB}, yN=y+(hB-lh(E.gseNom))/2;
+    rect(root,{x:PAD,y,width:anchoUtil,height:hB},E.gseBanda);
+    txt(root,nom,PAD+18,yN,E.gseNom,cB);
+    txt(root,sub,PAD+18+med(nom,E.gseNom)+10,yN+(E.gseNom.px-E.gseSub.px)*SVG_BASE,E.gseSub,cB);
+    return hB;
+  }
+  // Rotulo de indicador con su muestra de color (paleta de indicadores, del payload), centrado en yc. Devuelve su alto.
+  function _rotuloIndSvg(H,E,rol,root,x,yc,ancho,ind,celda){
+    const {lh,partir,rect,lineas}=H, ls=partir(ind.nombre,ancho-E.sw-9,rol), h=ls.length*lh(rol), y0=yc-h/2;
+    rect(root,{x,y:y0+(lh(rol)-E.sw)/2,width:E.sw,height:E.sw,rx:E.swRad},ind.color);
+    lineas(root,ls,x+E.sw+9,y0,rol,celda);
+    return h;
+  }
+  // Pie de la imagen: raya, fuente del dato y motor con la fecha. Devuelve la y siguiente.
+  function _pieSvg(H,root,PAD,y,anchoUtil){
+    const {lh,partir,lineas,raya}=H, px=n=>parseFloat(tokenCSS(n));
+    const PIE={px:px("--fs-overline"),peso:tokenCSS("--fw-regular"),estilo:"normal",color:tokenCSS("--gris")};
+    y+=16; raya(root,PAD,y,PAD+anchoUtil,y,tokenCSS("--linea"),1); y+=8;
+    piePaginaExport().forEach(l=>{ const ls=partir(l,anchoUtil,PIE), h=ls.length*lh(PIE); lineas(root,ls,PAD,y,PIE,{x:PAD,y,w:anchoUtil,h}); y+=h; });
+    return y;
+  }
+  function _cerrarSvg(H,root,fondo,totalW,y,PAD,fnameBase){
+    const totalH=Math.ceil(y+PAD);
+    root.setAttribute("height",totalH); root.setAttribute("viewBox","0 0 "+totalW+" "+totalH); fondo.setAttribute("height",totalH);
+    const cajas=Array.from(root.querySelectorAll("text")).map(n=>H.celdas.get(n)||null);
+    return {svgStr:new XMLSerializer().serializeToString(root),totalW,totalH,fnameBase,cajas};
+  }
+
+  // Vista actual: por cada GSE (los mismos `grupos` de la pantalla), las cuatro barras de indicador con su rotulo.
+  function construirSvgPanorama({grupos,grado,agno,cab,gseSel,nomArchivoTerr}){
+    const E=_estilosPanorama(), H=_herramientasSvg(E), {lh,partir,lineas,rect}=H;
+    // Ancho = el del comparador (1.150): rotulo de 300 px (.pan-dist-row) y la barra en el resto.
+    const PAD=24, W_LAB=300, GAP=16, PAD_Y=7, totalW=1150, anchoUtil=totalW-PAD*2, W_BAR=anchoUtil-W_LAB-GAP, xBar=PAD+W_LAB+GAP;
+    const root=svgEl("svg",{width:totalW}), fondo=rect(root,{x:0,y:0,width:totalW},tokenCSS("--panel"));
+    let y=_cabeceraPanoramaSvg(H,E,root,PAD,PAD,anchoUtil,cab,textoPiezas(helpPanorama(false))+" "+ROT.cienBarra);
+    let nClip=0; const nuevoId=()=>"pan-barra-"+(nClip++);
+    grupos.forEach((grp,gi)=>{
+      if(gi>0) y+=16;
+      y+=_bandaGseSvg(H,E,root,PAD,y,anchoUtil,nombreGse(grp.gse),textoPiezas(piezasSubGsePan(grp.items.length)))+10;
+      { const ls=partir(ROT.distPan,anchoUtil,E.subH), h=ls.length*lh(E.subH); lineas(root,ls,PAD,y,E.subH,{x:PAD,y,w:anchoUtil,h}); y+=h+6; }
+      DATA.indicadores.forEach(ind=>{
+        const t=trazarBarra({rep:repartoInd(grp.items,ind.id,grado,agno),ancho:W_BAR-2,medir:H.medirArchivo,anchoLinea:W_BAR});
+        // El rotulo se centra en la barra (s31c), no en el bloque barra + tira + nota.
+        const nL=partir(ind.nombre,W_LAB-E.sw-9,E.lab).length*lh(E.lab), hBar=_altoBarraSvg(H,E,t);
+        const yb=y+PAD_Y+Math.max(0,nL/2-SVG_BAR_H/2), hF=Math.max(yb+hBar,yb+SVG_BAR_H/2+nL/2)-y+PAD_Y;
+        _rotuloIndSvg(H,E,E.lab,root,PAD,yb+SVG_BAR_H/2,W_LAB,ind,{x:PAD,y,w:W_LAB,h:hF});
+        _pintarBarraSvg(H,E,root,xBar,yb,t,{x:xBar,y,w:W_BAR,h:hF},W_BAR,nuevoId);
+        y+=hF; });
+    });
+    y=_pieSvg(H,root,PAD,y,anchoUtil);
+    return _cerrarSvg(H,root,fondo,totalW,y,PAD,baseArchivoPanorama({grado,agno,gseSel,nomArchivoTerr}));
+  }
+  // Vista historica: por cada GSE (los mismos `grupos`), la franja: una fila por indicador y una columna por año con
+  // estado publicado (aniosEstado), como la pantalla; sin la matriz de puntajes.
+  function construirSvgHistorico({grupos,aniosEstado,antesEstado,grado,cab,gseSel,nomArchivoTerr,sinExcluido}){
+    const E=_estilosPanorama(), H=_herramientasSvg(E), {lh,partir,lineas,txt}=H;
+    const PAD=24, W_LAB=240, GAP=14, PAD_Y=6, totalW=1150, anchoUtil=totalW-PAD*2, nY=aniosEstado.length;
+    const W_COL=nY?Math.floor((anchoUtil-W_LAB-GAP*nY)/nY):0, xCol=i=>PAD+W_LAB+GAP+i*(W_COL+GAP);
+    const root=svgEl("svg",{width:totalW}), fondo=H.rect(root,{x:0,y:0,width:totalW},tokenCSS("--panel"));
+    let y=_cabeceraPanoramaSvg(H,E,root,PAD,PAD,anchoUtil,cab,txtFranjaUniverso(aniosEstado));
+    const bloque=(ls,r)=>{ const h=ls.length*lh(r); lineas(root,ls,PAD,y,r,{x:PAD,y,w:anchoUtil,h}); y+=h; };
+    if(aniosEstado.some(a=>PRELIM.has(String(a)))) { bloque([ROT.prelimNota],E.notaBp); y+=6; }
+    let nClip=0; const nuevoId=()=>"hist-barra-"+(nClip++);
+    grupos.forEach((grp,gi)=>{
+      if(gi>0) y+=16;
+      y+=_bandaGseSvg(H,E,root,PAD,y,anchoUtil,nombreGseHist(grp.gse),textoPiezas(piezasSubGseHist(grp.gse,grp.items.length)))+10;
+      bloque(partir(ROT.franjaTit,anchoUtil,E.subH),E.subH); y+=6;
+      if(!nY){ bloque(partir(ROT.sinEstadoNivel,anchoUtil,E.notaGris),E.notaGris); }
+      else {
+        const hY=lh(E.yr);
+        aniosEstado.forEach((a,i)=>txt(root,textoPiezas(piezasAnioFranja(a)),xCol(i)+W_COL/2,y,E.yr,{x:xCol(i),y,w:W_COL,h:hY},{anchor:"middle"}));
+        y+=hY+6;
+        DATA.indicadores.forEach(ind=>{
+          const ts=aniosEstado.map(a=>trazarBarra({rep:repartoInd(itemsFranja(grp.items,a),ind.id,grado,a),ancho:W_COL-2,medir:H.medirArchivo,anchoLinea:W_COL}));
+          const nL=partir(ind.nombre,W_LAB-E.sw-8,E.franjaLab).length*lh(E.franjaLab), hBar=Math.max(...ts.map(t=>_altoBarraSvg(H,E,t)));
+          const yb=y+PAD_Y+Math.max(0,nL/2-SVG_BAR_H/2), hF=Math.max(yb+hBar,yb+SVG_BAR_H/2+nL/2)-y+PAD_Y;
+          _rotuloIndSvg(H,E,E.franjaLab,root,PAD,yb+SVG_BAR_H/2,W_LAB,ind,{x:PAD,y,w:W_LAB,h:hF});
+          ts.forEach((t,i)=>_pintarBarraSvg(H,E,root,xCol(i),yb,t,{x:xCol(i),y,w:W_COL,h:hF},W_COL,nuevoId));
+          y+=hF; });
+      }
+      y+=6; bloque(partir(textoPiezas(piezasPieFranja(antesEstado)),anchoUtil,E.foot),E.foot);
+    });
+    y=_pieSvg(H,root,PAD,y,anchoUtil);
+    return _cerrarSvg(H,root,fondo,totalW,y,PAD,baseArchivoHistorico({grado,gseSel,nomArchivoTerr,sinExcluido}));
+  }
+  function exportarPanoramaSVG(args){
+    const r=construirSvgPanorama(args);
+    descargarBlob(new Blob([r.svgStr],{type:"image/svg+xml;charset=utf-8"}),r.fnameBase+".svg");
+  }
+  function exportarPanoramaPNG(args){ rasterizarSvgAPng(construirSvgPanorama(args)); }
+  function exportarHistoricoSVG(args){
+    const r=construirSvgHistorico(args);
+    descargarBlob(new Blob([r.svgStr],{type:"image/svg+xml;charset=utf-8"}),r.fnameBase+".svg");
+  }
+  function exportarHistoricoPNG(args){ rasterizarSvgAPng(construirSvgHistorico(args)); }
 
   // ===== s31 — Vista historica del panorama territorial (P-VISTA-TERRITORIAL) =====
   // Decision 50_documentacion/activa/decisiones/20260917_decision_vista_historica_territorial.md;
@@ -3184,7 +3387,7 @@ __FONTS_CSS__
     return out;
   }
 
-  function PanoramaHistorico({rosterHist,panGrado,gseVis,vtInd,onInd,orden,onOrden,esNacional,onSel,gseSel,nomArchivoTerr,glosaTerr,haySinGse}){
+  function PanoramaHistorico({rosterHist,panGrado,gseVis,vtInd,onInd,orden,onOrden,esNacional,onSel,gseSel,nomArchivoTerr,glosaTerr,haySinGse,cab}){
     const VT=DATA.meta.vista_territorial||{};
     const eje=(DATA.meta.eje_historico&&DATA.meta.eje_historico[panGrado])||[];
     const aniosEstado=(VT.anios_estado&&VT.anios_estado[panGrado])||[];
@@ -3208,13 +3411,17 @@ __FONTS_CSS__
       return arr; };
     const grupos=[...DATA.meta.gse,"sin"].filter(g=>gseVis.has(g))
       .map(g=>({gse:g,items:ordenar(filas.filter(r=>(r.gse||"sin")===g))})).filter(x=>x.items.length>0);
-    const nomGse=g=>g==="sin"?"Sin clasificar":(GSE[g]||g);
+    const nomGse=nombreGseHist;
     const prelimY=y=>PRELIM.has(String(y));
     // s32c: el asterisco solo se explica si algún año visible es preliminar (patrón de la nota de barras).
     const hayPrelim=conDato.some(y=>y.preliminar||prelimY(y.agno));
     const estadoTxt=s=>s===-1?"bajo":s===1?"sobre":"sin diferencia con";
     const nVis=grupos.reduce((a,g)=>a+g.items.length,0);
     const sinFilas=nFilasHistorico({grupos,conDato})===0;
+    // s33t T2: los mismos arreglos con los que se dibuja la franja, para el CSV y para la imagen (regla de fidelidad de s30).
+    const argsExport={grupos,conDato,aniosEstado,antesEstado,grado:panGrado,gseSel,nomArchivoTerr,glosaTerr,
+      sinExcluido:!!haySinGse&&!gseVis.has("sin"),cab};
+    const tituloSinFilas="No hay establecimientos que exportar con esta combinación";
     return (
       <div>
         <div className="help"><b>Vista histórica del territorio, sin agregar.</b> Cada fila es un establecimiento con su propio puntaje en cada año; el territorio no produce un puntaje propio. Sobre cada grupo, cómo se reparten sus establecimientos por <b>estado vs su GSE</b> en los años en que la Agencia lo publica{aniosEstado.length?" ("+listaY(aniosEstado)+")":""}. Un año sin resultado no es un resultado bajo: indica que no hubo medición o que no fue válida.</div>
@@ -3224,41 +3431,51 @@ __FONTS_CSS__
             <button key={i.id} className={"vt-ind-b"+(i.id===vtInd?" on":"")} style={{"--sw":i.color}} aria-pressed={i.id===vtInd} onClick={()=>onInd(i.id)}>
               <span className="sw" style={{background:i.color}}></span>{i.nombre}</button>)}</div>
           <span className="vt-lab">Estado vs su GSE</span>
-          <div className="vt-leg"><span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span><span><i style={{background:"var(--st-neutro)"}}></i>= sin diferencia</span><span><i style={{background:"var(--destaca)"}}></i>▲ sobre su GSE</span></div>
+          <div className="vt-leg">{LEYENDA_ESTADO.map(e=><span key={e.k}><i style={{background:"var("+e.token+")"}}></i>{e.txt}</span>)}</div>
           <span className="vt-lab">Puntaje</span>
           <div className="vt-leg">
             <span title={"Escala de 0 a 100. El color se calibra entre "+dom[0]+" y "+dom[1]+" y se satura fuera de ese rango."}>0<span className="vt-leg-bar" style={{background:"linear-gradient(90deg,"+vtTinte(indSel.color,dom[0],dom,k0)+","+vtTinte(indSel.color,dom[1],dom,k0)+")"}}></span>100</span>
-            <span>– sin resultado</span><span><span className="vt-leg-gap"></span>sin medición nacional</span>{hayPrelim && <span>* resultado preliminar</span>}
+            <span>– sin resultado</span><span><span className="vt-leg-gap"></span>sin medición nacional</span>{hayPrelim && <span>{ROT.prelimNota}</span>}
           </div>
           <div className="export-bar">
             <IconExport label="Exportar CSV" icon="download"
               disabled={sinFilas}
               title={sinFilas
-                ? "No hay establecimientos que exportar con esta combinación"
+                ? tituloSinFilas
                 : "Descarga en CSV "+(nVis===1?"el establecimiento":"los "+nEE(nVis))+" de esta vista: una fila por establecimiento, año con medición e indicador, con su puntaje, su GSE de ese año y su estado vs GSE"}
-              onExport={()=>descargarHistoricoCSV({grupos,conDato,grado:panGrado,gseSel,nomArchivoTerr,glosaTerr,
-                sinExcluido:!!haySinGse&&!gseVis.has("sin")})}/>
+              onExport={()=>descargarHistoricoCSV(argsExport)}/>
+            {/* s33t T2: la imagen de la franja (sin la matriz), con la forma de la del comparador. */}
+            <IconExport label="Imagen SVG" icon="chart"
+              disabled={sinFilas}
+              title={sinFilas ? tituloSinFilas
+                : "Descarga la franja por año (estado vs su GSE) de esta vista como imagen SVG (vectorial, sin límite de tamaño); la matriz de puntajes no va en la imagen"}
+              onExport={()=>exportarHistoricoSVG(argsExport)}/>
+            <IconExport label="Imagen PNG" icon="image"
+              disabled={sinFilas}
+              title={sinFilas ? tituloSinFilas
+                : "Descarga la franja por año de esta vista como imagen PNG a 2x (si es demasiado grande para el navegador, avisa y ofrece el SVG); la matriz de puntajes no va en la imagen"}
+              onExport={()=>exportarHistoricoPNG(argsExport)}/>
           </div>
         </div>
         {grupos.length===0 && <div className="empty">No hay establecimientos educacionales con datos en ningún año para esta combinación de territorio, nivel y GSE.</div>}
         {grupos.map(grp=>{ const gseNom=nomGse(grp.gse);
           return (
           <section className="gse-sec vt-sec" key={grp.gse}>
-            <div className="gse-sec-h"><span className="gse-sec-name">{gseNom}</span><span className="gse-sec-sub">{nEE(grp.items.length)} · {grp.gse==="sin"?"sin GSE publicado en ningún año":"GSE de su último año con GSE publicado"}</span></div>
+            <div className="gse-sec-h"><span className="gse-sec-name">{gseNom}</span><span className="gse-sec-sub">{piezasSubGseHist(grp.gse,grp.items.length)}</span></div>
             <div className="pan-gse-body">
               {/* A. Franja: reparto por estado, solo en los anios con sigdifgru publicado. */}
-              <div className="pan-sub-h">Estado vs su GSE, por año</div>
+              <div className="pan-sub-h">{ROT.franjaTit}</div>
               {aniosEstado.length===0
-                ? <div className="nota">La Agencia no publica el estado vs GSE en ningún año de este nivel.</div>
+                ? <div className="nota">{ROT.sinEstadoNivel}</div>
                 : <div className="vt-franja" style={{"--ny":aniosEstado.length}}>
-                    <div></div>{aniosEstado.map(y=><div key={y} className="vt-franja-yr hdr">{y}{prelimY(y)?"*":""}</div>)}
+                    <div></div>{aniosEstado.map(y=><div key={y} className="vt-franja-yr hdr">{piezasAnioFranja(y)}</div>)}
                     {DATA.indicadores.map(ind=><React.Fragment key={ind.id}>
                       <div className={"vt-franja-lab"+(ind.id===vtInd?" is-sel":"")}><span className="sw" style={{background:ind.color}}></span>{ind.nombre}</div>
-                      {aniosEstado.map(y=>{const itemsY=grp.items.filter(r=>Object.prototype.hasOwnProperty.call(r.anios,y));
+                      {aniosEstado.map(y=>{const itemsY=itemsFranja(grp.items,y);
                         return <div key={y} className="vt-franja-cell" data-yr={y}><StackedBar rep={repartoInd(itemsY,ind.id,panGrado,y)}/></div>;})}
                     </React.Fragment>)}
                   </div>}
-              <div className="vt-franja-foot">{antesEstado?antesEstado+": la Agencia no publicó el estado vs GSE. ":""}En cada año, el estado de un establecimiento se mide contra el GSE que tenía ese año.</div>
+              <div className="vt-franja-foot">{piezasPieFranja(antesEstado)}</div>
               {/* B. Matriz: puntaje propio por anio, un indicador. */}
               <div className="pan-sub-h" style={{marginTop:20}}>Puntaje de cada establecimiento por año · {indSel.nombre}{!esNacional && <span className="pan-sub-note"> · clic en una fila para ver su Panorama IDPS</span>}</div>
               {esNacional
@@ -3311,9 +3528,9 @@ __FONTS_CSS__
   // desplegado) y comparar (matriz territorios x GSE x indicador). Ya no quedan
   // stubs "en construccion"; el unico estado vacio es la invitacion de la ficha
   // cuando no hay establecimiento seleccionado.
-  const PANTALLAS=[["territorio","Panorama territorial"],
+  const PANTALLAS=[["territorio",ROT.panCeja],
                    ["ficha","Panorama IDPS por establecimiento"],
-                   ["comparar","Comparación entre territorios"]];
+                   ["comparar",ROT.cmpTitulo]];
 
   // ===== Navegacion territorial via EntityModal: comuna/slep/region/nacional/EE =====
   // (s29i: el tab "dependencia" ya no existe; la dependencia es atributo de la entidad.)
@@ -3448,6 +3665,14 @@ __FONTS_CSS__
                   : terr.kind==="comuna" ? "comuna de "+comNom(terr.cod)
                   : "Región de "+regNom(terr.cod);
 
+    // s33t T2: la linea de metadatos del banner (.pan-meta), en sus piezas, la usan la pantalla y las dos imagenes del
+    // panorama; y los mismos arreglos con los que se dibujan las franjas, para el CSV y para la imagen (s30).
+    const metaPan=piezasMetaPan({esSlep,nComunas:panComunas,hist:isHistPan,n:isHistPan?nHist:unidades.length,grado:panGrado,
+      nGseVis,anioIni:panAnios[0],agno:panAgno,depNom});
+    const cabPan={terrTxt,comunas:(esSlep&&panComunasNoms)||"",meta:metaPan};
+    const argsPanExport={grupos,grado:panGrado,agno:panAgno,gseSel:DATA.meta.gse.filter(g=>gseVis.has(g)),
+      nomArchivoTerr:terrTxt+(depNom?" "+depNom:""),glosaTerr:terrTxt+(depNom?" · "+depNom:""),cab:cabPan};
+    const tituloSinUnidades="No hay establecimientos que exportar con esta combinación";
     return (
       <>
         {/* Nav de pantallas: barra blanca sticky full-width bajo el header (#4) */}
@@ -3486,9 +3711,7 @@ __FONTS_CSS__
                 {/* s31: en la vista historica el banner dice la serie (primer-ultimo anio del
                     eje) y cuenta los EE con resultado en algun anio (roster de todos los anios).
                     s31c: el plural sale de nEE (s31b), como en el subtitulo de seccion. */}
-                <div className="pan-meta">{!esSlep && <>{nCom(panComunas)} · </>}{isHistPan
-                  ? <>{nEE(nHist)} con resultado en algún año · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAnios[0]}–{panAgno}{PRELIM.has(String(panAgno))?"*":""}</>
-                  : <>{nEE(unidades.length)} en el nivel seleccionado · {DATA.meta.grados[panGrado]} · {nGseVis} de {DATA.meta.gse.length} GSE · {panAgno}{PRELIM.has(String(panAgno))?" (preliminar)":""}</>}{depNom?" · dependencia: "+depNom:""}</div>
+                <div className="pan-meta">{metaPan}</div>
               </div>
               <div className="pan-nivel">
                 {/* s31: segmentador Vista actual / Vista historica, mismo patron que la ficha
@@ -3521,12 +3744,20 @@ __FONTS_CSS__
                 <IconExport label="Exportar CSV" icon="download"
                   disabled={unidades.length===0}
                   title={unidades.length===0
-                    ? "No hay establecimientos que exportar con esta combinación"
+                    ? tituloSinUnidades
                     : "Descarga en CSV "+(unidades.length===1?"el establecimiento":"los "+nEE(unidades.length))+" de esta vista, con su puntaje y su estado vs GSE en los cuatro indicadores"}
-                  onExport={()=>descargarPanoramaCSV({grupos,grado:panGrado,agno:panAgno,
-                    gseSel:DATA.meta.gse.filter(g=>gseVis.has(g)),
-                    nomArchivoTerr:terrTxt+(depNom?" "+depNom:""),
-                    glosaTerr:terrTxt+(depNom?" · "+depNom:"")})}/>
+                  onExport={()=>descargarPanoramaCSV(argsPanExport)}/>
+                {/* s33t T2: la imagen de las franjas por GSE (sin la grilla de tarjetas), con la forma de la del comparador. */}
+                <IconExport label="Imagen SVG" icon="chart"
+                  disabled={unidades.length===0}
+                  title={unidades.length===0 ? tituloSinUnidades
+                    : "Descarga las barras por GSE de esta vista como imagen SVG (vectorial, sin límite de tamaño); la grilla de establecimientos no va en la imagen"}
+                  onExport={()=>exportarPanoramaSVG(argsPanExport)}/>
+                <IconExport label="Imagen PNG" icon="image"
+                  disabled={unidades.length===0}
+                  title={unidades.length===0 ? tituloSinUnidades
+                    : "Descarga las barras por GSE de esta vista como imagen PNG a 2x (si es demasiado grande para el navegador, avisa y ofrece el SVG); la grilla de establecimientos no va en la imagen"}
+                  onExport={()=>exportarPanoramaPNG(argsPanExport)}/>
               </div>}
               <div className="gse-filter">{DATA.meta.gse.map(g=>
                 <button key={g} className={"gfb"+(gseVis.has(g)?" on":"")} onClick={()=>toggleGse(g)} aria-pressed={gseVis.has(g)}>
@@ -3541,21 +3772,19 @@ __FONTS_CSS__
                   orden={vtOrden} onOrden={setVtOrden} esNacional={esNacional} onSel={irFicha}
                   gseSel={DATA.meta.gse.filter(g=>gseVis.has(g))}
                   nomArchivoTerr={terrTxt+(depNom?" "+depNom:"")}
-                  glosaTerr={terrTxt+(depNom?" · "+depNom:"")} haySinGse={haySinGse}/>
+                  glosaTerr={terrTxt+(depNom?" · "+depNom:"")} haySinGse={haySinGse} cab={cabPan}/>
               : <>
-            <div className="help"><b>Panorama del territorio sin agregar.</b> El territorio acota la lista de establecimientos; no produce un puntaje propio. Por cada GSE: cómo se reparten sus establecimientos por <b>estado vs su GSE</b> (leído de la Agencia){esNacional?". ":" y la grilla para abrir el Panorama IDPS de cada uno. "}Las barras son <b>% (n) de establecimientos, nunca un promedio</b>.</div>
+            <div className="help">{pintarPiezas(helpPanorama(!esNacional))}</div>
             <div className="leyenda pan-state-leg">
-              <span><i style={{background:"var(--alerta)"}}></i>▼ bajo su GSE</span>
-              <span><i style={{background:"var(--st-neutro)"}}></i>= sin diferencia</span>
-              <span><i style={{background:"var(--destaca)"}}></i>▲ sobre su GSE</span>
+              {LEYENDA_ESTADO.map(e=><span key={e.k}><i style={{background:"var("+e.token+")"}}></i>{e.txt}</span>)}
             </div>
             {unidades.length===0
               ? <div className="empty">No hay establecimientos educacionales con datos para esta combinación de territorio{terr.dep?", dependencia":""}, nivel y GSE.</div>
               : grupos.map(grp=>(
                   <section className="gse-sec pan-sec" key={grp.gse}>
-                    <div className="gse-sec-h"><span className="gse-sec-name">{GSE[grp.gse]||"sin clasificar"}</span><span className="gse-sec-sub">{nEE(grp.items.length)} · grupo socioeconómico</span></div>
+                    <div className="gse-sec-h"><span className="gse-sec-name">{nombreGse(grp.gse)}</span><span className="gse-sec-sub">{piezasSubGsePan(grp.items.length)}</span></div>
                     <div className="pan-gse-body">
-                      <div className="pan-sub-h">Distribución por estado vs su GSE</div>
+                      <div className="pan-sub-h">{ROT.distPan}</div>
                       <div className="pan-dist">
                         {DATA.indicadores.map(ind=>{const rep=repartoInd(grp.items,ind.id,panGrado,panAgno);
                           return (
