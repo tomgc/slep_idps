@@ -13535,6 +13535,21 @@ function PanoramaHistorico(_ref37) {
 // stubs "en construccion"; el unico estado vacio es la invitacion de la ficha
 // cuando no hay establecimiento seleccionado.
 var PANTALLAS = [["territorio", ROT.panCeja], ["ficha", "Panorama IDPS por establecimiento"], ["comparar", ROT.cmpTitulo]];
+// s33u: vistas con dirección. Cada pantalla tiene su dirección (el nombre que ve el usuario; en el código siguen las
+// claves territorio, ficha y comparar), en un solo mapa. La dirección fija la pantalla al abrir y al cambiar
+// (Atrás, Adelante, un enlace o la dirección escrita a mano); una vacía o desconocida abre el panorama. Solo la vista:
+// la selección (territorio, establecimiento, entidades) no viaja en la dirección (matriz de s33n §5.2; como el hermano
+// slep_simce_adecuado, vistaDesdeDireccion y hashchange).
+var DIRECCION_VISTA = {
+  territorio: "#panorama",
+  ficha: "#ficha",
+  comparar: "#comparador"
+};
+var vistaDesdeDireccion = function vistaDesdeDireccion() {
+  return Object.keys(DIRECCION_VISTA).find(function (k) {
+    return DIRECCION_VISTA[k] === window.location.hash;
+  }) || "territorio";
+};
 
 // ===== Navegacion territorial via EntityModal: comuna/slep/region/nacional/EE =====
 // (s29i: el tab "dependencia" ya no existe; la dependencia es atributo de la entidad.)
@@ -13604,10 +13619,32 @@ function App() {
     _useState30 = _slicedToArray(_useState29, 2),
     rbdSel = _useState30[0],
     setRbdSel = _useState30[1];
-  var _useState31 = useState("territorio"),
+  var _useState31 = useState(vistaDesdeDireccion),
     _useState32 = _slicedToArray(_useState31, 2),
     pantalla = _useState32[0],
     setPantalla = _useState32[1];
+  // s33u: todo cambio de pantalla, venga de donde venga (pestañas, tarjetas, búsqueda, "Ir a Panorama territorial"),
+  // escribe la dirección con una entrada nueva en el historial, solo si difiere de la que pide la dirección actual. Al
+  // abrir, la pantalla ya salió de la dirección y no se escribe nada: sin dirección, o con una desconocida, la página
+  // se abre como antes. pushState no desplaza la página ni dispara hashchange; si el navegador lo impide (un marco
+  // aislado, por ejemplo), la pantalla cambia igual y la dirección queda como estaba.
+  useEffect(function () {
+    if (vistaDesdeDireccion() !== pantalla) {
+      try {
+        window.history.pushState(null, "", DIRECCION_VISTA[pantalla]);
+      } catch (e) {}
+    }
+  }, [pantalla]);
+  // Atrás, Adelante, un enlace o la dirección escrita a mano: hashchange fija la pantalla sin volver a escribir.
+  useEffect(function () {
+    var alCambiar = function alCambiar() {
+      return setPantalla(vistaDesdeDireccion());
+    };
+    window.addEventListener("hashchange", alCambiar);
+    return function () {
+      return window.removeEventListener("hashchange", alCambiar);
+    };
+  }, []);
   var _useState33 = useState(grados.includes("4b") ? "4b" : grados[0]),
     _useState34 = _slicedToArray(_useState33, 2),
     fichaGrado = _useState34[0],
