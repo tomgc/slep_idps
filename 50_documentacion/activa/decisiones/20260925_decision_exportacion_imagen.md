@@ -5,7 +5,7 @@
 - **Encargo que implementa la primera parte:** `50_documentacion/activa/encargos/encargo_claude_code_idps_ejecucion_final_s33o.md` (T3)
 - **Evidencia:** `50_documentacion/andamios/diseno/detalles/20260924_diagnostico_exportacion_imagen.md` y `mockup_exportacion_imagen_s33m.html` (log s33m)
 - **Tipo:** decisión de producto. No afecta ninguna cifra.
-- **Estado:** adoptada por el titular el 2026-09-25.
+- **Estado:** adoptada por el titular el 2026-09-25. C desplegada en s33o; A1 (comparador) en s33s; A2 (panorama, vista actual e histórica) en s33t. La imagen histórica sigue la franja de la pantalla (indicador × año), no una fila por año (D-1 de s33t).
 
 ## 1. Alternativa
 
