@@ -3538,6 +3538,18 @@ __FONTS_CSS__
   // slep_simce_adecuado, vistaDesdeDireccion y hashchange).
   const DIRECCION_VISTA={territorio:"#panorama",ficha:"#ficha",comparar:"#comparador"};
   const vistaDesdeDireccion=()=>Object.keys(DIRECCION_VISTA).find(k=>DIRECCION_VISTA[k]===window.location.hash)||"territorio";
+  // s34b: posición por vista (D-2 (b) de s34a, la forma estándar de la web). Toda vista a la que se llega HACIA ADELANTE
+  // (tarjeta, fila de la vista histórica, búsqueda, pestaña, "Ir a Panorama territorial") abre ARRIBA; toda vista a la
+  // que se llega con ATRÁS o ADELANTE recupera la posición en que se dejó esa entrada del historial. La posición la lleva
+  // el motor y no el navegador (history.scrollRestoration="manual"): el navegador la reponía solo al volver, pero subir la
+  // ficha con un scrollTo(0,0) suelto rompía esa reposición (s34a, FASE R, pasos 2 (c) y 2 (d)). Cada entrada del
+  // historial lleva un identificador en history.state (la inicial lo recibe con replaceState, sin tocar la dirección) y un
+  // mapa en memoria guarda la última posición de cada una. Nada de esto viaja en la dirección: la dirección sigue siendo
+  // solo la vista. El mapa vive mientras viva la página: al recargarla, la vista abre arriba.
+  const POS_VISTA=new Map();   // identificador de la entrada del historial -> última posición vertical (px)
+  const POS_BASE=Date.now().toString(36); let posN=0;   // identificadores únicos también entre recargas
+  const nuevaEntrada=()=>POS_BASE+"."+(++posN);
+  const entradaActual=()=>{const s=window.history.state;return s&&typeof s==="object"&&s.posVista?s.posVista:null;};
 
   // ===== Navegacion territorial via EntityModal: comuna/slep/region/nacional/EE =====
   // (s29i: el tab "dependencia" ya no existe; la dependencia es atributo de la entidad.)
@@ -3579,10 +3591,34 @@ __FONTS_CSS__
     // abrir, la pantalla ya salió de la dirección y no se escribe nada: sin dirección, o con una desconocida, la página
     // se abre como antes. pushState no desplaza la página ni dispara hashchange; si el navegador lo impide (un marco
     // aislado, por ejemplo), la pantalla cambia igual y la dirección queda como estaba.
-    useEffect(()=>{if(vistaDesdeDireccion()!==pantalla){try{window.history.pushState(null,"",DIRECCION_VISTA[pantalla]);}catch(e){}}},[pantalla]);
-    // Atrás, Adelante, un enlace o la dirección escrita a mano: hashchange fija la pantalla sin volver a escribir.
-    useEffect(()=>{const alCambiar=()=>setPantalla(vistaDesdeDireccion());
-      window.addEventListener("hashchange",alCambiar);return ()=>window.removeEventListener("hashchange",alCambiar);},[]);
+    // s34b: la entrada del historial en curso (su identificador). Al montar, la posición pasa a manos del motor, la
+    // entrada inicial recibe su identificador (sin tocar la dirección) y cada desplazamiento guarda la posición de la
+    // entrada en curso.
+    const entradaRef=useRef(null);
+    useLayoutEffect(()=>{try{window.history.scrollRestoration="manual";}catch(e){}
+      let id=entradaActual();
+      if(!id){id=nuevaEntrada();try{window.history.replaceState({...(window.history.state||{}),posVista:id},"");}catch(e){}}
+      entradaRef.current=id;POS_VISTA.set(id,window.scrollY);
+      const alDesplazar=()=>{if(entradaRef.current)POS_VISTA.set(entradaRef.current,window.scrollY);};
+      window.addEventListener("scroll",alDesplazar,{passive:true});return ()=>window.removeEventListener("scroll",alDesplazar);},[]);
+    // Hacia adelante (la pantalla cambió y la dirección aún no la pide): entrada nueva, con su identificador, y la vista
+    // nueva arriba, ya dibujada y antes de pintarse (useLayoutEffect: ningún cuadro se pinta en la posición vieja).
+    useLayoutEffect(()=>{if(vistaDesdeDireccion()!==pantalla){const id=nuevaEntrada();
+      try{window.history.pushState({posVista:id},"",DIRECCION_VISTA[pantalla]);entradaRef.current=id;}catch(e){}
+      window.scrollTo(0,0);if(entradaRef.current)POS_VISTA.set(entradaRef.current,window.scrollY);}},[pantalla]);
+    // Atrás, Adelante, un enlace o la dirección escrita a mano: popstate o hashchange fijan la pantalla sin volver a
+    // escribir la dirección y, con la vista ya dibujada (flushSync), se repone la posición guardada de esa entrada (si no
+    // hay, arriba). Una entrada sin identificador (una dirección escrita a mano) lo recibe aquí; el popstate y el
+    // hashchange de un mismo paso se atienden una sola vez.
+    useEffect(()=>{const alCambiar=()=>{let id=entradaActual();
+        if(!id){id=nuevaEntrada();try{window.history.replaceState({...(window.history.state||{}),posVista:id},"");}catch(e){}}
+        if(id===entradaRef.current) return;
+        entradaRef.current=id;
+        const fijar=()=>setPantalla(vistaDesdeDireccion());
+        if(typeof ReactDOM!=="undefined"&&ReactDOM.flushSync) ReactDOM.flushSync(fijar); else fijar();
+        window.scrollTo(0,POS_VISTA.get(id)||0);POS_VISTA.set(id,window.scrollY);};
+      window.addEventListener("popstate",alCambiar);window.addEventListener("hashchange",alCambiar);
+      return ()=>{window.removeEventListener("popstate",alCambiar);window.removeEventListener("hashchange",alCambiar);};},[]);
     const [fichaGrado,setFichaGrado]=useState(grados.includes("4b")?"4b":grados[0]);
     const fichaAnios=DATA.meta.grado_anios[fichaGrado]||[];
     const fichaAgno=fichaAnios[fichaAnios.length-1];
