@@ -1,7 +1,7 @@
 ESCANEO DE ESTRUCTURA — slep_idps
 Raiz   : /Users/tomgc/Projects/slep_idps
-Fecha  : 2026-09-25 15:05:24
-Totales: 34 carpetas, 382 archivos
+Fecha  : 2026-09-26 09:43:23
+Totales: 34 carpetas, 393 archivos
 Nota   : todos los datos son publicos (Agencia de Calidad) y se versionan en el repo.
 
 slep_idps/
@@ -114,8 +114,8 @@ slep_idps/
 │   ├── 33_construir_catalogos.R  (15.2K)
 │   ├── 34_leer_normalizar_idps.R  (26.6K)
 │   ├── 35_generar_motor_html.R  (41.9K)
-│   ├── 35_motor_template.html  (241K)
-│   └── 36_exponer_contrato_contexto.R  (7.21K)
+│   ├── 35_motor_template.html  (286K)
+│   └── 36_exponer_contrato_contexto.R  (10.1K)
 ├── 40_salidas/
 │   ├── intermedios/
 │   │   ├── .gitkeep  (0)
@@ -132,7 +132,7 @@ slep_idps/
 │   ├── publico/
 │   │   └── contexto_idps.parquet  (197K)
 │   ├── .DS_Store  (6K)
-│   └── motor_idps.html  (5.4M)
+│   └── motor_idps.html  (5.45M)
 ├── 50_documentacion/
 │   ├── activa/
 │   │   ├── decisiones/
@@ -146,7 +146,7 @@ slep_idps/
 │   │   │   ├── 20260910_decision_contraste_texto_estado.md  (36.8K)
 │   │   │   ├── 20260917_decision_vista_historica_territorial.md  (9.33K)
 │   │   │   ├── 20260925_decision_base_pequena.md  (2.78K)
-│   │   │   └── 20260925_decision_exportacion_imagen.md  (1.74K)
+│   │   │   └── 20260925_decision_exportacion_imagen.md  (3.96K)
 │   │   ├── encargos/
 │   │   │   ├── encargo_ajustes_motor_s14.md  (15.4K)
 │   │   │   ├── encargo_claude_code_idps_accesibilidad_responsive_s33d.md  (19.6K)
@@ -173,7 +173,9 @@ slep_idps/
 │   │   │   ├── encargo_claude_code_idps_diagnostico_historico.md  (23K)
 │   │   │   ├── encargo_claude_code_idps_display_fidelity.md  (7.66K)
 │   │   │   ├── encargo_claude_code_idps_ejecucion_final_s33o.md  (30K)
+│   │   │   ├── encargo_claude_code_idps_exportacion_panorama_a2_s33t.md  (18.8K)
 │   │   │   ├── encargo_claude_code_idps_exportacion_s30.md  (7.03K)
+│   │   │   ├── encargo_claude_code_idps_exportacion_svg_a1_s33s.md  (17.5K)
 │   │   │   ├── encargo_claude_code_idps_ficha_contraste_final_s29g.md  (6.93K)
 │   │   │   ├── encargo_claude_code_idps_filas_modal_s33i.md  (14.9K)
 │   │   │   ├── encargo_claude_code_idps_fix_fantasma.md  (6.32K)
@@ -195,11 +197,13 @@ slep_idps/
 │   │   │   ├── encargo_claude_code_idps_producto_deploy.md  (14K)
 │   │   │   ├── encargo_claude_code_idps_rama_contexto_s33l.md  (11.7K)
 │   │   │   ├── encargo_claude_code_idps_reanudar_exportacion_s30b.md  (7.22K)
+│   │   │   ├── encargo_claude_code_idps_renv_periodo_s33r.md  (8.42K)
 │   │   │   ├── encargo_claude_code_idps_sin_red_contexto_s33q.md  (21.1K)
 │   │   │   ├── encargo_claude_code_idps_tab_nacional_s29h.md  (6.15K)
 │   │   │   ├── encargo_claude_code_idps_tabla_comparador_scroll_s32d.md  (15.4K)
 │   │   │   ├── encargo_claude_code_idps_teclado_territorio_definitivos_2025_s32b.md  (22.1K)
 │   │   │   ├── encargo_claude_code_idps_uiux_s19_fase123.md  (14.7K)
+│   │   │   ├── encargo_claude_code_idps_verificacion_direcciones_s33u.md  (18.5K)
 │   │   │   ├── encargo_claude_code_idps_verificacion_integracion_historico.md  (16.4K)
 │   │   │   ├── encargo_claude_code_idps_verificacion_valores_historico.md  (12.3K)
 │   │   │   ├── encargo_claude_code_idps_vista_historica_ancho_s33g.md  (15K)
@@ -335,24 +339,29 @@ slep_idps/
 │   │   │   ├── 20260924_modal_comparador_s33c_log.md  (87.6K)
 │   │   │   ├── 20260924_preparacion_decisiones_s33m_log.md  (77K)
 │   │   │   ├── 20260924_rama_contexto_s33l_log.md  (36.7K)
-│   │   │   ├── 20260924_registro_asistente_s33.md  (12.1K)
+│   │   │   ├── 20260924_registro_asistente_s33.md  (13.8K)
 │   │   │   ├── 20260924_vista_historica_ancho_s33g_log.md  (56.3K)
 │   │   │   ├── 20260925_despliegue_s33p_log.md  (20.6K)
 │   │   │   ├── 20260925_ejecucion_final_s33o_log.md  (121K)
-│   │   │   ├── 20260925_sin_red_contexto_s33q_log.md  (51.8K)
+│   │   │   ├── 20260925_exportacion_panorama_a2_s33t_log.md  (78.1K)
+│   │   │   ├── 20260925_exportacion_svg_a1_s33s_log.md  (88.5K)
+│   │   │   ├── 20260925_renv_periodo_s33r_log.md  (65K)
+│   │   │   ├── 20260925_sin_red_contexto_s33q_log.md  (94.2K)
+│   │   │   ├── 20260925_verificacion_direcciones_s33u_log.md  (84.4K)
 │   │   │   └── cierres_log.md  (26.7K)
 │   │   ├── .DS_Store  (8K)
 │   │   ├── .gitkeep  (0)
 │   │   ├── 20260924_matriz_patrones_motores.md  (45.7K)
-│   │   └── 20260924_propuesta_ordenacion_repositorio.md  (13K)
+│   │   ├── 20260924_propuesta_ordenacion_repositorio.md  (13K)
+│   │   └── paquete_cierre_v32.md  (49.7K)
 │   ├── estructura/
 │   │   ├── .gitkeep  (0)
-│   │   ├── 20260923_231626_estructura.md  (22.2K)
-│   │   ├── 20260923_231626_estructura.txt  (22.3K)
 │   │   ├── 20260925_134519_estructura.md  (23.9K)
 │   │   ├── 20260925_134519_estructura.txt  (24K)
-│   │   ├── estructura_actual.md  (23.9K)
-│   │   └── estructura_actual.txt  (24K)
+│   │   ├── 20260925_150524_estructura.md  (25.7K)
+│   │   ├── 20260925_150524_estructura.txt  (25.9K)
+│   │   ├── estructura_actual.md  (25.7K)
+│   │   └── estructura_actual.txt  (25.9K)
 │   ├── suite/
 │   │   ├── assets/
 │   │   │   ├── logo-color-stacked.png  (126K)
@@ -407,9 +416,11 @@ slep_idps/
 │   │   └── traspaso_cierre_v31.md  (29.9K)
 │   └── .DS_Store  (10K)
 ├── docs/
-│   └── index.html  (5.23M)
+│   └── index.html  (5.45M)
 ├── tests/
-│   └── .gitkeep  (0)
+│   ├── .gitkeep  (0)
+│   ├── verificar_motor_helpers.R  (7.06K)
+│   └── verificar_motor.R  (5.68K)
 ├── .DS_Store  (16K)
 ├── .gitignore  (2.22K)
 ├── .renvignore  (140)
@@ -417,17 +428,17 @@ slep_idps/
 ├── .Rprofile  (26)
 ├── 00_build.R  (7.14K)
 ├── 00_escanear_proyecto.R  (9.92K)
-├── CLAUDE.md  (17K)
+├── CLAUDE.md  (22.9K)
 ├── README.md  (3.92K)
-├── renv.lock  (77K)
+├── renv.lock  (77.4K)
 └── slep_idps.Rproj  (195)
 
 Conteo por extension:
-  md                 200
+  md                 209
   xlsx               54
   (sin extension)    19
   html               16
-  r                  14
+  r                  16
   otf                13
   pdf                13
   xls                11
