@@ -3531,6 +3531,13 @@ __FONTS_CSS__
   const PANTALLAS=[["territorio",ROT.panCeja],
                    ["ficha","Panorama IDPS por establecimiento"],
                    ["comparar",ROT.cmpTitulo]];
+  // s33u: vistas con dirección. Cada pantalla tiene su dirección (el nombre que ve el usuario; en el código siguen las
+  // claves territorio, ficha y comparar), en un solo mapa. La dirección fija la pantalla al abrir y al cambiar
+  // (Atrás, Adelante, un enlace o la dirección escrita a mano); una vacía o desconocida abre el panorama. Solo la vista:
+  // la selección (territorio, establecimiento, entidades) no viaja en la dirección (matriz de s33n §5.2; como el hermano
+  // slep_simce_adecuado, vistaDesdeDireccion y hashchange).
+  const DIRECCION_VISTA={territorio:"#panorama",ficha:"#ficha",comparar:"#comparador"};
+  const vistaDesdeDireccion=()=>Object.keys(DIRECCION_VISTA).find(k=>DIRECCION_VISTA[k]===window.location.hash)||"territorio";
 
   // ===== Navegacion territorial via EntityModal: comuna/slep/region/nacional/EE =====
   // (s29i: el tab "dependencia" ya no existe; la dependencia es atributo de la entidad.)
@@ -3566,7 +3573,16 @@ __FONTS_CSS__
     const seriePan=panAnios.length>1;
     const isHistPan=vistaPan==="historica"&&seriePan;
     const [rbdSel,setRbdSel]=useState(null);
-    const [pantalla,setPantalla]=useState("territorio");
+    const [pantalla,setPantalla]=useState(vistaDesdeDireccion);
+    // s33u: todo cambio de pantalla, venga de donde venga (pestañas, tarjetas, búsqueda, "Ir a Panorama territorial"),
+    // escribe la dirección con una entrada nueva en el historial, solo si difiere de la que pide la dirección actual. Al
+    // abrir, la pantalla ya salió de la dirección y no se escribe nada: sin dirección, o con una desconocida, la página
+    // se abre como antes. pushState no desplaza la página ni dispara hashchange; si el navegador lo impide (un marco
+    // aislado, por ejemplo), la pantalla cambia igual y la dirección queda como estaba.
+    useEffect(()=>{if(vistaDesdeDireccion()!==pantalla){try{window.history.pushState(null,"",DIRECCION_VISTA[pantalla]);}catch(e){}}},[pantalla]);
+    // Atrás, Adelante, un enlace o la dirección escrita a mano: hashchange fija la pantalla sin volver a escribir.
+    useEffect(()=>{const alCambiar=()=>setPantalla(vistaDesdeDireccion());
+      window.addEventListener("hashchange",alCambiar);return ()=>window.removeEventListener("hashchange",alCambiar);},[]);
     const [fichaGrado,setFichaGrado]=useState(grados.includes("4b")?"4b":grados[0]);
     const fichaAnios=DATA.meta.grado_anios[fichaGrado]||[];
     const fichaAgno=fichaAnios[fichaAnios.length-1];
