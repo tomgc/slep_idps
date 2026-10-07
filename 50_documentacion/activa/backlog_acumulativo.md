@@ -15,7 +15,7 @@
 > anteriores; un error se corrige con una entrada nueva. La numeración global es
 > permanente y no se reinicia.
 >
-> **Versión:** consolidado a v32 (2026-09-26). **Total reconciliado: 193 cambios.**
+> **Versión:** consolidado a v33 (2026-10-07). **Total reconciliado: 201 cambios.**
 
 ---
 
@@ -77,7 +77,8 @@ distinguibles que el titular pidió, no como cada commit técnico.
 | 31 | v30 | 4 | 157–160 | Opus 5 | Compuerta de repositorio ejecutada, vista histórica del panorama territorial y corrección del estado sin comparación publicada, todo desplegado |
 | 32 | v31 | 9 | 161–169 | Opus 5.5 | Cuatro pendientes menores de s31, IDPS 2025 definitivos y la ruta de interfaz (tabla del comparador, foco del modal, rótulo del estado, contraste §5.6), todo desplegado |
 | 33 | v32 | 24 | 170–193 | Opus 5.5 | pendientes de v31 cerrados, matriz de usabilidad entre motores y sus adopciones (sin red, exportación SVG y PNG, verificador, direcciones), todo desplegado |
-| **Total** | | **193** | **1–193** | | |
+| 34 | v33 | 8 | 194–201 | Opus 5.5 | Atrás y posición por vista, cabecera con el logo del servicio, fuentes de marca que cargan, gobCL Bold y verificador de fuentes, todo desplegado |
+| **Total** | | **201** | **1–201** | | |
 
 > **Nota de reconciliación A22 (sesión 14):** las sesiones 1–9 mantuvieron
 > numeración global verificable y taxonomía recalculada en cada cierre (total 83
@@ -91,7 +92,7 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 ---
 
-## Clasificación temática (actualizada a v32, sobre 193 cambios)
+## Clasificación temática (actualizada a v33, sobre 201 cambios)
 
 > Taxonomía orgánica heredada de v09 (10 categorías), con dos categorías nuevas
 > que emergen al consolidar v10–v14. Categorías mutuamente excluyentes por
@@ -100,20 +101,20 @@ distinguibles que el titular pidió, no como cada commit técnico.
 
 | Categoría | N° | % | Descripción |
 |---|---|---|---|
-| Infraestructura y scaffold | 5 | 3% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
+| Infraestructura y scaffold | 5 | 2% | Estructura canónica, stubs, git, repo remoto, orquestador run_all |
 | Gobernanza de datos | 6 | 3% | Verificación sensibilidad, decisión Rama A, depuración directorio, ignore, gitignore inventarios scratch |
 | Visualización / diseño — motor base/datos | 14 | 7% | Prototipo, motor base, nacional, GSE eje, drill-down, estética, radares, evolución, EntityModal |
-| Visualización / diseño — rediseño UI | 68 | 35% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador), lote UI directo s20 (#121–130: leyenda redundante, comunas por SLEP, nivel seleccionado, nombre completo rcard, definición estática, leyenda subdim, preliminar/significancia, comparador nombre/Territorio), s21 (#131–133: polígono GSE en el radar, texto del bloque azul, leyenda duplicada), s22 (#135–140: alto de barras, leyenda media móvil, tope comparador 4→10, color sin-diferencia, señalética sigdif temporal, etiqueta externa segmentos finos) y s23 (#142–144: anclas del indicador en una fila, etiquetas del radar sin colisión, eliminación del rótulo "Mirada integral") y s25 (#145–147: valor de la media móvil en la vista histórica, distancia vs GSE en el tooltip de indicador, señalética «·» para años históricos sin comparación publicada) |
+| Visualización / diseño — rediseño UI | 71 | 35% | Rediseño 3 pantallas, auditoría de fidelidad, lote de corrección, barras vista histórica, pestaña SLEP, rampa de niveles + separador de dimensión (P-PALETA-v2), tanda s19 de 9 ítems UI/UX del motor (#111–119: ancla GSE primaria, signo %, definición abierta, techo 100, realce año vigente, media móvil, grados por EE, modal multiselección, botón comparador), lote UI directo s20 (#121–130: leyenda redundante, comunas por SLEP, nivel seleccionado, nombre completo rcard, definición estática, leyenda subdim, preliminar/significancia, comparador nombre/Territorio), s21 (#131–133: polígono GSE en el radar, texto del bloque azul, leyenda duplicada), s22 (#135–140: alto de barras, leyenda media móvil, tope comparador 4→10, color sin-diferencia, señalética sigdif temporal, etiqueta externa segmentos finos) y s23 (#142–144: anclas del indicador en una fila, etiquetas del radar sin colisión, eliminación del rótulo "Mirada integral") y s25 (#145–147: valor de la media móvil en la vista histórica, distancia vs GSE en el tooltip de indicador, señalética «·» para años históricos sin comparación publicada) |
 | Perfilado / exploración de datos | 4 | 2% | Censo, mapa de cobertura, lectura utils madre, diagnóstico P4 |
-| Limpieza / deuda técnica | 21 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108), tokenización tipográfica a 7 tokens --fs-* (P-TIPOGRAFIA, #120, s20), jerarquía `.axis-lab.b` por peso (#134, s22, cierra REVISAR s20) |
+| Limpieza / deuda técnica | 23 | 11% | P1-P2, commits atómicos, consolidación 20_insumos, gobernanza s5, fix encoding, higiene andamios, renombrado de glosas, snapshot escáner, reorganización del directorio (P-ORG), consolidación del backlog a v16/107 (#108), tokenización tipográfica a 7 tokens --fs-* (P-TIPOGRAFIA, #120, s20), jerarquía `.axis-lab.b` por peso (#134, s22, cierra REVISAR s20) |
 | Documentación conceptual / contenido | 10 | 5% | Corpus dual IDPS, niveles por ciclo, reconciliación, serialización de textos de nivel, P-meta, texto "qué refleja un puntaje alto" por indicador (#141, s22, nivel indicador desde el corpus) |
-| Pipeline / motor (código productivo) | 10 | 5% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
-| Saneamiento / calidad de datos de presentación | 23 | 12% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
-| Deploy / publicación | 9 | 5% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
-| Verificación / auditoría (independiente) | 8 | 4% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
+| Pipeline / motor (código productivo) | 11 | 5% | Catálogos (33), lectura/normalización (34), exposición anio_traspaso (35), carga histórica 2014–2019, serie histórica server-side |
+| Saneamiento / calidad de datos de presentación | 23 | 11% | Auditoría FASE I, correcciones H1-H8, tildes, dependencia vigente, saneamiento de nombres, bugfix dedup de establecimientos por RBD (#93, s12) |
+| Deploy / publicación | 9 | 4% | Deploy Pages inicial, republicaciones, verificación byte a byte docs/, deploys s9–s14 |
+| Verificación / auditoría (independiente) | 10 | 5% | Auditoría de integración histórica, censo de valores, fidelidad censal del build, auditoría de decimales nativos |
 | Decisión / gobernanza de producto | 4 | 2% | Decisión de ponderación, decisión H-FID-2 (dependencia vigente), decisión de paleta del folleto |
 | Documentación de proyecto (suite/política) | 4 | 2% | Suite `suitedoc` (4 HTML, v14) + P-DOC-RENDER (HTML autocontenidos + tema versionado, v15) + saneamiento del paquete `suitedoc` con inlining offline integrado (#109, v17) + regeneración de la suite como 4 standalone offline y retiro de `inline_suite.R` (#110, v17) |
-| Exportación de datos | 7 | 4% | sacar del motor, como archivo, lo que la pantalla ya dibuja, para que el equipo lo abra fuera de la herramienta. Ejemplo del proyecto: #154, CSV del comparador con los filtros vigentes, en formato Excel español. Se crea porque las tres entradas no son presentación (no cambian lo que se ve) ni pipeline (no tocan el dato), y meterlas en "Visualización / diseño — rediseño UI" habría engordado la categoría que ya está en observación por umbral con entradas que no son suyas. |
+| Exportación de datos | 7 | 3% | sacar del motor, como archivo, lo que la pantalla ya dibuja, para que el equipo lo abra fuera de la herramienta. Ejemplo del proyecto: #154, CSV del comparador con los filtros vigentes, en formato Excel español. Se crea porque las tres entradas no son presentación (no cambian lo que se ve) ni pipeline (no tocan el dato), y meterlas en "Visualización / diseño — rediseño UI" habría engordado la categoría que ya está en observación por umbral con entradas que no son suyas. |
 
 > **Vista analítica de 'Rediseño UI' (no-correlativa).** La categoría supera el 25%
 > desde v21 (observación de umbral, deltas v21/v23). Esta sub-tabla desglosa sus 50
@@ -257,6 +258,16 @@ mockups y la decisión de contraste.
 - **#193** — **Vistas con dirección propia** (`#panorama`, `#ficha`, `#comparador`), con Atrás y Adelante.
 
 **NO suman:** los seis despliegues, los encargos, logs, registro y documentos de diagnóstico por separado, las reparaciones de las auditorías propias, el encargo de alineamiento redactado para `slep_categoria_desempeno` (repo distinto) y el mensaje de contexto para `slep_minuta_buenas_senales`.
+
+- **Sesión 34** (2026-09-26 / 2026-10-07): cambios **194–201** (detalle en v33 §4 y en los 4 logs `50_documentacion/andamios/logs/2026*_s34[a-d]_log.md`, más el registro `20260926_registro_asistente_s34.md`; cubre los encargos s34a a s34d, sin traspaso intermedio). Atrás y posición por vista, cabecera con el logo del servicio, fuentes de marca que cargan, gobCL Bold y verificador de fuentes, todo desplegado:
+- **#194** — **Atrás tras desplazarse, medido en el motor publicado**: vuelve a la misma vista y al mismo lugar a 1280 y 390 px, con clic y teclado; la ficha, en cambio, abría a media página. Resuelve D-5 de s33u (validación de v32, pendiente 1, en lo que toca a Atrás).
+- **#195** — **La ficha abre arriba y cada vista recupera su posición** al volver con Atrás o Adelante (`scrollRestoration` manual e identificador por entrada del historial).
+- **#196** — **Ramas remotas ya integradas borradas** (`ordenacion/20260925`, `feat/contrato-contexto-v2`). Resuelve el pendiente 6 de v32 en lo remoto.
+- **#197** — **Las fuentes de marca cargan en el sitio**: el base64 de las `@font-face` va sin saltos de línea; antes el navegador descartaba las siete reglas y la estación del titular lo tapaba con gobCL instalada.
+- **#198** — **Cabecera con el logo oficial del servicio y "Área de Monitoreo"** (opción C entre tres maquetas), con el logo sobre el título hasta 720 px.
+- **#199** — **Instrumentos de s34c guardados fuera de `/tmp`**, en `_archivo/instrumentos/s34c/` con un `LEEME.md`, sin versionar.
+- **#200** — **El verificador revisa las fuentes embebidas**: una línea por archivo que falla sin caras, con saltos o espacios en `url(data:…)` o con un base64 que no decodifica a un OpenType entero.
+- **#201** — **gobCL Bold embebida**: lo que la interfaz pide en negrita sale en la Bold y no en la Heavy; el generador se detiene si falta una fuente.
 
 
 ---
@@ -539,3 +550,14 @@ mockups y la decisión de contraste.
 - **Reclasificaciones:** ninguna.
 - **Lectura:** La exportación de datos pasa de categoría marginal (3 entradas) a la que más crece junto con rediseño UI (+4 y +7), y verificación y pipeline suman dos cada una; rediseño UI sigue sobre el 25 %, pero por primera vez la sesión reparte su peso entre presentación, exportación e infraestructura del motor.
 - **Verificación de cuadre (cuatro totales):** suma de la columna N° de la tabla temática = **193** (5+6+14+68+4+21+10+10+23+9+8+4+4+7); correlativo global (detalle cronológico, último #193) = **193**; fila Total del resumen estadístico = **193**; encabezado del archivo = v32/**193**. Los cuatro cuadran. Suma de porcentajes redondeados: 100%.
+
+## Delta del backlog (consolidación v33)
+
+> Integra **s34** (sesión 34; cuatro encargos autónomos s34a a s34d bajo un solo traspaso, v33, sin traspaso intermedio). Verificado contra el detalle cronológico (último #193 a v32). Quinto cierre instrumentado del repositorio (`cierre_sesion_autonomo_cc_v16.md`).
+
+- **s34: +8 entradas** (194–201). Foco: Atrás y posición por vista, cabecera con el logo del servicio, fuentes de marca que cargan, gobCL Bold y verificador de fuentes, todo desplegado. Total 193 → **201**.
+- **Clasificación (reparto de autoría):** #194 → "Verificación / auditoría (independiente)"; #195 → "Visualización / diseño — rediseño UI"; #196 → "Limpieza / deuda técnica"; #197 → "Pipeline / motor (código productivo)"; #198 → "Visualización / diseño — rediseño UI"; #199 → "Limpieza / deuda técnica"; #200 → "Verificación / auditoría (independiente)"; #201 → "Visualización / diseño — rediseño UI". "Verificación / auditoría (independiente)" 8 → **10**; "Visualización / diseño — rediseño UI" 68 → **71**; "Limpieza / deuda técnica" 21 → **23**; "Pipeline / motor (código productivo)" 10 → **11**.
+- **Categorías nuevas:** ninguna.
+- **Reclasificaciones:** ninguna.
+- **Lectura:** La sesión empieza validando y termina en identidad visual; el hallazgo de más peso (fuentes que nunca cargaron) salió de medir un cambio estético, y quedó cubierto por el verificador para que no vuelva.
+- **Verificación de cuadre (cuatro totales):** suma de la columna N° de la tabla temática = **201** (5+6+14+71+4+23+10+11+23+9+10+4+4+7); correlativo global (detalle cronológico, último #201) = **201**; fila Total del resumen estadístico = **201**; encabezado del archivo = v33/**201**. Los cuatro cuadran. Suma de porcentajes redondeados: 97%.
