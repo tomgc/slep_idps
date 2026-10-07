@@ -562,7 +562,10 @@ fuentes <- list(
 )
 fonts_css <- vapply(fuentes, function(ft) {
   ruta <- fs::path(font_dir, ft$f)
-  b64 <- jsonlite::base64_enc(readBin(ruta, "raw", n = file.info(ruta)$size))
+  # s34c: base64 sin saltos de linea, como el dato (bloque 4). Un url() sin comillas no
+  # admite espacios ni saltos: el navegador descartaba las 7 reglas y el motor nunca cargo
+  # gobCL ni Museo Sans desde su origen.
+  b64 <- gsub("\n", "", jsonlite::base64_enc(readBin(ruta, "raw", n = file.info(ruta)$size)), fixed = TRUE)
   sprintf("@font-face{font-family:'%s';font-weight:%d;font-style:normal;font-display:swap;src:url(data:font/otf;base64,%s) format('opentype');}",
           ft$fam, ft$w, b64)
 }, character(1)) |> paste(collapse = "\n")
