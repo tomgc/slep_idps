@@ -456,7 +456,7 @@ las dos copias están en `.gitignore` (líneas 66 y 67), así que el cambio no e
 | F4 I1 | BLOQUEA | pasa |
 | F4 I2 | BLOQUEA | pasa (30 filas de datos suman 201) |
 | F4 I2bis | BLOQUEA | pasa (N = 201; 194–201 una vez cada una; sin N < 0; % ver advertencia) |
-| F4 I2bis, suma de % | ADVIERTE | advertencia: los % redondeados de las 14 filas suman 97 (no 100); redondeo simple de la tabla, 8 de 14 filas caen por debajo de .5 (Infraestructura 2,49; Pipeline 5,47; Deploy 4,48; Exportación 3,48; entre otras). La tabla declara que la suma puede no dar 100; el delta lo dice |
+| F4 I2bis, suma de % | ADVIERTE | advertencia: los % redondeados de las 14 filas suman 97 (no 100); redondeo simple de la tabla, 7 de 14 filas redondean hacia abajo con fracción cercana a .5 (Infraestructura 2,49; Pipeline 5,47; Deploy 4,48; Exportación 3,48; Limpieza y Saneamiento 11,44; Rediseño UI 35,32). La tabla declara que la suma puede no dar 100; el delta lo dice |
 | F4 I3 | BLOQUEA | pasa (29 + 1 = 30) |
 | F4 I4 | ADVIERTE | advertencia: apariciones de magnitudes viejas, todas clasificadas históricas (abajo) |
 | F4 I5 | ADVIERTE | advertencia: el TRASPASO §5 dice "8 entradas nuevas (194–201, numeración provisional)" (autoría; se lista, no se reescribe) |
