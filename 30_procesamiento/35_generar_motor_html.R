@@ -554,6 +554,9 @@ font_dir <- here::here("50_documentacion", "andamios", "diseno", "motor_idps", "
 fuentes <- list(
   list(fam = "gobCL", w = 300, f = "gobCL_Light.otf"),
   list(fam = "gobCL", w = 400, f = "gobCL_Regular.otf"),
+  # s34d: gobCL Bold. La plantilla pide 700 (--fw-bold) en las negritas; sin esta cara caian en la
+  # Heavy (800). Vive en 10_utils/fuentes/ (el andamio de diseno esta congelado): `dir` la ubica.
+  list(fam = "gobCL", w = 700, f = "gobCL_Bold.otf", dir = here::here("10_utils", "fuentes")),
   list(fam = "gobCL", w = 800, f = "gobCL_Heavy.otf"),
   list(fam = "Museo Sans", w = 100, f = "MuseoSans-100.otf"),
   list(fam = "Museo Sans", w = 300, f = "MuseoSans-300.otf"),
@@ -561,7 +564,8 @@ fuentes <- list(
   list(fam = "Museo Sans", w = 700, f = "MuseoSans_700.otf")
 )
 fonts_css <- vapply(fuentes, function(ft) {
-  ruta <- fs::path(font_dir, ft$f)
+  ruta <- fs::path(if (is.null(ft$dir)) font_dir else ft$dir, ft$f)
+  if (!file.exists(ruta)) stop("Falta la fuente: ", ruta)
   # s34c: base64 sin saltos de linea, como el dato (bloque 4). Un url() sin comillas no
   # admite espacios ni saltos: el navegador descartaba las 7 reglas y el motor nunca cargo
   # gobCL ni Museo Sans desde su origen.
