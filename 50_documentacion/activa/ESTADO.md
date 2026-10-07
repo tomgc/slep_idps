@@ -3,21 +3,21 @@ slug: slep_idps
 nombre_real: Motor de comparación interactivo de los Indicadores de Desarrollo Personal y Social (IDPS)
 categoria: activo
 semaforo: activo
-sesion_actual: v32
-ultima_actividad: 2026-09-26
+sesion_actual: v33
+ultima_actividad: 2026-10-07
 maneja_sensibles: false
 tipo_pendiente: nuevo
-sesion_abierta: true
+sesion_abierta: false
 maquina: MacBook-Pro-de-Tomas.local
-commit_cierre: b809f97
-traspaso_vigente: traspaso_cierre_v32.md
+commit_cierre: 152d9e3
+traspaso_vigente: traspaso_cierre_v33.md
 cierre_incompleto: no
-insumos_verificados: 2026-09-26
+insumos_verificados: 2026-10-07
 ventana_insumos: ./20_insumos
 ---
 ## En que vamos
-La sesión 33 cerró los pendientes de v31, midió el motor contra sus dos hermanos y adoptó lo que faltaba: abre sin red, exporta el comparador y el panorama en SVG y PNG desde un trazado único, imprime limpio, marca la base pequeña, tiene vistas con dirección propia y un verificador versionado del dato (`tests/verificar_motor.R`). Todo quedó desplegado en `docs/index.html` (md5 `c5542b20…`).
+La sesión 34 validó Atrás tras desplazarse, hizo que la ficha abra arriba y que cada vista recupere su posición, puso el logo oficial del servicio con "Área de Monitoreo" en la cabecera, reparó las fuentes de marca (nunca habían cargado), embebió gobCL Bold y sumó al verificador una línea de fuentes. Todo quedó desplegado en `docs/index.html` (md5 `c1cd87cb…`).
 ## Proximo paso
-Validar en equipos del Área lo publicado: exportaciones SVG y PNG en PowerPoint, impresión, CSV en Excel, Windows y Atrás tras desplazarse.
+Validar en Safari de iPhone y en Windows lo publicado y decidir las dudas abiertas de s34; la cabecera de los hermanos corre en sus propias sesiones.
 ## Bloqueantes
 - ninguno
