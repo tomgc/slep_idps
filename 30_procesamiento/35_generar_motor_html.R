@@ -675,12 +675,16 @@ message("[5] Plantilla, D3, pako y dependencias vendorizadas...")
 plantilla_path <- here::here("30_procesamiento", "35_motor_template.html")
 d3_path   <- here::here("10_utils", "d3.min.js")
 pako_path <- here::here("10_utils", "pako.min.js")
-for (p in c(plantilla_path, d3_path, pako_path)) if (!file.exists(p)) stop("Falta: ", p)
+logo_path <- here::here("10_utils", "logo_slep_cc_crema.png")
+for (p in c(plantilla_path, d3_path, pako_path, logo_path)) if (!file.exists(p)) stop("Falta: ", p)
 plantilla <- paste(readLines(plantilla_path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
 d3_code   <- paste(readLines(d3_path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
 pako_code <- paste(readLines(pako_path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
+# s34c: logo de la cabecera (opcion C) en linea como data URI; base64 sin saltos de linea,
+# como las fuentes.
+logo_b64  <- gsub("\n", "", jsonlite::base64_enc(readBin(logo_path, "raw", n = file.info(logo_path)$size)), fixed = TRUE)
 for (ph in c("__FONTS_CSS__", "__D3_INLINE__", "__PAKO_INLINE__", "__JSON_DATA__",
-             "__REACT_INLINE__", "__REACTDOM_INLINE__"))
+             "__REACT_INLINE__", "__REACTDOM_INLINE__", "__LOGO_CABECERA__"))
   if (!grepl(ph, plantilla, fixed = TRUE)) stop("La plantilla no contiene ", ph)
 
 invisible(lapply(VENDOR_JS, verificar_vendor))
@@ -715,6 +719,7 @@ html <- sub("__PAKO_INLINE__", pako_code, html,      fixed = TRUE)
 html <- sub("__JSON_DATA__",   json_b64,  html,      fixed = TRUE)
 html <- reemplazar_literal(html, "__REACT_INLINE__",    react_code)
 html <- reemplazar_literal(html, "__REACTDOM_INLINE__", reactdom_code)
+html <- reemplazar_literal(html, "__LOGO_CABECERA__",   logo_b64)
 
 ruta_salida <- here::here("40_salidas", "motor_idps.html")
 con <- file(ruta_salida, open = "wb", encoding = "UTF-8")
