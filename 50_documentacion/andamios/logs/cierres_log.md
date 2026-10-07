@@ -412,3 +412,107 @@ I4 — apariciones de magnitudes viejas (`169`, `v31`, `Sesión 32`, `61/…`), 
 - hash de documentación: `cbbd893` — `docs(cierre): traspaso v32 y backlog de sesion` — 7 rutas: `traspasos/traspaso_cierre_v32.md` (nuevo), `traspasos/archivo/traspaso_cierre_v31.md` (`git mv`), `activa/backlog_acumulativo.md`, `estructura/` (snapshot `20260926_094323_estructura.{md,txt}` nuevo, aliases `estructura_actual.{md,txt}`, poda de `20260925_134519_estructura.{md,txt}`; escáner: 34 carpetas, 393 archivos).
 - Escáner: `Rscript 00_escanear_proyecto.R`, exit 0.
 - push: por publicar (al final de F9, junto con el commit del log y el de estado).
+
+## v33 — 2026-10-07
+
+Instrumento: cierre_sesion_autonomo_cc_v16.md | kit 344bb39
+
+**F0.0.** kit: sincronizado (`fetch` + `merge --ff-only`, sin trackeados sucios; lo hizo el PASO A
+de `/cierre` y se reutiliza). normativos: actualizados desde el kit (POLITICA 5.8 → 5.9; SETTINGS v38 → v39);
+las dos copias están en `.gitignore` (líneas 66 y 67), así que el cambio no entra a ningún commit.
+
+### Tabla de severidades
+
+| condicion | severidad | resultado |
+|---|---|---|
+| F0.0 kit sincronizado | ADVIERTE | pasa |
+| F0.0 normativos (kit más nuevo que `activa/`) | REPARA | reparada: POLITICA 5.8 → 5.9 y SETTINGS v38 → v39 copiados desde el kit a `activa/` en F6 (ignorados por git; no van al commit) |
+| F0.0 normativo del proyecto más nuevo que el kit | BLOQUEA | pasa |
+| F0.1 `.git` y `traspasos/` | BLOQUEA | pasa |
+| F0.2 un solo paquete; cuatro delimitadores; cero placeholders | BLOQUEA | pasa (`paquete_cierre_v33.md`) |
+| F0.2 campo derivado con valor | ADVIERTE | pasa (ninguno) |
+| F0.3 `raiz_proyecto` = `pwd` | BLOQUEA | pasa |
+| F0.4 correlativo triple (v33 = paquete = máx v32 + 1) | BLOQUEA | pasa |
+| F0.5 `n` = `backlog_entradas_nuevas` | BLOQUEA | pasa (8 = 8; patrón de entrada `- **#[0-9]+** —`) |
+| F0.5 numeración provisional contigua | BLOQUEA | pasa (194→201) |
+| F0.5 desplazamiento `k` | REPARA | no aplica: `U` = 193, `k` = 0 |
+| F0.5 `sesion_nueva` = última en disco + 1 | ADVIERTE | pasa (34 = 33 + 1) |
+| F0.5 `fecha_cierre` = fecha de la máquina | ADVIERTE | pasa (2026-10-07) |
+| F0.5 referencias cruzadas al rango provisional | ADVIERTE | no aplica (`k` = 0) |
+| F0.5 `sello_escaner`, `escaner` | BLOQUEA | pasa (`regenerar`; `00_escanear_proyecto.R`) |
+| F0.5 `push_autorizado` | BLOQUEA | pasa (`si`) |
+| F0.5bis `reparto` (8 líneas = provisionales; categorías; control positivo) | BLOQUEA | pasa: 194,200 → Verificación / auditoría (independiente); 195,198,201 → Visualización / diseño — rediseño UI; 196,199 → Limpieza / deuda técnica; 197 → Pipeline / motor (código productivo); las 4 existen en disco |
+| F0.5ter `recuento_tematico: vigente` | REPARA | no aplica; medido: suma N en disco 193 = `U` |
+| F0.6 `settings_version` = kit | BLOQUEA | pasa (línea íntegra de v39; el paquete se reemitió contra el kit tras el bloqueo del primer intento, registrado en el traspaso §15 fila 8) |
+| F0.6 `compuerta_dudas: 3 registradas` | BLOQUEA | pasa (sección presente, 3 filas) |
+| F0.7 árbol limpio en lo que el cierre escribe | BLOQUEA | pasa |
+| F0.7bis sucio fuera (lista para F7.1) | BLOQUEA | pasa; lista vacía: árbol limpio salvo el propio paquete |
+| F0.8 `commit_cierre` y `maquina` = `<<EJECUTOR>>` | BLOQUEA | pasa |
+| F2 encabezados estructurales únicos | BLOQUEA | pasa: `Detalle cronológico`, `Resumen estadístico por sesión`, `Clasificación temática` 1 vez cada uno; `Delta del backlog`: criterio de v29–v32 (sección nueva `## Delta del backlog (consolidación v33)`, misma grafía que las 12 anteriores) |
+| F2 fila del resumen | REPARA | reparada: compuesta por el ejecutor antes de `**Total**`: `\| 34 \| v33 \| 8 \| 194–201 \| Opus 5.5 \| … \|`; Total 193 → 201, `1–193` → `1–201`; Modelo según "Modo real" de los logs s34b, s34c y s34d |
+| F2 encabezado de sesión | REPARA | reparada: compuesto desde la grafía de la Sesión 33: `- **Sesión 34** (2026-09-26 / 2026-10-07): cambios **194–201** (detalle en v33 §4 y en los 4 logs …). <foco>:` |
+| F3 catálogo aplicable sin disparo | ADVIERTE | pasa (R1, R11, R12 dispararon) |
+| F3 cifras sin rótulo | ADVIERTE | pasa (ninguna nueva) |
+| F4 I1 | BLOQUEA | pasa |
+| F4 I2 | BLOQUEA | pasa (30 filas de datos suman 201) |
+| F4 I2bis | BLOQUEA | pasa (N = 201; 194–201 una vez cada una; sin N < 0; % ver advertencia) |
+| F4 I2bis, suma de % | ADVIERTE | advertencia: los % redondeados de las 14 filas suman 97 (no 100); redondeo simple de la tabla, 8 de 14 filas caen por debajo de .5 (Infraestructura 2,49; Pipeline 5,47; Deploy 4,48; Exportación 3,48; entre otras). La tabla declara que la suma puede no dar 100; el delta lo dice |
+| F4 I3 | BLOQUEA | pasa (29 + 1 = 30) |
+| F4 I4 | ADVIERTE | advertencia: apariciones de magnitudes viejas, todas clasificadas históricas (abajo) |
+| F4 I5 | ADVIERTE | advertencia: el TRASPASO §5 dice "8 entradas nuevas (194–201, numeración provisional)" (autoría; se lista, no se reescribe) |
+| F4 I6 | BLOQUEA | pasa (0 RUT, 0 OneDrive, 0 credenciales, 0 coautoría, 0 placeholders vivos; también sobre el diff staged de F7.2) |
+| F4 I7 | BLOQUEA | pasa (tras archivar v32, un solo vigente: v33) |
+| F4.1 IE1 ningún archivo de encargo fuera de un expediente | — | informativo: 144 (legado sin migrar; `encargos/` no existe) |
+| F4.1 IE2 fichas válidas | — | informativo: fichas: 0 \| validas: 0 \| invalidas: 0 \| interrumpidas: 0 (script presente; ningún `50_log.md` versionado) |
+| F4.1 IE3 índice de encargos | — | informativo: no corre (el proyecto no adoptó el expediente: ningún `50_encargo.md`) |
+| F4.1 IE4 raíz de `andamios/` sin archivos de encargo | — | informativo: 0 |
+| F7.1 trabajo de la sesión | BLOQUEA | no aplica: lista de F0.7bis vacía |
+| F7.2 staging sin rutas excluidas | BLOQUEA | pasa: 7 rutas (traspaso nuevo, traspaso archivado, backlog, 4 del escáner); sin `ESTADO.md`, sin el paquete, sin normativos (ignorados) |
+| F8 distribución | BLOQUEA | pasa (TRASPASO y ESTADO con marcadores idénticos al bloque; BACKLOG_ENTRADAS byte a byte, `k` = 0); paquete eliminado |
+
+renumeracion: sin desplazamiento (`U` = 193; provisionales 194→201; `k` = 0).
+
+### Rótulos (F3) — disparos de este cierre = catálogo aplicable del siguiente
+
+| ID | rótulo | disparos | resultado |
+|---|---|---|---|
+| R1 | encabezado: "Total reconciliado: N cambios" | 1 | 193 → 201 |
+| R11 | encabezado: "consolidado a vNN (fecha)" | 1 | v32 (2026-09-26) → v33 (2026-10-07) |
+| R12 | título y tabla de Clasificación temática | 9 | título "actualizada a v33, sobre 201 cambios"; 8 filas con N y/o % recalculados |
+| catálogo no aplicable (cero disparos) | R2, R3, R4, R5, R6, R7, R8, R9, R10, R13 | (10 de 13) | sin cambio respecto del cierre anterior |
+
+cifra sin rotulo: ninguna nueva (las mismas cifras históricas legítimas de v14–v32, sin tocar).
+
+### Invariantes (F4)
+
+I1 pasa (148–201 contiguos sin duplicados en la grafía vigente; 54 entradas; 1–147 verificados en cierres previos) · I2 pasa (201) · I2bis pasa (N 201; % suman 97, advertencia) · I3 pasa (30) · I4 advertencia · I5 advertencia · I6 pasa · I7 pasa.
+
+I4 — apariciones de magnitudes viejas (`193`, `v32`, `Sesión 33`), todas clasificadas históricas legítimas: fila v32 del Resumen; bullet de la Sesión 33 del Detalle (incluido "#193" y su rango 170–193); sección `Delta del backlog (consolidación v32)` entera (append-only); las referencias a "v32" dentro de las entradas #194 y #196 (autoría: "validación de v32", "pendiente 6 de v32"); y las citas deliberadas dentro del delta v33 nuevo ("Total 193 → 201", "último #193 a v32", "68 → 71", "21 → 23", "10 → 11", "8 → 10"), que son el "antes" del cuadre.
+
+### Clasificación temática resultante (recuento vigente)
+
+| Categoría | N° | % |
+|---|---|---|
+| Infraestructura y scaffold | 5 | 2% |
+| Gobernanza de datos | 6 | 3% |
+| Visualización / diseño — motor base/datos | 14 | 7% |
+| Visualización / diseño — rediseño UI | 71 | 35% |
+| Perfilado / exploración de datos | 4 | 2% |
+| Limpieza / deuda técnica | 23 | 11% |
+| Documentación conceptual / contenido | 10 | 5% |
+| Pipeline / motor (código productivo) | 11 | 5% |
+| Saneamiento / calidad de datos de presentación | 23 | 11% |
+| Deploy / publicación | 9 | 4% |
+| Verificación / auditoría (independiente) | 10 | 5% |
+| Decisión / gobernanza de producto | 4 | 2% |
+| Documentación de proyecto (suite/política) | 4 | 2% |
+| Exportación de datos | 7 | 3% |
+| **Suma** | **201** | 97% (redondeo simple) |
+
+### Commits
+
+- hash de trabajo: ninguno (árbol limpio salvo el paquete al abrir el cierre; F0.7bis dio lista vacía).
+- hash de documentación: `2b4d71f` — `docs(cierre): traspaso v33 y backlog de sesion` — 7 rutas: `traspasos/traspaso_cierre_v33.md` (nuevo), `traspasos/archivo/traspaso_cierre_v32.md` (`git mv`), `activa/backlog_acumulativo.md`, `estructura/` (snapshot `20261007_162750_estructura.{md,txt}` nuevo, aliases `estructura_actual.{md,txt}`, poda de `20260925_150524_estructura.{md,txt}`; escáner: 36 carpetas, 405 archivos).
+- Escáner: `Rscript 00_escanear_proyecto.R`, exit 0.
+- Expediente de encargo: `encargos: legado sin migrar (144 archivos fuera de encargos/)`.
+- push: por publicar (al final de F9, junto con el commit del log y el de estado).
