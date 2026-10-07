@@ -78,7 +78,22 @@ __FONTS_CSS__
   /* Header tipo handout (revision P3): el H1 LIDERA con "Motor IDPS"; eyebrow de
      contexto bajo el titulo y un parrafo lede. Acento coral (borde inferior). */
   header.app{background:var(--azul);color:var(--cream);padding:34px 28px 30px;border-bottom:4px solid var(--coral);}
-  .app-header-inner{max-width:1200px;margin:0 auto;}
+  .app-header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:stretch;gap:44px;}
+  /* s34c: cabecera con logo (opcion C, "columna con divisor", aprobada por el titular en la sesion 34). El texto
+     de siempre a la izquierda; a la derecha la marca del servicio (logo oficial con las letras en --cream, en
+     linea como data URI desde 10_utils/) y "Area de Monitoreo", separada por un divisor --cream al 22 %
+     (rgba(255,246,224,.22): --cream con transparencia, no un color nuevo). Hasta 720 px la marca sube sobre el
+     titulo, sin divisor. */
+  .app-header-texto{flex:1 1 auto;min-width:0;}
+  .app-marca{flex:0 0 auto;padding-left:44px;border-left:1px solid rgba(255,246,224,.22);display:flex;flex-direction:column;justify-content:center;}
+  .app-marca img{width:196px;height:auto;display:block;}
+  .app-marca-area{margin-top:12px;font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:16px;color:var(--cream);white-space:nowrap;}
+  @media (max-width:720px){
+    .app-header-inner{flex-direction:column;gap:20px;}
+    .app-marca{order:-1;padding:0;border:0;}
+    .app-marca img{width:150px;}
+    .app-marca-area{font-size:13px;margin-top:8px;}
+  }
   .app-title{font-family:var(--font-display);font-weight:var(--fw-heavy);font-size:clamp(30px,4.2vw,48px);letter-spacing:-.01em;color:var(--cream);line-height:1.04;margin:0;}
   .app-title-sub{font-family:var(--font-display);font-weight:var(--fw-regular);font-size:inherit;color:var(--cream);opacity:.78;letter-spacing:0;}
   .app-eyebrow{font-family:var(--font-body);color:var(--cream);opacity:.62;margin:12px 0 0;font-size:clamp(13px,1.5vw,16px);line-height:1.5;letter-spacing:.01em;font-weight:var(--fw-regular);}
@@ -808,9 +823,15 @@ __FONTS_CSS__
 <body>
   <header class="app">
     <div class="app-header-inner">
+      <div class="app-header-texto">
       <h1 class="app-title">Motor IDPS<span class="app-title-sub"> — Indicadores de Desarrollo Personal y Social</span></h1>
       <p class="app-eyebrow">Datos <span id="cob-anios">2022–2025</span> · Lectura por establecimiento, segmentada por grupo socioeconómico (GSE) · Agencia de Calidad de la Educación</p>
       <p class="app-desc">Esta herramienta de análisis interno del <strong>SLEP Costa Central</strong> permite leer los <strong>Indicadores de Desarrollo Personal y Social</strong> (IDPS) de la Agencia de Calidad de la Educación, establecimiento por establecimiento y para cualquier territorio del país. Cada cifra se interpreta por su <strong>desvío respecto de su grupo socioeconómico (GSE)</strong> y su <strong>variación respecto de la evaluación anterior</strong>, ambas con su significancia estadística. La unidad es el establecimiento individual: <strong>nunca se promedia ni se agrega</strong>.</p>
+      </div>
+      <div class="app-marca" role="img" aria-label="Servicio Local de Educación Pública Costa Central, Área de Monitoreo">
+        <img src="data:image/png;base64,__LOGO_CABECERA__" alt="" width="196" height="90">
+        <div class="app-marca-area">Área de Monitoreo</div>
+      </div>
     </div>
   </header>
   <div id="root"></div>
