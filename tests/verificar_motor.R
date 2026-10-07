@@ -23,7 +23,10 @@
 #         comparación válida (sigdifgru nulo);
 #   (iii) que no pide nada a la red al abrirse: 0 `src="http`, 0 `href="http` y 0
 #         `text/babel`;
-# y, informativo, (iv) si los dos primeros archivos son el mismo (antes de desplegar
+#   (iv)  las fuentes embebidas (s34d): al menos una regla @font-face, ninguna con espacios
+#         o saltos dentro de su url(data:…) y todas con un OpenType entero (firma válida y
+#         directorio de tablas dentro del archivo) al decodificar su base64;
+# y, informativo, (v) si los dos primeros archivos son el mismo (antes de desplegar
 # difieren a propósito: eso no es falla).
 #
 # Qué no verifica: la pantalla, las exportaciones, la navegación, las dimensiones, los
@@ -92,6 +95,17 @@ for (r in rutas) {
   }
   red <- contar_red(html)
   informar(all(red == 0L), sprintf("%s · red: %d src=\"http, %d href=\"http, %d text/babel", e, red[[1]], red[[2]], red[[3]]))
+  # s34c: desde su origen el motor no cargó sus fuentes (saltos de línea dentro de url()) y nada
+  # lo detectó; desde s34d (s34d: gobCL Bold) cada @font-face se revisa aquí.
+  fu <- revisar_fuentes(html)
+  informar(fu$n_caras > 0L && fu$n_con_espacio == 0L && fu$n_firma_invalida == 0L,
+           sprintf("%s · fuentes: %d caras, %d con salto o espacio, %d con firma inválida",
+                   e, fu$n_caras, fu$n_con_espacio, fu$n_firma_invalida))
+  for (k in which(fu$detalle$con_espacio | !fu$detalle$firma_ok)) {
+    x <- fu$detalle[k, ]
+    cat(sprintf("        cara %s %s: %s\n", x$familia, x$peso,
+                paste(c("salto o espacio en url()", "firma inválida")[c(x$con_espacio, !x$firma_ok)], collapse = ", ")))
+  }
 }
 
 if (length(rutas) >= 2L && all(file.exists(rutas[1:2]))) {

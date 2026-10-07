@@ -50,6 +50,48 @@ contar_red <- function(html) {
   vapply(marcas, \(x) lengths(regmatches(html, gregexpr(x, html, fixed = TRUE, useBytes = TRUE))), integer(1))
 }
 
+# Firmas de un archivo OpenType (los cuatro primeros bytes): CFF, TrueType y TrueType de Apple.
+FIRMAS_OPENTYPE <- list(charToRaw("OTTO"), as.raw(c(0x00, 0x01, 0x00, 0x00)), charToRaw("true"))
+
+# TRUE si los bytes son un archivo OpenType entero: firma válida y un directorio de tablas
+# que cabe en el archivo (un base64 truncado deja tablas fuera aunque conserve la firma).
+opentype_entero <- function(b) {
+  if (length(b) < 12L) return(FALSE)
+  if (!any(vapply(FIRMAS_OPENTYPE, \(f) identical(b[1:4], f), logical(1)))) return(FALSE)
+  u16 <- \(i) as.integer(b[i]) * 256L + as.integer(b[i + 1L])
+  u32 <- \(i) ((as.numeric(b[i]) * 256 + as.numeric(b[i + 1L])) * 256 + as.numeric(b[i + 2L])) * 256 + as.numeric(b[i + 3L])
+  n_tablas <- u16(5L)
+  if (n_tablas == 0L || length(b) < 12L + 16L * n_tablas) return(FALSE)
+  # Cada registro: etiqueta, suma, desplazamiento y largo (4 bytes cada uno), desde el byte 13.
+  fin <- vapply(seq_len(n_tablas) - 1L, \(k) { p <- 13L + 16L * k; u32(p + 8L) + u32(p + 12L) }, numeric(1))
+  all(fin <= length(b))
+}
+
+# Fuentes embebidas del motor (s34c: las 7 reglas @font-face llevaban saltos de línea dentro de
+# un url(data:…) sin comillas; el navegador las descartaba y el motor nunca cargó sus fuentes sin
+# que nada lo notara). Por cada regla @font-face del HTML: familia, peso, si su url(data:…) lleva
+# espacios o saltos, y si el base64 (sin esos espacios) decodifica a un OpenType entero. Devuelve
+# los conteos y el detalle por cara; nunca el base64.
+revisar_fuentes <- function(html) {
+  reglas <- regmatches(html, gregexpr("@font-face\\{[^}]*\\}", html, useBytes = TRUE))[[1]]
+  campo <- function(r, patron) {
+    m <- regmatches(r, regexec(patron, r, useBytes = TRUE))[[1]]
+    if (length(m) < 2L) NA_character_ else m[2]
+  }
+  detalle <- data.frame(familia = character(0), peso = character(0), con_espacio = logical(0), firma_ok = logical(0))
+  for (r in reglas) {
+    b64 <- campo(r, "url\\(data:[^,)]*,([^)]*)\\)")
+    bytes <- if (is.na(b64)) raw(0) else
+      tryCatch(jsonlite::base64_dec(gsub("[[:space:]]", "", b64, useBytes = TRUE)), error = \(e) raw(0))
+    detalle[nrow(detalle) + 1L, ] <- list(campo(r, "font-family:[[:space:]]*['\"]?([^;'\"]+)"),
+                                          campo(r, "font-weight:[[:space:]]*([0-9]+)"),
+                                          !is.na(b64) && grepl("[[:space:]]", b64, useBytes = TRUE),
+                                          opentype_entero(bytes))
+  }
+  list(n_caras = nrow(detalle), n_con_espacio = sum(detalle$con_espacio), n_firma_invalida = sum(!detalle$firma_ok),
+       detalle = detalle)
+}
+
 # Filas de indicador del parquet que alimentan el motor (mismo universo que el
 # generador: familia "indicador", niveles del motor, RBD no nulo).
 leer_indicadores <- function(ruta_parquet) {
